@@ -2114,7 +2114,7 @@ checklist at 210, with the same stamps.
      `builder-clojure` image (or `PROBE_GRADER_IMAGE`), since a run with no image now halts
      before grading.
 
-## Spec round 21 (2026-11-14, draft)
+## Spec round 21 (2026-11-14)
 
 Cycle 14 of slice 06 (`06-c14`, spec 69ea324 plus the checklist-source correction 81d9f83)
 passed its gate on attempt 1 and scored 59/61. Against cycle 13, `06-066` newly passed;

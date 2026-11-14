@@ -14,7 +14,7 @@ cycle-preparation) are inside it. They are never built or launched on their own.
 |---|---|
 | `.pi/spec/cycle-runner/` (also `.pi/plan/06-cycle-runner/`) | The spec under grade: `spec.feature` (the stamped scenarios), `seam.md` (how a grader drives it), `event-model/`, `allium/`, `domain-design.md` |
 | `.pi/spec/<context>/seam.md`, `event-model/` | The seams and event models of the five contexts. Their methods are methods of the same candidate, on its one store. The one event model is every context's `event-model/` |
-| `.pi/spec/decisions.md` | The decisions record: readings of the spec. Round 20 is the last section |
+| `.pi/spec/decisions.md` | The decisions record: readings of the spec. Round 21 is the last section |
 | `checklist.txt` | The item ids, one per line, in file order: your denominator |
 | `harness-impl/06-cycle-runner/` | The gated candidate (a copy). `start.sh` boots it on its JSON-RPC stdio seam. `test.sh` runs its own suite. It carries its own copy of the event models |
 | `harness/v2/event_store_check.clj` (+ `event-store-check.sh`, `deps.edn`) | Reference only: how the gate reads a Grain SQLite store with Grain's own reader. Reuse its reading code to inspect a store |
