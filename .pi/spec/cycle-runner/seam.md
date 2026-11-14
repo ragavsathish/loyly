@@ -507,6 +507,12 @@ again to recover it. At ORC's pin a `repl-researcher` in flight is not resumed (
 `runtime.clj` resumes leaves only); a run stopped while grading is a known gap, until ORC resumes
 researcher nodes.
 
+Before resuming a pending run, the runner recreates ORC's live model provider from that run's
+`handed-in` model endpoint and names on the blackboard. The resumed tick can reach `render`,
+`drive-seam` or `judge` without another `start-run`, and each must have its provider. Provider
+registration is a process setup effect, not a new run effect or a new reading of the host's
+current `LOYLY_*` variables.
+
 ## Handed in
 
 Read when `start-run` runs, never only at boot, so a grader changes them between runs.

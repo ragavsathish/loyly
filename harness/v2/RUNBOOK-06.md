@@ -1,13 +1,13 @@
-# Runbook: a cycle of slice 06 (the new harness), built and graded by Claude Code
+# Runbook: a cycle of slice 06 (the new harness)
 
 How cycles 13 onward of slice 06 (`cycle-runner`, the one ORC tree `cycle.v1`) are run
-(`.pi/spec/decisions.md`, "Spec round 19" 4). The builder is a fresh Claude Code subagent (Opus)
-on the host and the grader a fresh Claude Code subagent (Sonnet) on the host: no pi in the
-legacy loop. Cycle 13 is the worked example: gate passed on attempt 1, 60/61
-(`harness/v2/cycles/06/13/`, commit `1d5020f`).
+(`.pi/spec/decisions.md`, "Spec round 19" 4). The builder and grader are fresh subagents on
+the host, on different models (ADR 0003): no pi in the legacy loop. Cycle 13 used Claude
+Opus and Sonnet; cycle 14 used Codex gpt-6.1-sol and gpt-6.1-terra. Cycle 14's gate passed on
+attempt 1 and scored 59/61 (`harness/v2/cycles/06/14/`, commit `8e3a354`).
 
 Run every command from the repository root. `STATE=.pi/harness/.state`. `NN=06`. `MM` is the
-cycle number (next: `14`).
+cycle number (next: `15`).
 
 ## 0. Once per machine
 
@@ -27,22 +27,20 @@ cycle number (next: `14`).
 
 The fence clones HEAD, so the spec the builder reads must be committed.
 
-1. `git status` / `git diff`: review the round. Round 20 (committed `69ea324`, 2026-11-14; the next
-   cycle, 14, builds on it) covers: the researcher's shell in a Gondolin VM the runner starts
-   (`LOYLY_GRADER_IMAGE`, @item-06-066 wording replaced), the harness digest's self-check
-   command read as handed in, readings for 013 and 071, the builder's open choices, and the
-   harness edits (`prompt.clj` host wording, `grader-instruction-06.md` host machine section and
-   a temp folder for 062).
+1. `git status` / `git diff`: review the round. Round 21 (draft, 2026-11-14) clarifies the
+   model provider registration before resume (`06-070`), replaces the untestable Given of
+   `06-026`, and pins the reachable ORC revision. The exact slice-06 selection needs the
+   operator's approval before fencing.
 2. Check the item count is unchanged (210; slice 06 at 61):
    `grep -c '@item-06-' .pi/spec/cycle-runner/spec.feature`
 3. Commit and push:
-   `git add -A .pi/spec harness .pi/harness/grader-instruction-06.md tools/spec/views/dist`
-   `git commit -m "Spec round 20: ..."` then `git push scope-impact spec-v2`.
+   `git add -A .pi/spec harness .pi/harness/grader-instruction-06.md orc tools/spec/views/dist`
+   `git commit -m "Spec round 21: ..."` then push to the authorized remote.
 
 ## 2. Fence and render
 
 ```bash
-STATE=.pi/harness/.state; MM=14
+STATE=.pi/harness/.state; MM=15
 ROOM=$STATE/rooms/06-c$MM; OUT=$STATE/prompts/06-c$MM
 SLICE=06 harness/fence.sh $ROOM > $ROOM.fence.log 2>&1; echo "fence exit $?"; tail -3 $ROOM.fence.log
 bb harness/v2/prompt.clj 06 $OUT       # OUT/system.md and OUT/prompt.md
@@ -51,10 +49,10 @@ bb harness/v2/prompt.clj 06 $OUT       # OUT/system.md and OUT/prompt.md
 The fence must end `fence OK: ... is a single-commit clean room with no ...`. The room must hold
 no `harness-impl/`.
 
-## 3. Build: a fresh Claude Code subagent
+## 3. Build: a fresh Codex subagent
 
-In a Claude Code session in this repository, launch an Agent: `general-purpose`, model `opus`,
-in the background. Its prompt is this preamble (put in the room's absolute path), then
+Launch a fresh Codex subagent on `gpt-6.1-sol` in the background. Its prompt is this preamble
+(put in the room's absolute path), then
 `---`, then the full text of `$OUT/prompt.md` word for word:
 
 ```text
@@ -103,13 +101,13 @@ Opus subagent given the same preamble and instruction, plus the previous candida
 fenced room `06-c$MM-a2`, with a closing paragraph naming both. Gate that room. Stop after
 attempt 3: the cycle failed at the gate.
 
-## 5. Grade: a fresh Claude Code subagent on another model
+## 5. Grade: a fresh Codex subagent on another model
 
 ```bash
 .pi/harness/bin/grading-room.sh $STATE/grading/06-c$MM 06 $ROOM/harness-impl/06-cycle-runner $(git rev-parse HEAD)
 ```
 
-Launch an Agent: `general-purpose`, model `sonnet` (not the builder's model, ADR 0003), in the
+Launch a fresh Codex subagent on `gpt-6.1-terra` (not the builder's model, ADR 0003), in the
 background. Its prompt is this preamble, then `---`, then the full text of
 `.pi/harness/grader-instruction-06.md` word for word:
 
@@ -139,9 +137,9 @@ V=$STATE/grading/06-c$MM/work/verdicts.json
 jq length $V                                                     # 61
 diff <(jq -r '.[].id' $V) $STATE/grading/06-c$MM/checklist.txt && echo order-ok
 jq '[.[]|select(.evidence|test("not reached"))]|length' $V       # 0
-harness/v2/score.sh 06 $ROOM --verdicts $V --by "claude subagent sonnet, grader-instruction-06" \
+harness/v2/score.sh 06 $ROOM --verdicts $V --by "codex subagent gpt-6.1-terra, grader-instruction-06" \
   > $STATE/logs/score-c$MM-slice06.log 2>&1; tail -12 $STATE/logs/score-c$MM-slice06.log
-git add harness/v2/cycles/06/$MM && git commit -m "Harness: cycle $MM of slice 06 scored X/61 ..." && git push scope-impact spec-v2
+git add harness/v2/cycles/06/$MM && git commit -m "Harness: cycle $MM of slice 06 scored X/61 ..." && git push ragavsathish spec-v2
 ```
 
 The report compares with the last scored cycle on shared items: newly passing and newly
@@ -165,4 +163,5 @@ take into the next round.
 |---|---|---|---|---|---|
 | 12 | 50c5d20 | pi gpt-6.1-sol in Gondolin, 3h42m | passed, attempt 1 | 43/61 | halted at grading |
 | 13 | 2a85cda | Claude Opus subagent, host, 67 min | passed, attempt 1 | 60/61 | 066: no Gondolin VM |
-| 14 | 69ea324 | (next) | | | round 20: researcher VM, new leaf `grading-vm` |
+| 14 | 69ea324, 81d9f83 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 59/61 | 066 passed; 026 unproved Given, 070 restart lacked model provider |
+| 15 | round 21 | (next) | | | same 61 items; resume provider, 026 Given, reachable ORC pin |

@@ -255,7 +255,7 @@ Feature: Cycle runner
     @balance @allium-guarantee.TheRunnerJudgesNoItem
     @item-06-026
     Scenario: An item the judge did not score is Measurement's to record as unreached
-      Given the stub model fails every request of the researcher of 01-002
+      Given the stub model returns researcher code that reads (get-input :item) and fails for 01-002, while 01-001 reaches a judge score
       When the operator starts run R-1 of cycle C-1 at source cut K-1
       Then the file-verdicts effect of run R-1 offered a verdict for 01-001 alone
       And the file-score effect's measurement/measurement-filed event shows 01-002 failed with the reason "unreached"

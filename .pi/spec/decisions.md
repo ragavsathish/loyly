@@ -2113,3 +2113,34 @@ checklist at 210, with the same stamps.
    - `harness/v2/probe-06.sh`: step 5 hands the run `LOYLY_GRADER_IMAGE`, the repository's
      `builder-clojure` image (or `PROBE_GRADER_IMAGE`), since a run with no image now halts
      before grading.
+
+## Spec round 21 (2026-11-14, draft)
+
+Cycle 14 of slice 06 (`06-c14`, spec 69ea324 plus the checklist-source correction 81d9f83)
+passed its gate on attempt 1 and scored 59/61. Against cycle 13, `06-066` newly passed;
+`06-026` and `06-070` newly failed. The grader's `surprises.json` was empty. This round
+clarifies two existing items and adds none, so slice 06 remains at 61 and the checklist at
+210.
+
+1. **A resumed run has its model provider before its tick resumes** (`@item-06-070`). A
+   black-box replay stopped the runner and builder five seconds into a session, then started
+   the runner on the same store. The builder reopened with the same session identity and the
+   earlier effects appeared once, but both grading child ticks failed `drive-seam` with ORC's
+   `provider-not-configured`; scoring saw zero verdicts and failed. Cycle 14 registered the
+   provider only inside `start-run`, while process boot called `resume-in-progress!` without a
+   new `start-run`. The seam's Resume paragraph now requires recreating the live provider from
+   the pending run's captured `handed-in` endpoint and model names before resuming that tick.
+   This is process setup, not a new run effect. Item 070's wording stands.
+2. **The unscored researcher's failure is scripted inside its code** (`@item-06-026`). The
+   first researcher prompt exposes the item's shape, not its value; the grader cannot make a
+   stub server reject every request for 01-002 while accepting the identical first request
+   for 01-001. The old Given was therefore untestable as written. Its replacement has the
+   stub return code that reads `(get-input :item)` and fails for 01-002, while 01-001 reaches
+   a judge score. The Thens and stamp are unchanged. The slice-06 grader instruction records
+   this setup. Replaced wording is a recorded reason to update the grader, never to turn a
+   measured failure green without observation.
+3. **The ORC submodule pin must be reachable in a fresh checkout.** The repository gitlink
+   `4f8ec152` is no longer served by `ObneyAI/orc`; a fresh `git submodule update --init`
+   failed. Cycle 14's prompt renderer used upstream `4966c8e3` from the failed checkout, and
+   its gate passed. The gitlink is advanced to that reachable commit so future clones render
+   and build from the same declared ORC revision.

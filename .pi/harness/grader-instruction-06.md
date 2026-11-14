@@ -85,6 +85,9 @@ What `seam.md` says, and what to expect:
 - Prompts carry tick ids and timestamps, and ORC may retry a request. Match on stable substrings
   (the node's output contract, the item's text, the reply fragments that matter). Never match on
   a whole prompt, a hash or a hit count.
+- For `@item-06-026`, give the researcher the same code for each item and branch on
+  `(get-input :item)` inside that code, so 01-002 fails while 01-001 reaches its judge. The
+  first request does not identify the item to the stub server.
 - Let the evidence decide the judge: a pass rule matches on what the candidate really answered,
   and a fail rule catches the rest.
 
