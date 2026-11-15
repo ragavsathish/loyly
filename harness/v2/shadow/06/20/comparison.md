@@ -1,0 +1,22 @@
+# Cycle 20 instrument shadow, 2026-11-15
+
+The gate-passed attempt-3 candidate (`06-c20-a3`) was driven on the same scratch
+Löyly HTTP cut and app used in the cycle 17–19 comparisons: cut `45ee37f`, `impl`
+tree `357bb59f7716fb5d407bf9bcc86bc8b46319ebf7`. The archived legacy
+result is under ignored `.pi/harness/.state/shadow/legacy-fence-s3` and
+`s3-c17-legacy-score`; the new runner replay is `runner-s8-c20`. The shared
+rubric says binary judge bands `fail=1, pass=2`, and the stub judge replied with
+level `2`, a reason and feedback.
+
+| Stage | Result on the same cut and app |
+|---|---|
+| Fence | Both clean trees are `e70996d111fd66da3b0b54c111a6785c60c62955`. Both retain `grain` and `orc` mode `160000` gitlinks at the same target commit IDs. |
+| Checklist | Both derived `01-001` through `01-011` in the same order. |
+| Gate | Both passed the same installed candidate. The installed `impl/` directory compared byte for byte with the shared fixture. The runner observed answer on poll 2 of 20 and reported margin 18. |
+| Verdicts and score | **Difference:** legacy filed 11 passes. The runner recorded no judge scores, its `file-verdicts` effect was refused for `zero-verdicts`, and its run failed at the score stage. |
+
+The cycle 20 attempt-3 repair recognized numeric marker levels `1` and `0` as
+pass and fail. The legacy comparison's sealed rubric uses level `2` for pass;
+the candidate did not score those replies. This shadow mismatch blocks
+acceptance under `AGENTS.md`'s instrument exception, independently of the
+61-item black-box grade and profile. The generated candidate was not edited.
