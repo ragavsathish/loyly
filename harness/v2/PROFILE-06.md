@@ -72,3 +72,18 @@ An isolated Gondolin run verified the watcher saw QEMU while the guest slept and
 snapshot saw no owned process once the CLI exited. Eight focused profile tests pass.
 The round 23 instruction also gives the grader an explicit gitlink fixture for the clarified
 `@item-06-013`; the sealed digest therefore covers both changes.
+
+## Cycle 19 finding and next instrument revision
+
+Cycle 19's grader scored 59/61 and its profile passed the VM and shutdown checks, with live
+QEMU observed in 31 cases. It saw a live candidate Java PID in every case but captured no JVM
+diagnostic in any case. A separate scratch run of the same candidate used `profile.py jvm`
+successfully to capture heap, GC, threads and version data, so the gap was in the grading
+procedure. The filed cycle 19 score and profile remain unchanged.
+
+For the next grader, `profile.py report` fails when an active capture observes a candidate
+Java PID but the whole cycle has no JVM diagnostic matching a live case and PID. The grader
+instruction requires at least one successful attachment while that JVM is alive and records
+failed attachments for diagnosis. This is a recorded instrument-behavior change; it alters
+neither the 61-item selection nor any item verdict. The revised sealed digest requires
+operator approval before use.

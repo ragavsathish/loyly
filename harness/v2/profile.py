@@ -484,6 +484,13 @@ def report(args):
                      - set(checklist))
     if unknown:
         problems.append(f"captures for unknown cases: {unknown}")
+    live_java = {(e.get("case"), p["pid"])
+                 for e in events if e.get("type") == "capture" and e.get("phase") == "active"
+                 for p in e["processes"] if p.get("jvm")}
+    sampled_java = {(e.get("case"), e.get("pid"))
+                    for e in events if e.get("type") == "jvm"}
+    if live_java and not (live_java & sampled_java):
+        problems.append("live candidate JVM observed but no matching JVM diagnostic sampled")
     result = dict(version=1, status="clean" if not problems else "failed",
                   checklist_sha256=sha256(args.checklist),
                   verdicts_sha256=sha256(args.verdicts),

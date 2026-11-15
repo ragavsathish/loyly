@@ -174,6 +174,40 @@ class ProfileTest(unittest.TestCase):
                      metrics["resourceMetrics"][0]["scopeMetrics"][0]["metrics"]]
             self.assertIn("loyly.vm.running", names)
 
+    def test_live_java_requires_matching_jvm_diagnostic(self):
+        for sampled_pid, expected in ((None, 1), (999, 1), (202, 0)):
+            with self.subTest(sampled_pid=sampled_pid), tempfile.TemporaryDirectory() as root:
+                root = Path(root)
+                (root / "checklist.txt").write_text("06-001\n")
+                (root / "verdicts.json").write_text('[{"id":"06-001","verdict":"pass"}]')
+                (root / "instruction.md").write_text("grader")
+                events = root / "events.jsonl"
+                base = dict(type="capture", case="06-001", room=str(root),
+                            at_utc="2026-11-15T00:00:00+00:00")
+                profile.append_line(events, dict(base, phase="before", monotonic_ns=1,
+                                                 processes=[]))
+                profile.append_line(events, dict(base, phase="active", monotonic_ns=2,
+                                                 processes=[dict(pid=202, ppid=201, pgid=201,
+                                                                 rss_kib=200, state="S",
+                                                                 kind="runner-tree", jvm=True)]))
+                profile.append_line(events, dict(base, phase="after", monotonic_ns=3,
+                                                 processes=[]))
+                profile.append_line(events, dict(type="mark", case="06-001", name="no-store",
+                                                 value="fixture stopped before store"))
+                profile.append_line(events, dict(type="mark", case="06-001",
+                                                 name="model-requests", value="0"))
+                if sampled_pid:
+                    profile.append_line(events, dict(type="jvm", case="06-001",
+                                                     pid=sampled_pid, thread_states={}))
+                args = SimpleNamespace(events=events, checklist=root / "checklist.txt",
+                                       verdicts=root / "verdicts.json",
+                                       instruction=root / "instruction.md",
+                                       output=root / "profile.json")
+                self.assertEqual(profile.report(args), expected)
+                result = json.loads((root / "profile.json").read_text())
+                self.assertEqual(any("no matching JVM diagnostic" in p
+                                     for p in result["problems"]), expected == 1)
+
 
 if __name__ == "__main__":
     unittest.main()

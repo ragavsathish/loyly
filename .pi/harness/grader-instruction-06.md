@@ -173,6 +173,12 @@ after boundary. Its JSON output lists `jvm_pids` for Java processes in the candi
 process tree. Use an actual Java PID from a live active capture for the JVM and JFR commands,
 not the `start.sh` launcher PID. If no Java PID was observed while live, record that limitation
 in `surprises.json`; do not claim a JVM sample.
+Across the whole grading cycle, capture at least one successful JVM diagnostic with
+`profile.py jvm` for a candidate Java PID seen in that item's active capture. Choose a case
+whose runner stays live long enough, and keep its JSON-RPC stdin open until the diagnostic
+finishes. If attachment fails, record the cause and retry on another live case. This changes
+no item verdict; the final profile reports a gap if it saw live candidate Java but has no
+matching JVM diagnostic.
 For a fixture that reaches `grade.v1`, start `profile.py watch` while its `start-run` request is
 in flight. It polls the owned process tree until it observes QEMU and records an active capture,
 or times out after a bounded interval. Start it before the grade leaf can finish, not after the

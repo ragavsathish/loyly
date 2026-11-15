@@ -2193,3 +2193,25 @@ accepted or promoted (`harness/v2/shadow/06/18/comparison.md`).
    change, not a revision of the cycle 18 score. The grader instruction also adds the
    gitlink fixture for 013 because its wording was replaced. Its new digest needs exact
    operator approval before cycle 19 uses it.
+
+## Spec round 24 (proposed, 2026-11-15)
+
+Cycle 19 of slice 06 (`06-c19`, spec `73e70a7`) passed its independent gate on attempt 1
+and scored 59/61. Against cycle 18, no item newly passed and `06-010` and `06-060` newly
+failed. The profile was clean, and its full instrument shadow matched legacy on the shared
+candidate, including the gitlinks. The build is not accepted. The exploratory diagnosis is
+filed in `harness/v2/cycles/06/19/diagnosis.md`.
+
+1. **The two failures are implementation regressions, not new readings.** Item 010 already
+   requires the failed self-check's last line as the cycle detail and the self-check as the
+   last runner effect. The candidate passed raw stdout with a newline into the failure and
+   recorded a separate `fail-cycle` effect. Item 060 already requires the passed gate's boot
+   margin; the candidate recorded 20 boot polls and an answer on poll 5 but its generic
+   read-model reducer did not derive or expose 15. Neither spec item nor its grader scenario
+   changes. Slice 06 remains 61 items, and the full checklist remains 210.
+2. **The next grading profile must include a live JVM diagnostic.** Cycle 19 observed Java
+   in active snapshots but filed no `jcmd`/`jstat` diagnostic. A separate live scratch probe
+   succeeded on the same candidate. The profile report now fails if live candidate Java was
+   observed yet no matching JVM diagnostic was filed across the cycle. The grader instruction
+   requires one successful capture while the JVM is alive. This changes instrument behavior,
+   not item scoring, and the new grader digest needs exact operator approval before cycle 20.
