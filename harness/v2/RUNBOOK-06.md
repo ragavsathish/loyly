@@ -3,11 +3,13 @@
 How cycles 13 onward of slice 06 (`cycle-runner`, the one ORC tree `cycle.v1`) are run
 (`.pi/spec/decisions.md`, "Spec round 19" 4). The builder and grader are fresh subagents on
 the host, on different models (ADR 0003): no pi in the legacy loop. Cycle 13 used Claude
-Opus and Sonnet; cycles 14 and 15 used Codex gpt-6.1-sol and gpt-6.1-terra. Cycle 15's gate
-passed on attempt 1 and scored 57/61 (`harness/v2/cycles/06/15/`, commit `6fbfb7d`).
+Opus and Sonnet; cycles 14 to 16 used Codex gpt-6.1-sol and gpt-6.1-terra. Cycle 16's gate
+passed on attempt 1 and scored 61/61 (`harness/v2/cycles/06/16/`). Its grader observed
+leaked Gondolin QEMU children after grading, so acceptance and the instrument shadow
+comparison remain open.
 
 Run every command from the repository root. `STATE=.pi/harness/.state`. `NN=06`. `MM` is the
-cycle number (next: `16`, after a spec round and selection approval).
+cycle number (next: `17`, after a spec round and selection approval).
 
 ## 0. Once per machine
 
@@ -28,8 +30,8 @@ cycle number (next: `16`, after a spec round and selection approval).
 The fence clones HEAD, so the spec the builder reads must be committed.
 
 1. `git status` / `git diff`: review the next spec round and obtain approval of its exact
-   deterministic selection before fencing (AGENTS.md, "Pi and ORC ownership"). Round 21 is
-   committed at `7bc2610`; cycle 15 used it.
+   deterministic selection before fencing (AGENTS.md, "Pi and ORC ownership"). Round 22 is
+   committed at `12f622b`; cycle 16 used it.
 2. Check the item count is unchanged (210; slice 06 at 61):
    `grep -c '@item-06-' .pi/spec/cycle-runner/spec.feature`
 3. Commit and push:
@@ -39,7 +41,7 @@ The fence clones HEAD, so the spec the builder reads must be committed.
 ## 2. Fence and render
 
 ```bash
-STATE=.pi/harness/.state; MM=16
+STATE=.pi/harness/.state; MM=17
 ROOM=$STATE/rooms/06-c$MM; OUT=$STATE/prompts/06-c$MM
 SLICE=06 harness/fence.sh $ROOM > $ROOM.fence.log 2>&1; echo "fence exit $?"; tail -3 $ROOM.fence.log
 bb harness/v2/prompt.clj 06 $OUT       # OUT/system.md and OUT/prompt.md
@@ -164,4 +166,5 @@ take into the next round.
 | 13 | 2a85cda | Claude Opus subagent, host, 67 min | passed, attempt 1 | 60/61 | 066: no Gondolin VM |
 | 14 | 69ea324, 81d9f83 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 59/61 | 066 passed; 026 unproved Given, 070 restart lacked model provider |
 | 15 | 7bc2610 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 57/61 | 026 passed; 010, 054, 056 newly failed; 070 still failed |
-| 16 | (next spec round) | (next) | | | selection requires approval |
+| 16 | 12f622b | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 61/61 | 010, 054, 056, 070 newly passed; QEMU children leaked after grading |
+| 17 | (next spec round) | (next) | | | selection requires approval |
