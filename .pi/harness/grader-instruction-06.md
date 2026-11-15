@@ -91,6 +91,10 @@ What `seam.md` says, and what to expect:
 - For `@item-06-026`, give the researcher the same code for each item and branch on
   `(get-input :item)` inside that code, so 01-002 fails while 01-001 reaches its judge. The
   first request does not identify the item to the stub server.
+- For `@item-06-013`, add a non-fenced gitlink named `provided-runtime` to the fixture cut
+  (mode `160000`, pointing to an existing commit), then have the stub builder record
+  `git ls-tree HEAD provided-runtime` inside its clean room. Compare its mode and object id
+  with the cut's tree, as well as the one-commit and fenced-path observations.
 - Let the evidence decide the judge: a pass rule matches on what the candidate really answered,
   and a fail rule catches the rest.
 

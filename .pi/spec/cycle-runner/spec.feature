@@ -125,11 +125,12 @@ Feature: Cycle runner
     @minimum @allium-boundary.TheBuilderSeesOnlyItsMounts
     @item-06-013
     Scenario: The fresh builder sees the clean room of one commit with no fenced path
-      Given the configuration fences "impl harness/cycles" and the commit holds both
-      And the stub builder records the paths and the commits its builder room holds
+      Given the configuration fences "impl harness/cycles" and the commit holds both and a non-fenced gitlink at "provided-runtime"
+      And the stub builder records the paths, commits and tree entries its builder room holds
       When the operator starts run R-1 of cycle C-1 at source cut K-1
       Then the stub builder saw the plan, the configuration and an empty candidate scope
       And it saw one commit, and no path under impl or harness/cycles in the tree or the history
+      And it saw "provided-runtime" still as a gitlink (mode 160000) with the same target commit id as in the cut's tree
 
   Rule: A regenerate runs one fresh builder session and records what it left in its candidate scope
 

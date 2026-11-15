@@ -3,14 +3,13 @@
 How cycles 13 onward of slice 06 (`cycle-runner`, the one ORC tree `cycle.v1`) are run
 (`.pi/spec/decisions.md`, "Spec round 19" 4). The builder and grader are fresh subagents on
 the host, on different models (ADR 0003): no pi in the legacy loop. Cycle 13 used Claude
-Opus and Sonnet; cycles 14 to 16 used Codex gpt-6.1-sol and gpt-6.1-terra. Cycle 16's gate
-passed on attempt 1 and scored 61/61 (`harness/v2/cycles/06/16/`). Its grader observed
-leaked Gondolin QEMU children after grading, so acceptance and the instrument shadow
-comparison remain open.
+Opus and Sonnet; cycles 14 to 18 used Codex gpt-6.1-sol and gpt-6.1-terra. Cycle 18's gate
+passed on attempt 1 and scored 61/61 (`harness/v2/cycles/06/18/`). Its profile failed and
+its shadow comparison found that the fence omitted non-fenced gitlinks. Acceptance remains open.
 The next grader's profile contract and its recorded reason are in `harness/v2/PROFILE-06.md`.
 
 Run every command from the repository root. `STATE=.pi/harness/.state`. `NN=06`. `MM` is the
-cycle number (next: `17`, after a spec round and selection approval).
+cycle number (next: `19`, after spec round 23 and selection approval).
 
 ## 0. Once per machine
 
@@ -31,8 +30,8 @@ cycle number (next: `17`, after a spec round and selection approval).
 The fence clones HEAD, so the spec the builder reads must be committed.
 
 1. `git status` / `git diff`: review the next spec round and obtain approval of its exact
-   deterministic selection before fencing (AGENTS.md, "Pi and ORC ownership"). Round 22 is
-   committed at `12f622b`; cycle 16 used it.
+   deterministic selection before fencing (AGENTS.md, "Pi and ORC ownership"). Round 23
+   clarifies item 013 and the grader profile procedure; it requires approval before use.
 2. Check the item count is unchanged (210; slice 06 at 61):
    `grep -c '@item-06-' .pi/spec/cycle-runner/spec.feature`
 3. Commit and push:
@@ -42,7 +41,7 @@ The fence clones HEAD, so the spec the builder reads must be committed.
 ## 2. Fence and render
 
 ```bash
-STATE=.pi/harness/.state; MM=17
+STATE=.pi/harness/.state; MM=19
 ROOM=$STATE/rooms/06-c$MM; OUT=$STATE/prompts/06-c$MM
 SLICE=06 harness/fence.sh $ROOM > $ROOM.fence.log 2>&1; echo "fence exit $?"; tail -3 $ROOM.fence.log
 bb harness/v2/prompt.clj 06 $OUT       # OUT/system.md and OUT/prompt.md
@@ -98,7 +97,7 @@ tail -5 $STATE/logs/gate-c$MM-slice06.log     # must end "=== gate OK: ..."
 ```
 
 It takes about 5 minutes (suite ~3.5 min, probe, store check). If it fails, a repair is a new
-Opus subagent given the same preamble and instruction, plus the previous candidate
+Codex gpt-6.1-sol subagent given the same preamble and instruction, plus the previous candidate
 (`$ROOM/harness-impl/06-cycle-runner`, read-only) and the gate log as evidence, in a freshly
 fenced room `06-c$MM-a2`, with a closing paragraph naming both. Gate that room. Stop after
 attempt 3: the cycle failed at the gate.

@@ -2167,3 +2167,29 @@ item and adds none: slice 06 remains at 61 and the full checklist at 210.
    detail is `3 of 65 tests failed`, and `@item-06-056` says the halt detail is
    `infrastructure the world did not come up`. Cycle 15 recorded an extra effect for 010
    and whole command outputs for 054 and 056. The spec and grader stay unchanged.
+
+## Spec round 23 (proposed, 2026-11-15)
+
+Cycle 18 of slice 06 (`06-c18`, spec `0e3f5e6`) passed its independent gate on attempt 1 and
+scored 61/61, with no newly passing or newly failing item against cycle 17. Its profile failed:
+54 after captures saw the grader's still-running JSON-RPC runner, and none of the 31 stores
+with a `grade.v1` trace had a live QEMU sample. The score and failed profile stay filed. A full
+shadow against legacy on the same Löyly candidate agreed on the 11 checklist identities,
+gate, per-item verdicts and baseline score, but its fenced tree differed: cycle 18 omitted the
+non-fenced `grain` and `orc` gitlinks (mode `160000`) that legacy kept. The build is not
+accepted or promoted (`harness/v2/shadow/06/18/comparison.md`).
+
+1. **The fence keeps non-fenced gitlinks.** E3 already says legacy `fence.sh` as-is, whose
+   fence retains gitlinks in the tree. The cycle 18 candidate used an archive
+   route that dropped them. E3 now names their mode and unchanged target commit id explicitly.
+   `@item-06-013`'s Given and Then now include a non-fenced gitlink so its clean-room observation
+   observes this part of the legacy behavior. This replaces wording of the same item, with
+   no new or removed item: slice 06 stays at 61 and the full checklist at 210.
+2. **The grading profile observes the normal shutdown and the live VM.** The revised
+   `profile.py` watches the candidate's descendants during grading and fails a profile whose
+   Grain store records `grade.v1` with no observed QEMU. The grader instruction
+   closes stdin and waits for the normal runner exit before the after capture, which still
+   precedes any manual cleanup of orphaned children. This is a recorded instrument-behavior
+   change, not a revision of the cycle 18 score. The grader instruction also adds the
+   gitlink fixture for 013 because its wording was replaced. Its new digest needs exact
+   operator approval before cycle 19 uses it.

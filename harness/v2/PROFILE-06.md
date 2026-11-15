@@ -70,3 +70,5 @@ remain diagnostic. This is a second recorded instrument-behavior reason to revis
 grader; the new instruction digest needs operator approval before use.
 An isolated Gondolin run verified the watcher saw QEMU while the guest slept and that the after
 snapshot saw no owned process once the CLI exited. Eight focused profile tests pass.
+The round 23 instruction also gives the grader an explicit gitlink fixture for the clarified
+`@item-06-013`; the sealed digest therefore covers both changes.
