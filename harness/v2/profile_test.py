@@ -16,6 +16,55 @@ SPEC.loader.exec_module(profile)
 
 
 class ProfileTest(unittest.TestCase):
+    def test_watch_records_live_qemu_during_case(self):
+        with tempfile.TemporaryDirectory() as root:
+            root = Path(root)
+            events = root / "events.jsonl"
+            with patch.object(profile.subprocess, "check_output", return_value=""), \
+                    patch("builtins.print"):
+                profile.capture(SimpleNamespace(events=events, case="06-066",
+                                                phase="before", room=root, runner_pid=None))
+            vm = dict(pid=202, ppid=201, pgid=201, rss_kib=500,
+                      state="S", kind="qemu", jvm=False)
+            args = SimpleNamespace(events=events, case="06-066", room=root,
+                                   runner_pid=201, kind="qemu", seconds=1,
+                                   interval_ms=50)
+            with patch.object(profile, "processes", side_effect=[[], [vm]]), \
+                    patch("builtins.print"):
+                self.assertEqual(profile.watch(args), 0)
+            captures = [json.loads(line) for line in events.read_text().splitlines()]
+            self.assertEqual([e["phase"] for e in captures], ["before", "active"])
+            self.assertEqual(captures[-1]["processes"], [vm])
+
+    def test_grade_trace_without_live_vm_fails_profile(self):
+        with tempfile.TemporaryDirectory() as root:
+            root = Path(root)
+            (root / "checklist.txt").write_text("06-066\n")
+            (root / "verdicts.json").write_text('[{"id":"06-066","verdict":"pass"}]')
+            (root / "instruction.md").write_text("grader")
+            events = root / "events.jsonl"
+            base = dict(type="capture", case="06-066", room=str(root),
+                        at_utc="2026-11-15T00:00:00+00:00", processes=[])
+            profile.append_line(events, dict(base, phase="before", monotonic_ns=1))
+            profile.append_line(events, dict(base, phase="after", monotonic_ns=2))
+            profile.append_line(events, dict(type="mark", case="06-066",
+                                             name="model-requests", value="1"))
+            profile.append_line(events, dict(type="store", case="06-066",
+                                             at_utc="2026-11-15T00:00:00+00:00",
+                                             event_count=1, trace_count=1, node_count=0,
+                                             judge_scores=0, store_sha256="abc",
+                                             traces=[{"trace-id": "t", "root-trace-id": "t",
+                                                      "parent-trace-id": None,
+                                                      "sheet": "cycle-runner/grade.v1",
+                                                      "status": "success", "duration-ms": 1}]))
+            args = SimpleNamespace(events=events, checklist=root / "checklist.txt",
+                                   verdicts=root / "verdicts.json",
+                                   instruction=root / "instruction.md",
+                                   output=root / "profile.json")
+            self.assertEqual(profile.report(args), 1)
+            result = json.loads((root / "profile.json").read_text())
+            self.assertIn("no live Gondolin VM", result["problems"][0])
+
     def test_capture_refuses_active_after_after_without_changing_evidence(self):
         with tempfile.TemporaryDirectory() as root:
             root = Path(root)

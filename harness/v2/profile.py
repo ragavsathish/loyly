@@ -247,7 +247,7 @@ def append_line(path, entry):
         file.write(json.dumps(entry, sort_keys=True, separators=(",", ":")) + "\n")
 
 
-def capture(args):
+def capture(args, found=None):
     room = str(Path(args.room).resolve(strict=True))
     known = {}
     phases = []
@@ -267,12 +267,37 @@ def capture(args):
                  runner_pid=args.runner_pid,
                  at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
                  monotonic_ns=time.monotonic_ns(),
-                 processes=processes(room, args.runner_pid, known))
+                 processes=found if found is not None else processes(room, args.runner_pid, known))
     append_line(args.events, entry)
     counts = {kind: sum(p["kind"] == kind for p in entry["processes"])
               for kind in ("qemu", "gondolin", "runner-tree")}
     print(json.dumps(dict(case=args.case, phase=args.phase, counts=counts,
                           jvm_pids=[p["pid"] for p in entry["processes"] if p["jvm"]])))
+    return 0
+
+
+def watch(args):
+    if not 1 <= args.seconds <= 30 or not 50 <= args.interval_ms <= 1000:
+        raise ValueError("watch requires 1–30 seconds and 50–1000 ms interval")
+    room = str(Path(args.room).resolve(strict=True))
+    known = {}
+    if Path(args.events).is_file():
+        for line in Path(args.events).read_text().splitlines():
+            prior = json.loads(line)
+            if prior.get("type") == "capture" and prior.get("case") == args.case:
+                known.update({p["pid"]: p["pgid"] for p in prior["processes"]})
+    deadline = time.monotonic() + args.seconds
+    while True:
+        found = processes(room, args.runner_pid, known)
+        known.update({p["pid"]: p["pgid"] for p in found})
+        observed = any(p["kind"] == args.kind for p in found)
+        if observed or time.monotonic() >= deadline:
+            args.phase = "active"
+            capture(args, found)
+            print(json.dumps(dict(case=args.case, watched=args.kind,
+                                  observed=observed)))
+            return 0 if observed else 1
+        time.sleep(args.interval_ms / 1000)
 
 
 def mark(args):
@@ -415,6 +440,8 @@ def report(args):
             case_problems.append("missing Grain profile or no-store reason")
         if store_entries and no_store:
             case_problems.append("Grain profile conflicts with no-store reason")
+        graded = any(trace.get("sheet") == "cycle-runner/grade.v1"
+                     for entry in store_entries for trace in entry.get("traces", []))
         if len(no_store) > 1 or (no_store and not no_store[0]["value"].strip()):
             case_problems.append("expected one nonempty no-store reason")
         if len(requests) != 1 or not requests[0]["value"].isdigit():
@@ -438,6 +465,8 @@ def report(args):
                     case_problems.append(f"{phase} has {len(live)} owned processes")
         peak_qemu = max((sum(p["kind"] == "qemu" for p in e["processes"])
                          for e in samples), default=0)
+        if graded and peak_qemu == 0:
+            case_problems.append("grade.v1 ran but no live Gondolin VM was sampled")
         peak_rss = max((sum(p["rss_kib"] for p in e["processes"])
                         for e in samples), default=0)
         elapsed_ms = (round((after[0]["monotonic_ns"] - before[0]["monotonic_ns"]) / 1e6)
@@ -501,6 +530,15 @@ def main():
     cap.add_argument("--room", required=True)
     cap.add_argument("--runner-pid", type=int)
     cap.set_defaults(func=capture)
+    watcher = sub.add_parser("watch")
+    watcher.add_argument("--events", required=True)
+    watcher.add_argument("--case", required=True)
+    watcher.add_argument("--room", required=True)
+    watcher.add_argument("--runner-pid", type=int, required=True)
+    watcher.add_argument("--kind", choices=("qemu", "gondolin"), default="qemu")
+    watcher.add_argument("--seconds", type=int, default=10)
+    watcher.add_argument("--interval-ms", type=int, default=100)
+    watcher.set_defaults(func=watch)
     marker = sub.add_parser("mark")
     marker.add_argument("--events", required=True)
     marker.add_argument("--case", required=True)

@@ -51,4 +51,22 @@ and JFR to the actual candidate JVM. The revised grader instruction requires tha
 the absence of a live Java PID honestly. This revision changes the sealed instruction digest and
 requires the operator's approval before use.
 An isolated live Java 21 probe found the owned JVM PID and captured its version, heap, GC and
-thread dump through `jcmd`/`jstat`; six focused profiler tests also pass.
+thread dump through `jcmd`/`jstat`; the focused profiler tests also pass.
+
+## Cycle 18 finding and next instrument revision
+
+Cycle 18 again scored 61/61, and its full instrument shadow against legacy had already agreed,
+but the filed profile failed on 54 after boundaries. The grader captured while its JSON-RPC
+runner was still live, then stopped it. That does not distinguish normal server lifetime from an
+orphan after shutdown. The profile also sampled no live QEMU in any of the 31 cases whose Grain
+store records `grade.v1`, so its VM resource view missed the very grading interval it sought to
+measure. The cycle 18 profile and score remain unchanged.
+
+The next instruction closes stdin and waits for the normal runner exit before `after`, then
+captures any remaining runner or VM process before manual cleanup. `profile.py watch` polls the
+owned process tree during the blocking run and records the first live QEMU observation. The
+report now fails any case with a `grade.v1` trace but no live VM sample. JVM and JFR evidence
+remain diagnostic. This is a second recorded instrument-behavior reason to revise the sealed
+grader; the new instruction digest needs operator approval before use.
+An isolated Gondolin run verified the watcher saw QEMU while the guest slept and that the after
+snapshot saw no owned process once the CLI exited. Eight focused profile tests pass.

@@ -157,8 +157,11 @@ For every checklist item, take at least two process snapshots with `harness/v2/p
 the fixture root as `--room` (the temporary root outside `.pi` for 06-062). Take `before` just
 before its fixture starts; take `active`
 while its candidate or grading VM is running, when it reaches that point; take `after` just after
-the run finishes **and before** cleaning up any survivor. Then stop surviving room-owned programs
-by their recorded PIDs. A failed scenario still gets `after`, so the profile has no gap.
+the run finishes. Before `after`, close the JSON-RPC stdin and wait for the candidate JVM to exit
+normally, and stop the fixture's stub model server. Take `after` **before manually killing any
+survivor** of that normal shutdown, including Gondolin and QEMU children; then stop survivors by
+their recorded PIDs. If the runner does not exit after stdin closes, take `after` with it live
+and record the failure. A failed scenario still gets `after`, so the profile has no gap.
 Pass `--runner-pid <pid>` on active and after captures when the candidate JVM was started; the
 sampler follows its child PIDs across captures even if their parent exits.
 The capture command refuses an active sample after `after`; take all live samples before the
@@ -166,12 +169,23 @@ after boundary. Its JSON output lists `jvm_pids` for Java processes in the candi
 process tree. Use an actual Java PID from a live active capture for the JVM and JFR commands,
 not the `start.sh` launcher PID. If no Java PID was observed while live, record that limitation
 in `surprises.json`; do not claim a JVM sample.
+For a fixture that reaches `grade.v1`, start `profile.py watch` while its `start-run` request is
+in flight. It polls the owned process tree until it observes QEMU and records an active capture,
+or times out after a bounded interval. Start it before the grade leaf can finish, not after the
+run response. A timeout is a profile gap to record; the final report checks every Grain store
+with a `grade.v1` trace for at least one live QEMU sample. Wait for the watcher before `after`.
 
 ```bash
 P=work/profile-events.jsonl
 python3 harness/v2/profile.py capture --events "$P" --case 06-001 --phase before --room work/06-001
-# Run the fixture; if a grading VM starts, sample it while it is live:
+# Start the candidate; while a grading run is in flight, watch for its VM:
+python3 harness/v2/profile.py watch --events "$P" --case 06-001 \
+  --room work/06-001 --runner-pid <candidate-launcher-pid> --kind qemu --seconds 20 &
+VM_WATCH_PID=$!
+# Run the fixture; sample the JVM while it is live, then wait for the watcher:
 python3 harness/v2/profile.py capture --events "$P" --case 06-001 --phase active --room work/06-001
+wait "$VM_WATCH_PID" || echo 'VM was not observed; preserve the profile gap'
+# Close stdin, wait for normal runner exit, stop the stub model, then capture survivors:
 python3 harness/v2/profile.py capture --events "$P" --case 06-001 --phase after --room work/06-001
 ```
 
