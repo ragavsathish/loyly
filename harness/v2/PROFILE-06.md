@@ -1,4 +1,4 @@
-# Slice 06 grading profile, draft for the next cycle
+# Slice 06 grading profile
 
 Cycle 16 passed its gate and all 61 checklist items, but its grader observed Gondolin QEMU
 children still alive after grading. A host probe reproduced the cause: stopping the Gondolin CLI
@@ -35,3 +35,20 @@ The payload follows the [OTLP JSON encoding](https://opentelemetry.io/docs/specs
 [`process.memory.usage` and `process.thread.count` conventions](https://opentelemetry.io/docs/specs/semconv/system/process-metrics/)
 and keeps Löyly-specific checks under `loyly.*` attributes and metrics. No raw prompt content is
 exported.
+
+## Cycle 17 finding and next instrument revision
+
+Cycle 17's sealed grader scored all 61 items as passing, but its profile failed: an extra active
+capture for 06-073 was recorded after that case's after boundary. Its scripts also sampled the
+`start.sh` launcher PID before identifying the Java child, so no JVM attachment succeeded. The
+filed cycle 17 profile and score remain unchanged. This is a recorded instrument-behavior reason
+to revise the grader procedure before another cycle; it is not a reason to alter any behavior
+verdict.
+
+`profile.py capture` now refuses a capture outside the before → active* → after sequence before
+appending it. A live capture returns the owned Java PIDs, so the grader can attach `jcmd`, `jstat`
+and JFR to the actual candidate JVM. The revised grader instruction requires that PID and records
+the absence of a live Java PID honestly. This revision changes the sealed instruction digest and
+requires the operator's approval before use.
+An isolated live Java 21 probe found the owned JVM PID and captured its version, heap, GC and
+thread dump through `jcmd`/`jstat`; six focused profiler tests also pass.

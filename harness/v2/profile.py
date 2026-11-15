@@ -235,7 +235,8 @@ def processes(room, runner_pid, known_pids=None):
             continue
         kind = "qemu" if qemu else "gondolin" if gondolin else "runner-tree"
         found.append(dict(pid=pid, ppid=ppid, pgid=pgid, rss_kib=rss,
-                          state=state, kind=kind))
+                          state=state, kind=kind,
+                          jvm=Path(command.split()[0]).name == "java"))
     return sorted(found, key=lambda p: p["pid"])
 
 
@@ -249,11 +250,19 @@ def append_line(path, entry):
 def capture(args):
     room = str(Path(args.room).resolve(strict=True))
     known = {}
+    phases = []
     if Path(args.events).is_file():
         for line in Path(args.events).read_text().splitlines():
             earlier = json.loads(line)
             if earlier.get("type") == "capture" and earlier.get("case") == args.case:
+                phases.append(earlier["phase"])
                 known.update({p["pid"]: p["pgid"] for p in earlier["processes"]})
+    expected = ("before" if not phases else
+                "after" if phases[-1] == "before" else
+                "active or after" if phases[-1] == "active" else "closed")
+    if (args.phase != "before" and not phases) or (args.phase == "before" and phases) \
+            or (phases and phases[-1] == "after"):
+        raise ValueError(f"{args.case}: capture {args.phase} refused; expected {expected}")
     entry = dict(type="capture", case=args.case, phase=args.phase, room=room,
                  runner_pid=args.runner_pid,
                  at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
@@ -262,7 +271,8 @@ def capture(args):
     append_line(args.events, entry)
     counts = {kind: sum(p["kind"] == kind for p in entry["processes"])
               for kind in ("qemu", "gondolin", "runner-tree")}
-    print(json.dumps(dict(case=args.case, phase=args.phase, counts=counts)))
+    print(json.dumps(dict(case=args.case, phase=args.phase, counts=counts,
+                          jvm_pids=[p["pid"] for p in entry["processes"] if p["jvm"]])))
 
 
 def mark(args):

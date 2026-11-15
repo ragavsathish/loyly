@@ -7,6 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 
 
 SPEC = importlib.util.spec_from_file_location("profile", Path(__file__).with_name("profile.py"))
@@ -15,6 +16,33 @@ SPEC.loader.exec_module(profile)
 
 
 class ProfileTest(unittest.TestCase):
+    def test_capture_refuses_active_after_after_without_changing_evidence(self):
+        with tempfile.TemporaryDirectory() as root:
+            root = Path(root)
+            events = root / "events.jsonl"
+            with patch.object(profile.subprocess, "check_output", return_value=""):
+                for phase in ("before", "active", "after"):
+                    profile.capture(SimpleNamespace(events=events, case="06-073",
+                                                    phase=phase, room=root, runner_pid=None))
+                original = events.read_bytes()
+                with self.assertRaisesRegex(ValueError, "expected closed"):
+                    profile.capture(SimpleNamespace(events=events, case="06-073",
+                                                    phase="active", room=root, runner_pid=None))
+            self.assertEqual(events.read_bytes(), original)
+
+    def test_capture_exposes_owned_java_pid_for_jvm_probe(self):
+        with tempfile.TemporaryDirectory() as root:
+            root = Path(root)
+            ps = """201 1 201 100 S /bin/sh ./start.sh
+202 201 201 200 S /usr/bin/java -cp app.jar Main
+203 1 203 300 S /usr/bin/java -cp other.jar Main
+"""
+            with patch.object(profile.subprocess, "check_output", return_value=ps), \
+                    patch("builtins.print") as emitted:
+                profile.capture(SimpleNamespace(events=root / "events.jsonl", case="06-003",
+                                                phase="before", room=root, runner_pid=201))
+            self.assertEqual(json.loads(emitted.call_args.args[0])["jvm_pids"], [202])
+
     def test_orphaned_qemu_stays_owned_by_mount(self):
         ps = """101 1 101 900 S qemu-system-aarch64 -append sandboxfs.bind=/room/case,/etc/gondolin
 102 1 102 900 S qemu-system-aarch64 -append sandboxfs.bind=/other/case

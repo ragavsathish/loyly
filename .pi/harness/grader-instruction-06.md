@@ -161,6 +161,11 @@ the run finishes **and before** cleaning up any survivor. Then stop surviving ro
 by their recorded PIDs. A failed scenario still gets `after`, so the profile has no gap.
 Pass `--runner-pid <pid>` on active and after captures when the candidate JVM was started; the
 sampler follows its child PIDs across captures even if their parent exits.
+The capture command refuses an active sample after `after`; take all live samples before the
+after boundary. Its JSON output lists `jvm_pids` for Java processes in the candidate's owned
+process tree. Use an actual Java PID from a live active capture for the JVM and JFR commands,
+not the `start.sh` launcher PID. If no Java PID was observed while live, record that limitation
+in `surprises.json`; do not claim a JVM sample.
 
 ```bash
 P=work/profile-events.jsonl
