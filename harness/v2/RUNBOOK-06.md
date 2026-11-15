@@ -175,3 +175,4 @@ grader instruction digest requires operator approval under AGENTS.md before use.
 | 15 | 7bc2610 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 57/61 | 026 passed; 010, 054, 056 newly failed; 070 still failed |
 | 16 | 12f622b | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 61/61 | 010, 054, 056, 070 newly passed; QEMU children leaked after grading |
 | 17 | ff6e8f5 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 61/61 | behavior unchanged from 16; profile failed on an out-of-order 073 capture; acceptance open |
+| 18 | 0e3f5e6 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 61/61 | behavior unchanged from 17; profile failed on 54 live runner after captures; acceptance open |
