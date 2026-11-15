@@ -7,6 +7,7 @@ Opus and Sonnet; cycles 14 to 16 used Codex gpt-6.1-sol and gpt-6.1-terra. Cycle
 passed on attempt 1 and scored 61/61 (`harness/v2/cycles/06/16/`). Its grader observed
 leaked Gondolin QEMU children after grading, so acceptance and the instrument shadow
 comparison remain open.
+The next grader's profile contract and its recorded reason are in `harness/v2/PROFILE-06.md`.
 
 Run every command from the repository root. `STATE=.pi/harness/.state`. `NN=06`. `MM` is the
 cycle number (next: `17`, after a spec round and selection approval).
@@ -119,10 +120,11 @@ Your grading room (working directory) is
 
 `cd` into it first and use absolute paths. Read only inside it, write only under its `work/`,
 except the dependency caches the Clojure CLI uses (~/.m2, ~/.gitlibs), the `gondolin` CLI and
-the guest image the instruction names, and the one temp folder the instruction allows for
-@item-06-062. Do not look at any other folder on this machine (not the room's parents, other
-rooms or grading folders, or the repository). Do not finish while any item is still `not
-reached`.
+the guest image the instruction names, the host process table through `profile.py` for this
+room's programs, Java 21's `jcmd`/`jstat`/`jfr` for a candidate JVM PID, and the one temp folder
+the instruction allows for @item-06-062. Do not look at any other folder on this machine (not
+the room's parents, other rooms or grading folders, or the repository). Do not finish while any
+item is still `not reached`.
 ```
 
 Cycle 13's grading took about 50 minutes. Progress while it runs:
@@ -139,13 +141,18 @@ jq length $V                                                     # 61
 diff <(jq -r '.[].id' $V) $STATE/grading/06-c$MM/checklist.txt && echo order-ok
 jq '[.[]|select(.evidence|test("not reached"))]|length' $V       # 0
 harness/v2/score.sh 06 $ROOM --verdicts $V --by "codex subagent gpt-6.1-terra, grader-instruction-06" \
+  --profile $STATE/grading/06-c$MM/work/profile.json \
   > $STATE/logs/score-c$MM-slice06.log 2>&1; tail -12 $STATE/logs/score-c$MM-slice06.log
 git add harness/v2/cycles/06/$MM && git commit -m "Harness: cycle $MM of slice 06 scored X/61 ..." && git push ragavsathish spec-v2
 ```
 
 The report compares with the last scored cycle on shared items: newly passing and newly
 failing, never a net. Read `$STATE/grading/06-c$MM/work/surprises.json` for spec readings to
-take into the next round.
+take into the next round. For the revised grader, also read `work/profile.json`; pass it to
+`score.sh` with `--profile $STATE/grading/06-c$MM/work/profile.json`, which files its digest
+and copy beside the score. A failed profile
+is still filed with the honest score and blocks acceptance until investigated. The revised
+grader instruction digest requires operator approval under AGENTS.md before use.
 
 ## 7. After a good score (not yet done)
 

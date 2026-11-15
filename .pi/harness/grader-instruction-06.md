@@ -18,6 +18,8 @@ cycle-preparation) are inside it. They are never built or launched on their own.
 | `checklist.txt` | The item ids, one per line, in file order: your denominator |
 | `harness-impl/06-cycle-runner/` | The gated candidate (a copy). `start.sh` boots it on its JSON-RPC stdio seam. `test.sh` runs its own suite. It carries its own copy of the event models |
 | `harness/v2/event_store_check.clj` (+ `event-store-check.sh`, `deps.edn`) | Reference only: how the gate reads a Grain SQLite store with Grain's own reader. Reuse its reading code to inspect a store |
+| `harness/v2/profile.py`, `profile_store.clj` | Host process and JVM sampler, Grain trace reader, and profile report; they record process IDs, usage, node facts and prompt digests, never command lines or raw prompts |
+| `.pi/harness/grader-instruction-06.md` | This sealed grader instruction, copied from the same spec commit; its digest is recorded in the profile |
 | `work/` | Yours, read-write: fixtures, stubs, stores, logs, and your output |
 
 ## The black-box rule
@@ -27,7 +29,8 @@ its build files, its notes). Its `README.md`, `UNCARRIED.md`, test names and tes
 builder's claims. You may run `harness-impl/06-cycle-runner/test.sh`, but a green suite is never
 a verdict.
 
-Do not read or look for anything outside this room. Never read builder sessions or transcripts,
+Read only this room, except for the process table through `profile.py` and Java 21 tools
+attached to a candidate JVM you started. Never read builder sessions or transcripts,
 prompts or instructions handed to a builder, prior verdicts or scores of any cycle
 (`harness/v2/cycles`, `grading/`), or other candidates. They are not here. Do not try to
 reconstruct them.
@@ -143,9 +146,84 @@ that folder when you are done.
 The first start of a Clojure program may fetch its dependencies: start
 `harness-impl/06-cycle-runner/start.sh` once with stdin closed (`</dev/null`) before you grade.
 If a program fails at startup, read its error: it is most likely your setup (a variable, a path,
-a fixture). Fix it and retry before you fail an item for it. The candidate is a JVM: run at most
-two scenarios in parallel, and kill every process a scenario started (the candidate, your stub
-model, any `gondolin` VM left running; `gondolin list` shows them) before the next.
+a fixture). Fix it and retry before you fail an item for it. Grade scenarios serially, using one
+unique `work/<item-id>/` folder for each. The candidate is a JVM. Stop every process a scenario
+started (the candidate, your stub model, any `gondolin` VM left running; `gondolin list` shows
+them) before the next.
+
+## Profile each scenario
+
+For every checklist item, take at least two process snapshots with `harness/v2/profile.py`. Use
+the fixture root as `--room` (the temporary root outside `.pi` for 06-062). Take `before` just
+before its fixture starts; take `active`
+while its candidate or grading VM is running, when it reaches that point; take `after` just after
+the run finishes **and before** cleaning up any survivor. Then stop surviving room-owned programs
+by their recorded PIDs. A failed scenario still gets `after`, so the profile has no gap.
+Pass `--runner-pid <pid>` on active and after captures when the candidate JVM was started; the
+sampler follows its child PIDs across captures even if their parent exits.
+
+```bash
+P=work/profile-events.jsonl
+python3 harness/v2/profile.py capture --events "$P" --case 06-001 --phase before --room work/06-001
+# Run the fixture; if a grading VM starts, sample it while it is live:
+python3 harness/v2/profile.py capture --events "$P" --case 06-001 --phase active --room work/06-001
+python3 harness/v2/profile.py capture --events "$P" --case 06-001 --phase after --room work/06-001
+```
+
+Use `mark` to bind the scenario's observed run ID, Grain trace ID and model request count to the
+profile when those exist: `python3 harness/v2/profile.py mark --events "$P" --case 06-001
+--name trace-id --value <id>`. Read ORC's node and prompt evidence from the Grain store and the
+stub model's request log, not from process guesses. The prompt optimizer is a later spec round;
+grading records its evidence and does not change instructions.
+Record exactly one `model-requests` mark for each case, including `0` when the model was not
+called. If the fixture never created a Grain store, record one `no-store` mark with the reason as
+its value. Every case has either a Grain profile or a `no-store` reason.
+
+For each scenario that opened a Grain store, attach ORC's own event and trace profile. The reader
+copies the SQLite store and WAL before opening them. It reports tick lineage, node names and
+outcomes, durations, token usage where present, prompt instruction digests and event counts. It
+keeps raw prompts and blackboard values in the room's store for later approved GEPA work.
+
+```bash
+python3 harness/v2/profile.py store --events "$P" --case 06-001 \
+  --store work/06-001/events.sqlite --output work/06-001/orc-profile.json
+```
+
+If a scenario keeps its JVM running long enough to sample, capture it with the Java 21 tools
+through `profile.py jvm`. It writes a heap summary, GC counters and a thread dump under that
+item's `work/` folder; the filed report holds their hashes and thread-state counts. The VM and
+JVM must still be stopped at the `after` boundary. JVM measurements diagnose a failure or a slow
+case; they are not exact thresholds.
+
+```bash
+python3 harness/v2/profile.py jvm --events "$P" --case 06-001 \
+  --pid <candidate-jvm-pid> --output work/06-001/jvm
+```
+
+For a slow or stuck case, run a bounded Java Flight Recorder sample:
+
+```bash
+python3 harness/v2/profile.py jfr --events "$P" --case 06-001 \
+  --pid <candidate-jvm-pid> --seconds 10 --output work/06-001/jfr
+```
+
+Keep the `.jfr` under `work/`; the filed report carries its digest and size. The JFR sample
+diagnoses JVM CPU, allocation, lock and GC behavior. Use ORC's Grain trace for Clojure leaf and
+model-call attribution.
+
+After all verdicts are final, write the profile report. It checks that every checklist item has
+one `before` and `after`, in order, with no room-owned VM process at either boundary, and that
+its model and Grain evidence is accounted for. It keeps timings and peak observed RSS as
+diagnostics. It also writes `work/profile.traces.otlp.json` and
+`work/profile.metrics.otlp.json`: OTLP/HTTP JSON with grading and item spans, probe events,
+process memory, VM count and JVM thread metrics. If it reports `failed`, preserve its findings
+and still file the honest item verdicts; put the profile problem in `surprises.json`.
+
+```bash
+python3 harness/v2/profile.py report --events "$P" --checklist checklist.txt \
+  --verdicts work/verdicts.json --instruction .pi/harness/grader-instruction-06.md \
+  --output work/profile.json
+```
 
 ## Output
 
@@ -166,4 +244,5 @@ you will be asked to continue with them.
 Optionally, write `work/surprises.json`: `[{"id", "note"}]`, places where the spec was ambiguous
 or the candidate did something the spec does not mention. A surprise never changes a verdict.
 
-When every item has a verdict, answer with one line: the number of items, passes and fails.
+When every item has a verdict and `work/profile.json` exists, answer with one line: the number of
+items, passes, fails and the profile status.
