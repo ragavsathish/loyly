@@ -2144,3 +2144,26 @@ clarifies two existing items and adds none, so slice 06 remains at 61 and the ch
    failed. Cycle 14's prompt renderer used upstream `4966c8e3` from the failed checkout, and
    its gate passed. The gitlink is advanced to that reachable commit so future clones render
    and build from the same declared ORC revision.
+
+## Spec round 22 (draft, 2026-11-15)
+
+Cycle 15 of slice 06 (`06-c15`, spec `7bc2610`) passed its gate on attempt 1 and scored
+57/61. `06-026` newly passed; `06-010`, `06-054` and `06-056` newly failed; `06-070`
+remained failed. The grader's `surprises.json` was empty. This round clarifies one existing
+item and adds none: slice 06 remains at 61 and the full checklist at 210.
+
+1. **An abandoned builder must resume before its stage expires** (`@item-06-070`). In the
+   cycle 15 black-box replay, the first builder was stopped five seconds into its session.
+   The restarted runner reopened the same session identity, but only when ORC's previous
+   leaf lease expired. ORC's default lease is 90 seconds, equal to the fixture's regenerate
+   stage timeout. Grain recorded `regeneration-cycle/cycle-failed` for `budget` at
+   `21:58:45.215Z`; the resumed builder leaf then tried to record its candidate and was
+   refused `cycle-concluded`. The original tick failed, and run progress stayed `running`.
+   The seam now requires a lease duration that permits abandonment recovery and completion
+   inside the original stage budget, while preserving single ownership, the tick and the
+   builder session identity. Item 070's Given and Thens stand.
+2. **The other three failures already have exact readings.** `@item-06-010` says the
+   self-check is the last effect after its failure. `@item-06-054` says the failed gate's
+   detail is `3 of 65 tests failed`, and `@item-06-056` says the halt detail is
+   `infrastructure the world did not come up`. Cycle 15 recorded an extra effect for 010
+   and whole command outputs for 054 and 056. The spec and grader stay unchanged.

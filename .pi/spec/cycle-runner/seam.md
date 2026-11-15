@@ -513,6 +513,13 @@ Before resuming a pending run, the runner recreates ORC's live model provider fr
 registration is a process setup effect, not a new run effect or a new reading of the host's
 current `LOYLY_*` variables.
 
+The runner configures ORC's execution lease so an abandoned builder leaf can be reclaimed,
+reopened and completed within the original regenerate stage's remaining budget. A restart does
+not reset that stage clock. The lease must still protect a live builder from a second invocation:
+only an abandoned leaf is resumed, with its original tick and session identity. ORC's default
+90-second lease is too long for a run whose regenerate stage is also 90 seconds; recovery at the
+lease expiry races the stage clock and cannot satisfy `@item-06-070`.
+
 ## Handed in
 
 Read when `start-run` runs, never only at boot, so a grader changes them between runs.
