@@ -97,6 +97,10 @@ What `seam.md` says, and what to expect:
   with the cut's tree, as well as the one-commit and fenced-path observations.
 - Let the evidence decide the judge: a pass rule matches on what the candidate really answered,
   and a fail rule catches the rest.
+- The judge's ORC binary scale is integer level `1` for fail (score `0.0`) and level `2` for pass
+  (score `1.0`). Use those levels in the stub replies. Level `0` is out of range. For 064, inspect
+  the two ORC judge score events as well as the filed verdicts. For 067, reply with level `2`
+  and feedback but no reasoning for 01-002; verify it leaves no judge score.
 
 ## Scoring and the store (items 059, 061 and 064 to 073)
 

@@ -9,7 +9,7 @@ its shadow matched legacy, but items 010 and 060 newly failed. Acceptance remain
 The next grader's profile contract and its recorded reason are in `harness/v2/PROFILE-06.md`.
 
 Run every command from the repository root. `STATE=.pi/harness/.state`. `NN=06`. `MM` is the
-cycle number (next: `20`, after spec round 24 and selection approval).
+cycle number (next: `21`, after spec round 25 and selection approval).
 
 ## 0. Once per machine
 
@@ -30,8 +30,8 @@ cycle number (next: `20`, after spec round 24 and selection approval).
 The fence clones HEAD, so the spec the builder reads must be committed.
 
 1. `git status` / `git diff`: review the next spec round and obtain approval of its exact
-   deterministic selection before fencing (AGENTS.md, "Pi and ORC ownership"). Round 24
-   leaves the 61 items unchanged and tightens JVM profile capture; the revised grader
+   deterministic selection before fencing (AGENTS.md, "Pi and ORC ownership"). Round 25
+   leaves the 61 items unchanged and specifies the judge's binary levels; the revised grader
    digest requires approval before use.
 2. Check the item count is unchanged (210; slice 06 at 61):
    `grep -c '@item-06-' .pi/spec/cycle-runner/spec.feature`
@@ -42,7 +42,7 @@ The fence clones HEAD, so the spec the builder reads must be committed.
 ## 2. Fence and render
 
 ```bash
-STATE=.pi/harness/.state; MM=20
+STATE=.pi/harness/.state; MM=21
 ROOM=$STATE/rooms/06-c$MM; OUT=$STATE/prompts/06-c$MM
 SLICE=06 harness/fence.sh $ROOM > $ROOM.fence.log 2>&1; echo "fence exit $?"; tail -3 $ROOM.fence.log
 bb harness/v2/prompt.clj 06 $OUT       # OUT/system.md and OUT/prompt.md
@@ -177,3 +177,4 @@ grader instruction digest requires operator approval under AGENTS.md before use.
 | 17 | ff6e8f5 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 61/61 | behavior unchanged from 16; profile failed on an out-of-order 073 capture; acceptance open |
 | 18 | 0e3f5e6 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 61/61 | behavior unchanged from 17; profile failed on 54 live runner after captures; acceptance open |
 | 19 | 73e70a7 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 59/61 | 010 and 060 newly failed; profile clean, shadow matched legacy; acceptance open |
+| 20 | 6f187ac | Codex gpt-6.1-sol subagent, host | passed, attempt 3 | 61/61 | 010 and 060 newly passed; profile clean; judge numeric bands failed the legacy shadow; acceptance open |

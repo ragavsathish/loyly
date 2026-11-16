@@ -196,9 +196,12 @@ workflow `cycle-runner/grade.v1`, as a child tick of its own:
   gated candidate's copy at `APP_DIR`, never a builder room, gate evidence or a store.
   It drives the candidate over its seam from fresh state and writes what it set up, sent and
   observed as the item's evidence ("The researcher's VM", below).
-- **`judge`** (`code`) scores the item on that evidence on one binary scale, pass or fail, the
-  reason first and then the score, with the rubric handed in (`LOYLY_GRADER_RUBRIC`). A reply with
-  no reason, or a score that is not pass or fail, scores nothing. ORC's own banded-output check
+- **`judge`** (`code`) scores the item on that evidence on one ORC binary `discrete-scale`:
+  integer level `1` means fail and maps to judge score `0.0`; integer level `2` means pass and
+  maps to judge score `1.0`. The scale has explicit descriptions for both bands. The judge gives
+  its reason first and then its level, using the rubric handed in (`LOYLY_GRADER_RUBRIC`) as the
+  item's criterion. A reply with no reason, or a level outside `1` and `2`, scores nothing;
+  level `0` is not a fail band. ORC's own banded-output check
   reads only the `level` field, so the judge checks the `reasoning` field itself: a reply with a
   `level` and no `reasoning`, or an empty one, scores nothing (`@item-06-067`). The score is recorded as ORC's
   judge score event, its judge name `checklist/<item-id>`, so each item keeps its own score.
@@ -510,7 +513,7 @@ researcher nodes.
 Before resuming a pending run, the runner recreates ORC's live model provider from that run's
 `handed-in` model endpoint and names on the blackboard. The resumed tick can reach `render`,
 `drive-seam` or `judge` without another `start-run`, and each must have its provider. Provider
-registration is a process setup effect, not a new run effect or a new reading of the host's
+registration is provider setup, not a new run effect or a new reading of the host's
 current `LOYLY_*` variables.
 
 The runner configures ORC's execution lease so an abandoned builder leaf can be reclaimed,

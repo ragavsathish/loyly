@@ -28,11 +28,11 @@
 #      the builder ran
 #   5. cycle-runner/start-run of R-full at the commit, its approved grader digests naming the
 #      rubric's, with LOYLY_GATE_CMD a stub gate command that passes and LOYLY_MODEL_API_BASE a
-#      stub model (ORC's marker format: it answers every output field a request names, `level` 1,
+#      stub model (ORC's marker format: it answers every output field a request names, `level` 2,
 #      a researcher's code a bare `(final! ...)` with the keys the request asks for): within
 #      RUN_BUDGET seconds the run passed with its cycle, the self-check and the builder ran, the
 #      model was called, run-progress shows the file-verdicts and file-score effects recorded and a
-#      score for the one item, 01-001. A runner that halts or fails before the score fails here.
+#      pass score for the one item, 01-001. A runner that halts or fails before the score fails here.
 #      The run is handed LOYLY_GRADER_IMAGE, the real guest image (spec round 20: a run with no
 #      image halts before grading): PROBE_GRADER_IMAGE, else the checkout's builder-clojure image.
 #
@@ -104,7 +104,7 @@ def stub_reply(text):
         if f == "code":
             v = "(final! {" + " ".join(f'{k} "stub: the scenario was observed over the seam"' for k in keys) + "})"
         elif f == "level":
-            v = "1"
+            v = "2"
         else:
             v = f"stub {f}: the scenario holds, as observed over the seam."
         out.append(f"[[ ## {f} ## ]]\n{v}")
@@ -129,7 +129,7 @@ class StubModel(http.server.BaseHTTPRequestHandler):
 model_server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), StubModel)
 threading.Thread(target=model_server.serve_forever, daemon=True).start()
 instruction = write(os.path.join(work, "instruction.md"), "Build the probe's product.\n")
-rubric = write(os.path.join(work, "rubric.md"), "Pass when the item's behaviour is observed over the seam; else fail.\n")
+rubric = write(os.path.join(work, "rubric.md"), "Pass when the item's behaviour is observed over the seam; else fail. Binary bands: 1 = fail, 2 = pass.\n")
 with open(rubric, "rb") as f:
     grader_digest = "sha256:" + hashlib.sha256(b"cycle-runner/grade.v1\n" + f.read()).hexdigest()
 images = os.path.join(work, "images")
@@ -256,9 +256,9 @@ if r.get("status") != "passed":
          f"effects {sorted(done)}; want passed with its cycle")
 missing = [e for e in ("self-check", "fence", "regenerate", "file-verdicts", "file-score")
            if done.get(e) != "recorded"]
-if missing or scored != ["01-001"]:
+if missing or scored != ["01-001"] or (r.get("scores") or [{}])[0].get("verdict") != "pass":
     fail(f"R-full passed, but its effect results {json.dumps(done)[:300]} lack {missing} recorded, or its "
-         f"scores are {scored}, not one score for 01-001")
+         f"scores are {json.dumps(r.get('scores'))[:300]}, not one pass for 01-001")
 ran = [m for m in ("self-check", "builder", "gate") if not os.path.exists(os.path.join(marks, m))]
 if ran or not model_calls:
     fail(f"R-full passed, but " + (f"the {' and the '.join(ran)} never ran" if ran else "the model was never called"))

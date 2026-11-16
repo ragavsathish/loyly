@@ -2127,22 +2127,22 @@ clarifies two existing items and adds none, so slice 06 remains at 61 and the ch
    the runner on the same store. The builder reopened with the same session identity and the
    earlier effects appeared once, but both grading child ticks failed `drive-seam` with ORC's
    `provider-not-configured`; scoring saw zero verdicts and failed. Cycle 14 registered the
-   provider only inside `start-run`, while process boot called `resume-in-progress!` without a
+   provider only inside `start-run`, while startup called `resume-in-progress!` without a
    new `start-run`. The seam's Resume paragraph now requires recreating the live provider from
    the pending run's captured `handed-in` endpoint and model names before resuming that tick.
-   This is process setup, not a new run effect. Item 070's wording stands.
+   This is provider setup, not a new run effect. Item 070's wording stands.
 2. **The unscored researcher's failure is scripted inside its code** (`@item-06-026`). The
-   first researcher prompt exposes the item's shape, not its value; the grader cannot make a
-   stub server reject every request for 01-002 while accepting the identical first request
+   first researcher request exposes the item's shape, not its value; the grader cannot make a
+   model stub reject every request for 01-002 while accepting the identical first request
    for 01-001. The old Given was therefore untestable as written. Its replacement has the
    stub return code that reads `(get-input :item)` and fails for 01-002, while 01-001 reaches
    a judge score. The Thens and stamp are unchanged. The slice-06 grader instruction records
    this setup. Replaced wording is a recorded reason to update the grader, never to turn a
    measured failure green without observation.
-3. **The ORC submodule pin must be reachable in a fresh checkout.** The repository gitlink
+3. **The ORC submodule pin must be reachable in a fresh repository copy.** The repository gitlink
    `4f8ec152` is no longer served by `ObneyAI/orc`; a fresh `git submodule update --init`
-   failed. Cycle 14's prompt renderer used upstream `4966c8e3` from the failed checkout, and
-   its gate passed. The gitlink is advanced to that reachable commit so future clones render
+   failed. Cycle 14's instruction renderer used upstream `4966c8e3` from the failed repository copy, and
+   its gate passed. The gitlink is advanced to that reachable commit so subsequent copies render
    and build from the same declared ORC revision.
 
 ## Spec round 22 (draft, 2026-11-15)
@@ -2202,16 +2202,39 @@ failed. The profile was clean, and its full instrument shadow matched legacy on 
 candidate, including the gitlinks. The build is not accepted. The exploratory diagnosis is
 filed in `harness/v2/cycles/06/19/diagnosis.md`.
 
-1. **The two failures are implementation regressions, not new readings.** Item 010 already
+1. **The two failures are candidate regressions, not new readings.** Item 010 already
    requires the failed self-check's last line as the cycle detail and the self-check as the
    last runner effect. The candidate passed raw stdout with a newline into the failure and
    recorded a separate `fail-cycle` effect. Item 060 already requires the passed gate's boot
-   margin; the candidate recorded 20 boot polls and an answer on poll 5 but its generic
+   margin; the candidate recorded 20 boot polls and a response on poll 5 but its generic
    read-model reducer did not derive or expose 15. Neither spec item nor its grader scenario
    changes. Slice 06 remains 61 items, and the full checklist remains 210.
 2. **The next grading profile must include a live JVM diagnostic.** Cycle 19 observed Java
-   in active snapshots but filed no `jcmd`/`jstat` diagnostic. A separate live scratch probe
+   in active samples but filed no `jcmd`/`jstat` diagnostic. A separate live scratch probe
    succeeded on the same candidate. The profile report now fails if live candidate Java was
    observed yet no matching JVM diagnostic was filed across the cycle. The grader instruction
    requires one successful capture while the JVM is alive. This changes instrument behavior,
    not item scoring, and the new grader digest needs exact operator approval before cycle 20.
+
+## Spec round 25 (proposed, 2026-11-16)
+
+Cycle 20 passed its independent gate on attempt 3 and its black-box grade scored 61/61. Its
+instrument shadow with the legacy harness on the same HTTP candidate differed at scoring:
+the cycle 20 runner filed no verdict when the model returned integer level 2, while a scratch
+replay using level 1 filed a pass. The candidate's judge instruction had assigned level 1 to
+pass and level 0 to fail. The shadow's scratch rubric contained only `shadow rubric`; the
+earlier comparison report incorrectly said that rubric assigned numeric bands. This round
+corrects that report and settles the numeric contract from the pinned ORC source.
+
+1. **The binary judge scale has levels 1 and 2.** ORC's `discrete-scale` requires a
+   description for each integer level, and `level->unit-score` maps `(level - min) / (max -
+   min)`. A direct isolated check at pinned ORC `4966c8e3` returned 1 → 0.0 and 2 → 1.0;
+   it rejected 0 and 3. Thus the cycle runner's fail band is 1 and pass band is 2. The
+   rubric supplies the item's criterion, while the scale supplies the two band anchors.
+   The cycle-runner seam and Allium state the mapping; `@item-06-064` now observes both
+   verdicts and both ORC score values, and `@item-06-067` names level 2 for its unreasoned
+   reply. The stamped count stays 61 and the full checklist stays 210.
+2. **The gate and grader use the same levels.** The slice-06 identity probe now sends level 2
+   and requires a pass verdict. Its fixture rubric names both bands. The grader instruction
+   names the numeric levels for 064 and 067, so it must be sealed under a new digest and
+   approved before the next cycle. No cycle 20 score or candidate has been changed.
