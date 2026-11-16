@@ -20,3 +20,8 @@ pass and fail. The legacy comparison's sealed rubric uses level `2` for pass;
 the candidate did not score those replies. This shadow mismatch blocks
 acceptance under `AGENTS.md`'s instrument exception, independently of the
 61-item black-box grade and profile. The generated candidate was not edited.
+
+A supplemental scratch replay kept the cut, candidate and model reply text
+fixed and changed only the numeric level from `2` to `1` (`runner-s9-c20-level1`).
+It filed 11 passes and ended `passed`. That confirms the adapter's numeric-band
+mismatch; it does not make the level-`1` reply a pass under the shared rubric.
