@@ -63,7 +63,7 @@ identity**, the **stamped scenario** and, since R2, the **one reading of Gherkin
 ## Drafts (R3, 2026-11-06)
 
 `drafts.feature`: 17 draft scenarios for the 24 must-cover obligations of this context
-(`tools/spec/v2/coverage.py`: each rule's success, each `requires` that is behaviour, each
+(`tools/spec/coverage.sh --v2`: each rule's success, each `requires` that is behaviour, each
 invariant, each contract invariant, each guarantee), every one tagged; 0 uncovered. Each
 draft names its rule, file and the Gherkin `Rule:` it goes under, cites the legacy
 `@harness-NNN` it preserves, and suggests a tier. Unit-level, not drafted (2): `StampFirstScenarios.3` and `StampSlice.3` (one half each of the ledger / no-ledger pair). Refusals 2, 4 and 5 of the two stamping rules are drafted as Scenario Outlines with one example per rule (no ledger, a ledger).

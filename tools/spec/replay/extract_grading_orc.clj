@@ -5,7 +5,7 @@
          '[babashka.process :as p]
          '[clojure.string :as str]
          '[cheshire.core :as json])
-(import '[java.time Instant])
+(import '[java.time Instant Duration])
 
 (def root (str (-> (java.io.File. *file*) .getCanonicalFile .getParentFile .getParentFile .getParentFile .getParentFile)))
 (def work (str root "/.pi/harness/.state/grading/06-c25/work"))
@@ -23,12 +23,12 @@
     (when-not (zero? (:exit r)) (throw (ex-info (:err r) {:file file})))
     (for [line (str/split (:out r) #"\u001e") :when (not (str/blank? line))
           :let [[time type hex] (str/split line #"\u001f" 3)]]
-      {:at (.toEpochMilli (Instant/parse time)) :type type :data (fr/decode hex)})))
+      {:at (Instant/parse time) :type type :data (fr/decode hex)})))
 (defn first-domain-ms [file]
   (let [q "select time from events where type not like ':grain/%' and type not like ':sheet/%' order by time,id limit 1"
         r (p/sh {:out :string :err :string} "sqlite3" file q)]
     (when-not (zero? (:exit r)) (throw (ex-info (:err r) {:file file})))
-    (when-let [time (not-empty (str/trim (:out r)))] (.toEpochMilli (Instant/parse time)))))
+    (when-let [time (not-empty (str/trim (:out r)))] (Instant/parse time))))
 (defn extract [file]
   (let [rs (vec (rows file))
         sheets (into {} (for [{:keys [type data]} rs :when (= type ":sheet/sheet-created")]
@@ -50,7 +50,7 @@
                                    [(if (str/ends-with? type "started") "start" "done") node]
                                    (= type ":judge/score-emitted") ["score" "judge"])]
                      :when entry]
-                 [(- at origin) (second entry) (first entry)])]
+                 [(quot (.toNanos (Duration/between origin at)) 1000000) (second entry) (first entry)])]
     (vec result)))
 (let [ids (set (map :id (:items scores)))
       cases (into (sorted-map)

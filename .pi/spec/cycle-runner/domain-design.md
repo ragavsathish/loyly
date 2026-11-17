@@ -125,7 +125,7 @@ round 8 `@item-06-039` to `@item-06-048` (the stdio gate and the plan's slices),
 round 11 `@item-06-052` (the http probe in the gated tree), and spec round 12 `@item-06-053` to
 `@item-06-057` (the gate command), spec round 13 `@item-06-058` (the context start deadline), and spec
 round 14 `@item-06-059` (each effect its own leaf, reworded in spec round 16 for the delegated attempt), spec round 15 `@item-06-060` (the boot polls start at once; reworded in spec round 16b to count polls, not seconds), and spec round 16 `@item-06-061` to `@item-06-063` (the delegated gate attempt, the build's own event model, a context's reply bound), all minimum: 63 items. `drafts.feature` holds none. Of the 56 must-cover obligations
-(`tools/spec/v2/coverage.py`), 7 are unit level and 4 gate-verified (`TheGateRoomIsNotTheBuilders`, planned `room-policy`; `TheBlackboardIsTheRunsState` and `EveryWaitHasABound`, planned `leaf-contract`; `TheCandidateHoldsOnlyItsBuild`, planned `candidate-contents`).
+(`tools/spec/coverage.sh --v2`), 7 are unit level and 4 gate-verified (`TheGateRoomIsNotTheBuilders`, planned `room-policy`; `TheBlackboardIsTheRunsState` and `EveryWaitHasABound`, planned `leaf-contract`; `TheCandidateHoldsOnlyItsBuild`, planned `candidate-contents`).
 
 ## Decided in spec round 18
 

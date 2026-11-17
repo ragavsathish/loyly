@@ -60,7 +60,7 @@ The spec page's menu (<https://scope-impact.github.io/loyly/>) lists every publi
 
 ## Cycle 25 grading playback
 
-`extract_grading_storm.py` reads the 61 canonical Grain stores retained under
+`extract_grading_storm.clj` reads the 61 canonical Grain stores retained under
 `.pi/harness/.state/grading/06-c25/work/06-*/events.sqlite` and writes a compact,
 checked-in timeline of 1,910 domain event types and relative times. It omits
 payloads, IDs, paths and prompts. Two passing grader cases emitted no domain event.
@@ -72,7 +72,7 @@ decodes the Fressian event bodies locally to resolve node names, then retains
 only the relative time, step name and start/done/score transition in the public
 JSON. It carries no event payload, ID, path or prompt.
 
-`build_grading.py` combines both timelines, the original six-context storm SVG,
+`build_grading.clj` combines both timelines, the original six-context storm SVG,
 and the filed cycle-25 OTLP trace, score and profile under `harness/v2/cycles/06/25/`.
 The resulting `cycle-25-grading.html` uses one scrubber for the domain event board
 and the ORC black-box grading strip. It lights the actual spec event nodes as a
@@ -88,9 +88,9 @@ The page inlines the same event-model and replay stylesheets as run-03 and the
 current generated `story.svg`, so it is self-contained.
 
 ```bash
-python3 tools/spec/replay/build_grading.py
+bb --classpath tools/spec/replay/src tools/spec/replay/build_grading.clj
 # On the machine retaining the raw grader stores, to refresh the compact timeline:
-python3 tools/spec/replay/extract_grading_storm.py
+bb --classpath tools/spec/replay/src tools/spec/replay/extract_grading_storm.clj
 bb --classpath tools/spec/replay/src tools/spec/replay/extract_grading_orc.clj
 ```
 
