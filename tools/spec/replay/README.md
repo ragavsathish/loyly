@@ -67,7 +67,12 @@ grading playback, distinct from the run-03 cycle-runner replay above. The filed 
 profile and its audited retry-name exception remain visible. The generator selects
 specific diagnostic fields and omits raw identifiers, paths and prompts.
 It inlines the same event-model and replay stylesheets used by run-03, so the
-published page remains self-contained and visually consistent.
+published page remains self-contained and visually consistent. Its main view
+uses the spec page's event-storm reading order: time moves right and the grader,
+process/VM, Grain/model and ORC observations occupy rows. The 61 columns are
+sorted by their first recorded trace event; selecting a sticky jumps into the
+underlying event playback. The board summarizes filed evidence, without adding
+new domain events or inferred causal arrows.
 
 ```bash
 python3 tools/spec/replay/build_grading.py
