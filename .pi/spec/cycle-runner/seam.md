@@ -188,6 +188,16 @@ When an attempt passed, every checklist item is graded, one at a time, in checkl
 `map-each` over the checklist delegates each item to the sealed grader, the versioned judge
 workflow `cycle-runner/grade.v1`, as a child tick of its own:
 
+This is the black-box grader **running**, not the Grader lifecycle preparing it. The `grader`
+leaf before the fence verifies the digest supplied in the approved run; it does not author,
+calibrate, seal or approve a grader. ORC's child tick and `clear-evidence`, `drive-seam`, and
+`judge` node records, including `:judge/score-emitted` when there is a score, share the Grain
+store with `measurement/item-verdicts-filed`, `measurement/measurement-filed`, and
+`measurement/scoreboard-reported`. They provide the observable grading path. None of those
+records implies `grader-lifecycle/instrument-golden-written` or
+`grader-lifecycle/instrument-golden-moved`: those occur only when the instrument maintainer
+changes a golden, outside the ordinary cycle (`../event-storm.md`, "Current ORC grading overlay").
+
 - **`clear-evidence`** (`code`) writes the item's evidence empty, so no item sees another's.
 - **`drive-seam`** (`repl-researcher`) is given the item (its identity and scenario), and the
   seam it drives: the `seam.md` and `event-model/*.edn` beside the item's spec file in the cut,

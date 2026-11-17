@@ -43,6 +43,11 @@ over stdio, as `harness/v2/gate.sh` does (`APP_SEAM=stdio`).
   room (`seam.md`, "The researcher's VM"). The score leaf files the
   judge's scores as scored; an item with no score is Measurement's to file as an unreached fail.
   The grader's digest must be one the run approved, or the run halts before the cycle.
+  This is the grader's execution inside the cycle, not Grader lifecycle preparation: the
+  `grader` leaf checks an already approved digest, and `grade.v1` records ORC node and judge
+  facts on the one Grain store. Grader lifecycle's current domain events are instrument golden
+  writes and moves on their own clock; a grading run does not cause either event. The current
+  execution overlay is in `../event-storm.md`.
 - **One builder per run at a time**: a pi-durable session in a Gondolin VM, run by a code leaf
   through the provided builder host, its identity derived from the run's tick, so a resumed run
   reopens it. The builder's exit is not evidence; the gate is.
