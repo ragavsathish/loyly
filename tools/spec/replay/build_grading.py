@@ -84,7 +84,7 @@ def main():
             "problem": profile["problems"][0], "trace": profile["otel_trace_id"]}
     data_json = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     data_json = data_json.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
-    template = (Path(__file__).with_name("grading-template.html")).read_text()
+    template = (Path(__file__).parent / "src/replay/grading-template.html").read_text()
     base_css = (ROOT / "tools/spec/views/src/specviews/page.css").read_text()
     replay_css = (ROOT / "tools/spec/replay/src/replay/page.css").read_text()
     page = (template.replace("BASE_CSS", base_css)
