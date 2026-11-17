@@ -55,12 +55,12 @@ later rounds.
 ## The regeneration cycle
 
 ORC runs one cycle, in the shape of the legacy harness. The accepted cycle runner
-(`harness-impl/06-cycle-runner/`, cycle 23) drives slices 01-05; the legacy harness (`harness/`,
+(`harness-impl/06-cycle-runner/`, cycle 25) drives slices 01-05; the legacy harness (`harness/`,
 `archive/legacy-harness/`) remains the reference and builds replacements for slice 06 (ADR 0006).
 A run rebuilds **the Löyly app** (`docs/plan` into `impl/`); the harness is not asked to rebuild
 itself ("Self-hosting stopped"). Run-03 (2026-11-10) is the worked example: gate passed,
-grading 11/11. The accepted runner's known failures and its legacy shadow are recorded in
-`harness-impl/06-cycle-runner/PROVENANCE.md`. ADR 0007 permits a bounded repair slice from
+grading 11/11. The accepted runner's score, audited profile exception and legacy shadow are
+recorded in `harness-impl/06-cycle-runner/PROVENANCE.md`. ADR 0007 permits a bounded repair slice from
 an accepted base under the pinned workflow in `harness/v2/REPAIR-06.md`.
 
 A run: start the runner with its `LOYLY_*` environment (seam.md, "Handed in"), call

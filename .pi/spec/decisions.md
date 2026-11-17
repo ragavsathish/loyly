@@ -2280,3 +2280,23 @@ judge all 61, and the instrument shadow is required before the complete replacem
 accepted. Preflight `harness/v2/preflight/06/25.md` compares the exception to legacy and
 proves that the strengthened identity probe passes cycle 23 and rejects cycle 24's missing
 built-in gate. No spec item or grader scenario changed in this decision.
+
+## Acceptance of cycle 25 repaired runner (2026-11-17)
+
+The bounded repair from accepted cycle 23 changed two source files and one test file, plus a
+repair note; the pinned base remained unchanged. Its independent gate passed the 45-test,
+406-assertion suite, the strengthened stdio identity probe (including the built-in HTTP
+gate), and the Grain store check. The independent black-box grader filed 61/61, with 047
+and 066 newly passing against the accepted base and no newly failing item. The same-cut
+instrument shadow matched the legacy harness at the clean tree, app bytes, gate and ordered
+11 verdicts.
+
+The filed profile is still `failed`: its sole problem is eight separately named fresh
+retries outside the checklist. The raw captures were audited individually for ordered
+boundaries, model and store evidence, no owned process after shutdown, and live QEMU samples
+where grading ran (`harness/v2/cycles/06/25/profile-retry-audit.md`). Every canonical case
+was clean and a live JVM diagnostic exists. The operator explicitly chose "Accept audited
+exception" for this finding. This acceptance preserves the failed report and raw evidence;
+it does not change the 61 verdicts or make a claim that the profile reporter itself passed.
+The complete cycle-25 artifact is the running build at `harness-impl/06-cycle-runner/`, with
+its provenance and source digest. The five other accepted contexts are retained.

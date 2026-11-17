@@ -245,17 +245,19 @@
           (t/is (= "run-in-progress" (get-in (call *ctx* "cycle-runner/start-run" (approved "second-live")) [:error :data :refusal]))))
         (t/is (:result (deref work 30000 nil)))))))
 (t/deftest item-06-066
-  (t/testing "@item-06-066 researcher reads scenario seam and event model through get-input; shell is Linux"
+  (t/testing "@item-06-066 first researcher request carries the cut contract; shell is isolated Linux"
     (let [repo (get-in *fixture* [:env "LOYLY_PROJECT_REPO"])]
       (write! (str repo "/plan/01-demo/seam.md") "FIXTURE-SEAM-OUTSIDE-CANDIDATE")
       (write! (str repo "/plan/01-demo/event-model/area.edn") "{:fixture-contract :seam-only}")
       (swap! model-control assoc :reply (fn [request normal]
         (if (str/includes? request "[[ ## code ## ]]")
-          "[[ ## reasoning ## ]]\nObserve VM\n[[ ## code ## ]]\n(let [r (shell {\"command\" \"uname -s; pwd; ls ..; test -f plan/01-demo/spec.feature; test -f impl/start.sh\"})] (println (str \"FINAL\" \"_ANSWER: \" (pr-str {:evidence (str (:out r) (pr-str (get-input :item)))}))))\n[[ ## completed ## ]]" normal)))
+          "[[ ## reasoning ## ]]\nObserve VM\n[[ ## code ## ]]\n(let [r (shell {\"command\" \"uname -s; pwd; ls -a; ls -a ..; test -f plan/01-demo/spec.feature && test -f impl/start.sh && test ! -e ../clean && test ! -e ../gate-1 && test ! -e ../builder-1 && test ! -e ../../../events.sqlite && echo ISOLATED-ROOM-VERIFIED\"})] (println (str \"FINAL\" \"_ANSWER: \" (pr-str {:evidence (str (:out r) (pr-str (get-input :item)))}))))\n[[ ## completed ## ]]" normal)))
       (let [run (run! (assoc (approved "vm-contract") :commit (recommit!))) requests (:requests @model-control)
+            first-research (first (filter #(str/includes? % "[[ ## code ## ]]") requests))
             research-evidence (first (filter #(and (str/includes? % "[[ ## level ## ]]") (not (str/includes? % "[[ ## code ## ]]"))) requests))]
         (t/is (= "passed" (:status run)))
-        (doseq [text ["Given the fixture" "FIXTURE-SEAM-OUTSIDE-CANDIDATE" "fixture-contract"]] (t/is (str/includes? research-evidence text)))
+        (doseq [text ["Given the fixture" "FIXTURE-SEAM-OUTSIDE-CANDIDATE" "fixture-contract"]] (t/is (str/includes? first-research text)) (t/is (str/includes? research-evidence text)))
+        (t/is (str/includes? research-evidence "ISOLATED-ROOM-VERIFIED"))
         (t/is (some #(and (str/includes? % "Linux") (not (str/includes? % "[[ ## code ## ]]"))) requests))))))
 (t/deftest item-06-069
   (t/testing "@item-06-069 no scored items fails score without another builder"
@@ -352,9 +354,12 @@
       (sh/sh "mkdir" "-p" (str repo "/spec"))
       (sh/sh "mv" (str repo "/plan/01-demo") (str repo "/spec/demo"))
       (sh/sh "ln" "-s" "../spec/demo" (str repo "/plan/01-demo"))
-      (let [run (run! (assoc (params *fixture* "link") :commit (recommit!)))
+      (let [run (run! (assoc (approved "link") :commit (recommit!)))
             stamps (get-in (call *ctx* "specification/stamped-items" {:slice "01"}) [:result :slice])]
-        (t/is (= "grader" (get-in run [:halt :effect])))
+        (t/is (= "passed" (:status run)))
+        (let [items (:items (first (:events (first (filter #(= "checklist" (:effect %)) (:effect-results run))))))]
+          (t/is (= ["01-001" "01-002"] (mapv :item-id items)))
+          (t/is (= ["plan/01-demo/spec.feature:3" "plan/01-demo/spec.feature:6"] (mapv :source items))))
         (t/is (= ["01-001" "01-002"] (mapv :item-id (:items stamps))))
         (t/is (every? #(str/includes? (:source %) "/01-demo/spec.feature") (:items stamps)))))))
 (t/deftest item-06-055

@@ -24,7 +24,7 @@
           (when (or (= select #{""}) (contains? select slice))
             (let [target (if (= mode "120000")
               (str (.normalize (.resolve (.getParent (.toPath (io/file path))) (str/trim (cut-file env p path))))) path)]
-              {:slice (.getName (io/file path)) :path (str target "/spec.feature")}))))) entries)))))
+              {:slice (.getName (io/file path)) :path (str target "/spec.feature") :source (str path "/spec.feature")}))))) entries)))))
 (defn scenarios [text path]
   (let [lines (vec (str/split-lines text))]
     (loop [i 0 rule nil tags [] out []]
@@ -101,7 +101,7 @@
     (assoc item :slice (:slice slice) :scenario scenario :seam seam :event-model (str/join "\n" (map #(cut-file env p %) paths)))))
 (defn checklist-leaf [ctx]
   (let [in (input ctx) p (params in) env (json/read-str (:handed-in in)) slices (:slices in)]
-    (try (let [items (mapcat #(scenarios (cut-file env p (:path %)) (:path %)) slices)
+    (try (let [items (mapcat #(scenarios (cut-file env p (:path %)) (or (:source %) (:path %))) slices)
                reply (d/issue ctx :measurement/derive-checklist
                  (merge (select-keys p [:cut-id :selection-id]) {:items (mapv #(dissoc % :line) (filter :item-id items))
                    :unstamped (mapv #(select-keys % [:source :title]) (remove :item-id items)) :skipped-slices []}))]

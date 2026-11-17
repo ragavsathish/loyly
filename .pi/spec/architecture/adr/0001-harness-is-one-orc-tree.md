@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted for the cycle-runner context (2026-11-17). Cycle 23 passed its gate, scored 59/61,
-and matched the legacy instrument on one same-cut HTTP fixture. Its two failed items remain
-open in `harness-impl/06-cycle-runner/PROVENANCE.md`.
+Accepted for the cycle-runner context (2026-11-17). Cycle 23 first passed its gate, scored
+59/61, and matched the legacy instrument on one same-cut HTTP fixture. Cycle 25 repaired
+its two open items, scored 61/61, and matched legacy; its profile exception is recorded in
+`harness-impl/06-cycle-runner/PROVENANCE.md`.
 
 ## Context
 

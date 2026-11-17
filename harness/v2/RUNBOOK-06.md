@@ -4,7 +4,8 @@ How cycles 13 onward of slice 06 (`cycle-runner`, the one ORC tree `cycle.v1`) a
 (`.pi/spec/decisions.md`, "Spec round 19" 4). The builder and grader are fresh subagents on
 the host, on different models (ADR 0003): no pi in the legacy loop. Cycle 13 used Claude
 Opus and Sonnet; cycles 14 to 22 used Codex builders, and cycles 23 and 24 used Astra.
-Cycle 23 is the accepted running context, with its two failed items recorded in
+Cycle 25 is the accepted running context, repaired from accepted cycle 23. Its score was
+61/61 and its legacy shadow matched; its profile exception is recorded in
 `harness-impl/06-cycle-runner/PROVENANCE.md`. Cycle 24's gate passed on attempt 1 but scored
 31/61, with a failed profile and two legacy shadow regressions (`harness/v2/cycles/06/24/`,
 `harness/v2/shadow/06/24/`). It is not accepted.
@@ -222,3 +223,4 @@ grader instruction digest requires operator approval under AGENTS.md before use.
 | 22 | cb19e87 | Codex gpt-6.1-sol subagent, host | passed | 55/61 | profile failed; legacy shadow matched; not accepted |
 | 23 | cb19e87 | Codex gpt-6-astra subagents, host | passed, attempt 2 | 59/61 | profile clean; legacy shadow matched; 047 and 066 failed; accepted with both open |
 | 24 | 76ee55b | Codex gpt-6-astra subagent, host | passed, attempt 1 | 31/61 | profile failed; built-in gate missing and gitlinks dropped in legacy shadow; not accepted |
+| 25 | 3d58399 | Codex gpt-6-astra repair subagent, host | passed, attempt 1 | 61/61 | 047 and 066 newly passed vs accepted 23; no newly failing; legacy shadow matched; profile failed on eight audited retry names; accepted by explicit operator exception |

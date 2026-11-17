@@ -52,7 +52,7 @@
     (orc/sequence "grade-item"
       (leaf "clear-evidence" [] [:evidence])
       (orc/repl-researcher "drive-seam" :rlm true :provider :loyly-model :model (get env "LOYLY_GRADER_MODEL" "grader")
-        :instruction "Drive this candidate over its public seam from fresh state. Read the item and its public contract with (get-input :item). Use shell to run programs in the grading room. Report evidence of what was set up, sent and observed."
+        :instruction (str "Drive this candidate over its public seam from fresh state. Read the item and its public contract with (get-input :item). Use shell to run programs in the grading room. Report evidence of what was set up, sent and observed.\n" (get env "research-contract" ""))
         :reads [:item :gate-room :candidate :handed-in :config] :writes [:evidence] :mcp-tools ["shell"]
         :tool-contracts {"shell" {:checkpoint-safe? true :arguments [:map ["command" :string]] :result [:map [:exit :int] [:out :string] [:err :string] [:timeout :boolean]]}}
         :tool-caller-fn "loyly.grading/shell-caller" :max-iterations 5 :options {:tool-arg-specs {"shell" ["command"]}})
@@ -97,6 +97,19 @@
       (orc/sequence "failed-cycle" (is-run "cycle-failed" "cycle-failed") (leaf "conclude:failed" [:params :cycle] [:run]))
       (orc/sequence "halted-run" (is-run "halting" "halting") (leaf "halt" [:params :halt] [:run]))
       (is-run "refused-start" "refused"))))
+(defn research-contract [env p]
+  ;; RLM describes structured input shapes. Supply the selected cut's public
+  ;; documents separately, while the current item stays behind get-input.
+  (try
+    (str/join "\n\n"
+      (for [slice (effects/slices-at env p (effects/config env))
+            :let [folder (.getParent (clojure.java.io/file (:path slice)))
+                  paths (str/split-lines (effects/git env "ls-tree" "-r" "--name-only" (:commit p) (str folder "/event-model/")))]]
+        (str "Public contract for " (:slice slice) "\n"
+          (effects/cut-file env p (:path slice)) "\n"
+          (try (effects/cut-file env p (str folder "/seam.md")) (catch Exception _ "")) "\n"
+          (str/join "\n" (map #(effects/cut-file env p %) paths)))))
+    (catch Exception _ "")))
 (defn build! [ctx env]
   (router/register! :loyly-model {:provider :openai :model (get env "LOYLY_RENDER_MODEL" "render")
     :config {:api-base (get env "LOYLY_MODEL_API_BASE" "http://127.0.0.1:1/v1") :api-key "fixture-or-host" :timeout 60000}})
@@ -134,7 +147,7 @@
         (not (m/validate (:schema (or cmd query)) p)) (error id -32602 "Invalid params" {})
         query {:jsonrpc "2.0" :id id :result (:query/result (qp/process-query (assoc ctx :query (assoc p :query/name method :query/id (random-uuid) :query/timestamp (java.time.OffsetDateTime/now)))))}
         (= method :cycle-runner/start-run)
-        (let [result (orc/execute ctx (build! ctx (effects/environment)) {:params (json/write-str p) :attempt 0} :timeout-ms 240000)
+        (let [result (orc/execute ctx (build! ctx (assoc (effects/environment) "research-contract" (research-contract (effects/environment) p))) {:params (json/write-str p) :attempt 0} :timeout-ms 240000)
               outputs (:outputs result) refusal (:refusal outputs)]
           (cond
             (not= :success (:status result)) (error id -32603 "Workflow did not complete" result)
