@@ -1,9 +1,8 @@
 # harness-impl: the promoted build of spec v2
 
-The new harness, as built: the six contexts of spec v2 (`../.pi/spec/`), each the candidate a
-regeneration cycle built from a fenced clean room, that passed its gate and was scored. Promoted
-here on 2026-11-08, after the switch (`../.pi/spec/decisions.md`, "The switch to the new
-harness"): this is the build that runs the regeneration cycles since then.
+The accepted builds of the six spec-v2 contexts (`../.pi/spec/`) are recorded here. Contexts
+01–05 were promoted in the first switch; the cycle-23 build of context 06 was accepted on
+2026-11-17. Each came from a fenced clean room, passed its gate, and was scored.
 
 | Folder | Context | Cycle | Score |
 |---|---|---|---|
@@ -12,11 +11,14 @@ harness"): this is the build that runs the regeneration cycles since then.
 | `03-grader-lifecycle/` | grader-lifecycle | 05 | 11/11 |
 | `04-regeneration-cycle/` | regeneration-cycle | 05 | 76/76 |
 | `05-cycle-preparation/` | cycle-preparation | selfhost-01 (runner c05), the first self-hosted cycle | 4/4 |
-| `06-cycle-runner/` | cycle-runner | 08 (a handed-in gate command, `LOYLY_GATE_CMD`, spec round 12) | 57/57 |
+| `06-cycle-runner/` | cycle-runner | 23, attempt 2 (accepted with two open items) | 59/61 |
 
 Each folder's `PROVENANCE.md` names the room it came from, its gate log and verdict, its score
 and cycle commit, the spec commit it was built from, and the digest of its source, which equals
 the digest computed in the room.
+
+The cycle-23 runner is accepted as a complete generated context. Its open items are `06-047`
+and `06-066`; see its provenance. The five other accepted contexts were retained as built.
 
 ## Running a context
 
@@ -37,15 +39,11 @@ Some contexts read more (`LOYLY_PROJECT_COMMITS`, `LOYLY_SCENARIO_DIGESTS`,
 
 ## Driving the cycle runner
 
-`06-cycle-runner/` performs a whole cycle, driving the five contexts of slices 01-05 through
-their seams. It is handed its store, a runs directory, the project repository, the project's
-harness configuration, the five contexts (`LOYLY_CONTEXTS`, a JSON file naming each context's
-`start.sh` here), the self-check, the builder command and the builder instruction:
-`../.pi/spec/cycle-runner/seam.md`, "Handed in". How it was run against the Löyly benchmark, and
-what stays open (a run cannot yet resume after a restart, so the runner is kept alive from start
-to the filed score), is in `../.pi/spec/decisions.md`, "The switch to the new harness", and the
-builder command in `../.pi/harness/README.md`, "The builder command".
-The whole loop over Löyly, step by step: `../README.md`, "The tutorial: one full loop".
+`06-cycle-runner/` performs the whole cycle as one ORC tree on one Grain store. It includes the
+event models of contexts 01–05 and receives the store, runs directory, project repository,
+harness configuration, self-check, builder command and instruction, and grader image as its
+seam specifies (`../.pi/spec/cycle-runner/seam.md`, "Handed in"). Its acceptance evidence and
+known failures are in `06-cycle-runner/PROVENANCE.md`.
 
 ## A build product
 

@@ -2256,3 +2256,14 @@ through `(get-input :item)`. This supersedes round 21's assertion that the first
 response can still serve both and branch inside the code. Item 066's Then and all stamps stand.
 The sealed grader instruction receives the same reading. Its revised digest requires approval
 before use. Slice 06 remains 61 items and the full checklist remains 210.
+
+## Acceptance of cycle 23 runner (2026-11-17)
+
+The operator chose to promote the complete cycle-23 attempt-2 candidate as the running
+cycle-runner context. Its independent gate passed, its score was 59/61 with a clean profile,
+and its same-cut instrument shadow matched the legacy harness on the shared HTTP fixture.
+The accepted source is copied unchanged into `harness-impl/06-cycle-runner/`; its provenance
+records the candidate digest and evidence. Items 06-047 and 06-066 remain failed and open.
+Round 26's 066 clarification was committed after this candidate was graded, so the old
+verdict has not been rewritten. Cycle 24 remains unaccepted after its 31/61 score and
+instrument regressions. ADR 0007 proposes context-scoped reuse after this acceptance.

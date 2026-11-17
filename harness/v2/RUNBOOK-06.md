@@ -4,8 +4,10 @@ How cycles 13 onward of slice 06 (`cycle-runner`, the one ORC tree `cycle.v1`) a
 (`.pi/spec/decisions.md`, "Spec round 19" 4). The builder and grader are fresh subagents on
 the host, on different models (ADR 0003): no pi in the legacy loop. Cycle 13 used Claude
 Opus and Sonnet; cycles 14 to 22 used Codex builders, and cycles 23 and 24 used Astra.
-Cycle 24's gate passed on attempt 1 but scored 31/61, with a failed profile and two legacy
-shadow regressions (`harness/v2/cycles/06/24/`, `harness/v2/shadow/06/24/`). It is not accepted.
+Cycle 23 is the accepted running context, with its two failed items recorded in
+`harness-impl/06-cycle-runner/PROVENANCE.md`. Cycle 24's gate passed on attempt 1 but scored
+31/61, with a failed profile and two legacy shadow regressions (`harness/v2/cycles/06/24/`,
+`harness/v2/shadow/06/24/`). It is not accepted.
 The next grader's profile contract and its recorded reason are in `harness/v2/PROFILE-06.md`.
 
 Run every command from the repository root. `STATE=.pi/harness/.state`. `NN=06`. `MM` is the
@@ -190,16 +192,17 @@ and copy beside the score. A failed profile
 is still filed with the honest score and blocks acceptance until investigated. The revised
 grader instruction digest requires operator approval under AGENTS.md before use.
 
-## 7. After a good score (not yet done)
+## 7. After a score and instrument comparison
 
 - **Acceptance** is the operator's call (AGENTS.md, "An accepted build is the running build"):
   copy the candidate into `harness-impl/06-cycle-runner/` with its `PROVENANCE.md` (cycle, spec
   commit, gate log, score).
 - **The instrument exception**: slice 06 is the instrument, so before it is used, run it once
   side by side with the legacy harness on the same candidates and compare.
-- **Proposed, not decided**: ADR 0007, rebuild only the context a round changed and keep the
-  accepted rest read-only, with a full rebuild before each acceptance and every few rounds. Pros
-  and cons were discussed 2026-11-14. Draft it only after a build is accepted.
+- **Proposed, not decided**: ADR 0007, rebuild only the changed context and retain accepted
+  contexts by digest, with an integration gate, dependency invalidation and periodic full
+  regeneration. It was drafted after cycle 23's acceptance; it does not permit item-level
+  source mixing within slice 06.
 
 ## Cycle record
 
@@ -216,5 +219,5 @@ grader instruction digest requires operator approval under AGENTS.md before use.
 | 20 | 6f187ac | Codex gpt-6.1-sol subagent, host | passed, attempt 3 | 61/61 | 010 and 060 newly passed; profile clean; judge numeric bands failed the legacy shadow; acceptance open |
 | 21 | cb19e87 | Codex gpt-6.1-sol subagent, host | passed | 23/61 | profile failed; not accepted |
 | 22 | cb19e87 | Codex gpt-6.1-sol subagent, host | passed | 55/61 | profile failed; legacy shadow matched; not accepted |
-| 23 | cb19e87 | Codex gpt-6-astra subagents, host | passed, attempt 2 | 59/61 | profile clean; legacy shadow matched; 047 and 066 failed; not accepted |
+| 23 | cb19e87 | Codex gpt-6-astra subagents, host | passed, attempt 2 | 59/61 | profile clean; legacy shadow matched; 047 and 066 failed; accepted with both open |
 | 24 | 76ee55b | Codex gpt-6-astra subagent, host | passed, attempt 1 | 31/61 | profile failed; built-in gate missing and gitlinks dropped in legacy shadow; not accepted |

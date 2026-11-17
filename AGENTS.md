@@ -54,14 +54,14 @@ later rounds.
 
 ## The regeneration cycle
 
-ORC runs one cycle, in the shape of the legacy harness. Since 2026-11-08 the cycle runner
-(`harness-impl/06-cycle-runner/`) runs it, driving slices 01-05; the legacy harness (`harness/`,
-`archive/legacy-harness/`) is the reference, never deleted (`.pi/spec/decisions.md`, "The switch
-to the new harness"). A run rebuilds **the Löyly app** (`docs/plan` into `impl/`); the harness is
-not asked to rebuild itself ("Self-hosting stopped"). Run-03 (2026-11-10) is the worked example:
-gate passed, grading 11/11. Until the cycle is one ORC tree (ADR 0001), cycles are driven by the
-legacy shell harness and slice 06 is not rebuilt; the legacy shell harness also builds the new
-harness, one tree from all six contexts' specs, never the cycle runner (ADR 0006).
+ORC runs one cycle, in the shape of the legacy harness. The accepted cycle runner
+(`harness-impl/06-cycle-runner/`, cycle 23) drives slices 01-05; the legacy harness (`harness/`,
+`archive/legacy-harness/`) remains the reference and builds replacements for slice 06 (ADR 0006).
+A run rebuilds **the Löyly app** (`docs/plan` into `impl/`); the harness is not asked to rebuild
+itself ("Self-hosting stopped"). Run-03 (2026-11-10) is the worked example: gate passed,
+grading 11/11. The accepted runner's known failures and its legacy shadow are recorded in
+`harness-impl/06-cycle-runner/PROVENANCE.md`. Context-scoped reuse is proposed in ADR 0007;
+until that decision is accepted, follow the current regeneration and acceptance rules here.
 
 A run: start the runner with its `LOYLY_*` environment (seam.md, "Handed in"), call
 `cycle-runner/start-run`, grade the gated candidate black-box, then `cycle-runner/hand-in-verdicts`
