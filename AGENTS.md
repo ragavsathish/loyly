@@ -60,8 +60,8 @@ ORC runs one cycle, in the shape of the legacy harness. The accepted cycle runne
 A run rebuilds **the Löyly app** (`docs/plan` into `impl/`); the harness is not asked to rebuild
 itself ("Self-hosting stopped"). Run-03 (2026-11-10) is the worked example: gate passed,
 grading 11/11. The accepted runner's known failures and its legacy shadow are recorded in
-`harness-impl/06-cycle-runner/PROVENANCE.md`. A repair slice from an accepted base is proposed in ADR 0007;
-until that decision is accepted, follow the current regeneration and acceptance rules here.
+`harness-impl/06-cycle-runner/PROVENANCE.md`. ADR 0007 permits a bounded repair slice from
+an accepted base under the pinned workflow in `harness/v2/REPAIR-06.md`.
 
 A run: start the runner with its `LOYLY_*` environment (seam.md, "Handed in"), call
 `cycle-runner/start-run`, grade the gated candidate black-box, then `cycle-runner/hand-in-verdicts`
@@ -106,6 +106,13 @@ For a harness context, the clean room holds the spec of the one context being re
 consumes, the glossary, the domain sources, and its public seam. It holds no other context's
 spec, no spec v1, no prior implementation, recorded measurement, report, grader, calibration fixture, or
 grading harness. The builder reads it read-only and writes only its declared scope.
+
+For the approved cycle-25 repair selection only, the instrument adds the accepted cycle-23
+source as `repair-input/accepted-base/`, pinned and checked by `harness/v2/repair-base-06.py`.
+The builder may read that one prior implementation and writes a new candidate under its
+declared scope. It receives no prior verdict file or grader transcript. The gate, full
+checklist score, profile, and instrument shadow still judge the entire replacement context
+(ADR 0007; `harness/v2/REPAIR-06.md`).
 
 ## The instrument
 

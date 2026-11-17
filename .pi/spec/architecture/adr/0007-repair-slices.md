@@ -2,8 +2,10 @@
 
 ## Status
 
-Proposed (2026-11-17). The accepted cycle-23 runner is the proposed base. No repair cycle has
-started, and this proposal does not change the current clean-room rule until approved.
+Accepted for the cycle-25 repair (2026-11-17). The operator's "Do it" approved the bounded
+repair described in `harness/v2/REPAIR-06.md` after the accepted cycle-23 runner and its two
+open items were identified. The repair's spec, selection, base and sealed grader digests are
+pinned there. No repair cycle had started at acceptance.
 
 ## Context
 
@@ -22,7 +24,7 @@ two unrelated failures would add a seam and assembly work without isolating shar
 | Extract new contexts around the failures | Independent future builds if genuine domain boundaries emerge | 047 and 066 have different responsibilities; the one-tree runner still needs assembly changes |
 | Repair selection from an accepted base | Builder effort targets two behaviors; accepted code is pinned and auditable | Prior source deliberately crosses the fence, so the exception and full regression proof must be explicit |
 
-## Proposed decision
+## Decision
 
 Define a **repair slice** as a deterministic selection of existing stamped items within one
 accepted context. It creates a new candidate version of that *whole context*; it is not a new
@@ -54,8 +56,7 @@ migration.
 
 - The builder's task is bounded to 047 and 066; the acceptance denominator remains 61.
 - This is an explicit exception to `AGENTS.md`'s fresh-builder exclusion of prior candidates.
-  The exception applies only to the pinned accepted base and only after this ADR and its
-  workflow contract are approved.
+  The exception applies only to the pinned accepted base and the approved repair selection.
 - Before first use, prove that the repair room contains exactly the current spec and pinned
   base, that the base remains unchanged, and that an unrelated file edit is visible in the
   source diff. The instrument preflight must compare the new contract with legacy's repair

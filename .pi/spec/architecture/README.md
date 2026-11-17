@@ -108,7 +108,7 @@ as the tree; a row it settled says so.
 | [0004](adr/0004-self-improving-loop-scope.md) | GEPA improves the builder and the grader, per project context | accepted |
 | [0005](adr/0005-opentelemetry.md) | OpenTelemetry | proposed |
 | [0006](adr/0006-legacy-shell-harness.md) | The legacy shell harness drives cycles and builds the new harness | accepted |
-| [0007](adr/0007-repair-slices.md) | Repair a bounded selection on an accepted build | proposed |
+| [0007](adr/0007-repair-slices.md) | Repair a bounded selection on an accepted build | accepted for cycle 25 |
 
 An ADR is one page: Status, Context, Decision, Consequences, Evidence. A proposed ADR gains
 evidence as prototypes and cycles report, and is accepted in a spec round (`../decisions.md`). A

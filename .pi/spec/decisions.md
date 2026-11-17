@@ -2267,3 +2267,16 @@ records the candidate digest and evidence. Items 06-047 and 06-066 remain failed
 Round 26's 066 clarification was committed after this candidate was graded, so the old
 verdict has not been rewritten. Cycle 24 remains unaccepted after its 31/61 score and
 instrument regressions. ADR 0007 proposes a bounded repair slice from this accepted base.
+
+## Cycle-25 repair selection (2026-11-17)
+
+The operator approved a repair slice for the two failed behaviors, 06-047 and 06-066, against
+the accepted cycle-23 source. The exact selected IDs, 39-file base digest, 61-item checklist
+digest, current spec.feature digest and unchanged sealed grader-instruction digest are pinned
+in `harness/v2/REPAIR-06.md`. The operator's "Do it" followed that concrete contract. ADR
+0007 is accepted for this repair, permitting exactly the pinned prior source in the builder's
+room; prior verdicts and transcripts remain fenced. The independent gate and grader still
+judge all 61, and the instrument shadow is required before the complete replacement is
+accepted. Preflight `harness/v2/preflight/06/25.md` compares the exception to legacy and
+proves that the strengthened identity probe passes cycle 23 and rejects cycle 24's missing
+built-in gate. No spec item or grader scenario changed in this decision.

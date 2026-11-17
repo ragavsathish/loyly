@@ -1,8 +1,9 @@
-# Draft repair slice for the accepted cycle-23 runner
+# Cycle-25 repair slice for the accepted cycle-23 runner
 
-This draft is the proposed workflow contract under ADR 0007. It does not authorize fencing,
-building, or grading until the operator approves the exact inputs and the preflight proves
-the legacy comparison and room boundary.
+This is the approved workflow contract under ADR 0007. The operator said "Do it" after the
+exact repair inputs were presented in this file. The same 61-item selection and sealed grader
+digest were approved for cycle 24; neither changed. The legacy comparison and room-boundary
+proof are recorded in `preflight/06/25.md`.
 
 | Input | Pinned value |
 | --- | --- |
@@ -26,7 +27,30 @@ the other 59 newly fail, the profile is clean, and a same-cut instrument shadow 
 legacy on the shared fixture. Promotion replaces the complete context and records both the
 base digest and repair diff in provenance.
 
-Before opening this repair room, finish `preflight/06/25.md`: compare the proposed exception
-with legacy's gate repair, add a built-in-gate identity fixture that catches cycle 24's gap,
-and prove the repair-room source boundary. The accepted cycle-23 runner stays in service
-until a replacement meets all checks.
+The accepted cycle-23 runner stays in service until a replacement meets all checks. Run the
+cycle from the committed cut in this order:
+
+1. Run `SLICE=06 harness/fence.sh .pi/harness/.state/rooms/06-c25`, then
+   `python3 harness/v2/repair-base-06.py prepare .pi/harness/.state/rooms/06-c25` from this
+   checkout. The first command must prove a single-commit clean room; the second must report
+   the pinned 39-file digest. The room's `repair-input/` holds only `accepted-base/`.
+2. Launch one fresh Astra builder in the background. Its only readable inputs are the room,
+   its declared dependency caches, the two pinned git dependencies, Gondolin and its image.
+   Tell it to copy `repair-input/accepted-base/` into `harness-impl/06-cycle-runner/`, read the
+   current spec, and carry 06-047 and 06-066 with public-seam tests. The full regeneration
+   prompt from `prompt.clj` is not used: it says there is no previous implementation and
+   would contradict this approved repair contract. The builder writes only the candidate,
+   runs its complete suite and fresh stdio identity, and reports remaining selected items.
+   Continue that same session on its remaining selected IDs up to three times, stopping on
+   no change, as the legacy `carry-slice!` rule does. It sees no previous verdicts or scores.
+3. Run `python3 harness/v2/repair-base-06.py check ROOM` after each builder turn and keep its
+   JSON source diff. Run the independent `harness/v2/gate.sh 06 ROOM`; a gate failure gets at
+   most two fresh repair attempts under the current gate-repair contract.
+4. Make a fresh grading room and use a different-model Terra grader under
+   `grader-instruction-06.md`, exactly as `RUNBOOK-06.md` steps 5–6 require. Score every item
+   once and retain the profile and surprises. The score is compared with cycle 23 on shared
+   items: report newly passing and newly failing separately.
+5. Before accepting the complete candidate, run the same-cut instrument shadow against
+   legacy. Require 047 and 066 to pass, no newly failing protected item, a clean profile,
+   and a matching shadow. The operator accepts the replacement with provenance naming the
+   base, source diff, gate, score and shadow.
