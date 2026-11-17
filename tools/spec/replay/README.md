@@ -65,11 +65,20 @@ The spec page's menu (<https://scope-impact.github.io/loyly/>) lists every publi
 checked-in timeline of 1,910 domain event types and relative times. It omits
 payloads, IDs, paths and prompts. Two passing grader cases emitted no domain event.
 
-`build_grading.py` combines that timeline, the original six-context storm SVG,
+`extract_grading_orc.clj` reads the same 61 stores and writes 883 selected,
+timestamped ORC grading transitions: digest check, VM check, item grader ticks,
+evidence clearing, seam research, judge, verdict filing and score filing. It
+decodes the Fressian event bodies locally to resolve node names, then retains
+only the relative time, step name and start/done/score transition in the public
+JSON. It carries no event payload, ID, path or prompt.
+
+`build_grading.py` combines both timelines, the original six-context storm SVG,
 and the filed cycle-25 OTLP trace, score and profile under `harness/v2/cycles/06/25/`.
-The resulting `cycle-25-grading.html` lights the actual spec event nodes as a
-selected case's Grain events are played. Events outside the 25-node spec board
-remain in the event list. The board's arrows are spec relationships, never
+The resulting `cycle-25-grading.html` uses one scrubber for the domain event board
+and the ORC black-box grading strip. It lights the actual spec event nodes as a
+selected case's Grain events are played, and the grading steps as their ORC
+transitions occur. Events outside the 25-node spec board remain in the event list.
+The board's arrows are spec relationships, never
 inferred causal links from the trace. The 3,023 OTLP diagnostics remain available
 as selected-case details. The filed failed profile and its audited retry-name
 exception stay visible. This is grading playback, distinct from run-03's product
@@ -82,6 +91,7 @@ current generated `story.svg`, so it is self-contained.
 python3 tools/spec/replay/build_grading.py
 # On the machine retaining the raw grader stores, to refresh the compact timeline:
 python3 tools/spec/replay/extract_grading_storm.py
+bb --classpath tools/spec/replay/src tools/spec/replay/extract_grading_orc.clj
 ```
 
 The Pages publisher includes the generated HTML at

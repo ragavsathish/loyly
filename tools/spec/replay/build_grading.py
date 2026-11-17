@@ -83,15 +83,18 @@ def main():
         del event["order"]
     cases.sort(key=lambda case: case["id"])
     grain = json.loads((ROOT / "tools/spec/replay/src/replay/cycle-25-grain-events.json").read_text())
+    orc = json.loads((ROOT / "tools/spec/replay/src/replay/cycle-25-orc-events.json").read_text())
     assert set(grain["cases"]) == set(score_by_id)
+    assert set(orc["cases"]) == set(score_by_id)
     assert sum(map(len, grain["cases"].values())) == 1910
+    assert sum(map(len, orc["cases"].values())) == 883
     story_svg = (ROOT / "tools/spec/views/dist/story.svg").read_text().split("?>", 1)[1].strip()
     story_events = set(re.findall(r'data-event="([^"]+)"', story_svg))
     assert len(story_events) == 25
     story_svg = story_svg.replace('href="#', 'href="../index.html#')
     data = {"cases": cases, "events": events, "status": profile["status"],
             "problem": profile["problems"][0], "trace": profile["otel_trace_id"],
-            "grain": grain["cases"]}
+            "grain": grain["cases"], "orc": orc["cases"]}
     data_json = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     data_json = data_json.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     template = (Path(__file__).parent / "src/replay/grading-template.html").read_text()
@@ -102,7 +105,8 @@ def main():
                     .replace("STORY_SVG", story_svg)
                     .replace("DATA_JSON", data_json))
     OUTPUT.write_text(page)
-    print(f"{OUTPUT}: {len(cases)} cases, {len(events)} recorded trace events")
+    print(f"{OUTPUT}: {len(cases)} cases, {len(events)} recorded trace events, "
+          f"{sum(map(len, orc['cases'].values()))} ORC grading transitions")
 
 
 if __name__ == "__main__":
