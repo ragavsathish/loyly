@@ -84,43 +84,14 @@ def main():
             "problem": profile["problems"][0], "trace": profile["otel_trace_id"]}
     data_json = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     data_json = data_json.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
-    page = TEMPLATE.replace("DATA_JSON", data_json)
+    template = (Path(__file__).with_name("grading-template.html")).read_text()
+    base_css = (ROOT / "tools/spec/views/src/specviews/page.css").read_text()
+    replay_css = (ROOT / "tools/spec/replay/src/replay/page.css").read_text()
+    page = (template.replace("BASE_CSS", base_css)
+                    .replace("REPLAY_CSS", replay_css)
+                    .replace("DATA_JSON", data_json))
     OUTPUT.write_text(page)
     print(f"{OUTPUT}: {len(cases)} cases, {len(events)} recorded trace events")
-
-
-TEMPLATE = '''<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cycle 25 grading playback | Löyly</title>
-<meta name="description" content="Recorded OTLP timeline of the 61 cycle-25 runner grading cases.">
-<style>
-:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color-scheme:light dark;--bg:#f7f5f0;--card:#fff;--ink:#22211e;--muted:#625e55;--line:#d7d2c8;--green:#216335;--amber:#805d17}
-@media(prefers-color-scheme:dark){:root{--bg:#171713;--card:#23231e;--ink:#eeece5;--muted:#bbb5a8;--line:#49463e;--green:#9cdbab;--amber:#e2bd70}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}main{max-width:1100px;margin:auto;padding:24px 20px 70px}a{color:inherit;text-underline-offset:3px}nav{font-size:.9rem;color:var(--muted)}nav a{margin-right:16px}h1{font-size:clamp(2rem,5vw,3.2rem);letter-spacing:-.04em;line-height:1.1;margin:38px 0 10px}h2{font-size:1.25rem;margin:30px 0 10px}.muted{color:var(--muted)}.lede{font-size:1.1rem;max-width:78ch}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}.card,.panel,.note{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:16px}.card b{display:block;font-size:1.35rem}.card span{font-size:.83rem;color:var(--muted)}.good{color:var(--green)}.warn{color:var(--amber)}.note{border-left:4px solid var(--amber)}button,select,input{font:inherit}button,select{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:7px 12px;cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--green)}.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.controls input{flex:1;min-width:180px}.columns{display:grid;grid-template-columns:minmax(240px,1fr) minmax(0,2fr);gap:14px;margin-top:16px}.list{max-height:540px;overflow:auto;display:grid;align-content:start;gap:4px}.case{width:100%;text-align:left;display:flex;justify-content:space-between;gap:8px}.case.active{border-color:var(--green);background:color-mix(in srgb,var(--green) 11%,var(--card))}.case small{color:var(--muted)}.event{border-bottom:1px solid var(--line);padding:8px 0;font-size:.9rem}.event b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.event small{color:var(--muted)}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.8rem;margin:5px 0 0}#now{min-height:55px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:.75rem;font-weight:700;color:var(--muted)}@media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}.list{max-height:240px}}
-</style></head><body><main>
-<nav><a href="../index.html">Event model</a><a href="../eval/cycle-runner.html">Cycle 25 evaluation</a><a href="loyly-run-03.html">Historical run-03 replay</a></nav>
-<div class="eyebrow" style="margin-top:34px">Spec v2 · slice 06 · recorded grading trace</div>
-<h1>Cycle 25 grading playback</h1>
-<p class="lede">Step through the recorded OpenTelemetry events from the independent grading of the accepted runner. This is the grading session for 61 runner behaviors. The run-03 page replays a separate Löyly product build.</p>
-<div class="cards"><div class="card"><b class="good">61 / 61</b><span>behavior verdicts passed</span></div><div class="card"><b id="event-count">3,023</b><span>recorded trace events</span></div><div class="card"><b>61</b><span>canonical item profiles clean</span></div><div class="card"><b class="warn">Exception</b><span>filed profile status: failed</span></div></div>
-<div class="note"><strong>Profile exception remains visible.</strong> Eight separately captured retry names are outside the checklist, so the filed profile status is <code>failed</code>. Their raw boundaries and cleanup were audited and the operator explicitly accepted the exception. This playback does not change any score or profile.</div>
-<h2>Replay the grading trace</h2><div class="panel"><div class="controls"><button id="play" type="button">Play</button><button id="reset" type="button">Start</button><label for="speed">Speed</label><select id="speed"><option value="1">1×</option><option value="4" selected>4×</option><option value="12">12×</option></select><input id="position" type="range" min="0" max="0" value="0" aria-label="Trace event position"><output id="progress">0 / 0</output></div><p id="now" aria-live="polite"></p></div>
-<div class="columns"><section class="panel"><h2>Items</h2><p class="muted">Choose an item to jump to its first recorded event.</p><div id="cases" class="list"></div></section><section class="panel"><h2>Recorded events</h2><p class="muted">Times are offsets from the start of the grading trace. Events with the same timestamp retain their filed order.</p><div id="events" class="list"></div></section></div>
-<p class="muted">Source: <a href="https://github.com/ragavsathish/loyly/blob/spec-v2/harness/v2/cycles/06/25/profile.traces.otlp.json">filed OTLP trace</a>, <a href="https://github.com/ragavsathish/loyly/blob/spec-v2/harness/v2/cycles/06/25/scores.json">score</a>, and <a href="https://github.com/ragavsathish/loyly/blob/spec-v2/harness/v2/cycles/06/25/profile-retry-audit.md">retry audit</a>. Only selected diagnostic fields are displayed; raw IDs, paths and prompts are omitted.</p>
-</main><script id="trace-data" type="application/json">DATA_JSON</script><script>
-const D=JSON.parse(document.getElementById('trace-data').textContent);
-const E=D.events,C=D.cases,byId=new Map(C.map(c=>[c.id,c]));
-const $=id=>document.getElementById(id), range=$('position'),eventList=$('events'),caseList=$('cases');
-range.max=String(E.length);$('event-count').textContent=E.length.toLocaleString();
-let pos=0,timer=null;const first=new Map();E.forEach((e,i)=>{if(!first.has(e.id))first.set(e.id,i)});
-const caseButtons=new Map();for(const c of C){const b=document.createElement('button');b.type='button';b.className='case';const title=document.createElement('span');title.textContent=c.id+' · '+c.name;const meta=document.createElement('small');meta.textContent=c.verdict+' · '+c.events+' events';b.append(title,meta);b.title=c.name;b.onclick=()=>{stop();show(first.get(c.id)+1)};caseList.append(b);caseButtons.set(c.id,b)}
-function fmt(ms){const s=Math.floor(ms/1000);return '+'+Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s'}
-function stop(){if(timer){clearInterval(timer);timer=null}$('play').textContent='Play'}
-function show(n){pos=Math.max(0,Math.min(E.length,n));range.value=String(pos);$('progress').textContent=pos+' / '+E.length;eventList.replaceChildren();const current=pos?E[pos-1]:null;const visible=E.slice(Math.max(0,pos-16),pos).reverse();for(const e of visible){const row=document.createElement('div');row.className='event';const head=document.createElement('div');const bold=document.createElement('b');bold.textContent=e.id+' '+e.kind;const time=document.createElement('small');time.textContent='  '+fmt(e.t);head.append(bold,time);const detail=document.createElement('pre');detail.textContent=JSON.stringify(e.detail);row.append(head,detail);eventList.append(row)}$('now').textContent=current?`${current.id}: ${byId.get(current.id).name} · ${current.kind} at ${fmt(current.t)}`:'At the start of the recorded grading trace';for(const [id,b] of caseButtons)b.classList.toggle('active',!!current&&id===current.id);if(pos===E.length)stop()}
-$('play').onclick=()=>{if(timer){stop();return}if(pos===E.length)show(0);$('play').textContent='Pause';timer=setInterval(()=>show(pos+Number($('speed').value)),80)};
-$('reset').onclick=()=>{stop();show(0)};range.oninput=()=>{stop();show(Number(range.value))};show(0);
-</script></body></html>
-'''
 
 
 if __name__ == "__main__":

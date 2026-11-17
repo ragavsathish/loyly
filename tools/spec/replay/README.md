@@ -66,6 +66,8 @@ score and profile under `harness/v2/cycles/06/25/`. It shows the independent gra
 grading playback, distinct from the run-03 cycle-runner replay above. The filed failed
 profile and its audited retry-name exception remain visible. The generator selects
 specific diagnostic fields and omits raw identifiers, paths and prompts.
+It inlines the same event-model and replay stylesheets used by run-03, so the
+published page remains self-contained and visually consistent.
 
 ```bash
 python3 tools/spec/replay/build_grading.py
