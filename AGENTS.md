@@ -60,7 +60,7 @@ ORC runs one cycle, in the shape of the legacy harness. The accepted cycle runne
 A run rebuilds **the Löyly app** (`docs/plan` into `impl/`); the harness is not asked to rebuild
 itself ("Self-hosting stopped"). Run-03 (2026-11-10) is the worked example: gate passed,
 grading 11/11. The accepted runner's known failures and its legacy shadow are recorded in
-`harness-impl/06-cycle-runner/PROVENANCE.md`. Context-scoped reuse is proposed in ADR 0007;
+`harness-impl/06-cycle-runner/PROVENANCE.md`. A repair slice from an accepted base is proposed in ADR 0007;
 until that decision is accepted, follow the current regeneration and acceptance rules here.
 
 A run: start the runner with its `LOYLY_*` environment (seam.md, "Handed in"), call

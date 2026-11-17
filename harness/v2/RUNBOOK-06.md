@@ -199,10 +199,11 @@ grader instruction digest requires operator approval under AGENTS.md before use.
   commit, gate log, score).
 - **The instrument exception**: slice 06 is the instrument, so before it is used, run it once
   side by side with the legacy harness on the same candidates and compare.
-- **Proposed, not decided**: ADR 0007, rebuild only the changed context and retain accepted
-  contexts by digest, with an integration gate, dependency invalidation and periodic full
-  regeneration. It was drafted after cycle 23's acceptance; it does not permit item-level
-  source mixing within slice 06.
+- **Proposed, not decided**: ADR 0007 defines a repair slice for 06-047 and 06-066 from the
+  pinned accepted cycle-23 artifact. It requires its own approved workflow contract, full
+  gate, all-61 grading, clean profile, and same-cut legacy shadow before a repaired runner
+  can replace the accepted one. The draft exact inputs are in `harness/v2/REPAIR-06.md`.
+  The current fresh-room runbook remains in force until then.
 
 ## Cycle record
 

@@ -2266,4 +2266,4 @@ The accepted source is copied unchanged into `harness-impl/06-cycle-runner/`; it
 records the candidate digest and evidence. Items 06-047 and 06-066 remain failed and open.
 Round 26's 066 clarification was committed after this candidate was graded, so the old
 verdict has not been rewritten. Cycle 24 remains unaccepted after its 31/61 score and
-instrument regressions. ADR 0007 proposes context-scoped reuse after this acceptance.
+instrument regressions. ADR 0007 proposes a bounded repair slice from this accepted base.
