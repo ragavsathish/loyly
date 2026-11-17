@@ -9,7 +9,7 @@ its shadow matched legacy, but items 010 and 060 newly failed. Acceptance remain
 The next grader's profile contract and its recorded reason are in `harness/v2/PROFILE-06.md`.
 
 Run every command from the repository root. `STATE=.pi/harness/.state`. `NN=06`. `MM` is the
-cycle number (next: `21`, after spec round 25 and selection approval).
+next unused cycle number; set it explicitly before fencing.
 
 ## 0. Once per machine
 
@@ -25,14 +25,29 @@ cycle number (next: `21`, after spec round 25 and selection approval).
   ```
 - Java, the Clojure CLI, `bb`, `jq`, `git` on the host.
 
+## Before every cycle: compare with the legacy harness
+
+Before selection approval or fencing, review every proposed cycle-runner spec, grader, gate,
+and runbook change against the reference behavior in `harness/regen.clj` and
+`archive/legacy-harness/{fence.sh,verify.sh,score.clj,scoreboard.clj}`. Include the adapted
+`harness/` tools when the public seam differs from the archive. Read the previous cycle's
+instrument shadow comparison; if it is absent, run the previous candidate and legacy harness
+on the same fixture before starting another build. Record a short table at
+`harness/v2/preflight/06/$MM.md`: changed behavior, legacy reference, preserved behavior or
+intentional divergence, and the test or shadow observation that will prove it. Resolve any
+unexplained divergence and commit this report with the approved selection before fencing.
+
+The new candidate's own shadow comparison can run only after it exists. For slice 06, perform
+that comparison before accepting or using the candidate, as `AGENTS.md` requires for the
+instrument.
+
 ## 1. Finish the spec round, commit, push
 
 The fence clones HEAD, so the spec the builder reads must be committed.
 
 1. `git status` / `git diff`: review the next spec round and obtain approval of its exact
-   deterministic selection before fencing (AGENTS.md, "Pi and ORC ownership"). Round 25
-   leaves the 61 items unchanged and specifies the judge's binary levels; the revised grader
-   digest requires approval before use.
+   deterministic selection and sealed grader digest before fencing (AGENTS.md, "Pi and ORC
+   ownership" and "The instrument").
 2. Check the item count is unchanged (210; slice 06 at 61):
    `grep -c '@item-06-' .pi/spec/cycle-runner/spec.feature`
 3. Commit and push:
@@ -42,7 +57,7 @@ The fence clones HEAD, so the spec the builder reads must be committed.
 ## 2. Fence and render
 
 ```bash
-STATE=.pi/harness/.state; MM=21
+STATE=.pi/harness/.state; MM=<next-unused-cycle-number>
 ROOM=$STATE/rooms/06-c$MM; OUT=$STATE/prompts/06-c$MM
 SLICE=06 harness/fence.sh $ROOM > $ROOM.fence.log 2>&1; echo "fence exit $?"; tail -3 $ROOM.fence.log
 bb harness/v2/prompt.clj 06 $OUT       # OUT/system.md and OUT/prompt.md
@@ -89,6 +104,27 @@ When it reports, check it wrote only its scope (must print `0`):
 (cd $ROOM && git status --short | grep -vc '^?? harness-impl/')
 cat $ROOM/harness-impl/06-cycle-runner/UNCARRIED.md
 ```
+
+Before the gate, continue the **same builder subagent** while `UNCARRIED.md` lists slice-06
+items, up to three continuation turns. This is the legacy `regen.clj` `carry-slice!` rule:
+the builder keeps its own session and candidate, and no grading evidence enters the room.
+On each turn, give it only the IDs in its current `UNCARRIED.md` and this task:
+
+```text
+Your turn ended with these items of your slice still listed in
+harness-impl/06-cycle-runner/UNCARRIED.md: <CURRENT ITEM IDS>. Carry them now. For each, write a
+failing test that drives it through the public seam and names its id, make it pass with the
+smallest real change, keep the whole suite green, and remove its line from UNCARRIED.md. Leave a
+line only for an item you truly cannot carry, with the reason. Then rerun test.sh, start
+start.sh on a fresh store, and confirm the full identity check over stdin. The clean-room
+boundary and write scope from the first turn still apply.
+```
+
+After each continuation, check the write scope again and compare a digest of the candidate's
+relative file paths and bytes with the digest before that turn. Stop when no items remain, the
+candidate did not change, or three continuations have finished. Record the remaining IDs in the
+cycle handoff. Gate repair in step 4 is separate: it begins only after an independent gate
+failure and uses a fresh subagent with that gate's evidence.
 
 ## 4. Gate (at most three attempts)
 
