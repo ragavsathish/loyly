@@ -60,22 +60,28 @@ The spec page's menu (<https://scope-impact.github.io/loyly/>) lists every publi
 
 ## Cycle 25 grading playback
 
-`build_grading.py` builds `cycle-25-grading.html` from the filed cycle-25 OTLP trace,
-score and profile under `harness/v2/cycles/06/25/`. It shows the independent grader's
-61 item timelines and selected diagnostics (3,023 recorded trace events). This is a
-grading playback, distinct from the run-03 cycle-runner replay above. The filed failed
-profile and its audited retry-name exception remain visible. The generator selects
-specific diagnostic fields and omits raw identifiers, paths and prompts.
-It inlines the same event-model and replay stylesheets used by run-03, so the
-published page remains self-contained and visually consistent. Its main view
-uses the spec page's event-storm reading order: time moves right and the grader,
-process/VM, Grain/model and ORC observations occupy rows. The 61 columns are
-sorted by their first recorded trace event; selecting a sticky jumps into the
-underlying event playback. The board summarizes filed evidence, without adding
-new domain events or inferred causal arrows.
+`extract_grading_storm.py` reads the 61 canonical Grain stores retained under
+`.pi/harness/.state/grading/06-c25/work/06-*/events.sqlite` and writes a compact,
+checked-in timeline of 1,910 domain event types and relative times. It omits
+payloads, IDs, paths and prompts. Two passing grader cases emitted no domain event.
+
+`build_grading.py` combines that timeline, the original six-context storm SVG,
+and the filed cycle-25 OTLP trace, score and profile under `harness/v2/cycles/06/25/`.
+The resulting `cycle-25-grading.html` lights the actual spec event nodes as a
+selected case's Grain events are played. Events outside the 25-node spec board
+remain in the event list. The board's arrows are spec relationships, never
+inferred causal links from the trace. The 3,023 OTLP diagnostics remain available
+as selected-case details. The filed failed profile and its audited retry-name
+exception stay visible. This is grading playback, distinct from run-03's product
+build replay.
+
+The page inlines the same event-model and replay stylesheets as run-03 and the
+current generated `story.svg`, so it is self-contained.
 
 ```bash
 python3 tools/spec/replay/build_grading.py
+# On the machine retaining the raw grader stores, to refresh the compact timeline:
+python3 tools/spec/replay/extract_grading_storm.py
 ```
 
 The Pages publisher includes the generated HTML at

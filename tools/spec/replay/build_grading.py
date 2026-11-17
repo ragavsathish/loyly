@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Build a public playback of cycle-25 grading from the filed OTLP trace.
+"""Build a public playback of cycle-25 grading on the spec event storm.
 
-Only explicitly selected trace fields enter the page. The recorded evidence files are
-read-only inputs; this is a visualization, not a new score or a runner-store replay.
+Only explicitly selected trace fields and the extracted Grain event-type timeline
+enter the page. Evidence files are read-only inputs; this is a visualization,
+not a new score or a single cycle-runner-store replay.
 """
 
 import json
+import re
 from pathlib import Path
 
 
@@ -80,8 +82,16 @@ def main():
     for event in events:
         del event["order"]
     cases.sort(key=lambda case: case["id"])
+    grain = json.loads((ROOT / "tools/spec/replay/src/replay/cycle-25-grain-events.json").read_text())
+    assert set(grain["cases"]) == set(score_by_id)
+    assert sum(map(len, grain["cases"].values())) == 1910
+    story_svg = (ROOT / "tools/spec/views/dist/story.svg").read_text().split("?>", 1)[1].strip()
+    story_events = set(re.findall(r'data-event="([^"]+)"', story_svg))
+    assert len(story_events) == 25
+    story_svg = story_svg.replace('href="#', 'href="../index.html#')
     data = {"cases": cases, "events": events, "status": profile["status"],
-            "problem": profile["problems"][0], "trace": profile["otel_trace_id"]}
+            "problem": profile["problems"][0], "trace": profile["otel_trace_id"],
+            "grain": grain["cases"]}
     data_json = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     data_json = data_json.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     template = (Path(__file__).parent / "src/replay/grading-template.html").read_text()
@@ -89,6 +99,7 @@ def main():
     replay_css = (ROOT / "tools/spec/replay/src/replay/page.css").read_text()
     page = (template.replace("BASE_CSS", base_css)
                     .replace("REPLAY_CSS", replay_css)
+                    .replace("STORY_SVG", story_svg)
                     .replace("DATA_JSON", data_json))
     OUTPUT.write_text(page)
     print(f"{OUTPUT}: {len(cases)} cases, {len(events)} recorded trace events")
