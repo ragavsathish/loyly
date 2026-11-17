@@ -3,9 +3,9 @@
 How cycles 13 onward of slice 06 (`cycle-runner`, the one ORC tree `cycle.v1`) are run
 (`.pi/spec/decisions.md`, "Spec round 19" 4). The builder and grader are fresh subagents on
 the host, on different models (ADR 0003): no pi in the legacy loop. Cycle 13 used Claude
-Opus and Sonnet; cycles 14 to 19 used Codex gpt-6.1-sol and gpt-6.1-terra. Cycle 19's gate
-passed on attempt 1 and scored 59/61 (`harness/v2/cycles/06/19/`). Its profile was clean and
-its shadow matched legacy, but items 010 and 060 newly failed. Acceptance remains open.
+Opus and Sonnet; cycles 14 to 22 used Codex builders, and cycles 23 and 24 used Astra.
+Cycle 24's gate passed on attempt 1 but scored 31/61, with a failed profile and two legacy
+shadow regressions (`harness/v2/cycles/06/24/`, `harness/v2/shadow/06/24/`). It is not accepted.
 The next grader's profile contract and its recorded reason are in `harness/v2/PROFILE-06.md`.
 
 Run every command from the repository root. `STATE=.pi/harness/.state`. `NN=06`. `MM` is the
@@ -68,7 +68,7 @@ no `harness-impl/`.
 
 ## 3. Build: a fresh Codex subagent
 
-Launch a fresh Codex subagent on `gpt-6.1-sol` in the background. Its prompt is this preamble
+Launch a fresh Codex subagent on the approved builder model in the background. Its prompt is this preamble
 (put in the room's absolute path), then
 `---`, then the full text of `$OUT/prompt.md` word for word:
 
@@ -134,7 +134,7 @@ tail -5 $STATE/logs/gate-c$MM-slice06.log     # must end "=== gate OK: ..."
 ```
 
 It takes about 5 minutes (suite ~3.5 min, probe, store check). If it fails, a repair is a new
-Codex gpt-6.1-sol subagent given the same preamble and instruction, plus the previous candidate
+Codex subagent on the same builder model, given the same preamble and instruction, plus the previous candidate
 (`$ROOM/harness-impl/06-cycle-runner`, read-only) and the gate log as evidence, in a freshly
 fenced room `06-c$MM-a2`, with a closing paragraph naming both. Gate that room. Stop after
 attempt 3: the cycle failed at the gate.
@@ -214,3 +214,7 @@ grader instruction digest requires operator approval under AGENTS.md before use.
 | 18 | 0e3f5e6 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 61/61 | behavior unchanged from 17; profile failed on 54 live runner after captures; acceptance open |
 | 19 | 73e70a7 | Codex gpt-6.1-sol subagent, host | passed, attempt 1 | 59/61 | 010 and 060 newly failed; profile clean, shadow matched legacy; acceptance open |
 | 20 | 6f187ac | Codex gpt-6.1-sol subagent, host | passed, attempt 3 | 61/61 | 010 and 060 newly passed; profile clean; judge numeric bands failed the legacy shadow; acceptance open |
+| 21 | cb19e87 | Codex gpt-6.1-sol subagent, host | passed | 23/61 | profile failed; not accepted |
+| 22 | cb19e87 | Codex gpt-6.1-sol subagent, host | passed | 55/61 | profile failed; legacy shadow matched; not accepted |
+| 23 | cb19e87 | Codex gpt-6-astra subagents, host | passed, attempt 2 | 59/61 | profile clean; legacy shadow matched; 047 and 066 failed; not accepted |
+| 24 | 76ee55b | Codex gpt-6-astra subagent, host | passed, attempt 1 | 31/61 | profile failed; built-in gate missing and gitlinks dropped in legacy shadow; not accepted |
