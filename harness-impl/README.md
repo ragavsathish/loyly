@@ -33,8 +33,8 @@ LOYLY_GRAIN_STORE=/tmp/prep/events.sqlite LOYLY_PROJECT_COMMITS=/tmp/prep/commit
 ```
 
 Some contexts read more (`LOYLY_PROJECT_COMMITS`, `LOYLY_SCENARIO_DIGESTS`,
-`LOYLY_SCORING_TOOL_PATHS`); their seams say which. A candidate reads its event model from
-`../.pi/spec/<context>/event-model/`, so run it from this checkout. Build outputs and caches
+`LOYLY_SCORING_TOOL_PATHS`); their seams say which. The cycle-23 runner carries the six
+contexts' event-model fragments in its build. Build outputs and caches
 (`.cpcache/`, `target/`, `classes/`) are made on first start and ignored (`.gitignore`).
 
 ## Driving the cycle runner
