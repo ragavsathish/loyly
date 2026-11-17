@@ -83,14 +83,16 @@ What `seam.md` says, and what to expect:
   `reasoning` and `code`. The judge's are `reasoning`, `level` and `feedback`.
 - The researcher's `code` is raw Clojure (no markdown fences). Its tool is `vm_bash`, which
   returns `{:exit :stdout :stderr}`. It ends with `(final! {:evidence "..."})`.
-- The researcher's prompt shows the item's shape, never its value. So one researcher rule serves
-  every item: its code reads `(get-input :item)` and branches on the item's id.
+- The first researcher request contains the item's scenario text and the slice's seam and
+  event-model text from the cut. The structured `item` input appears by shape, not by value.
+  One researcher rule can still serve every item: its code reads `(get-input :item)` and
+  branches on the item's id.
 - Prompts carry tick ids and timestamps, and ORC may retry a request. Match on stable substrings
   (the node's output contract, the item's text, the reply fragments that matter). Never match on
   a whole prompt, a hash or a hit count.
 - For `@item-06-026`, give the researcher the same code for each item and branch on
-  `(get-input :item)` inside that code, so 01-002 fails while 01-001 reaches its judge. The
-  first request does not identify the item to the stub server.
+  `(get-input :item)` inside that code, so 01-002 fails while 01-001 reaches its judge.
+  Match the same response rule for both items even though their scenario text may differ.
 - For `@item-06-013`, add a non-fenced gitlink named `provided-runtime` to the fixture cut
   (mode `160000`, pointing to an existing commit), then have the stub builder record
   `git ls-tree HEAD provided-runtime` inside its clean room. Compare its mode and object id

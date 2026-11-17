@@ -2238,3 +2238,21 @@ corrects that report and settles the numeric contract from the pinned ORC source
    and requires a pass verdict. Its fixture rubric names both bands. The grader instruction
    names the numeric levels for 064 and 067, so it must be sealed under a new digest and
    approved before the next cycle. No cycle 20 score or candidate has been changed.
+
+## Spec round 26 (draft, 2026-11-17)
+
+Cycle 23 passed its independent gate on attempt 2 and scored 59/61 with a clean profile. Its
+instrument shadow matched legacy on the shared HTTP candidate. Item 047 failed because the
+candidate recorded source paths under a symlink target rather than the plan link; the seam and
+scenario already require the plan link's path, so this is a candidate defect, not a spec change.
+
+**The researcher's first request carries contract text, while its structured item value stays
+behind `get-input`** (`@item-06-066`, `@item-06-026`). Cycle 23's grader observed that the first
+request contained only the item's key names. Item 066 requires the scenario, seam and event-model
+text in that request. The seam now states that those texts from the cut are request context; the
+structured `item` blackboard value is represented by shape and read by the researcher's code
+through `(get-input :item)`. This supersedes round 21's assertion that the first requests for
+01-001 and 01-002 are identical: their scenario context may differ, while the grader's scripted
+response can still serve both and branch inside the code. Item 066's Then and all stamps stand.
+The sealed grader instruction receives the same reading. Its revised digest requires approval
+before use. Slice 06 remains 61 items and the full checklist remains 210.

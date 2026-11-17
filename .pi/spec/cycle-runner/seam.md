@@ -191,7 +191,10 @@ workflow `cycle-runner/grade.v1`, as a child tick of its own:
 - **`clear-evidence`** (`code`) writes the item's evidence empty, so no item sees another's.
 - **`drive-seam`** (`repl-researcher`) is given the item (its identity and scenario), and the
   seam it drives: the `seam.md` and `event-model/*.edn` beside the item's spec file in the cut,
-  when there are any. Its one tool is a shell in a Gondolin VM whose only mount is the item's
+  when there are any. Its first model request contains the scenario text and the seam and event
+  model text from that cut as request context. The structured `item` blackboard value stays behind
+  `(get-input :item)`: the request describes that input's shape rather than serializing its value.
+  Its one tool is a shell in a Gondolin VM whose only mount is the item's
   grading room: a fresh copy of the passed attempt's gate room, the clean room's files with the
   gated candidate's copy at `APP_DIR`, never a builder room, gate evidence or a store.
   It drives the candidate over its seam from fresh state and writes what it set up, sent and
@@ -647,9 +650,10 @@ Everything the runner acts on is a fixture a grader states, so no item waits for
   item as scripted (a score with a reason, a score with none, a failure), and records every request
   it is sent. It replies in ORC's marker format (`[[ ## <field> ## ]]` per field, then
   `[[ ## completed ## ]]`), since the provider is registered under a name other than `:openai`
-  ("Handed in"). A request sent for the researcher shows the item's shape, never its value, so a
-  scripted researcher's code reads `(get-input :item)` and branches on it. Requests carry tick ids
-  and timestamps, and ORC may retry a request, so a stub matches a request on stable substrings
+  ("Handed in"). The first researcher request contains the item's scenario text and its slice's
+  seam and event-model text from the cut. It shows the structured `item` input's shape, not that
+  blackboard value; a scripted researcher's code reads `(get-input :item)` and branches on it.
+  Requests carry tick ids and timestamps, and ORC may retry a request, so a stub matches a request on stable substrings
   (the node's output contract, the item's text, the reply fragments that matter), never on the
   whole text, a hash or a count;
 - `LOYLY_GRADER_RUBRIC` a fixture rubric whose digest the grader computes and names, or not, in the
