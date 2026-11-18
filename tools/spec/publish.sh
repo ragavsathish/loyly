@@ -6,8 +6,9 @@
 # Rebuilds and checks the page, then commits it as index.html (with .nojekyll), and each
 # tools/spec/eval/*.html as eval/<name>.html, and each tools/spec/replay/*.html (a run's replay,
 # tools/spec/replay/build.sh) selected by the project's Runs :only list as replay/<name>.html,
-# plus the cycle-26 Allure report at
-# allure/cycle-26/, on top of the remote's gh-pages, so every
+# plus the cycle-26 Allure report at allure/cycle-26/. A grader-only report may be
+# supplied with LOYLY_GRADER_ONLY_ALLURE_DIR; later publishes retain its Pages copy.
+# All are committed on top of the remote's gh-pages, so every
 # published version stays in that branch's history. --dry-run makes the commit in a throwaway
 # worktree and shows it, without pushing.
 set -euo pipefail
@@ -48,6 +49,16 @@ done <<< "$replays"
 mkdir -p allure/cycle-26
 cp -R "$root/.pi/harness/.state/pages/allure-cycle-26/." allure/cycle-26/
 git add allure/cycle-26
+grader_only=allure/grader-only-2026-11-18
+if [ -n "${LOYLY_GRADER_ONLY_ALLURE_DIR:-}" ]; then
+  test -f "$LOYLY_GRADER_ONLY_ALLURE_DIR/index.html"
+  mkdir -p "$grader_only"
+  cp -R "$LOYLY_GRADER_ONLY_ALLURE_DIR/." "$grader_only/"
+  git add "$grader_only"
+elif git cat-file -e "HEAD:$grader_only/index.html" 2>/dev/null; then
+  git archive HEAD "$grader_only" | tar -x
+  git add "$grader_only"
+fi
 git commit -q -m "Publish the Löyly spec v2 event model from $src"
 git log --oneline -1; git show --stat --format= HEAD
 if [ "$DRY" = 1 ]; then echo "dry run: not pushed to $REMOTE $BRANCH"; exit 0; fi
