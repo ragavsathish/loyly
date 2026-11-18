@@ -74,6 +74,17 @@ instants travel as ISO-8601 UTC text.
   `reason` and `detail` of `run-halted`.
 - **Reading changes nothing.** A query records no event, performs no effect and runs no ORC
   workflow.
+- **Allure results.** After `measurement/file-score` files a score, the runner projects the
+  filed Measurement receipt into `LOYLY_RUNS_DIR/<run-id>/allure-results/`. There is exactly
+  one `<uuid>-result.json` per checklist item, including an unreached item. Each is an Allure
+  test-result object with an Allure UUID, stable history and case identities, `fullName`, `name`,
+  `status` (`passed` or `failed`), and a `labels` entry with `name` `tag` and `value`
+  `item-<item-id>`. Its description is the filed evidence or unreached reason; a failed
+  result also carries that reason in `statusDetails.message`. The projector reads the filed
+  receipt, never the judge's preliminary scores, and changes no Measurement event, verdict,
+  denominator or scoreboard. It writes no result when no score was filed. A write failure
+  halts the run as `effect-could-not-run`, preserving the already filed measurement for the
+  operator to inspect. The Allure directory is a report artifact, not a second score.
 
 ## The effects
 

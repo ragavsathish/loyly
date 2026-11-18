@@ -1259,9 +1259,15 @@
    "name": "Reading a running run shows its tick and the leaves it completed",
    "rule": "A run that cannot perform an effect halts, loudly, and a run that ended stays as it ended",
    "source": ".pi/plan/06-cycle-runner/spec.feature:725"
+  },
+  {
+   "id": "06-074",
+   "name": "The run projects filed verdicts and unreached items into tagged Allure results",
+   "rule": "A filed score has an Allure result for every checklist item",
+   "source": ".pi/plan/06-cycle-runner/spec.feature:737"
   }
  ],
  "counts": {
-  "total": 210
+  "total": 211
  }
 }

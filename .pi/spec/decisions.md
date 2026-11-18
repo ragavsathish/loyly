@@ -2293,10 +2293,67 @@ instrument shadow matched the legacy harness at the clean tree, app bytes, gate 
 
 The filed profile is still `failed`: its sole problem is eight separately named fresh
 retries outside the checklist. The raw captures were audited individually for ordered
-boundaries, model and store evidence, no owned process after shutdown, and live QEMU samples
+boundaries, model and store evidence, no owned program after shutdown, and live QEMU samples
 where grading ran (`harness/v2/cycles/06/25/profile-retry-audit.md`). Every canonical case
 was clean and a live JVM diagnostic exists. The operator explicitly chose "Accept audited
 exception" for this finding. This acceptance preserves the failed report and raw evidence;
 it does not change the 61 verdicts or make a claim that the profile reporter itself passed.
 The complete cycle-25 artifact is the running build at `harness-impl/06-cycle-runner/`, with
 its provenance and source digest. The five other accepted contexts are retained.
+
+## Legacy parity reading after cycle 25 (2026-11-17)
+
+The operator clarified the boundary: apart from slice handling and the instrument's result
+projection, the product cycle keeps legacy harness behavior while ORC runs it. The result
+projection uses Allure test-result JSON and an Allure `tag` label for each stamped item;
+OTLP profiles and the legacy golden oracle remain separate evidence, while OCI names the
+container image format. This round
+records that reading in `architecture/README.md` and corrects the source attribution of
+`@item-06-068`: archived `score.clj` accepts a verdicts file and has no grader-approval check;
+the later `harness/regen.clj` wrapper selected approved sealed spec-v1 graders. Spec-v2
+bootstrap cycles use external black-box verdicts through `harness/v2/score.sh`; the accepted
+runner's `grade.v1` scores inside ORC. All retain the legacy checklist and honest score
+semantics. The product grader's calibration and full workflow sealing remain open under ADR
+0003. The cycle-25 same-cut shadow proves one fixture, not the stale `make verdicts` launcher.
+No stamped scenario, item selection, grader instruction or candidate changed in this reading;
+slice 06 remains 61 items and the full checklist remains 210.
+
+## Allure grading result format (2026-11-17)
+
+The operator specified Allure as the grader's result schema. The slice-06 bootstrap grader
+still files its authoritative `verdicts.json` and profile. It now also exports one Allure
+test result per stamped item, with `tag=item-06-NNN`, stable test identity, pass/fail status,
+evidence text and that case's profile summary as a JSON attachment. The instrument verifies
+the Allure files against the same checklist, verdicts and profile before filing them. A
+failed profile remains failed in its attachment and cannot turn a behavior verdict green or
+red. The accepted ORC runner is not edited here; Measurement's equivalent Allure projection
+is drafted for its next regeneration. The existing 61-item slice and 210-item accepted
+checklist are unchanged. The grader instruction changed for this format, so its new digest
+is SHA-256 `4d093a63c0ac7267b1e6d3ea83532f57997dda636776839f668e1f08ee6ccc1b` and
+requires exact approval before the next fenced cycle.
+
+## Spec round 27 (proposed, 2026-11-18)
+
+The operator requested one more cycle to compare the updated spec and candidate with the
+legacy harness. The accepted cycle-25 runner remains the running build. Its same-cut
+shadow matched legacy on one HTTP fixture; the new preflight is
+`harness/v2/preflight/06/26.md`.
+
+**Allure is a reporting projection after Measurement files a score.** New item 06-074
+requires one Allure test-result JSON file for every filed checklist item, including an
+unreached item, under the run's results directory. Its tag carries the stamped identity,
+and its status and reason agree with the filed Measurement receipt. Legacy checklist,
+verdict, zero-verdict refusal, denominator and scoreboard behavior remain authoritative.
+The runner must not use Allure as a grader or a second score. This intentional instrument
+extension does not rewrite any older stamp. Slice 06 has 62 items and the full spec has
+211. The external bootstrap grader's Allure projection is separate from the product
+runner's projection; both use the same result schema.
+
+Measurement's draft scenario also asks for a per-item diagnostic profile attachment.
+That part remains a draft because the accepted ORC runner has no per-item diagnostic
+profile and a slice-06-only cycle cannot ratify a new slice-02 item. Item 06-074 checks
+the product result files and preserves the filed score. It does not claim to carry the
+broader Measurement draft. The next cycle must grade the new item and all 61 protected
+slice-06 items, pass its independent gate, produce a clean grading profile, and match a
+same-cut legacy instrument shadow before replacing the accepted runner. The approved
+cycle-25 profile exception does not transfer.

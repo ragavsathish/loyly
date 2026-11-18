@@ -51,10 +51,10 @@ The fence clones HEAD, so the spec the builder reads must be committed.
 1. `git status` / `git diff`: review the next spec round and obtain approval of its exact
    deterministic selection and sealed grader digest before fencing (AGENTS.md, "Pi and ORC
    ownership" and "The instrument").
-2. Check the item count is unchanged (210; slice 06 at 61):
+2. Check the approved item count (proposed cycle 26: 211 total; slice 06 at 62):
    `grep -c '@item-06-' .pi/spec/cycle-runner/spec.feature`
 3. Commit and push:
-   `git add -A .pi/spec harness .pi/harness/grader-instruction-06.md orc tools/spec/views/dist`
+   `git add -A AGENTS.md .pi/spec harness .pi/harness/grader-instruction-06.md .pi/harness/bin/grading-room.sh orc tools/spec/views/dist`
    `git commit -m "Spec round NN: ..."` then push to the authorized remote.
 
 ## 2. Fence and render
@@ -176,13 +176,14 @@ jq -r 'group_by(.verdict)|map("\(.[0].verdict): \(length)")|.[]' $STATE/grading/
 
 ```bash
 V=$STATE/grading/06-c$MM/work/verdicts.json
-jq length $V                                                     # 61
+jq length $V                                                     # proposed cycle 26: 62
 diff <(jq -r '.[].id' $V) $STATE/grading/06-c$MM/checklist.txt && echo order-ok
 jq '[.[]|select(.evidence|test("not reached"))]|length' $V       # 0
 harness/v2/score.sh 06 $ROOM --verdicts $V --by "codex subagent gpt-6.1-terra, grader-instruction-06" \
   --profile $STATE/grading/06-c$MM/work/profile.json \
+  --allure $STATE/grading/06-c$MM/work/allure-results \
   > $STATE/logs/score-c$MM-slice06.log 2>&1; tail -12 $STATE/logs/score-c$MM-slice06.log
-git add harness/v2/cycles/06/$MM && git commit -m "Harness: cycle $MM of slice 06 scored X/61 ..." && git push ragavsathish spec-v2
+git add harness/v2/cycles/06/$MM && git commit -m "Harness: cycle $MM of slice 06 scored X/62 ..." && git push ragavsathish spec-v2
 ```
 
 The report compares with the last scored cycle on shared items: newly passing and newly
@@ -192,6 +193,9 @@ take into the next round. For the revised grader, also read `work/profile.json`;
 and copy beside the score. A failed profile
 is still filed with the honest score and blocks acceptance until investigated. The revised
 grader instruction digest requires operator approval under AGENTS.md before use.
+The Allure directory has one result per checklist item, each with its stamped item ID as an
+Allure `tag` label and its case profile as an attachment; `score.sh` verifies it against
+the filed verdicts and profile before copying it into the cycle record.
 
 ## 7. After a score and instrument comparison
 

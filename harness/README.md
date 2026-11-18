@@ -473,3 +473,10 @@ observation added one line inside `@item-06-013`, shifting the `source` lines fo
 `06-014` through `06-073` forward by one. No item, name, rule, order, or count changed.
 The checklist golden was re-recorded with `harness/oracle.sh record`; its diff consists
 only of those source line numbers.
+
+**2026-11-18: the spec grew by one Allure result item in proposed round 27.**
+The product owner asked for a further instrument cycle with legacy comparison. Slice 06
+appended `06-074`; its earlier item identities, names, rules, order and source lines are
+unchanged. The golden is re-recorded for the stated reason "spec grew". Its expected diff
+is one item appended and `total` 210 → 211. The slice-06 grader instruction grows by this
+item and changes digest; the accepted cycle-25 verdicts are unchanged.

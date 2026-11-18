@@ -658,7 +658,7 @@ Feature: Cycle runner
   Rule: A run grades only with the approved sealed grader
 
     # context.allium, contract TheJudge, invariant OnlyAnApprovedGrader; cycle-run.allium, rule HaltRun
-    # Legacy: score.clj files verdicts only under an approved grader digest; AGENTS.md "used only after an operator approves that exact digest"
+    # Legacy: regen.clj selects approved sealed spec-v1 graders before score.clj files their verdicts; score.clj itself does not approve a digest. AGENTS.md requires operator approval of the product grader.
     @minimum @allium-boundary.OnlyAnApprovedGrader @allium-rule-success.HaltRun
     @item-06-068
     Scenario: A sealed grader whose digest the run did not approve halts the run before the cycle
@@ -727,3 +727,18 @@ Feature: Cycle runner
       When the operator reads the run progress of run R-1
       Then it shows run R-1 running, with the identity of its tick of "cycle-runner/cycle.v1"
       And the nodes it completed so far, in order, end with the fence and the render, and the regenerate leaf is running
+
+  Rule: A filed score has an Allure result for every checklist item
+
+    # Instrument reporting projection: legacy score.clj's checklist, verdict and unreached
+    # semantics remain authoritative. Allure is an additional result format, not a grader.
+    @balance
+    @item-06-074
+    Scenario: The run projects filed verdicts and unreached items into tagged Allure results
+      Given the checklist of cycle C-1 holds 01-001 and 01-002
+      And the stub judge scores 01-001 pass with the reason "booked" and leaves 01-002 unscored
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then Measurement files a score of 1 of 2, with 01-002 failed as unreached
+      And the run's allure-results directory holds exactly one Allure test result JSON file for each checklist item
+      And each result has a tag label with its stamped item identity, a stable test identity and a status matching the filed verdict
+      And the failed result carries the filed unreached reason, while neither result changes the score or denominator

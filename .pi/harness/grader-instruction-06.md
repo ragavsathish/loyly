@@ -19,6 +19,7 @@ cycle-preparation) are inside it. They are never built or launched on their own.
 | `harness-impl/06-cycle-runner/` | The gated candidate (a copy). `start.sh` boots it on its JSON-RPC stdio seam. `test.sh` runs its own suite. It carries its own copy of the event models |
 | `harness/v2/event_store_check.clj` (+ `event-store-check.sh`, `deps.edn`) | Reference only: how the gate reads a Grain SQLite store with Grain's own reader. Reuse its reading code to inspect a store |
 | `harness/v2/profile.py`, `profile_store.clj` | Host process and JVM sampler, Grain trace reader, and profile report; they record process IDs, usage, node facts and prompt digests, never command lines or raw prompts |
+| `harness/v2/allure.clj` | Projects final item verdicts and case profiles into Allure result files and verifies their tags and schema |
 | `.pi/harness/grader-instruction-06.md` | This sealed grader instruction, copied from the same spec commit; its digest is recorded in the profile |
 | `work/` | Yours, read-write: fixtures, stubs, stores, logs, and your output |
 
@@ -104,7 +105,7 @@ What `seam.md` says, and what to expect:
   the two ORC judge score events as well as the filed verdicts. For 067, reply with level `2`
   and feedback but no reasoning for 01-002; verify it leaves no judge score.
 
-## Scoring and the store (items 059, 061 and 064 to 073)
+## Scoring and the store (items 059, 061 and 064 to 074)
 
 - When a gate attempt passed, each checklist item of the fixture plan is graded by the sealed
   grader `cycle-runner/grade.v1`, in a child tick of its own: `clear-evidence`, `drive-seam`,
@@ -137,6 +138,13 @@ What `seam.md` says, and what to expect:
     paragraph.
   - 072: a render the model fails halts the run before any builder.
   - 073: `run-progress` of a running run shows its tick and the running leaf.
+  - 074: run a two-item fixture with one judge score and one item left unscored. Read the
+    filed Measurement receipt and `LOYLY_RUNS_DIR/<run-id>/allure-results/` after the run.
+    Require two Allure result JSON files, tagged with their item identities; the scored
+    pass must be `passed`, the unreached item `failed` with its filed reason. Repeat on a
+    fresh store and compare each item's stable Allure history and case identity. Compare
+    the score and denominator with the receipt. These are the candidate's product results,
+    separate from the Allure files you export for this grading run under `work/`.
 
 ## The machine
 
@@ -279,5 +287,21 @@ you will be asked to continue with them.
 Optionally, write `work/surprises.json`: `[{"id", "note"}]`, places where the spec was ambiguous
 or the candidate did something the spec does not mention. A surprise never changes a verdict.
 
-When every item has a verdict and `work/profile.json` exists, answer with one line: the number of
-items, passes, fails and the profile status.
+After `work/profile.json` exists, export and verify Allure results:
+
+```bash
+bb harness/v2/allure.clj export --checklist checklist.txt --verdicts work/verdicts.json \
+  --profile work/profile.json --out work/allure-results
+bb harness/v2/allure.clj verify --checklist checklist.txt --verdicts work/verdicts.json \
+  --profile work/profile.json --out work/allure-results
+```
+
+Each checklist item has one `{uuid}-result.json` in the [Allure test result format](https://allurereport.org/docs/how-it-works-test-result-file/).
+Its `labels` include `{"name":"tag","value":"item-06-001"}` for `@item-06-001`;
+`status` maps `pass` to `passed` and `fail` to `failed`. A JSON attachment holds the
+case's profile summary. The profile's own `failed` status stays visible in that attachment
+and never changes an item verdict. Allure is a view of `verdicts.json`, not a second score;
+the OTLP trace and metric files remain separate.
+
+When every item has a verdict, `work/profile.json` exists, and Allure verification passes,
+answer with one line: the number of items, passes, fails and the profile status.
