@@ -4,7 +4,9 @@ Status: Proposed (2026-11-18). [ADR 0003](0003-judge-scores-checklist-items.md) 
 
 ## Context
 
-The accepted `cycle-runner/grade.v1` uses an ORC researcher and judge with a model endpoint. The operator wants ORC to launch an agent session through a host command, starting with the grader, while allowing Pi, Codex, or Claude to supply that session. The legacy grading step already separates a fresh grading room from the builder and files item verdicts after grading. ORC must still own the cycle, checklist denominator, score events, deadlines, and durable evidence.
+The accepted `cycle-runner/grade.v1` uses an ORC researcher and judge with a model endpoint. The operator wants ORC to launch both builder and grader agent processes through provider-neutral hosts while retaining Pi as the default. The legacy grading step already separates a fresh grading room from the builder and files item verdicts after grading. ORC must still own the cycle, checklist denominator, score events, deadlines, and durable evidence.
+
+The `scope-impact/claude/beautiful-clarke-5778ir` branch demonstrates a resumable file-backed factory, a Claude worker, and a separate Claude grader process. Its useful part is the separate process lifecycle. It forked from old `master`, replaces the Clojure harness tools with TypeScript, and does not carry the accepted ORC/Grain runner. Its grader permits Bash on the host, so read-tool denials and a prompt do not physically prevent source or credential reads. The branch is evidence for an adapter, not a tree to merge into the accepted implementation.
 
 ## Options considered
 
@@ -20,7 +22,7 @@ Introduce `cycle-runner/grade.v2` with one bounded grader session per checklist 
 
 The provider host must demonstrate that the grader can drive the gated candidate through its public seam but cannot reach builder rooms, gate evidence, earlier verdicts, sibling grading rooms, unrelated repository files, or host credentials. The grader must not use candidate source to decide a verdict. The legacy and current VM grading rooms contain candidate files so the grader can launch the app; the source-use rule is enforced through instruction and trace review, not by denying reads of those files. A focused local `codex exec --sandbox workspace-write -C <empty room>` probe on 2026-11-18 found both an unrelated repository file and the Codex auth file readable to its shell (`test -r` exit 0 for each; neither file's contents were opened). Therefore that command alone cannot be the grader host. Codex can be the first provider only with a further isolation boundary; verification must include a denied forbidden read, a real seam probe, cancellation of the host command and its children, and a same-candidate shadow against the accepted grader and legacy score. The grader's model must differ from the builder's recorded model.
 
-The sealed grader digest must cover the new workflow version, rubric, result schema, host policy, and selected model. Changing any of those requires a new approval. The builder command and build room remain as accepted while the grader boundary is changed and measured.
+The sealed grader digest must cover the new workflow version, rubric, result schema, host policy, and selected model. Changing any of those requires a new approval. The builder command and build room remain as accepted while the grader boundary is changed and measured. The provided `bin/agent-process.sh` dispatches to the existing Pi builder and bootstrap grader by default, or to an absolute executable process host without shell evaluation. `bin/builder-process.sh` can already be supplied as `LOYLY_BUILDER_HOST`; `bin/grader-process.sh` does not change the accepted ORC grader until `grade.v2` is specified and regenerated. Dispatch is not an isolation boundary: each provider host must prove one.
 
 ## Rationale and consequences
 
