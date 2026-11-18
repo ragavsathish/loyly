@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: A failed gate attempt is repaired by a fresh builder that sees only the previous candidate and the gate's evidence
+
+    @minimum @allium-boundary.TheBuilderSeesOnlyItsMounts @item-06-023
+    Scenario: A repair builder sees the previous candidate and the gate evidence, read-only
+      Given the stub builder records the paths its builder room holds, and its first candidate has a red suite
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the repair effect of run R-1 for attempt 2 was recorded with the event "regeneration-cycle/candidate-regenerated" for "verification-repair", its detail naming the evidence root that attempt 1's "regeneration-cycle/gate-attempt-failed" carries
+      And the second launch saw the clean room, the previous candidate and the gate evidence of attempt 1, and could write neither of the last two

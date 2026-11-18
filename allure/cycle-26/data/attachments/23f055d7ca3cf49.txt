@@ -1,0 +1,11 @@
+Feature: Cycle runner
+  Rule: The judge grades each item of the gated candidate, its scores are filed as scored, and the run ends as its cycle ends
+
+    @minimum @allium-boundary.ReasonBeforeScore @item-06-067
+    Scenario: A judge reply with the level of a pass and no reasoning scores nothing, and the item is filed unreached
+      Given the stub model, as the judge, scores 01-001 pass with the reason "booked"
+      And as the judge of 01-002 replies with integer level 2 and its feedback, and no reasoning
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the file-verdicts effect of run R-1 offered a verdict for 01-001 alone
+      And the progress of run R-1 shows a score for 01-001 alone, and the one store holds no judge score of 01-002
+      And the file-score effect's measurement/measurement-filed event shows 1 of 2 passing, 01-002 failed with the reason "unreached"

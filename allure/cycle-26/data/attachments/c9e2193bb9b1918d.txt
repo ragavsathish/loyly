@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: Measurement keeps its history across runs on the one store, so a scoreboard compares a cycle with the last measured cycle of its selection
+
+    @minimum @allium-boundary.MeasurementKeepsItsHistory @item-06-051
+    Scenario: Two runs on one store compare the second cycle with the first
+      Given run R-1 of cycle C-1 at source cut K-1 passed with its cycle on the store S
+      When the operator starts run R-2 of cycle C-2 at source cut K-2 on S, everything else the same
+      Then Measurement's scoreboard of cycle C-2, read through the candidate's seam after run R-2 ended, has the previous cycle C-1
+      And run R-2 did not halt at its stamp, and its stamp effect recorded no new item identity

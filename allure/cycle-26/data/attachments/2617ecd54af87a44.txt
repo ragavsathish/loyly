@@ -1,0 +1,10 @@
+Feature: Cycle runner
+  Rule: The fence builds the clean room of the cut and proves it, as legacy fence.sh does
+
+    @minimum @allium-boundary.RefusalsAreTheContexts @allium-rule-success.ConcludeRunFailed @item-06-012
+    Scenario: A fenced path that matches nothing fails the cycle at the fence
+      Given the configuration fences "impl harness/cycles" and the commit holds impl but no harness/cycles
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the fence effect of run R-1 was refused "fenced-path-matched-nothing", as regeneration-cycle answered
+      And its next effect, fail-cycle, was recorded, and run R-1 failed with its cycle at the fence for "fence-refused"
+      And no builder was launched

@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: The judge grades each item of the gated candidate, its scores are filed as scored, and the run ends as its cycle ends
+
+    @minimum @allium-boundary.RefusalsAreTheContexts @allium-rule-failure.ConcludeRunPassed.2 @allium-rule-failure.ConcludeRunFailed.2 @allium-invariant.NoBuilderAfterTheScoring @item-06-069
+    Scenario: No item scored fails the score stage, and the run fails with its cycle
+      Given the stub model fails every request of every item's researcher
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the file-verdicts effect of run R-1 was refused "zero-verdicts", as measurement answered, and its fail-score-stage effect was recorded
+      And run R-1 failed with its cycle at the score for "score-stage-failed", and no builder was launched after the file-verdicts effect

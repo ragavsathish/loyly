@@ -1,0 +1,10 @@
+Feature: Cycle runner
+  Rule: A failed gate attempt is repaired by a fresh builder that sees only the previous candidate and the gate's evidence
+
+    @minimum @allium-rule-success.ConcludeRunFailed @item-06-024
+    Scenario: Three failed attempts fail the cycle, no fourth builder is launched, and nothing is graded
+      Given every candidate the stub builder leaves has a red suite
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the stub builder was launched three times
+      And run R-1 failed with its cycle at the gate for "gate-attempts-exhausted"
+      And the stub model was asked to drive no item, and run R-1 has no file-verdicts effect

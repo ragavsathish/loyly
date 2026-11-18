@@ -1,0 +1,10 @@
+Feature: Cycle runner
+  Rule: The gate grades a copy of the candidate on the host, in legacy verify.sh's order
+
+    @minimum @allium-boundary.TheLegacyGateOrder @item-06-060
+    Scenario: A candidate that refuses its first three requests is answered on a later poll, its margin 20 less that poll
+      Given the stub builder leaves a candidate whose suite is green and whose launch entrypoint replies to its first three HTTP requests with the status 503 and serves the marker from its fourth on
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the gate effect of run R-1 for attempt 1 was recorded with the event "regeneration-cycle/gate-attempt-passed"
+      And that event carries a boot budget of 10 seconds and 20 polls, answered on poll 4 or later
+      And run R-1's attempt 1 shows a boot margin of 20 polls less the poll it was answered on

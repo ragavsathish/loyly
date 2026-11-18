@@ -1,0 +1,12 @@
+Feature: Cycle runner
+  Rule: A stdio candidate is gated as harness/v2/gate.sh gates it: its suite, its identity probe, then the store the probe's candidate wrote
+
+    @minimum @allium-boundary.TheStdioGateOrder @item-06-042
+    Scenario: An identity probe that fails fails the attempt for its identity, and the store is not checked
+      Given the configuration's seam is "stdio" and the budget allows 1 gate attempt
+      And the stub builder leaves a candidate whose suite exits 0
+      And the cut's identity probe prints "no response within the 30s boot budget" and exits 1
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the gate effect of run R-1 for attempt 1 was recorded with the event "regeneration-cycle/gate-attempt-failed" for "identity-probe-failed"
+      And its detail carries "no response within the 30s boot budget"
+      And the store check never ran

@@ -1,0 +1,10 @@
+Feature: Cycle runner
+  Rule: The gate grades a copy of the candidate on the host, in legacy verify.sh's order
+
+    @minimum @allium-boundary.TheLegacyGateOrder @item-06-018
+    Scenario: Something answering on the port is a gate refusal, and three in a row fail the cycle
+      Given the stub builder leaves a candidate the gate would pass
+      And something already responds on the configured port
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the gate effects of run R-1 for attempt 1 were refused "seam-answered-before-boot" three times, each followed by a recorded gate-refusal effect
+      And run R-1 failed with its cycle at the gate for "infrastructure", and the candidate's launch entrypoint was never started

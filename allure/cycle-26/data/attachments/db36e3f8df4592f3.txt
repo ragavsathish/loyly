@@ -1,0 +1,11 @@
+Feature: Cycle runner
+  Rule: A gate attempt is one subtree, delegated once per attempt
+
+    @minimum @allium-guarantee.EachGateAttemptOneDelegatedTick @item-06-061
+    Scenario: Each gate attempt runs as a child tick of its own of the workflow "cycle-runner/gate-attempt.v1"
+      Given the stub builder's first candidate has a red suite, and its second a green suite and a launch entrypoint that serves the marker on the port
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then run R-1 passed with its cycle, its gate effect for attempt 2 recorded with the event "regeneration-cycle/gate-attempt-passed"
+      And in the one store, the install, self-check and gate effect results of attempt 1 lie inside leaves of one tick of the ORC workflow "cycle-runner/gate-attempt.v1", and those of attempt 2 inside leaves of another
+      And each of those two ticks is a child tick of the run's tick of the ORC workflow "cycle-runner/cycle.v1"
+      And the repair effect result of attempt 2 lies inside a leaf of attempt 1's tick of "cycle-runner/gate-attempt.v1"

@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: A run starts once, one at a time, on a commit of the project repository
+
+    @minimum @allium-invariant.OneRunInProgress @item-06-003
+    Scenario: A second run is refused while the first is running
+      Given run R-1 of cycle C-1 is running, its stub builder sleeping
+      When the operator starts run R-2 of cycle C-2
+      Then the start is refused
+      And no run R-2 exists, and run R-1 is still running

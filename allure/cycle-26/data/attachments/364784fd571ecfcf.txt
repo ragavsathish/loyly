@@ -1,0 +1,10 @@
+Feature: Cycle runner
+  Rule: The runner stamps, pins and derives the checklist, on the one store
+
+    @minimum @allium-rule-success.HaltRun @item-06-009
+    Scenario: A plan whose item identities a fresh stamp does not give back halts the run before the cycle
+      Given the plan at the commit also holds a scenario with no item identity
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the stamp effect of run R-1 was recorded, as specification answered
+      And run R-1 is halted at the stamp effect for a refusal before the cycle
+      And it has no pin effect and no checklist effect
