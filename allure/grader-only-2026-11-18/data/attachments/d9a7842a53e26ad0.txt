@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: A run starts once, one at a time, on a commit of the project repository
+
+    @balance @allium-invariant.OneRunPerCycle @item-06-004
+    Scenario: A cycle is run once
+      Given run R-1 of cycle C-1 concluded passed
+      When the operator starts run R-2 of cycle C-1
+      Then the start is refused
+      And no run R-2 exists

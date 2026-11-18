@@ -1,0 +1,10 @@
+Feature: Cycle runner
+  Rule: A run grades only with the approved sealed grader
+
+    @minimum @allium-boundary.OnlyAnApprovedGrader @allium-rule-success.HaltRun @item-06-068
+    Scenario: A sealed grader whose digest the run did not approve halts the run before the cycle
+      Given the sealed grader's digest is "r-2"
+      And the run's approved grader digests are "r-1"
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then run R-1 is halted at the grader for a refusal before the cycle, its detail naming "r-2"
+      And it has no self-check effect and no fence effect, and no builder was launched

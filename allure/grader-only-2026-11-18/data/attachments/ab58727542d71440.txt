@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: A run that cannot perform an effect halts, loudly, and a run that ended stays as it ended
+
+    @balance @allium-guarantee.ObservingChangesNothing @item-06-035
+    Scenario: Reading a run's progress changes nothing
+      Given run R-1 of cycle C-1 passed with its cycle
+      When the operator reads the run progress of run R-1 twice
+      Then both readings are identical
+      And run R-1 is still passed

@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: A run starts once, one at a time, on a commit of the project repository
+
+    @minimum @allium-rule-failure.StartRun.4 @item-06-005
+    Scenario: A run of something that is not a commit of the project repository is refused
+      Given "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef" is no commit of the project repository
+      When the operator starts run R-1 of cycle C-1 at source cut K-1, commit "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+      Then the start is refused
+      And no run R-1 exists, and no builder was launched

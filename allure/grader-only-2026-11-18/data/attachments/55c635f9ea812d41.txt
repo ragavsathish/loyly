@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: A run that cannot perform an effect halts, loudly, and a run that ended stays as it ended
+
+    @balance @allium-guarantee.ObservingChangesNothing @item-06-073
+    Scenario: Reading a running run shows its tick and the leaves it completed
+      Given run R-1 of cycle C-1 is running, its stub builder sleeping
+      When the operator reads the run progress of run R-1
+      Then it shows run R-1 running, with the identity of its tick of "cycle-runner/cycle.v1"
+      And the nodes it completed so far, in order, end with the fence and the render, and the regenerate leaf is running

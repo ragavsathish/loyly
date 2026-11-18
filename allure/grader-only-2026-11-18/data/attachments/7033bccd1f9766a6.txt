@@ -1,0 +1,10 @@
+Feature: Cycle runner
+  Rule: A gate command handed in is the gate: the runner hands it the cut's tree, the candidate's copy and an evidence directory, and records its result
+
+    @minimum @allium-rule-success.HaltRun @item-06-056
+    Scenario: A gate command whose last line names no code the runner reads halts the run at the gate
+      Given the operator hands in a gate command that prints "BOOT 20 10" and last "infrastructure the world did not come up", and exits 2
+      And the stub builder leaves a candidate in its candidate scope
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then run R-1 is halted at the gate effect because a handed-in command could not run, its detail "infrastructure the world did not come up"
+      And run R-1's progress has no gate effect result, no fail-cycle effect result and no cycle: the runner did not conclude its cycle

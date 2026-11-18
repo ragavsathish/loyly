@@ -1,0 +1,10 @@
+Feature: Cycle runner
+  Rule: The runner stamps, pins and derives the checklist, on the one store
+
+    @minimum @allium-boundary.RefusalsAreTheContexts @allium-boundary.OnlyThroughTheCommands @allium-guarantee.OwnsNoContextRule @allium-rule-success.HaltRun @item-06-008
+    Scenario: A checklist Measurement refuses halts the run with Measurement's refusal
+      Given the plan at the commit holds only a spec file with no scenario
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the checklist effect of run R-1 was refused "empty-checklist", as measurement answered
+      And run R-1 is halted at the checklist effect for a refusal before the cycle
+      And it has no self-check effect and no fence effect

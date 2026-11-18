@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: The runner carries its own event model, as its room gave it
+
+    @minimum @allium-guarantee.CarriesItsOwnEventModel @item-06-062
+    Scenario: A copy of the candidate in a folder of its own, with no spec around it, runs a cycle
+      Given a copy of the candidate in a folder outside the project repository, with no .pi folder in it or in any folder above it
+      And the stub builder leaves a candidate whose suite is green and whose launch entrypoint serves the marker on the port
+      When the operator starts run R-1 of cycle C-1 at source cut K-1 on that copy
+      Then run R-1 passed with its cycle, its gate effect for attempt 1 recorded with the event "regeneration-cycle/gate-attempt-passed"

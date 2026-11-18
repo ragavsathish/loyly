@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: A run starts once, one at a time, on a commit of the project repository
+
+    @balance @allium-invariant.OneRunPerIdentity @item-06-002
+    Scenario: A run identity is started once
+      Given run R-1 of cycle C-1 concluded failed at the fence
+      When the operator starts run R-1 of cycle C-2
+      Then the start is refused
+      And the run progress lists run R-1 once, for cycle C-1

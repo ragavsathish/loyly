@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: The judge grades each item of the gated candidate, its scores are filed as scored, and the run ends as its cycle ends
+
+    @minimum @allium-boundary.TheResearcherDrivesTheSeamOnly @item-06-066
+    Scenario: The researcher is given the item, the seam and the event model, and a shell in the grading room only
+      Given the stub model records every request it is sent, and as the researcher of 01-001 asks its shell for the system it runs, its working folder, that folder's files and the folders above it
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the first request sent for the researcher of 01-001 holds the scenario of 01-001, and the text of slice 01's seam.md and of its event model at the cut
+      And the shell's replies came from a Linux VM in which the item's grading room is the only folder of the host: it held the clean room's files and the gated candidate's copy at its scope, and no builder room, no gate evidence, no store and no other item's grading room

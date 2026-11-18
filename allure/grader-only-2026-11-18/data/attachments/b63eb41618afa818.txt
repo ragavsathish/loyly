@@ -1,0 +1,12 @@
+Feature: Cycle runner
+  Rule: A filed score has an Allure result for every checklist item
+
+    @balance @item-06-074
+    Scenario: The run projects filed verdicts and unreached items into tagged Allure results
+      Given the checklist of cycle C-1 holds 01-001 and 01-002
+      And the stub judge scores 01-001 pass with the reason "booked" and leaves 01-002 unscored
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then Measurement files a score of 1 of 2, with 01-002 failed as unreached
+      And the run's allure-results directory holds exactly one Allure test result JSON file for each checklist item
+      And each result has a tag label with its stamped item identity, a stable test identity and a status matching the filed verdict
+      And the failed result carries the filed unreached reason, while neither result changes the score or denominator

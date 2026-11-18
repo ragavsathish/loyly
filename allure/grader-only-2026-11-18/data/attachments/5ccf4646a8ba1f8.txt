@@ -1,0 +1,11 @@
+Feature: Cycle runner
+  Rule: A stdio candidate is gated as harness/v2/gate.sh gates it: its suite, its identity probe, then the store the probe's candidate wrote
+
+    @minimum @allium-rule-success.HaltRun @item-06-045
+    Scenario: A stdio run whose store check cannot be started halts at the gate
+      Given the configuration's seam is "stdio" and the cut's identity probe exits 0
+      And the stub builder leaves a candidate whose suite exits 0
+      And the store-check command handed in names no program
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then run R-1 is halted at the gate effect because a handed-in command could not run
+      And it has no gate effect result

@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: A regenerate runs one fresh builder session and records what it left in its candidate scope
+
+    @balance @allium-boundary.OneFreshBuilderPerRegenerate @item-06-017
+    Scenario: A builder that outlives the regenerate timeout is stopped and the cycle fails for its budget
+      Given the budget's regenerate timeout is 2 seconds and the stub builder sleeps 30 seconds
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the stub builder was stopped
+      And run R-1 failed with its cycle at the regenerate stage for "budget"

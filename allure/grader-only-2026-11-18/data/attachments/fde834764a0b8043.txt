@@ -1,0 +1,10 @@
+Feature: Cycle runner
+  Rule: A regenerate runs one fresh builder session and records what it left in its candidate scope
+
+    @minimum @allium-boundary.TheBuilderRunsInTheConfiguredImage @item-06-049
+    Scenario: Each builder is handed the configured builder image, and each regenerate names the image and its digest
+      Given the configuration's builder image is "builder-clojure" and the builder images directory holds a folder of that name
+      And the stub builder records the arguments of each launch, and the candidate it leaves fails the gate once, then passes
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then each launch of the stub builder was handed three arguments: its builder room, its instruction file and the path of "builder-clojure" in the builder images directory
+      And the regenerate and repair effects of run R-1 each name in their detail the builder image "builder-clojure" and its digest

@@ -1,0 +1,9 @@
+Feature: Cycle runner
+  Rule: The gate grades a copy of the candidate on the host, in legacy verify.sh's order
+
+    @minimum @allium-boundary.TheLegacyGateOrder @item-06-021
+    Scenario: A served page without the marker fails the attempt for its identity
+      Given the stub builder leaves a candidate with a green suite whose page does not carry "sauna"
+      And the configuration's marker is "sauna" and the budget allows 1 gate attempt
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the gate effect of run R-1 for attempt 1 was recorded with the event "regeneration-cycle/gate-attempt-failed" for "identity-probe-failed"
