@@ -1,0 +1,33 @@
+# 0008: Grade through a bounded agent session
+
+Status: Proposed (2026-11-18). [ADR 0003](0003-judge-scores-checklist-items.md) remains active until a replacement passes the instrument shadow and a fresh slice-06 cycle is accepted.
+
+## Context
+
+The accepted `cycle-runner/grade.v1` uses an ORC researcher and judge with a model endpoint. The operator wants ORC to launch an agent session through a host command, starting with the grader, while allowing Pi, Codex, or Claude to supply that session. The legacy grading step already separates a fresh grading room from the builder and files item verdicts after grading. ORC must still own the cycle, checklist denominator, score events, deadlines, and durable evidence.
+
+## Options considered
+
+| Option | Benefit | Cost or risk | Evidence or unknown |
+| --- | --- | --- | --- |
+| Keep `grade.v1` and bridge the model endpoint to Pi | Smallest change to the accepted runner | Keeps the researcher and judge coupled to one model provider | Current runner and ADR 0003 |
+| ORC starts a grader host command through one provider-neutral contract | Codex, Pi, and Claude can grade under the same cycle rules | Requires a new workflow version and isolation verification for each provider host | `codex exec` is installed and supports noninteractive structured output; the legacy grader has a three-argument launcher |
+| The operator launches a grader and hands in verdicts | Works for bootstrap cycles | An unattended ORC run cannot own the grading deadline or resume | Legacy `score.sh` and bootstrap cycles |
+
+## Proposed decision
+
+Introduce `cycle-runner/grade.v2` with one bounded grader session per checklist item. ORC creates the item room and a request naming the item, approved cut, public seam, rubric digest, model identity, deadline, and expected result path. A configured `LOYLY_GRADER_HOST` command runs the selected agent and writes a structured result: item ID, observed evidence, reasoning, level 1 or 2, launch provenance, and trace location. The same command shape and result schema apply to Codex, Pi, and Claude provider hosts. ORC validates the item ID, schema, rubric digest, completion, and deadline before it records `:judge/score-emitted` in the item's child tick. Missing or invalid results leave the item unreached; Measurement still files the full checklist and Allure projection. A command exit code or its final prose is never itself a verdict.
+
+The provider host must demonstrate that the grader can drive the gated candidate through its public seam but cannot read candidate source, builder rooms, gate evidence, earlier verdicts, sibling grading rooms, or host credentials. A working directory or prompt restriction alone is insufficient. A focused local `codex exec --sandbox workspace-write -C <empty room>` probe on 2026-11-18 found both an unrelated repository file and the Codex auth file readable to its shell (`test -r` exit 0 for each; neither file's contents were opened). Therefore that command alone cannot be the grader host. Codex can be the first provider only with a further isolation boundary; verification must include a denied forbidden read, a real seam probe, cancellation of the host command and its children, and a same-candidate shadow against the accepted grader and legacy score. The grader's model must differ from the builder's recorded model.
+
+The sealed grader digest must cover the new workflow version, rubric, result schema, host policy, and selected model. Changing any of those requires a new approval. The builder command and build room remain as accepted while the grader boundary is changed and measured.
+
+## Rationale and consequences
+
+| Driver | Evidence or constraint | Trade-off | Assessment |
+| --- | --- | --- | --- |
+| Agent choice | The operator wants Pi, Codex, and Claude to be interchangeable workers | Each provider host needs isolation and lifecycle verification | Proposed |
+| Durable score | `cycle.v1` already owns the Grain run and Measurement receipt | ORC must validate external output before recording a score | Required |
+| Black-box independence | ADR 0003 requires seam-only access and a different model | A local `codex exec` probe could read unrelated repo and auth paths | Further isolation required before acceptance |
+
+This proposal does not change the accepted `grade.v1` or authorize a new cycle. Before regeneration, update the slice-06 seam, event model, and stamped scenarios together; compare the proposed grader with legacy behavior; then obtain approval of the exact selection and sealed grader digest required by `AGENTS.md`.
