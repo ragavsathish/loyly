@@ -24,7 +24,7 @@ Each part has one language. Do not mix them.
 |---|---|---|
 | The model: behaviour | Gherkin scenarios, one stamped `@item-NN-SSS` per checklist item | `.pi/spec/<context>/spec.feature`; an accepted context is slice `NN` through its link `.pi/plan/NN-<context>` |
 | The model: event storming and rules | Grain Event Model (commands, events, read models, queries, processors) and Allium (entities, rules, invariants, surfaces); the public seam | `.pi/spec/<context>/event-model/*.edn`, `.pi/spec/<context>/allium/`, `.pi/spec/<context>/seam.md` |
-| The harness implementation | Clojure on ORC, with Grain for the event store: the accepted cycle-25 `cycle.v1` runs on one store whose event model is the union of the contexts' (ADR 0001) | `harness-impl/`, generated from `.pi/spec` by the regeneration cycle |
+| The harness implementation | Clojure on ORC, with Grain for the event store: the accepted cycle-26 `cycle.v1` runs on one store whose event model is the union of the contexts' (ADR 0001) | `harness-impl/`, generated from `.pi/spec` by the regeneration cycle |
 | The builder and Gondolin rooms | `pi` with its Gondolin backend, on the existing Codex login, launched by the cycle runner (`LOYLY_BUILDER_CMD`, `.pi/spec/cycle-runner/seam.md`). Provided, like ORC and Grain: never regenerated. `.pi/harness/bin/builder.sh` runs each builder as a pi-durable session (`.pi/harness/builder-host/`) whose tools run in a Gondolin VM | `.pi/harness/`, `harness/Makefile`, `harness/<project-id>/` |
 | The graders | The accepted runner's `grade.v1` uses a black-box researcher and an ORC judge per item (ADR 0003). Product grader calibration and sealing are still owed. Bootstrap cycles for slice 06 use an external black-box agent and `harness/v2/score.sh`, as the legacy reference does | `harness-impl/06-cycle-runner/`, `.pi/spec/grader-lifecycle/` |
 | The legacy driver | Babashka and shell, the legacy harness tools: the reference since the switch, never deleted, not how the loop runs | `harness/`, `archive/legacy-harness/` |
@@ -55,7 +55,7 @@ later rounds.
 ## The regeneration cycle
 
 ORC runs one cycle, in the shape of the legacy harness. The accepted cycle runner
-(`harness-impl/06-cycle-runner/`, cycle 25) drives slices 01-05; the legacy harness (`harness/`,
+(`harness-impl/06-cycle-runner/`, cycle 26) drives slices 01-05; the legacy harness (`harness/`,
 `archive/legacy-harness/`) remains the reference and builds replacements for slice 06 (ADR 0006).
 A run rebuilds **the Löyly app** (`docs/plan` into `impl/`); the harness is not asked to rebuild
 itself ("Self-hosting stopped"). Run-03 (2026-11-10) is the worked example: gate passed,

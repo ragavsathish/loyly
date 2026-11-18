@@ -2357,3 +2357,19 @@ broader Measurement draft. The next cycle must grade the new item and all 61 pro
 slice-06 items, pass its independent gate, produce a clean grading profile, and match a
 same-cut legacy instrument shadow before replacing the accepted runner. The approved
 cycle-25 profile exception does not transfer.
+
+## Acceptance of cycle 26 runner (2026-11-18)
+
+The operator accepted the fresh cycle-26 candidate as the running slice-06 build after its
+independent gate, 62/62 black-box score and clean filed profile. All 61 items shared with
+cycle 25 stayed passing; new item 06-074 passed, including tagged Allure results for filed
+and unreached verdicts. The initial 06-070 VM watcher exceeded its own limit, and the
+initial 06-061 fixture allowed one gate attempt. Both initial captures and the corrected
+fresh retry events are retained in `harness/v2/cycles/06/26/profile-retry-audit.md`; the
+filed clean profile binds the reconciled raw events. Cycle 25's profile exception was not
+reused. The same-cut legacy shadow matched the clean tree, installed app, gate and ordered
+11 score rows; the Allure projection is the specified instrument extension. This shadow
+proves one fixture, not general equivalence. The complete candidate was copied unchanged
+into `harness-impl/06-cycle-runner/`, whose provenance records its source and gate evidence.
+The cycle-25 build remains recoverable in Git history. Product grader calibration and
+sealing, and the old public launcher, remain open.
