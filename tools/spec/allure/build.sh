@@ -10,6 +10,14 @@ scores="$root/harness/v2/cycles/06/$cycle/scores.json"
 out="$root/.pi/harness/.state/pages/allure-cycle-$cycle"
 test -d "$results"
 test -f "$scores"
+if [[ "$cycle" == 26 ]]; then
+  # The filed verdicts and profile stay unchanged. Enrich a throwaway copy from the
+  # approved spec cut so Allure can group by Feature and Rule and display Gherkin.
+  cut=a0c700f7cf969fd660fdf108be09ce881c99f412
+  results="$root/.pi/harness/.state/pages/allure-cycle-$cycle-results"
+  rm -rf "$results"
+  (cd "$root/tools/spec" && clojure -M -m spec.allure "$cycle" "$cut")
+fi
 npx --yes allure-commandline@2.46.1 generate "$results" --clean --output "$out"
 expected=$(jq '.items | length' "$scores")
 passed=$(jq '[.items[] | select(.verdict == "pass")] | length' "$scores")

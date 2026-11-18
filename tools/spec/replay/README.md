@@ -104,7 +104,11 @@ cases yielded 1,504 Grain domain events, 689 selected ORC grading transitions,
 and 2,769 OTLP diagnostic events. For 06-061 and 06-070, the extractors select
 the preserved fresh retry stores that back the filed clean profile; the initial
 captures remain in the cycle record. The separate Allure report presents the 62
-tagged item results and their attachments, without changing the filed score.
+tagged item results and their attachments, without changing the filed score. Its
+publisher parses the approved-cut Gherkin with Cucumber's JVM parser and adds
+Allure Feature and Story labels, the scenario title, source link, and a parsed
+scenario attachment to a derived copy of the filed result files. Given/When/Then
+lines are source text, not individually graded execution steps.
 
 ```bash
 bb --classpath tools/spec/replay/src tools/spec/replay/extract_grading_storm.clj 26
