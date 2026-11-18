@@ -1,5 +1,5 @@
 #!/usr/bin/env bb
-;; Public, chronological ORC grading facts from cycle 25's canonical Grain stores.
+;; Public, chronological ORC grading facts from a cycle's final Grain stores.
 ;; Only event time, workflow/node name and transition leave this extractor.
 (require '[replay.fressian :as fr]
          '[babashka.process :as p]
@@ -8,9 +8,11 @@
 (import '[java.time Instant Duration])
 
 (def root (str (-> (java.io.File. *file*) .getCanonicalFile .getParentFile .getParentFile .getParentFile .getParentFile)))
-(def work (str root "/.pi/harness/.state/grading/06-c25/work"))
-(def output (str root "/tools/spec/replay/src/replay/cycle-25-orc-events.json"))
-(def scores (json/parse-string (slurp (str root "/harness/v2/cycles/06/25/scores.json")) true))
+(def cycle (or (first *command-line-args*) "25"))
+(assert (re-matches #"[0-9]+" cycle))
+(def work (str root "/.pi/harness/.state/grading/06-c" cycle "/work"))
+(def output (str root "/tools/spec/replay/src/replay/cycle-" cycle "-orc-events.json"))
+(def scores (json/parse-string (slurp (str root "/harness/v2/cycles/06/" cycle "/scores.json")) true))
 (def wanted #{"grader" "grading-vm" "clear-evidence" "drive-seam" "judge" "file-verdicts" "file-score"})
 (def types [":sheet/sheet-created" ":sheet/node-name-set" ":sheet/tree-tick-started"
             ":sheet/tree-tick-completed" ":sheet/node-execution-started"
@@ -55,8 +57,9 @@
 (let [ids (set (map :id (:items scores)))
       cases (into (sorted-map)
                   (for [id (sort ids)
-                        :let [file (str work "/" id "/events.sqlite")]]
+                        :let [suffix (if (and (= cycle "26") (#{"06-061" "06-070"} id)) "-retry" "")
+                              file (str work "/" id suffix "/events.sqlite")]]
                     (do (assert (.isFile (java.io.File. file)) (str "missing " id))
                         [id (extract file)])))]
-  (spit output (str (json/generate-string {:version 1 :source "cycle-25 canonical grader Grain stores; selected ORC grading transitions" :cases cases}) "\n"))
+  (spit output (str (json/generate-string {:version 1 :source (str "cycle-" cycle " final grader Grain stores; selected ORC grading transitions") :cases cases}) "\n"))
   (println output ":" (count cases) "stores," (reduce + (map count (vals cases))) "ORC grading transitions"))

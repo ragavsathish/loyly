@@ -96,3 +96,23 @@ bb --classpath tools/spec/replay/src tools/spec/replay/extract_grading_orc.clj
 
 The Pages publisher includes the generated HTML at
 `replay/cycle-25-grading.html` and the event-model menu links to it.
+
+## Cycle 26 grading playback and Allure report
+
+Cycle 26 uses the same event-storm board and grading workflow strip. Its 62 final
+cases yielded 1,504 Grain domain events, 689 selected ORC grading transitions,
+and 2,769 OTLP diagnostic events. For 06-061 and 06-070, the extractors select
+the preserved fresh retry stores that back the filed clean profile; the initial
+captures remain in the cycle record. The separate Allure report presents the 62
+tagged item results and their attachments, without changing the filed score.
+
+```bash
+bb --classpath tools/spec/replay/src tools/spec/replay/extract_grading_storm.clj 26
+bb --classpath tools/spec/replay/src tools/spec/replay/extract_grading_orc.clj 26
+bb --classpath tools/spec/replay/src tools/spec/replay/build_grading.clj 26
+bash tools/spec/allure/build.sh 26
+```
+
+`tools/spec/publish.sh ragavsathish` publishes the playback at
+`replay/cycle-26-grading.html` and the generated Allure site at
+`allure/cycle-26/index.html`. The playback links directly to the report.

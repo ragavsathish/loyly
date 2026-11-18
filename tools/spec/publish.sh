@@ -5,7 +5,8 @@
 #
 # Rebuilds and checks the page, then commits it as index.html (with .nojekyll), and each
 # tools/spec/eval/*.html as eval/<name>.html, and each tools/spec/replay/*.html (a run's replay,
-# tools/spec/replay/build.sh) as replay/<name>.html, on top of the remote's gh-pages, so every
+# tools/spec/replay/build.sh) as replay/<name>.html, plus the cycle-26 Allure report at
+# allure/cycle-26/, on top of the remote's gh-pages, so every
 # published version stays in that branch's history. --dry-run makes the commit in a throwaway
 # worktree and shows it, without pushing.
 set -euo pipefail
@@ -18,6 +19,7 @@ for a in "$@"; do case "$a" in --dry-run) DRY=1 ;; *) REMOTE="$a" ;; esac; done
 cd "$root"
 bash tools/spec/views/build.sh >/dev/null
 bash tools/spec/views/check.sh
+bash tools/spec/allure/build.sh 26
 page="$root/tools/spec/views/dist/event-model.html"
 src=$(git rev-parse --short HEAD); [ -z "$(git status --porcelain -- .pi tools/spec ':!tools/spec/views/dist')" ] || src="$src+uncommitted"
 
@@ -39,6 +41,9 @@ for f in "$root"/tools/spec/replay/*.html; do
   [ -e "$f" ] || continue
   mkdir -p replay; cp "$f" "replay/$(basename "$f")"; git add "replay/$(basename "$f")"
 done
+mkdir -p allure/cycle-26
+cp -R "$root/.pi/harness/.state/pages/allure-cycle-26/." allure/cycle-26/
+git add allure/cycle-26
 git commit -q -m "Publish the Löyly spec v2 event model from $src"
 git log --oneline -1; git show --stat --format= HEAD
 if [ "$DRY" = 1 ]; then echo "dry run: not pushed to $REMOTE $BRANCH"; exit 0; fi
