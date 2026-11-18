@@ -27,9 +27,10 @@ Feature: Cycle runner, draft scenarios
     @draft
     Scenario: A grader session has no access to the builder or another item's evidence
       Given a grader session for item 01-002 receives only its scenario, approved seam, rubric and fresh grading capability
-      When that session attempts to read the builder room, gate evidence, candidate source and item 01-001's evidence
+      When that session attempts to read the builder room, gate evidence, host credentials and item 01-001's evidence
       Then each read is denied by the host boundary and recorded in the grader's trace
       And the session can still drive item 01-002 through the candidate's public seam
+      And its verdict does not use candidate source as evidence
 
     @draft
     Scenario: A grader host command stopped at its deadline leaves no running child and no score
