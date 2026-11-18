@@ -340,7 +340,7 @@ evidence/builder/ the builder launches, runs/ LOYLY_RUNS_DIR, project/ LOYLY_PRO
                              "# LOYLY_BUILDER_SESSION_ID=" run-id "-<n> (unless set), stdin from /dev/null.\n"
                              "c=" (q (str sd "/bin/builder-launches")) "; n=$(( $(cat \"$c\" 2>/dev/null || echo 0) + 1 )); echo \"$n\" > \"$c\"\n"
                              "export LOYLY_BUILDER_SESSION_ID=\"${LOYLY_BUILDER_SESSION_ID:-" run-id "-$n}\"\n"
-                             "exec " (q (or (env "LOYLY_BUILDER_HOST") (str root "/.pi/harness/bin/builder.sh"))) " \"$@\" < /dev/null\n"))
+                             "exec " (q (or (overrides "LOYLY_BUILDER_HOST") (env "LOYLY_BUILDER_HOST") (str root "/.pi/harness/bin/builder.sh"))) " \"$@\" < /dev/null\n"))
         _ (fs/set-posix-file-permissions wrapper "rwxr-xr-x")
         env (assoc env "LOYLY_BUILDER_HOST" wrapper)
         budget (if-let [f (:budget-file opts)]
