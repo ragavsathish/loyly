@@ -1,0 +1,23 @@
+{:paths ["src" "event-model" "test"]
+ :deps {org.clojure/clojure {:mvn/version "1.12.0"}
+        org.clojure/data.json {:mvn/version "2.5.1"}
+        org.clojure/tools.cli {:mvn/version "1.1.230"}
+        org.clojure/core.async {:mvn/version "1.7.701"}
+        org.xerial/sqlite-jdbc {:mvn/version "3.46.1.3"}
+        cat/schema-util {:git/url "https://github.com/ObneyAI/grain.git"
+                         :git/sha "dbf5b5229aad09785e40f71e96adf65c90f971d5"
+                         :deps/root "components/schema-util"}
+        obneyai/orc-evaluation {:git/url "https://github.com/ObneyAI/orc.git"
+                                :git/sha "4966c8e35e3bb5939570bfc645eac52a8d18eb6e"
+                                :deps/root "projects/orc-evaluation"}
+        obneyai/grain-core-v2 {:git/url "https://github.com/ObneyAI/grain.git"
+                               :git/sha "dbf5b5229aad09785e40f71e96adf65c90f971d5"
+                               :deps/root "projects/grain-core-v2"}
+        obneyai/grain-event-store-sqlite-v3 {:git/url "https://github.com/ObneyAI/grain.git"
+                                             :git/sha "dbf5b5229aad09785e40f71e96adf65c90f971d5"
+                                             :deps/root "projects/grain-event-store-sqlite-v3"}
+        obneyai/grain-code-agent-tools {:git/url "https://github.com/ObneyAI/grain.git"
+                                        :git/sha "dbf5b5229aad09785e40f71e96adf65c90f971d5"
+                                        :deps/root "projects/grain-code-agent-tools"}}
+ :aliases {:run {:jvm-opts ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                            "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"]}}}
