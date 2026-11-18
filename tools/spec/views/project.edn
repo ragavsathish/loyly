@@ -17,7 +17,8 @@
  :out-dir "tools/spec/views/dist"
  :outputs {:page "event-model.html" :review "review.html" :story "story.svg"}
  :publish {:remote "scope-impact" :branch "gh-pages"}           ; read by tools/spec/publish.sh
- :site-pages [{:label "Runs" :dir "tools/spec/replay" :href "replay"}   ; optional: the other pages publish.sh
+ :site-pages [{:label "Runs" :dir "tools/spec/replay" :href "replay"
+               :only ["cycle-26-grading.html"]}                         ; only the current replay is published
               {:label "Eval" :dir "tools/spec/eval" :href "eval"}]    ; publishes, linked from the site menu
  ;; The event storm (L0): its order comes from the event models' flows and handoffs; :after adds
  ;; the order they do not hold. The cycle runner's tree issues the other contexts' commands in its

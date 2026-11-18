@@ -52,11 +52,10 @@ if `/Users/` or `/private/` survives anywhere in the page.
 
 ## Publishing
 
-`tools/spec/publish.sh` publishes every checked-in `tools/spec/replay/*.html` as
-`replay/<name>.html` on gh-pages.
-
-Published so far: [Löyly run-03](https://scope-impact.github.io/loyly/replay/loyly-run-03.html).
-The spec page's menu (<https://scope-impact.github.io/loyly/>) lists every published replay.
+`tools/spec/publish.sh` publishes the replay named in the Runs `:only` list of
+`tools/spec/views/project.edn` as `replay/<name>.html` on gh-pages. Historical
+replay HTML remains in this repository. The spec page's menu lists only the
+current published replay.
 
 ## Cycle 25 grading playback
 
@@ -94,8 +93,7 @@ bb --classpath tools/spec/replay/src tools/spec/replay/extract_grading_storm.clj
 bb --classpath tools/spec/replay/src tools/spec/replay/extract_grading_orc.clj
 ```
 
-The Pages publisher includes the generated HTML at
-`replay/cycle-25-grading.html` and the event-model menu links to it.
+The cycle-25 page remains a historical source artifact in this repository.
 
 ## Cycle 26 grading playback and Allure report
 
@@ -117,6 +115,6 @@ bb --classpath tools/spec/replay/src tools/spec/replay/build_grading.clj 26
 bash tools/spec/allure/build.sh 26
 ```
 
-`tools/spec/publish.sh ragavsathish` publishes the playback at
+`tools/spec/publish.sh ragavsathish` publishes the current playback at
 `replay/cycle-26-grading.html` and the generated Allure site at
 `allure/cycle-26/index.html`. The playback links directly to the report.

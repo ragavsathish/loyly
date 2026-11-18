@@ -5,7 +5,8 @@
 #
 # Rebuilds and checks the page, then commits it as index.html (with .nojekyll), and each
 # tools/spec/eval/*.html as eval/<name>.html, and each tools/spec/replay/*.html (a run's replay,
-# tools/spec/replay/build.sh) as replay/<name>.html, plus the cycle-26 Allure report at
+# tools/spec/replay/build.sh) selected by the project's Runs :only list as replay/<name>.html,
+# plus the cycle-26 Allure report at
 # allure/cycle-26/, on top of the remote's gh-pages, so every
 # published version stays in that branch's history. --dry-run makes the commit in a throwaway
 # worktree and shows it, without pushing.
@@ -37,10 +38,13 @@ for f in "$root"/tools/spec/eval/*.html; do
   [ -e "$f" ] || continue
   mkdir -p eval; cp "$f" "eval/$(basename "$f")"; git add "eval/$(basename "$f")"
 done
-for f in "$root"/tools/spec/replay/*.html; do
-  [ -e "$f" ] || continue
-  mkdir -p replay; cp "$f" "replay/$(basename "$f")"; git add "replay/$(basename "$f")"
-done
+replays=$(bb -e "(let [c (clojure.edn/read-string (slurp \"$root/tools/spec/views/project.edn\"))] (doseq [p (:site-pages c) :when (= \"replay\" (:href p)) f (:only p)] (println f)))")
+[ -n "$replays" ] || { echo 'no published replay selected in project.edn' >&2; exit 1; }
+while IFS= read -r name; do
+  f="$root/tools/spec/replay/$name"
+  [ -f "$f" ] || { echo "missing selected replay: $f" >&2; exit 1; }
+  mkdir -p replay; cp "$f" "replay/$name"; git add "replay/$name"
+done <<< "$replays"
 mkdir -p allure/cycle-26
 cp -R "$root/.pi/harness/.state/pages/allure-cycle-26/." allure/cycle-26/
 git add allure/cycle-26
