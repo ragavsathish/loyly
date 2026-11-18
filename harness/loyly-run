@@ -324,7 +324,7 @@ evidence/builder/ the builder launches, runs/ LOYLY_RUNS_DIR, project/ LOYLY_PRO
                     "LOYLY_PROJECT_REPO" repo
                     "LOYLY_HARNESS_CONFIG" (str sd "/benchmark-config.sh")
                     "LOYLY_SELF_CHECK_CMD" (str repo "/harness/check.sh --local")
-                    "LOYLY_BUILDER_INSTRUCTION" (str sd "/builder-instruction.md")
+                    "LOYLY_BUILDER_INSTRUCTION" (slurp (str sd "/builder-instruction.md"))
                     "LOYLY_BUILDER_IMAGES" (str root "/.pi/harness/.state/assets")
                     "LOYLY_GRADER_IMAGE" (str root "/.pi/harness/.state/assets/builder-clojure")
                     "LOYLY_GRADER_RUBRIC" (str sd "/grader-rubric.md")

@@ -2,7 +2,7 @@
 
 status: accepted, 2026-11-07 (spec v2; drafted in spec round 7a, `../decisions.md`, "Slice 06
 (draft)"; accepted as slice 06 in spec round 7b, "Spec round 7b"; rewritten as the one tree
-`cycle.v1` in spec round 18, "Spec round 18"). From the stage-1 triage (effects E1 to
+`cycle.v2` in spec round 18, "Spec round 18"). From the stage-1 triage (effects E1 to
 E8), the legacy harness's operator steps (`archive/legacy-harness/README.md`, "A cycle") and the
 prototype `proto/orc-harness`, in the glossary's words.
 
@@ -11,7 +11,7 @@ prototype `proto/orc-harness`, in the glossary's words.
 The five contexts record a cycle's facts and guard them; none of them acts. Every command of the
 Regeneration cycle is "issued by ORC runtime from what one of its nodes did in a room"
 (`../decisions.md`, "Slice 04" 4). The cycle runner is that issuer: since spec round 18 one ORC
-tree, `cycle-runner/cycle.v1`, on one Grain store, whose leaves perform the effects (read the
+tree, `cycle-runner/cycle.v2`, on one Grain store, whose leaves perform the effects (read the
 repository at the cut, build and probe the clean room, run a builder session and wait for it,
 install the candidate in a gate room and run the gate, grade each item with the judge, file the
 score) and record each result into the context that owns it, by that context's command on the
@@ -36,15 +36,14 @@ over stdio, as `harness/v2/gate.sh` does (`APP_SEAM=stdio`).
 - **Its own rules guard only its own facts**: one run at a time, a cycle run once, an effect
   result recorded once at its position, no builder once the score stage began, a run passed only
   with its score filed.
-- **The runner itself judges no item.** For each item the sealed grader, the versioned judge
-  workflow `cycle-runner/grade.v1`, drives the gated candidate over its seam with a researcher and
-  scores it with the judge, the reason before the score. The researcher's shell runs in a Gondolin
-  VM of its own per item, made from `LOYLY_GRADER_IMAGE`, its one host folder the item's grading
-  room (`seam.md`, "The researcher's VM"). The score leaf files the
-  judge's scores as scored; an item with no score is Measurement's to file as an unreached fail.
+- **The runner itself judges no item.** For each item the sealed
+  `cycle-runner/grade.v2` workflow starts a separate Pi grader session in a Gondolin VM. The
+  grader drives the gated candidate over its public seam and writes one verdict row with
+  observed evidence. ORC validates the row and the host's model and trace before recording a
+  judge score. An item with no valid score is Measurement's to file as an unreached fail.
   The grader's digest must be one the run approved, or the run halts before the cycle.
-  This is the grader's execution inside the cycle, not Grader lifecycle preparation: the
-  `grader` leaf checks an already approved digest, and `grade.v1` records ORC node and judge
+  This is grader execution inside the cycle, not Grader lifecycle preparation: the
+  `grader` leaf checks an already approved digest, and `grade.v2` records ORC node and judge
   facts on the one Grain store. Grader lifecycle's current domain events are instrument golden
   writes and moves on their own clock; a grading run does not cause either event. The current
   execution overlay is in `../event-storm.md`.
@@ -60,10 +59,10 @@ over stdio, as `harness/v2/gate.sh` does (`APP_SEAM=stdio`).
 
 | Module | Event Model | Allium | Aggregate | Lives |
 |---|---|---|---|---|
-| Context | `event-model/area.edn` (screen `run-desk`; the flow `cycle.v1`) | `allium/context.allium` (RunBudget, contracts `OneStore`, `ProjectRepository`, `BuilderSession`, `GateOnTheHost`, `TheJudge`, enums, config, the decided questions) | none | |
+| Context | `event-model/area.edn` (screen `run-desk`; the flow `cycle.v2`) | `allium/context.allium` (RunBudget, contracts `OneStore`, `ProjectRepository`, `BuilderSession`, `GateOnTheHost`, `TheJudge`, enums, config, the decided questions) | none | |
 | Cycle run | `event-model/cycle-run.edn` | `allium/cycle-run.allium` (rules `StartRun`, `RecordEffect`, `ConcludeWithTheCycle`, `ConcludeRunPassed`, `ConcludeRunFailed`, `HaltRun`; surfaces `RunDesk`, `EffectNodes`) | **CycleRun** (with EffectResult) | the one store; one per run |
 
-Actors: the **operator** starts a run (`RunDesk`); the leaves of `cycle.v1` and of the workflows it
+Actors: the **operator** starts a run (`RunDesk`); the leaves of `cycle.v2` and of the workflows it
 delegates to (ORC's worker) issue the rest (`EffectNodes`).
 
 ## Design decisions
@@ -142,8 +141,9 @@ graded by the sealed grader `cycle-runner/grade.v1` (`TheJudge`); a stopped run 
 whose steps named the relay, the hand-in or a run awaiting its verdicts. 61 items; of the 48
 must-cover obligations, 8 are unit level and 5 gate-verified (`AModelOtherThanTheBuildersOwn`,
 planned `model-independence`, added).
-Then ("Spec round 18" 12) `@item-06-067` also covers a judge reply with a level and no reasoning:
-it scores nothing. Still 61 items.
+Spec round 28 proposes `cycle.v2` with `grade.v2`, a separate Pi grader session for each
+item. Item 06-067 now rejects a host result without observed evidence; 06-075 and 06-076
+cover timeout cleanup and model independence. The proposed slice has 64 items.
 
 ## Decided questions (spec round 7b)
 

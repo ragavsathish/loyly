@@ -216,6 +216,13 @@ committed, at `.pi/harness/.state/shadow/run-01` to `run-05`.
 
 ### The goldens, and why they moved
 
+**2026-11-18: the proposed Pi grader host changes slice 06.** The cycle-27 spec adds
+`@item-06-075` and `@item-06-076` and rewrites the titles and behavior of 06-026 and
+06-064 to 06-067 for `grade.v2`. The checklist diff preserves every earlier ID in order,
+adds exactly those two IDs, changes those five titles, updates source line positions and
+the total from 211 to 213. The golden was re-recorded for this spec change, before the
+self-hosted fence; it is not evidence that the new candidate passed.
+
 Since 2026-11-07 no spec-v2 cycle has a sealed grader ("Scoring a spec-v2 cycle", above): where
 an entry from then on says a slice's grader grows, the grading agent grades the grown checklist.
 "Approved grader" in these entries means `graders.approved.json`, written for spec v1.

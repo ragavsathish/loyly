@@ -7,8 +7,8 @@
 # repository it is handed, record a run's first effects into the contexts it holds, and halt
 # the run before the cycle when its sealed grader is not approved, and then take one run through
 # the whole tree to a filed score (spec round 19, `@item-06-064`). Everything it acts on is the
-# probe's own fixture, written to a temporary directory: a stub builder host, a stub gate command
-# and a stub model stand in for pi, Gondolin and the model, so no live builder, VM or model runs.
+# probe's own fixture, written to a temporary directory: a stub builder host, a stub grader
+# host, a stub gate command and a stub render model, so no live builder, VM or model runs.
 #
 #   0. a fixture project repository (git, one commit): a plan of one slice with one stamped
 #      scenario, its harness configuration; a stub self-check and a stub builder host that
@@ -22,14 +22,14 @@
 #      rubric's: start-run answers exactly one cycle-runner/run-started, once the run halted
 #   4. cycle-runner/run-progress of R-probe: halted at the grader effect, reason
 #      refused-before-the-cycle, its detail naming the rubric's grader digest ("sha256:" and the
-#      SHA-256 of the line cycle-runner/grade.v1 LF followed by the rubric's bytes); its effect
+#      grade.v2 digest of the rubric, host, policy and model); its effect
 #      results the stamp, the pin and the checklist, each recorded into its context; the run
 #      list holds R-probe once (the two refusals recorded nothing); neither the self-check nor
 #      the builder ran
 #   5. cycle-runner/start-run of R-full at the commit, its approved grader digests naming the
 #      rubric's, with LOYLY_GATE_CMD a stub gate command that passes and LOYLY_MODEL_API_BASE a
-#      stub model (ORC's marker format: it answers every output field a request names, `level` 2,
-#      a researcher's code a bare `(final! ...)` with the keys the request asks for): within
+#      stub render model (ORC's marker format) and a stub grader host returning one observed
+#      pass row: within
 #      RUN_BUDGET seconds the run passed with its cycle, the self-check and the builder ran, the
 #      model was called, run-progress shows the file-verdicts and file-score effects recorded and a
 #      pass score for the one item, 01-001. A runner that halts or fails before the score fails here.
@@ -87,13 +87,23 @@ os.makedirs(marks)
 self_check = write(os.path.join(work, "stubs/self-check.sh"),
                    f"#!/bin/sh\ntouch '{marks}/self-check'\nexit 0\n", executable=True)
 builder = write(os.path.join(work, "stubs/builder.sh"),
-                f"#!/bin/sh\ntouch '{marks}/builder'\nmkdir -p \"$1/app\"\n"
+                f"#!/bin/sh\ntouch '{marks}/builder'\nmkdir -p \"$1/app\" \"$BUILDER_EVIDENCE_DIR/launch-1\"\n"
+                "printf 'model=probe-builder\\n' > \"$BUILDER_EVIDENCE_DIR/launch-1/launch.txt\"\n"
                 "printf '#!/bin/sh\\nexit 0\\n' > \"$1/app/test.sh\"\n"
                 "printf '#!/bin/sh\\necho probe\\n' > \"$1/app/start.sh\"\n"
                 "chmod +x \"$1/app/test.sh\" \"$1/app/start.sh\"\nexit 0\n", executable=True)
 gate_cmd = write(os.path.join(work, "stubs/gate.sh"),
                  f"#!/bin/sh\ntouch '{marks}/gate'\necho gated > \"$3/gate.txt\"\n"
                  "echo 'BOOT 20 10'\necho 'ANSWERED 1'\necho 'the probe answered'\nexit 0\n", executable=True)
+grader_host = write(os.path.join(work, "stubs/grader.sh"),
+                    f"#!/bin/sh\ntouch '{marks}/grader'\n"
+                    "mkdir -p \"$1/work\" \"$GRADER_EVIDENCE_DIR/launch-1\"\n"
+                    "printf '[{\"id\":\"01-001\",\"verdict\":\"pass\",\"evidence\":\"probe answered over the public seam\"}]\\n' > \"$1/work/verdicts.json\"\n"
+                    "cp \"$1/work/verdicts.json\" \"$GRADER_EVIDENCE_DIR/launch-1/verdicts.json\"\n"
+                    "ih=$(shasum -a 256 \"$2\" | cut -d' ' -f1)\n"
+                    "printf 'model=probe-grader\\ninstruction_sha256=%s\\nrequest_id=probe-item\\nexit=0\\n' \"$ih\" > \"$GRADER_EVIDENCE_DIR/launch-1/launch.txt\"\n"
+                    "printf 'public seam probe\\n' > \"$GRADER_EVIDENCE_DIR/launch-1/pi.stdout\"\n"
+                    "touch \"$GRADER_EVIDENCE_DIR/launch-1/pi.stderr\"\nexit 0\n", executable=True)
 
 # the stub model: an OpenAI-compatible /chat/completions in ORC's marker format, no live model
 model_calls = []
@@ -132,9 +142,13 @@ class StubModel(http.server.BaseHTTPRequestHandler):
 model_server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), StubModel)
 threading.Thread(target=model_server.serve_forever, daemon=True).start()
 instruction = write(os.path.join(work, "instruction.md"), "Build the probe's product.\n")
-rubric = write(os.path.join(work, "rubric.md"), "Pass when the item's behaviour is observed over the seam; else fail. Binary bands: 1 = fail, 2 = pass.\n")
-with open(rubric, "rb") as f:
-    grader_digest = "sha256:" + hashlib.sha256(b"cycle-runner/grade.v1\n" + f.read()).hexdigest()
+rubric = write(os.path.join(work, "rubric.md"), "Pass when the item's behaviour is observed over the seam; else fail.\n")
+def sha(path):
+    with open(path, "rb") as f: return hashlib.sha256(f.read()).hexdigest()
+policy = write(os.path.join(work, "grader-policy.txt"), grader_host + "\t" + sha(grader_host) + "\n")
+grader_digest = "sha256:" + hashlib.sha256(("cycle-runner/grade.v2\n"
+    + "singleton-id-verdict-evidence-v1\n" + sha(rubric) + "\n" + sha(grader_host) + "\n"
+    + sha(policy) + "\nprobe-grader\n").encode()).hexdigest()
 images = os.path.join(work, "images")
 os.makedirs(images)
 config_file = write(os.path.join(work, "config.sh"), config + "BUILDER_IMAGE=probe-image\n")
@@ -146,9 +160,12 @@ env = dict(os.environ,
            LOYLY_HARNESS_CONFIG=config_file,
            LOYLY_SELF_CHECK_CMD=self_check,
            LOYLY_BUILDER_HOST=builder,
+           BUILDER_EVIDENCE_DIR=os.path.join(work, "builder-evidence"),
            LOYLY_BUILDER_IMAGES=images,
            LOYLY_BUILDER_INSTRUCTION=instruction,
            LOYLY_GRADER_RUBRIC=rubric,
+           LOYLY_GRADER_HOST=grader_host,
+           LOYLY_GRADER_HOST_POLICY=policy,
            LOYLY_GRADER_IMAGE=grader_image,
            LOYLY_GATE_CMD=gate_cmd,
            LOYLY_MODEL_API_BASE=f"http://127.0.0.1:{model_server.server_address[1]}/v1",

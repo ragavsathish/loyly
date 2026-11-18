@@ -2373,3 +2373,36 @@ proves one fixture, not general equivalence. The complete candidate was copied u
 into `harness-impl/06-cycle-runner/`, whose provenance records its source and gate evidence.
 The cycle-25 build remains recoverable in Git history. Product grader calibration and
 sealing, and the old public launcher, remain open.
+
+## Spec round 28 (approved selection, 2026-11-18): Pi grader host and bounded self-hosting
+
+The operator requested that the accepted ORC harness build its own successor, with Pi as the
+actual builder and grader agent host. The accepted cycle-26 `cycle.v1` remains fixed as parent;
+the candidate is `cycle.v2` delegating each item to `grade.v2`. This lifts the earlier
+self-hosting stop only for a bounded slice-06 regeneration. It does not promote a candidate or
+let a candidate grade itself. The parent owns its fence, builder continuation, gate and score;
+an independent Pi black-box bootstrap grader and same-candidate legacy instrument shadow are
+acceptance evidence. `harness/v2/preflight/06/27.md` compares the proposed behavior with the
+legacy loop and records the previous cycle-26 shadow's limit.
+
+1. `grade.v2` starts one Pi grader host session per item in a fresh Gondolin grading room.
+   The host writes the legacy singleton verdict row (`id`, `verdict`, nonempty observed
+   `evidence`), with model and trace metadata separately. ORC validates before emitting its
+   judge score. Missing or invalid rows remain unreached in Measurement's full denominator.
+2. The grader digest binds `grade.v2`, the row schema, rubric bytes, host executable and policy
+   manifest bytes, and model identity. ORC checks it against the approved run before any
+   clean room. The builder's model and grader's model must differ. Host and descendants stop
+   at the item deadline.
+3. The changed delegate makes the parent workflow `cycle.v2`. The accepted `cycle.v1` and
+   `grade.v1` stay recoverable in Git. The slice retains its 62 existing stamped IDs and adds
+   06-075 and 06-076 for deadline cleanup and model independence: 64 items total. The
+   external bootstrap grader instruction is revised to drive the host boundary. It must be
+   separately sealed and approved with the exact item selection before fencing.
+4. The provided Pi launcher and agent host overlay are supplied tooling. Another provider
+   may be selected only after proving equivalent VM
+   isolation, model independence, cancellation, result validation and a same-candidate
+   shadow. Allure remains a projection of filed Measurement results.
+
+The operator approved the exact 64-item selection and the parent, candidate and bootstrap
+grader digests recorded in `harness/v2/preflight/06/27.md` on 2026-11-18. Approval authorizes
+the bounded cycle-27 build and grade; it is not candidate acceptance.
