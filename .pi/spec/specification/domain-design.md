@@ -32,6 +32,11 @@ identity**, the **stamped scenario** and, since R2, the **one reading of Gherkin
    `StampSlice` continues it. A spec file with no scenario opens it with nothing stamped.
 5. **One reading of Gherkin** for the stamper and the checklist (contract
    `ScenarioReading`), so the two tools cannot disagree about what is an item.
+6. **An approved tagged cut imports its existing identities.** A fresh Grain ledger does
+   not imply a fresh specification. `stamp-slice` verifies the complete stamped vector
+   against the file, emits only missing identities, and advances its next free number
+   beyond the highest tag. A runner rejects any untagged scenario before its fence.
+   This closes the retired-gap failure in self-host attempt 27 (spec round 29).
 
 ## Legacy behaviours added in R2 (decisions.md "to add")
 

@@ -1,7 +1,7 @@
 # Löyly Agent Instructions
 
 The maintained assets are the behavioral specifications under `.pi/spec/` (spec v2, one folder
-per bounded context, 211 stamped items; `.pi/model/` is spec v1, history, kept for its
+per bounded context, 217 stamped items; `.pi/model/` is spec v1, history, kept for its
 glossary); generated
 implementation is a reproducible build product. Keep specification planning and
 implementation in separate rounds. Never repair a specification from inside a fenced
@@ -172,6 +172,8 @@ context: a fenced clean room, a fresh builder, the gate, grading, the score. Nev
   regression (runner cycle 04, `@item-06-018`; `.pi/spec/decisions.md`, "Spec round 8b").
 - **The builder never sees `harness-impl/`**: `harness/config.sh` fences it from every clean
   room.
-- **Self-hosting is stopped** (`.pi/spec/decisions.md`, "Self-hosting stopped"): the harness
-  builds Löyly and is not asked to rebuild itself. The legacy shell harness builds the new harness instead
-  (ADR 0006): one tree from all six contexts' specs, after slice 06 is rewritten.
+- **Self-hosting bootstrap** (`.pi/spec/decisions.md`, "Spec round 29"): the approved
+  bounded self-host attempt 27 halted before fencing because the accepted runner
+  renumbered retired ID gaps. The legacy shell harness builds the corrected successor
+  once; only an accepted successor may run its following regeneration cycle. The
+  earlier general stop remains the default outside this approved path (ADR 0006).

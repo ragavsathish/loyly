@@ -7,6 +7,12 @@ Opus and Sonnet; cycles 14 to 22 used Codex builders, and cycles 23 and 24 used 
 Cycle 26 is the accepted running context, freshly regenerated after cycle 25. Its score was
 62/62, its grading profile was clean after preserved fresh retries, and its same-cut legacy
 shadow matched. Its evidence is recorded in `harness-impl/06-cycle-runner/PROVENANCE.md`.
+The approved self-host attempt 27 halted at stamp before a builder launched: the accepted
+runner renumbered retired gaps. Round 29 proposes a tagged-cut import; cycle 28 is the
+one legacy-driven bootstrap selected by the operator. Its exact proposed selection and
+legacy comparison are in `harness/v2/preflight/06/28.md`. Obtain exact digest approval
+before step 2. The accepted cycle-26 runner remains in service until a successor passes
+gate, independent grading, profile and same-candidate legacy shadow.
 Cycle 24's gate passed on attempt 1 but scored
 31/61, with a failed profile and two legacy shadow regressions (`harness/v2/cycles/06/24/`,
 `harness/v2/shadow/06/24/`). It is not accepted.
@@ -52,7 +58,7 @@ The fence clones HEAD, so the spec the builder reads must be committed.
 1. `git status` / `git diff`: review the next spec round and obtain approval of its exact
    deterministic selection and sealed grader digest before fencing (AGENTS.md, "Pi and ORC
    ownership" and "The instrument").
-2. Check the approved item count (proposed cycle 26: 211 total; slice 06 at 62):
+2. Check the approved item count (proposed cycle 28: 217 total; slice 06 at 65):
    `grep -c '@item-06-' .pi/spec/cycle-runner/spec.feature`
 3. Commit and push:
    `git add -A AGENTS.md .pi/spec harness .pi/harness/grader-instruction-06.md .pi/harness/bin/grading-room.sh orc tools/spec/views/dist`
@@ -177,14 +183,14 @@ jq -r 'group_by(.verdict)|map("\(.[0].verdict): \(length)")|.[]' $STATE/grading/
 
 ```bash
 V=$STATE/grading/06-c$MM/work/verdicts.json
-jq length $V                                                     # proposed cycle 26: 62
+jq length $V                                                     # proposed cycle 28: 65
 diff <(jq -r '.[].id' $V) $STATE/grading/06-c$MM/checklist.txt && echo order-ok
 jq '[.[]|select(.evidence|test("not reached"))]|length' $V       # 0
 harness/v2/score.sh 06 $ROOM --verdicts $V --by "codex subagent gpt-6.1-terra, grader-instruction-06" \
   --profile $STATE/grading/06-c$MM/work/profile.json \
   --allure $STATE/grading/06-c$MM/work/allure-results \
   > $STATE/logs/score-c$MM-slice06.log 2>&1; tail -12 $STATE/logs/score-c$MM-slice06.log
-git add harness/v2/cycles/06/$MM && git commit -m "Harness: cycle $MM of slice 06 scored X/62 ..." && git push ragavsathish spec-v2
+git add harness/v2/cycles/06/$MM && git commit -m "Harness: cycle $MM of slice 06 scored X/65 ..." && git push ragavsathish spec-v2
 ```
 
 The report compares with the last scored cycle on shared items: newly passing and newly

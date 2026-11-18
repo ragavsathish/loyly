@@ -337,12 +337,11 @@ config {
 -- Decided questions (spec round 7b; decisions.md, "Spec round 7b")
 ------------------------------------------------------------
 --
--- Q1: the stamped plan against Specification's ledger: the runner restamps a copy of each
---     plan spec file with its item tags removed; the restamped identities must equal the
---     file's own tags, else the run halts (HaltReason above). A slice the one store's
---     ledger already holds is not stamped again; its identities are read from the ledger,
---     and must equal the file's own tags in the same way (spec round 18). Specification
---     is unchanged.
+-- Q1 revised in spec round 29: the runner copies each tagged plan spec without stripping
+--     item tags. Specification verifies and imports its current IDs unchanged into a fresh
+--     ledger. Gaps from retired items remain gaps. A duplicate, malformed, foreign-slice
+--     or absent item ID halts before the self-check and fence. Existing ledger items stay;
+--     only the current approved file determines the checklist.
 -- Q2, Q5: the benchmark's configuration is its own, handed in: the archived Löyly
 --     configuration with the fence "impl harness-impl .pi archive/legacy-harness/cycles".
 -- Q3: the harness digest is the SHA-256 of the configuration file, the self-check command

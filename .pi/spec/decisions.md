@@ -2406,3 +2406,35 @@ legacy loop and records the previous cycle-26 shadow's limit.
 The operator approved the exact 64-item selection and the parent, candidate and bootstrap
 grader digests recorded in `harness/v2/preflight/06/27.md` on 2026-11-18. Approval authorizes
 the bounded cycle-27 build and grade; it is not candidate acceptance.
+
+## Spec round 29 (proposed, 2026-11-18): Preserve a tagged cut in a fresh ledger
+
+Self-host attempt 27 halted at stamp before it fenced or launched Pi. The accepted runner
+stripped item tags and gave 64 active scenarios fresh consecutive identities; the slice-06
+cut retains retired gaps and ends at 06-076. Its same-cut shadow had used a contiguous
+single-item fixture, so it did not exercise this case. The legacy stamper leaves existing
+tags intact and the checklist reads the current tags. The operator chose one legacy-driven
+bootstrap to build a successor capable of preserving them; the accepted cycle-26 build
+stays untouched.
+
+1. Specification's `stamp-slice` accepts an optional complete `stamped` vector. It reads
+   the tagged source itself and refuses a false, duplicate or foreign-slice offer. It
+   imports each valid item identity absent from its ledger unchanged, without inventing
+   retired rows, and advances the next free identity beyond the highest known tag. The
+   existing authoring path still gives untagged scenarios new identities.
+2. Cycle runner reads each selected tagged file at the approved commit without stripping
+   item tags. It requires every scenario to be stamped exactly once, offers the file's
+   stamped vector to Specification, then derives the current checklist. A prior ledger
+   may hold retired items, but it does not add them to the current denominator. An
+   untagged, malformed, duplicate or foreign-slice identity halts before self-check and
+   fence. This supersedes the stripped-copy decision of round 7b.
+3. The new bootstrap cycle regenerates the whole slice-06 candidate from a fresh legacy
+   clean room, then independently gates and grades it. Before acceptance, the candidate
+   must replay a gapped cut on a fresh store, reject malformed cuts, preserve a prior
+   ledger, and match the legacy instrument on the same candidate and cut. The following
+   cycle may use the accepted successor as its controller. Exact selection and sealed
+   grader digests require fresh approval before fencing because the spec changed.
+
+The operator approved the cycle-28 exact 65-item selection and sealed grader digests in
+`harness/v2/preflight/06/28.md` on 2026-11-18. Approval permits the legacy bootstrap and
+independent evaluation; it is not acceptance of the generated successor.

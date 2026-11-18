@@ -88,9 +88,13 @@ mount evidence. For 067, exit zero but give 01-002 empty evidence; it must stay 
 For 068, use a grader digest absent from the approved set. For 069, write no valid rows.
 For 075, start a host child that outlives the item deadline; prove both stop. For 076, report
 the builder's model from the grader launch and prove no score, then report a distinct model
-for a valid row. A host exit code or final prose is never a verdict.
+for a valid row. For 077, make a fixture cut whose tagged scenarios are 06-001, 06-003 and
+06-076, with a fresh store; inspect Specification's three imported events, the ordered
+Measurement checklist and receipt, and the next free identity. Repeat with a prior ledger
+that includes a retired identity, then offer an untagged or duplicate item and show the
+run halts before self-check or fence. A host exit code or final prose is never a verdict.
 
-## Scoring and the store (items 059, 061 and 064 to 076)
+## Scoring and the store (items 059, 061 and 064 to 077)
 
 Each checklist item is graded in its own `cycle-runner/grade.v2` child tick after a passed gate.
 `clear-evidence` prepares a fresh room; `grade-item` launches the host and validates its result.

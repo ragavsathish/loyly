@@ -216,6 +216,12 @@ committed, at `.pi/harness/.state/shadow/run-01` to `run-05`.
 
 ### The goldens, and why they moved
 
+**2026-11-18: tagged-cut import after self-host attempt 27.** The proposed round-29 spec
+adds `@item-01-016` to `018` and `@item-06-077`, rewords the title of 06-009, and moves
+source lines below the inserted scenarios. The audit found all 213 prior IDs still in
+their previous relative order, no removed IDs, and a total of 217. Re-recording this
+checklist golden reflects that deliberate spec change; it says nothing about a candidate.
+
 **2026-11-18: the proposed Pi grader host changes slice 06.** The cycle-27 spec adds
 `@item-06-075` and `@item-06-076` and rewrites the titles and behavior of 06-026 and
 06-064 to 06-067 for `grade.v2`. The checklist diff preserves every earlier ID in order,

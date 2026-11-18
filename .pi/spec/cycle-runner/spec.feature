@@ -75,16 +75,28 @@ Feature: Cycle runner
       And run R-1 is halted at the checklist effect for a refusal before the cycle
       And it has no self-check effect and no fence effect
 
-    # cycle-run.allium, rule HaltRun (the restamped identities are not the plan's; decisions.md, "Spec round 7b" 2)
+    # cycle-run.allium, rule HaltRun (the approved cut has an unstamped scenario; decisions.md, "Spec round 29")
     # Legacy: AGENTS.md "an unstamped scenario or an empty selection stops the cycle"
     @minimum @allium-rule-success.HaltRun
     @item-06-009
-    Scenario: A plan whose item identities a fresh stamp does not give back halts the run before the cycle
+    Scenario: A plan with an unstamped scenario halts before the cycle
       Given the plan at the commit also holds a scenario with no item identity
       When the operator starts run R-1 of cycle C-1 at source cut K-1
       Then the stamp effect of run R-1 was recorded, as specification answered
       And run R-1 is halted at the stamp effect for a refusal before the cycle
       And it has no pin effect and no checklist effect
+
+    # Specification ImportStampedScenarios; legacy stamp_item_ids.clj preserves existing tags
+    @balance
+    @item-06-077
+    Scenario: A fresh runner store preserves the approved cut's item IDs across retired gaps
+      Given the plan at the commit holds the stamped slice-06 scenarios 06-001, 06-003 and 06-076, with 06-002 retired
+      And the runner has a fresh Grain store and a stub builder and grader host that pass
+      When the operator starts run R-1 of cycle C-1 at source cut K-1
+      Then the stamp effect imports exactly 06-001, 06-003 and 06-076 in file order
+      And the checklist and filed score contain those three IDs in that order, with no 06-002
+      And the next item identity in Specification's ledger is 06-077
+      And run R-1 passed with its cycle
 
   Rule: No clean room is built over a failed harness self-check
 

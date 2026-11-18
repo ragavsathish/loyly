@@ -151,8 +151,8 @@
                        "a suffix, `readlink -f`, `date -d` or `timeout`). The host gate has `gondolin` on `PATH` and "
                        "the guest image at `" grader-image "` as `LOYLY_GRADER_IMAGE`; tests that launch a nested VM "
                        "may need the host gate to exercise them. Do not assume nested VM access in your builder room.")
-         :identity (str "the product, handed a fixture project repository whose commit holds a one-slice plan with one "
-                        "stamped scenario, a stub self-check, a stub builder host, a stub grader host and a grader rubric, must refuse "
+         :identity (str "the product, handed a fixture project repository whose commit holds a one-slice plan with two "
+                        "stamped scenarios, 01-001 and 01-003 with retired 01-002 absent, a stub self-check, a stub builder host, a stub grader host and a grader rubric, must refuse "
                         "`cycle-runner/start-run` at a hex string that is no commit of the repository (`not-a-commit`), "
                         "refuse a start whose configuration names a builder image `LOYLY_BUILDER_IMAGES` does not hold "
                         "(`builder-image-missing`), and run a start whose approved grader digests do not name the "

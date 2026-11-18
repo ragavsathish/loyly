@@ -147,11 +147,12 @@ cover timeout cleanup and model independence. The proposed slice has 64 items.
 
 ## Decided questions (spec round 7b)
 
-- **Q1, the stamped plan against a fresh ledger: restamp a stripped copy.** The runner stamps a
-  copy of each plan spec file with its item tags removed; the identities the stamp hands out
-  must equal the file's own tags, in file order, else the run halts (`refused-before-the-cycle`).
-  Specification is unchanged. A plan whose numbering has a gap halts too; the Löyly plan's
-  `@item-01-001` to `011` has none.
+- **Q1 revised in spec round 29: import a tagged cut unchanged.** The runner copies each
+  selected spec file with its item tags intact. Specification verifies the complete stamped
+  offer against the file and imports IDs missing from its ledger. A fresh ledger accepts
+  retired gaps, and the current approved file determines the checklist. Untagged, duplicate,
+  malformed and foreign-slice IDs halt before the self-check and fence. This supersedes the
+  round-7b stripped-copy decision, which prevented a fresh store from running slice 06.
 - **Q2 and Q5, the benchmark's fence and clean room: its own configuration.** The archived Löyly
   configuration with `FENCED_PATHS="impl .pi archive/legacy-harness/cycles"`: the paths that
   hold a prior candidate or evidence; `docs/`, `raw/` and the harness tools stay in the room.

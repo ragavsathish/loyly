@@ -10,8 +10,8 @@
 # probe's own fixture, written to a temporary directory: a stub builder host, a stub grader
 # host, a stub gate command and a stub render model, so no live builder, VM or model runs.
 #
-#   0. a fixture project repository (git, one commit): a plan of one slice with one stamped
-#      scenario, its harness configuration; a stub self-check and a stub builder host that
+#   0. a fixture project repository (git, one commit): a plan of one slice with two stamped
+#      scenarios, 01-001 and 01-003 (retired gap), its harness configuration; a stub self-check and a stub builder host that
 #      each leave a mark when launched (neither may run); a grader rubric; the configuration
 #      file the probe hands in, rewritten between the steps (the seam: read at every start-run)
 #   1. cycle-runner/start-run of R-probe at a well-formed hex string that is no commit of the
@@ -32,7 +32,8 @@
 #      pass row: within
 #      RUN_BUDGET seconds the run passed with its cycle, the self-check and the builder ran, the
 #      model was called, run-progress shows the file-verdicts and file-score effects recorded and a
-#      pass score for the one item, 01-001. A runner that halts or fails before the score fails here.
+#      pass scores for 01-001 and 01-003, with retired 01-002 absent. A runner that halts
+#      or fails before the score fails here.
 #      The run is handed LOYLY_GRADER_IMAGE, the real guest image (spec round 20: a run with no
 #      image halts before grading): PROBE_GRADER_IMAGE, else the checkout's builder-clojure image.
 #   6. a fresh process and store run R-built-in with no LOYLY_GATE_CMD. Its stub builder
@@ -71,7 +72,9 @@ config = (f"APP_DIR=app\nPORT={port}\nPLAN_DIR=plan\nAPP_MARKER=probe\nAPP_PROBE
 repo = os.path.join(work, "repo")
 write(os.path.join(repo, "plan/01-probe/spec.feature"),
       "Feature: Probe\n\n  Rule: One rule\n\n    @item-01-001\n    Scenario: The probe's scenario\n"
-      "      Given a probe\n      When it runs\n      Then it is heard\n")
+      "      Given a probe\n      When it runs\n      Then it is heard\n\n"
+      "    @item-01-003\n    Scenario: The probe's second scenario after a retired gap\n"
+      "      Given a probe\n      When it runs\n      Then the gap is kept\n")
 write(os.path.join(repo, "config.sh"), config)
 write(os.path.join(repo, "probe.sh"), "#!/bin/sh\necho probe identity\nexit 0\n", executable=True)
 write(os.path.join(repo, "secret/README.md"), "fenced\n")
@@ -98,7 +101,8 @@ gate_cmd = write(os.path.join(work, "stubs/gate.sh"),
 grader_host = write(os.path.join(work, "stubs/grader.sh"),
                     f"#!/bin/sh\ntouch '{marks}/grader'\n"
                     "mkdir -p \"$1/work\" \"$GRADER_EVIDENCE_DIR/launch-1\"\n"
-                    "printf '[{\"id\":\"01-001\",\"verdict\":\"pass\",\"evidence\":\"probe answered over the public seam\"}]\\n' > \"$1/work/verdicts.json\"\n"
+                    "item=$(grep -Eo '01-(001|003)' \"$2\" | head -1)\n"
+                    "printf '[{\"id\":\"%s\",\"verdict\":\"pass\",\"evidence\":\"probe answered over the public seam\"}]\\n' \"$item\" > \"$1/work/verdicts.json\"\n"
                     "cp \"$1/work/verdicts.json\" \"$GRADER_EVIDENCE_DIR/launch-1/verdicts.json\"\n"
                     "ih=$(shasum -a 256 \"$2\" | cut -d' ' -f1)\n"
                     "printf 'model=probe-grader\\ninstruction_sha256=%s\\nrequest_id=probe-item\\nexit=0\\n' \"$ih\" > \"$GRADER_EVIDENCE_DIR/launch-1/launch.txt\"\n"
@@ -249,6 +253,11 @@ if (not isinstance(results, list)
         or any(x.get("outcome") != "recorded" for x in results)):
     fail(f"the effect results of R-probe are {json.dumps(results)[:400]}: want the stamp, the pin and the "
          f"checklist, each recorded into its context")
+stamp_ids = [e.get("item-id") for e in (results[0].get("events") or [])
+             if e.get("type") == "specification/scenario-stamped"]
+if stamp_ids != ["01-001", "01-003"]:
+    fail(f"the fresh runner ledger imported {stamp_ids}, not the file's 01-001 and 01-003; "
+         "retired 01-002 must not be fabricated")
 runs = (call(5, "cycle-runner/run-progress", {}) or {}).get("runs")
 if not isinstance(runs, list) or [x.get("run-id") for x in runs] != ["R-probe"]:
     fail(f"cycle-runner/run-progress answered {json.dumps(runs)[:300]}: want R-probe once, the refused "
@@ -276,9 +285,9 @@ if r.get("status") != "passed":
          f"effects {sorted(done)}; want passed with its cycle")
 missing = [e for e in ("self-check", "fence", "regenerate", "file-verdicts", "file-score")
            if done.get(e) != "recorded"]
-if missing or scored != ["01-001"] or (r.get("scores") or [{}])[0].get("verdict") != "pass":
+if missing or scored != ["01-001", "01-003"] or any(s.get("verdict") != "pass" for s in (r.get("scores") or [])):
     fail(f"R-full passed, but its effect results {json.dumps(done)[:300]} lack {missing} recorded, or its "
-         f"scores are {json.dumps(r.get('scores'))[:300]}, not one pass for 01-001")
+         f"scores are {json.dumps(r.get('scores'))[:300]}, not passes for 01-001 and 01-003")
 ran = [m for m in ("self-check", "builder", "gate") if not os.path.exists(os.path.join(marks, m))]
 if ran or not model_calls:
     fail(f"R-full passed, but " + (f"the {' and the '.join(ran)} never ran" if ran else "the model was never called"))
@@ -308,7 +317,7 @@ if not isinstance(events, list) or not any(e.get("type") == "cycle-runner/run-st
 r = (call(9, "cycle-runner/run-progress", {"run-id": "R-built-in"}, deadline=t6 + RUN_BUDGET) or {}).get("run") or {}
 done = {x.get("effect"): x.get("outcome") for x in (r.get("effect-results") or []) if isinstance(x, dict)}
 if (r.get("status") != "passed" or done.get("gate") != "recorded"
-        or [s.get("item-id") for s in (r.get("scores") or [])] != ["01-001"]
+        or [s.get("item-id") for s in (r.get("scores") or [])] != ["01-001", "01-003"]
         or os.path.exists(os.path.join(marks, "gate"))):
     fail(f"R-built-in did not pass through the built-in gate and score: status {r.get('status')!r}, "
          f"halt {json.dumps(r.get('halt'))[:200]}, effects {sorted(done)}")
