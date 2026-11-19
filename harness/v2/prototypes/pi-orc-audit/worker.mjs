@@ -10,13 +10,14 @@ import { createModels } from "@earendil-works/pi-ai";
 import { Harness, createRegistry, defineEntry, defineExtension, defineTask } from "@earendil-works/pi-durable";
 import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite/node";
 import { runGate } from "./gate-adapter.mjs";
-import { runBuilder } from "./builder-adapter.mjs";
+import { hasBuilderLaunch, runBuilder } from "./builder-adapter.mjs";
 import { candidateDigest as digestCandidate, prepareGradingRoom, verifyGradingRoom } from "./grading-room.mjs";
 import { prepareShards, combineShards } from "./grader-shards.mjs";
 import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer,
   verifyBlindReviewPacket, writeBlindAgentAllure } from "./blind-review.mjs";
 import { runBlindAgent } from "./blind-agent-adapter.mjs";
 import { bindScoreInput, verifyScoredCycle } from "./score-receipt.mjs";
+import { MAX_CONTINUATIONS, continuationPrompt, selectedUncarried } from "./continuation.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
@@ -210,9 +211,10 @@ const Builder = defineTask({
             reconciled: r?.reconciled ?? false, reason_code: reason ? "builder-effect-or-scope" : null,
             fixture: builder.model.startsWith("test/"),
           });
-          return { status: "terminal", outcome: digest
-            ? { status: "completed", result: { candidateDigest: digest } }
-            : { status: "failed", error: "build" } };
+          return digest
+            ? { status: "running", checkpoint: { phase: "maybe-continue", continuation: 0,
+              candidateDigest: digest } }
+            : { status: "terminal", outcome: { status: "failed", error: "build" } };
         }, ctx);
         return;
       }
@@ -237,6 +239,77 @@ const Builder = defineTask({
           fixture: true,
         });
         return { status: "terminal", outcome: { status: "completed", result: { red } } };
+      }, ctx);
+    },
+    "maybe-continue": async (task, runtime) => {
+      const { continuation, candidateDigest: before } = task.state.checkpoint;
+      verifyBuilderScope();
+      if (candidateDigest() !== before) throw new Error("candidate changed between builder turns");
+      const ids = selectedUncarried(room, join(scratch, "checklist.json"));
+      await runtime.commit(async (tx) => {
+        if (!ids.length || continuation >= MAX_CONTINUATIONS) {
+          await audit(tx, task, "builder-continuation", "stopped", {
+            attempt: task.input.attempt, session_id: `prototype-cycle-1-attempt-${task.input.attempt}`,
+            continuations: continuation, remaining_uncarried: ids,
+            reason: ids.length ? "limit" : "all-carried", fixture: builder.model.startsWith("test/") });
+          return { status: "terminal", outcome: { status: "completed", result: {
+            candidateDigest: before, continuations: continuation, remainingUncarried: ids } } };
+        }
+        const next = continuation + 1;
+        await audit(tx, task, "builder-continuation", "scheduled", {
+          attempt: task.input.attempt, continuation: next, continued_ids: ids,
+          candidate_before: before, fixture: builder.model.startsWith("test/") });
+        return { status: "running", checkpoint: { phase: "continue", continuation: next,
+          candidateDigest: before, ids } };
+      }, ctx);
+    },
+    continue: async (task, runtime) => {
+      const { continuation, candidateDigest: before, ids } = task.state.checkpoint;
+      const attempt = task.input.attempt;
+      const sessionId = `prototype-cycle-1-attempt-${attempt}`;
+      const requestId = `${sessionId}-c${continuation}`;
+      const instruction = join(scratch, `continuation-${attempt}-${continuation}.md`);
+      const evidenceDir = join(scratch, `builder-${attempt}-evidence`);
+      let r, digest, reason;
+      try {
+        verifyBuilderScope();
+        if (!hasBuilderLaunch(evidenceDir, sessionId, requestId)
+            && (candidateDigest() !== before
+              || JSON.stringify(selectedUncarried(room, join(scratch, "checklist.json"))) !== JSON.stringify(ids)))
+          throw new Error("candidate or uncarried list changed before continuation");
+        const prompt = continuationPrompt(ids);
+        if (!existsSync(instruction)) writeFileSync(instruction, prompt, { flag: "wx" });
+        if (readFileSync(instruction, "utf8") !== prompt)
+          throw new Error("continuation instruction changed after scheduling");
+        if (hash(readFileSync(builder.command)) !== builder.commandSha256
+            || hash(readFileSync(join(builder.image, "manifest.json"))) !== builder.imageSha256)
+          throw new Error("builder command or image changed before continuation");
+        r = await runBuilder({ command: builder.command, room, instruction,
+          image: builder.image, evidenceDir,
+          sessionId, requestId, model: builder.model, stateRoot: join(ROOT, ".pi/harness/.state"),
+          prompt: "Continue this same builder session now." });
+        if (r.exit !== 0) throw new Error(`builder continuation exited ${r.exit}`);
+        verifyBuilderScope();
+        digest = candidateDigest();
+      } catch (error) {
+        reason = String(error.stack ?? error);
+        writeFileSync(join(scratch, `continuation-${attempt}-${continuation}-error.log`), `${reason}\n`);
+      }
+      await runtime.commit(async (tx) => {
+        await audit(tx, task, "builder-continuation", digest ? "completed" : "failed", {
+          attempt, continuation, session_id: sessionId, request_id: requestId,
+          continued_ids: ids, candidate_before: before, candidate_after: digest ?? null,
+          instruction_sha256: existsSync(instruction) ? hash(readFileSync(instruction)) : null,
+          reconciled: r?.reconciled ?? false, changed: digest ? digest !== before : null,
+          remaining_uncarried: digest ? selectedUncarried(room, join(scratch, "checklist.json")) : null,
+          reason_code: reason ? "builder-continuation-effect-or-scope" : null,
+          fixture: builder.model.startsWith("test/") });
+        if (!digest) return { status: "terminal", outcome: { status: "failed", error: "continuation" } };
+        if (digest === before) return { status: "terminal", outcome: { status: "completed", result: {
+          candidateDigest: digest, continuations: continuation,
+          remainingUncarried: selectedUncarried(room, join(scratch, "checklist.json")) } } };
+        return { status: "running", checkpoint: { phase: "maybe-continue", continuation,
+          candidateDigest: digest } };
       }, ctx);
     },
   },

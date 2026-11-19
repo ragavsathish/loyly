@@ -14,7 +14,7 @@ function fields(path) {
     return at < 0 ? [line, ""] : [line.slice(0, at), line.slice(at + 1)];
   }));
 }
-function latestLaunch(evidenceDir, sessionId) {
+function latestLaunch(evidenceDir, sessionId, requestId) {
   if (!existsSync(evidenceDir)) return null;
   const names = readdirSync(evidenceDir).filter((name) => /^launch-\d+$/.test(name))
     .sort((a, b) => Number(b.slice(7)) - Number(a.slice(7)));
@@ -24,17 +24,22 @@ function latestLaunch(evidenceDir, sessionId) {
     const receipt = fields(path);
     // A concurrent writer may have created launch.txt but not yet written its
     // session_id line. Treat that as pending, never as permission to relaunch.
-    if (receipt.session_id === sessionId || !receipt.session_id) return { path, receipt };
+    if (!receipt.session_id || !receipt.request_id
+        || (receipt.session_id === sessionId && receipt.request_id === requestId))
+      return { path, receipt };
   }
   return null;
 }
-async function readyLaunch(evidenceDir, sessionId) {
-  let found = latestLaunch(evidenceDir, sessionId);
+export function hasBuilderLaunch(evidenceDir, sessionId, requestId) {
+  return latestLaunch(evidenceDir, sessionId, requestId) !== null;
+}
+async function readyLaunch(evidenceDir, sessionId, requestId) {
+  let found = latestLaunch(evidenceDir, sessionId, requestId);
   for (let n = 0; found && n < 100; n++) {
     if (found.receipt.instruction_sha256 && found.receipt.model && found.receipt.wrapper_pid)
       return found;
     await pause(50);
-    found = latestLaunch(evidenceDir, sessionId);
+    found = latestLaunch(evidenceDir, sessionId, requestId);
   }
   if (found) throw new Error("builder launch receipt stayed incomplete");
   return null;
@@ -44,10 +49,11 @@ function livePid(pid, expectedCommand) {
   const r = spawnSync("ps", ["-p", pid, "-o", "command="], { encoding: "utf8" });
   return r.status === 0 && r.stdout.includes(expectedCommand);
 }
-function validateReceipt(found, instructionSha256, model, room, image, readonlyInputs) {
+function validateReceipt(found, instructionSha256, model, room, image, readonlyInputs, sessionId, requestId) {
   if (!found) return;
   const { receipt } = found;
-  if (receipt.instruction_sha256 !== instructionSha256 || receipt.model !== model
+  if (receipt.session_id !== sessionId || receipt.request_id !== requestId
+      || receipt.instruction_sha256 !== instructionSha256 || receipt.model !== model
       || receipt.room !== room || receipt.builder_image !== image
       || (readonlyInputs ? receipt.room_readonly_inputs !== "1"
         : receipt.room_readonly_inputs !== undefined && receipt.room_readonly_inputs !== "0"))
@@ -64,18 +70,19 @@ function stopGroup(pid, expectedCommand) {
 }
 
 export async function runBuilder({ command, room, instruction, image, evidenceDir, sessionId,
-  model, stateRoot, timeoutMs = 14_400_000, signal, prompt, roomLabel, piSettings,
+  requestId = sessionId, model, stateRoot, timeoutMs = 14_400_000, signal, prompt, roomLabel, piSettings,
   imageAdditionsPath, readonlyInputs = false }) {
   for (const path of [command, room, instruction, image, evidenceDir, stateRoot])
     if (!isAbsolute(path)) throw new Error(`builder path must be absolute: ${path}`);
   if (!/^[A-Za-z0-9._-]+$/.test(sessionId)) throw new Error("unsafe builder session ID");
+  if (!/^[A-Za-z0-9._-]+$/.test(requestId)) throw new Error("unsafe builder request ID");
   if (!existsSync(room) || !existsSync(instruction) || !existsSync(image))
     throw new Error("builder room, instruction, or image missing");
   if (signal?.aborted) throw new Error("builder launch already aborted");
   const instructionSha256 = sha256(readFileSync(instruction));
   mkdirSync(evidenceDir, { recursive: true });
-  let found = await readyLaunch(evidenceDir, sessionId);
-  validateReceipt(found, instructionSha256, model, room, image, readonlyInputs);
+  let found = await readyLaunch(evidenceDir, sessionId, requestId);
+  validateReceipt(found, instructionSha256, model, room, image, readonlyInputs, sessionId, requestId);
   if (found?.receipt.exit !== undefined)
     return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
 
@@ -91,8 +98,8 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
       throw new Error("existing builder host exceeded deadline");
     }
     await pause(1000);
-    found = await readyLaunch(evidenceDir, sessionId);
-    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs);
+    found = await readyLaunch(evidenceDir, sessionId, requestId);
+    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs, sessionId, requestId);
     if (found?.receipt.exit !== undefined)
       return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
   }
@@ -103,7 +110,8 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
   const child = spawn(command, [room, instruction, image], {
     cwd: room, detached: true, stdio: ["ignore", out, err],
     env: { ...process.env, BUILDER_EVIDENCE_DIR: evidenceDir,
-      LOYLY_BUILDER_SESSION_ID: sessionId, LOYLY_PI_MODEL: model,
+      LOYLY_BUILDER_SESSION_ID: sessionId, LOYLY_BUILDER_REQUEST_ID: requestId,
+      LOYLY_PI_MODEL: model,
       PI_HARNESS_STATE_ROOT: stateRoot,
       ...(prompt ? { LOYLY_PI_PROMPT: prompt } : {}),
       ...(roomLabel ? { LOYLY_ROOM_LABEL: roomLabel } : {}),
@@ -121,8 +129,8 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
       child.once("error", reject);
       child.once("exit", (code, sig) => resolve(code ?? (sig ? 128 : 1)));
     });
-    found = await readyLaunch(evidenceDir, sessionId);
-    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs);
+    found = await readyLaunch(evidenceDir, sessionId, requestId);
+    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs, sessionId, requestId);
     if (timedOut) throw new Error("builder host exceeded deadline");
     if (!found || found.receipt.exit === undefined)
       throw new Error("builder host exited without a completed launch receipt");

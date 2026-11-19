@@ -16,10 +16,13 @@ function fixture(sleep = 0) {
   const command = join(root, "builder-stub.sh");
   writeFileSync(command, `#!/bin/sh
 set -eu
-mkdir -p "$BUILDER_EVIDENCE_DIR/launch-1"
-l="$BUILDER_EVIDENCE_DIR/launch-1/launch.txt"
+n=$(find "$BUILDER_EVIDENCE_DIR" -maxdepth 1 -type d -name 'launch-*' | wc -l | tr -d ' ')
+n=$((n + 1))
+mkdir -p "$BUILDER_EVIDENCE_DIR/launch-$n"
+l="$BUILDER_EVIDENCE_DIR/launch-$n/launch.txt"
 {
   echo "session_id=$LOYLY_BUILDER_SESSION_ID"
+  echo "request_id=$LOYLY_BUILDER_REQUEST_ID"
   echo "room=$1"
   echo "builder_image=$3"
   echo "instruction_sha256=$(shasum -a 256 "$2" | cut -d' ' -f1)"
@@ -55,6 +58,18 @@ test("grader receipt pins its read-only VM policy on reopening", async () => {
   assert.equal((await runBuilder(args)).exit, 0);
   assert.equal((await runBuilder(args)).reconciled, true);
   await assert.rejects(() => runBuilder({ ...args, readonlyInputs: false }), /approved room/);
+});
+
+test("distinct requests in one session each keep their own launch receipt", async () => {
+  const args = fixture();
+  assert.equal((await runBuilder(args)).exit, 0);
+  const continued = { ...args, requestId: `${args.sessionId}-c1` };
+  const first = await runBuilder(continued);
+  assert.deepEqual([first.exit, first.reconciled], [0, false]);
+  assert.equal(launches(args.evidenceDir).length, 2);
+  const reopened = await runBuilder(continued);
+  assert.deepEqual([reopened.exit, reopened.reconciled], [0, true]);
+  assert.equal(launches(args.evidenceDir).length, 2);
 });
 
 test("a killed controller waits for the original builder, then reads its receipt", async () => {

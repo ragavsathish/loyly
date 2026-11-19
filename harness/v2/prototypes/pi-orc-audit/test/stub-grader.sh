@@ -7,6 +7,7 @@ mkdir -p "$BUILDER_EVIDENCE_DIR/launch-1" "$room/work"
 launch="$BUILDER_EVIDENCE_DIR/launch-1/launch.txt"
 {
   echo "session_id=$LOYLY_BUILDER_SESSION_ID"
+  echo "request_id=${LOYLY_BUILDER_REQUEST_ID:-$LOYLY_BUILDER_SESSION_ID}"
   echo "room=$room"
   echo "builder_image=$3"
   echo "instruction_sha256=$(shasum -a 256 "$instruction" | cut -d' ' -f1)"

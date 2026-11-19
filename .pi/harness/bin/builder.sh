@@ -14,6 +14,8 @@
 #   LOYLY_BUILDER_SESSION_ID  optional: the durable session's key, [A-Za-z0-9._-]; store
 #                             $BUILDER_EVIDENCE_DIR/sessions/<id>/session.sqlite, request id <id>.
 #                             Without it: launch-N/session.sqlite, request id launch-N (a fresh session).
+#   LOYLY_BUILDER_REQUEST_ID  optional with a session ID: a distinct input request on the same
+#                             Pi store, used for bounded same-session continuation turns.
 #   LOYLY_BUILDER_PI_SETTINGS a pi settings.json whose defaultTools selects the builder's tools
 #                             (default ../config/pi.builder.settings.json)
 #   PI_HARNESS_STATE_ROOT     the state root (default .pi/harness/.state beside this script)
@@ -45,8 +47,10 @@ INSTR="$(cd "$(dirname "$INSTR")" && pwd)/$(basename "$INSTR")"
 mkdir -p "$EV"
 n=$(ls -d "$EV"/launch-* 2>/dev/null | wc -l | tr -d ' '); n=$((n+1)); L="$EV/launch-$n"; mkdir -p "$L"
 if [[ -n "$SID" ]]; then
-  STORE="$EV/sessions/$SID/session.sqlite"; RID="$SID"
+  STORE="$EV/sessions/$SID/session.sqlite"; RID="${LOYLY_BUILDER_REQUEST_ID:-$SID}"
+  [[ "$RID" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "bad LOYLY_BUILDER_REQUEST_ID: $RID" >&2; exit 2; }
 else
+  [[ -z "${LOYLY_BUILDER_REQUEST_ID:-}" ]] || { echo "LOYLY_BUILDER_REQUEST_ID needs LOYLY_BUILDER_SESSION_ID" >&2; exit 2; }
   STORE="$L/session.sqlite"; RID="launch-$n"
 fi
 mkdir -p "$(dirname "$STORE")"

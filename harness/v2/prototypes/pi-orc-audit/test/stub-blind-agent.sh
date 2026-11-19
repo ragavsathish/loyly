@@ -11,6 +11,7 @@ launch="$BUILDER_EVIDENCE_DIR/launch-1"
 mkdir -p "$launch"
 {
   echo "session_id=$LOYLY_BUILDER_SESSION_ID"
+  echo "request_id=${LOYLY_BUILDER_REQUEST_ID:-$LOYLY_BUILDER_SESSION_ID}"
   echo "room=$room"
   echo "builder_image=$image"
   echo "instruction_sha256=$(shasum -a 256 "$instruction" | cut -d' ' -f1)"
