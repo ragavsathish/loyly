@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prepare": "node prepare.mjs"
+    "prepare": "node prepare.mjs",
+    "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "@earendil-works/chord": "1.5.1",

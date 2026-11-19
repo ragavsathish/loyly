@@ -2,9 +2,10 @@
 // the original legacy harness's clean room before launching any agent.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { runBuilder } from "./builder-adapter.mjs";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai";
 import { Harness, createRegistry, defineEntry, defineExtension, defineTask } from "@earendil-works/pi-durable";
@@ -28,10 +29,25 @@ function options(args) {
       || !/^[A-Za-z0-9._-]+$/.test(runId ?? "")
       || !/^[0-9a-f]{64}$/.test(checklistSha256 ?? ""))
     throw new Error("usage: node prepare.mjs --state-dir DIR --commit 40-HEX --run-id ID --checklist-sha256 64-HEX");
-  return { state, commit, runId, checklistSha256 };
+  const stage = found.stage ?? "prepare";
+  if (!["prepare", "build"].includes(stage)) throw new Error("--stage must be prepare or build");
+  const build = stage === "build" ? {
+    command: resolve(found["builder-command"] ?? join(ROOT, ".pi/harness/bin/builder.sh")),
+    image: resolve(found["builder-image"] ?? ""),
+    model: found["builder-model"],
+    instructionSha256: found["builder-instruction-sha256"],
+    commandSha256: found["builder-command-sha256"],
+    imageSha256: found["builder-image-sha256"],
+  } : null;
+  if (build && (!found["builder-image"] || !build.model
+      || [build.instructionSha256, build.commandSha256, build.imageSha256]
+        .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? ""))))
+    throw new Error("build needs image, model, instruction, command and image-manifest SHA-256 values");
+  return { input: { state, commit, runId, checklistSha256 }, stage, build };
 }
 
-const input = options(process.argv.slice(2));
+const cli = options(process.argv.slice(2));
+const input = cli.input;
 const cutRoot = join(input.state, "cut");
 const project = join(cutRoot, "project");
 const room = join(input.state, "room");
@@ -75,6 +91,37 @@ async function audit(tx, task, stage, outcome, detail = {}) {
   console.log(`${entry.id} ${stage} ${outcome}`);
 }
 const fail = (stage) => ({ status: "terminal", outcome: { status: "failed", error: stage } });
+
+function candidateDigest() {
+  const app = join(room, "impl");
+  const start = join(app, "start.sh"), test = join(app, "test.sh");
+  if (!existsSync(start) || !existsSync(test)) throw new Error("builder did not leave both legacy app entrypoints");
+  const status = spawnSync("git", ["status", "--porcelain=v1", "-z", "--untracked-files=all"],
+    { cwd: room, encoding: "buffer" });
+  if (status.status !== 0) throw new Error("cannot check builder write scope");
+  for (const line of status.stdout.toString("utf8").split("\0").filter(Boolean)) {
+    if (line.slice(0, 2) !== "??") throw new Error("builder modified a tracked clean-room file");
+    const path = line.slice(3);
+    if (!path.startsWith("impl/") && !path.startsWith(".builder/"))
+      throw new Error(`builder wrote outside declared scope: ${path}`);
+  }
+  const digest = createHash("sha256");
+  let fileCount = 0;
+  const walk = (dir, prefix) => {
+    for (const name of readdirSync(dir).sort()) {
+      const path = `${prefix}/${name}`, file = join(dir, name), stat = lstatSync(file);
+      if (stat.isDirectory()) walk(file, path);
+      else if (stat.isFile()) {
+        digest.update(path); digest.update("\0");
+        digest.update(String(stat.mode & 0o777)); digest.update("\0");
+        digest.update(readFileSync(file)); digest.update("\0");
+        fileCount++;
+      } else throw new Error(`candidate has a symlink or special file: ${path}`);
+    }
+  };
+  walk(app, "impl");
+  return { sha256: digest.digest("hex"), fileCount };
+}
 
 const Prepare = defineTask({
   name: "loyly.pi.cycle.prepare", version: 1,
@@ -121,7 +168,7 @@ const Prepare = defineTask({
         if (r.code !== 0 || !approved) return fail("checklist");
         await audit(tx, task, "preparation", "completed", { item_count: items, cut_commit: cutReceipt().cut });
         return { status: "terminal", outcome: { status: "completed", result: {
-          runId: input.runId, cut: cutReceipt().cut, itemCount: items,
+          runId: input.runId, cut: cutReceipt().cut, fenceCommit: git(room, "rev-parse", "HEAD"), itemCount: items,
           checklistSha256: actual, room,
         } } };
       }, ctx);
@@ -130,8 +177,76 @@ const Prepare = defineTask({
   abort: (_task, runtime) => runtime.commit(() => ({ status: "terminal", outcome: { status: "aborted" } }), ctx),
 });
 
+const Build = defineTask({
+  name: "loyly.pi.cycle.build", version: 1,
+  initial: () => ({ phase: "instruction" }),
+  phases: {
+    instruction: async (task, runtime) => {
+      const source = join(ROOT, "harness", "loyly", "builder-instruction.md");
+      const bytes = readFileSync(source);
+      const actual = hash(bytes);
+      const commandSha256 = existsSync(task.input.command) ? fileHash(task.input.command) : null;
+      const manifest = join(task.input.image, "manifest.json");
+      const imageSha256 = existsSync(manifest) ? fileHash(manifest) : null;
+      const approved = actual === task.input.instructionSha256
+        && commandSha256 === task.input.commandSha256
+        && imageSha256 === task.input.imageSha256;
+      if (approved)
+        writeFileSync(join(input.state, "builder-instruction.md"), bytes);
+      await runtime.commit(async (tx) => {
+        await audit(tx, task, "builder-input", approved ? "approved" : "refused", {
+          instruction_sha256: actual, approved_instruction_sha256: task.input.instructionSha256,
+          command_sha256: commandSha256, approved_command_sha256: task.input.commandSha256,
+          image_sha256: imageSha256, approved_image_sha256: task.input.imageSha256 });
+        return approved
+          ? { status: "running", checkpoint: { phase: "launch" } } : fail("builder-instruction");
+      }, ctx);
+    },
+    launch: async (task, runtime) => {
+      const clean = fenced() && git(room, "rev-parse", "HEAD") === task.input.fenceCommit
+        && fileHash(checklistFile) === task.input.checklistSha256;
+      await runtime.commit(async (tx) => {
+        await audit(tx, task, "build", clean ? "started" : "refused", {
+          attempt: 1, session_id: `${input.runId}-attempt-1`, model: task.input.model,
+          instruction_sha256: task.input.instructionSha256 });
+        return clean ? { status: "running", checkpoint: { phase: "run" } } : fail("builder-room");
+      }, ctx);
+    },
+    run: async (task, runtime) => {
+      const sessionId = `${input.runId}-attempt-1`;
+      let r, candidate, reason;
+      try {
+        if (git(room, "rev-parse", "HEAD") !== task.input.fenceCommit
+            || fileHash(checklistFile) !== task.input.checklistSha256
+            || fileHash(join(input.state, "builder-instruction.md")) !== task.input.instructionSha256
+            || fileHash(task.input.command) !== task.input.commandSha256
+            || fileHash(join(task.input.image, "manifest.json")) !== task.input.imageSha256)
+          throw new Error("approved cut, checklist, instruction, host or image changed after launch");
+        r = await runBuilder({ command: task.input.command, room,
+          instruction: join(input.state, "builder-instruction.md"), image: task.input.image,
+          evidenceDir: join(input.state, "evidence", "builder"), sessionId,
+          model: task.input.model, stateRoot: join(ROOT, ".pi", "harness", ".state") });
+        if (r.exit === 0) candidate = candidateDigest();
+        else reason = "builder-host-exit";
+      } catch (error) {
+        reason = "builder-effect-or-scope";
+        writeFileSync(join(input.state, "build-error.log"), `${error.stack ?? error}\n`);
+      }
+      await runtime.commit(async (tx) => {
+        await audit(tx, task, "build", candidate ? "completed" : "failed", {
+          attempt: 1, session_id: sessionId, model: task.input.model,
+          candidate_sha256: candidate?.sha256 ?? null, candidate_files: candidate?.fileCount ?? 0,
+          reconciled: r?.reconciled ?? false, exit: r?.exit ?? null, reason_code: reason ?? null });
+        return candidate ? { status: "terminal", outcome: { status: "completed", result: candidate } }
+          : fail("build");
+      }, ctx);
+    },
+  },
+  abort: (_task, runtime) => runtime.commit(() => ({ status: "terminal", outcome: { status: "aborted" } }), ctx),
+});
+
 const registry = createRegistry();
-registry.install(defineExtension({ name: "loyly-pi-cycle", tasks: [Prepare] }));
+registry.install(defineExtension({ name: "loyly-pi-cycle", tasks: [Prepare, Build] }));
 const harness = await Harness.open(await openNodeSqliteStorage(join(input.state, "cycle.sqlite")),
   { models: createModels(), registry }, ctx);
 try {
@@ -146,6 +261,21 @@ try {
   const final = await harness.waitForTask(id, ctx);
   console.log(JSON.stringify(final.state.outcome));
   if (final.state.outcome?.status !== "completed") process.exitCode = 1;
+  if (cli.stage === "build" && final.state.outcome?.status === "completed") {
+    const buildInput = { ...cli.build, runId: input.runId, cut: final.state.outcome.result.cut,
+      fenceCommit: final.state.outcome.result.fenceCommit ?? git(room, "rev-parse", "HEAD"),
+      checklistSha256: input.checklistSha256 };
+    const builds = await harness.commit((tx) => tx.scanTasks({ kind: "loyly.pi.cycle.build" }, 10), ctx);
+    let buildId = builds.items[0]?.id;
+    if (buildId && JSON.stringify(builds.items[0].input) !== JSON.stringify(buildInput))
+      throw new Error("this store belongs to another approved builder input");
+    if (!buildId) buildId = await harness.commit((tx) => tx.createTask(Build, buildInput,
+      { ownership: { kind: "conversation" }, conversationId: root.id }), ctx);
+    harness.resume();
+    const built = await harness.waitForTask(buildId, ctx);
+    console.log(JSON.stringify(built.state.outcome));
+    if (built.state.outcome?.status !== "completed") process.exitCode = 1;
+  }
 } finally {
   await harness.close(ctx);
 }
