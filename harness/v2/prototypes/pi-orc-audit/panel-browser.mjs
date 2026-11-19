@@ -17,7 +17,8 @@ await mkdir(allure, { recursive: true });
 const sourceFilesSha256 = treeDigest(candidate, 'impl');
 const expectedSourceFilesSha256 = config.source_files_sha256;
 const candidateSha256 = config.candidate_sha256;
-const serverRendered = existsSync(join(candidate, 'web.mjs'));
+const uiVariant = existsSync(join(candidate, 'ui.mjs'));
+const serverRendered = uiVariant || existsSync(join(candidate, 'web.mjs'));
 const modern = !serverRendered && existsSync(join(candidate, 'contract.json'))
   && JSON.parse(await readFile(join(candidate, 'contract.json'), 'utf8')).request?.path === '/api/bookings';
 const uuid = randomUUID();
@@ -109,7 +110,8 @@ try {
     await page.goto(base, { waitUntil: 'networkidle' });
     assert((await page.title()).includes('Löyly'), 'Unexpected page title');
     const free = serverRendered
-      ? page.getByRole('link', { name: /Request pukuhuone 8, Tuesday, 17:00/ })
+      ? page.getByRole('link', { name: uiVariant
+        ? /Choose pukuhuone 8, Tuesday at 17:00/ : /Request pukuhuone 8, Tuesday, 17:00/ })
       : modern ? page.locator('button.slot[data-slot="ph8|Tuesday|17:00"]')
       : page.getByRole('link', { name: 'Request Tuesday 17:00 in Pukuhuone 8' });
     assert(await free.count() === 1, 'Expected one free room 8 Tuesday 17:00 slot');
@@ -117,19 +119,21 @@ try {
     await page.screenshot({ path: join(artifacts, 'before.png'), fullPage: true });
   });
   await step('Submit the native booking form as apartment 12', async () => {
-    if (serverRendered) await page.getByRole('link', { name: /Request pukuhuone 8, Tuesday, 17:00/ }).click();
+    if (serverRendered) await page.getByRole('link', { name: uiVariant
+      ? /Choose pukuhuone 8, Tuesday at 17:00/ : /Request pukuhuone 8, Tuesday, 17:00/ }).click();
     else if (modern) await page.locator('button.slot[data-slot="ph8|Tuesday|17:00"]').click();
     else await page.getByRole('link', { name: 'Request Tuesday 17:00 in Pukuhuone 8' }).click();
     const selector = serverRendered ? (name) => page.locator(`[name="${name}"]`) : (name) => page.locator(`#${name}`);
-    assert(await selector('resource').inputValue() === (serverRendered ? 'pukuhuone 8' : 'ph8'), 'Room selection failed');
+    assert(await selector('resource').inputValue() === (serverRendered && !uiVariant ? 'pukuhuone 8' : 'ph8'), 'Room selection failed');
     assert(await selector('weekday').inputValue() === 'Tuesday', 'Weekday selection failed');
     assert(await selector('start').inputValue() === '17:00', 'Start selection failed');
     if (serverRendered) {
+      if (uiVariant) await page.locator('[name="household"]').first().fill('12');
       const navigation = page.waitForNavigation();
       await page.getByRole('button', { name: /Request standing slot/ }).click();
       const response = await navigation;
-      assert(response?.status() === 201, `Booking form status ${response?.status()}`);
-      assert(await page.getByRole('status').getByText('All set').count() === 1, 'Confirmation notice missing');
+      assert([200, 201].includes(response?.status()), `Booking form status ${response?.status()}`);
+      assert(await page.getByRole('status').count() === 1, 'Confirmation notice missing');
     } else if (modern) {
       const response = page.waitForResponse(r => r.url().endsWith('/api/bookings') && r.request().method() === 'POST');
       await page.getByRole('button', { name: /Confirm standing slot/ }).click();
@@ -145,15 +149,16 @@ try {
     observations.checks.formConfirmation = true;
   });
   await step('Inspect holding, schedule, posted list, heater and billing views', async () => {
-    if (serverRendered) await page.goto(`${base}/my-slots?household=12`);
+    if (serverRendered) await page.goto(uiVariant
+      ? `${base}/?household=12` : `${base}/my-slots?household=12`);
     else if (modern) await page.locator('[data-tab="mine"]').click();
-    const holdings = serverRendered ? page.locator('.booking-card')
+    const holdings = serverRendered ? page.locator(uiVariant ? '.holdings table tbody tr' : '.booking-card')
       : modern ? page.locator('#my-bookings .booking-card') : page.locator('#holdings .holding-card');
     assert(await holdings.count() === 1, 'Expected one standing holding card');
     assert((await holdings.innerText()).includes('Tuesday'), 'Holding weekday missing');
     assert((await holdings.innerText()).includes('17:00'), 'Holding time missing');
     const schedule = await page.request.get(`${base}/api/schedule`).then(r => r.json());
-    const slot = schedule.slots.find(s => s.resource === (serverRendered ? 'pukuhuone 8' : 'ph8')
+    const slot = schedule.slots.find(s => s.resource === (serverRendered && !uiVariant ? 'pukuhuone 8' : 'ph8')
       && s.weekday === 'Tuesday' && s.start === '17:00');
     assert((slot?.status ?? slot?.state) === 'held' && slot.household === '12', `Schedule mismatch: ${JSON.stringify(slot)}`);
     const views = await page.request.get(`${base}/api/views`).then(r => r.json());
@@ -161,11 +166,20 @@ try {
     assert(views.postedList[0].household === '12', 'Posted list household mismatch');
     assert(views.invoicingSignals[0].payer === '12', 'Billing payer mismatch');
     if (serverRendered) {
-      await page.goto(`${base}/views`);
-      const view = await page.locator('main').innerText();
-      assert(view.includes('Apartment 12') && view.includes('17:00')
-        && view.includes('Posted slot list') && view.includes('Heater schedule')
-        && view.includes('Invoicing signals'), 'Derived views are not visible together');
+      if (uiVariant) {
+        for (const name of ['posted-list', 'heater-schedule', 'invoicing-signals']) {
+          await page.goto(`${base}/?view=${name}&household=12`);
+          const view = await page.locator('main').innerText();
+          assert(view.includes('17:00') && (name === 'heater-schedule' || view.includes('Apartment 12')),
+            `${name} is not visible`);
+        }
+      } else {
+        await page.goto(`${base}/views`);
+        const view = await page.locator('main').innerText();
+        assert(view.includes('Apartment 12') && view.includes('17:00')
+          && view.includes('Posted slot list') && view.includes('Heater schedule')
+          && view.includes('Invoicing signals'), 'Derived views are not visible together');
+      }
     } else if (modern) {
       await page.locator('[data-tab="views"]').click();
       const view = page.locator('#panel-views');

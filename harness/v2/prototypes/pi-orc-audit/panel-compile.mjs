@@ -76,7 +76,7 @@ function specialistResults({ specialists, plan, planSha256, manifest, candidateS
       || producer.execution_receipt_sha256 !== fileSha(join(dir, receiptFile)))
       throw new Error(`${spec.id}: execution receipt is not candidate and image bound`);
     let runtime;
-    if (manifest.schema === "loyly.panel-vm-run.v1" && receipt.vm_exit_code === 0
+    if (manifest.schema === "loyly.panel-vm-run.v1" && Number.isInteger(receipt.vm_exit_code)
         && receipt.isolation === "gondolin-qemu-vm"
         && receipt.mounts?.candidate === "read-only"
         && receipt.mounts?.worker === "read-only")

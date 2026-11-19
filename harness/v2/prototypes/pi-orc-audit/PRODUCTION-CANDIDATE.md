@@ -75,6 +75,25 @@ node run-live.mjs --run scratch-production/live-run.json
 The contract must be fixed before `--run`. Credentials remain in the operator
 environment; the JSON file contains only paths, model names and digests.
 
+## Panel-only reassessment
+
+When a filed score exists but the specialist instrument needs correction,
+`reassess-panel.mjs` takes a second pinned JSON contract: `schema` is
+`loyly.pi-panel-reassessment.v1`; supply the clean controller commit, source
+commit, candidate and filed score SHA-256, panel plan and image manifest
+SHA-256, the original cycle scratch path, a private output path inside it,
+and the image path. `--check` verifies the frozen candidate and committed Pi
+score. `--run` launches three parallel VMs, compiles Allure from the original
+grader and blind directories plus the new specialist directories, then writes
+an immutable `reassessment.json`. The filed score, original panel manifest
+and failed cycle audit remain unchanged. This is a separately named
+reassessment, never a rewrite of the original cycle outcome.
+
+```sh
+node reassess-panel.mjs --check scratch-production-cycle-03/reassessment-01/config.json
+node reassess-panel.mjs --run scratch-production-cycle-03/reassessment-01/config.json
+```
+
 ## Acceptance boundary
 
 This candidate is **not yet the running harness**. It needs a fresh scored

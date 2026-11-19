@@ -9,7 +9,8 @@ import { treeDigest } from './grading-room.mjs';
 
 const out = '/out';
 const config = JSON.parse(await readFile(join(out, 'config.json'), 'utf8'));
-const serverRendered = existsSync('/candidate/web.mjs');
+const uiVariant = existsSync('/candidate/ui.mjs');
+const serverRendered = uiVariant || existsSync('/candidate/web.mjs');
 const modern = !serverRendered && existsSync('/candidate/contract.json')
   && JSON.parse(await readFile('/candidate/contract.json', 'utf8')).request?.path === '/api/bookings';
 const uuid = randomUUID(), start = Date.now();
@@ -67,7 +68,7 @@ try {
   await step('Confirm one durable booking and all three derived views', async () => {
     const booked = await request('/api/bookings', { method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ household: 'Probe-17', resource: serverRendered ? 'pukuhuone 8' : 'ph8',
+      body: JSON.stringify({ household: 'Probe-17', resource: serverRendered && !uiVariant ? 'pukuhuone 8' : 'ph8',
         weekday: 'Tuesday', start: '17:00' }) });
     const views = await request('/api/views');
     const stored = JSON.parse(await readFile(join(out, 'record.json'), 'utf8'));
