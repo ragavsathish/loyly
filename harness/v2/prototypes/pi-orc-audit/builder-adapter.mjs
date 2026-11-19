@@ -44,11 +44,13 @@ function livePid(pid, expectedCommand) {
   const r = spawnSync("ps", ["-p", pid, "-o", "command="], { encoding: "utf8" });
   return r.status === 0 && r.stdout.includes(expectedCommand);
 }
-function validateReceipt(found, instructionSha256, model, room, image) {
+function validateReceipt(found, instructionSha256, model, room, image, readonlyInputs) {
   if (!found) return;
   const { receipt } = found;
   if (receipt.instruction_sha256 !== instructionSha256 || receipt.model !== model
-      || receipt.room !== room || receipt.builder_image !== image)
+      || receipt.room !== room || receipt.builder_image !== image
+      || (readonlyInputs ? receipt.room_readonly_inputs !== "1"
+        : receipt.room_readonly_inputs !== undefined && receipt.room_readonly_inputs !== "0"))
     throw new Error("builder launch receipt differs from approved room, instruction, image or model");
 }
 function stopGroup(pid, expectedCommand) {
@@ -63,7 +65,7 @@ function stopGroup(pid, expectedCommand) {
 
 export async function runBuilder({ command, room, instruction, image, evidenceDir, sessionId,
   model, stateRoot, timeoutMs = 14_400_000, signal, prompt, roomLabel, piSettings,
-  imageAdditionsPath }) {
+  imageAdditionsPath, readonlyInputs = false }) {
   for (const path of [command, room, instruction, image, evidenceDir, stateRoot])
     if (!isAbsolute(path)) throw new Error(`builder path must be absolute: ${path}`);
   if (!/^[A-Za-z0-9._-]+$/.test(sessionId)) throw new Error("unsafe builder session ID");
@@ -73,7 +75,7 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
   const instructionSha256 = sha256(readFileSync(instruction));
   mkdirSync(evidenceDir, { recursive: true });
   let found = await readyLaunch(evidenceDir, sessionId);
-  validateReceipt(found, instructionSha256, model, room, image);
+  validateReceipt(found, instructionSha256, model, room, image, readonlyInputs);
   if (found?.receipt.exit !== undefined)
     return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
 
@@ -90,7 +92,7 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
     }
     await pause(1000);
     found = await readyLaunch(evidenceDir, sessionId);
-    validateReceipt(found, instructionSha256, model, room, image);
+    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs);
     if (found?.receipt.exit !== undefined)
       return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
   }
@@ -106,6 +108,7 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
       ...(prompt ? { LOYLY_PI_PROMPT: prompt } : {}),
       ...(roomLabel ? { LOYLY_ROOM_LABEL: roomLabel } : {}),
       ...(piSettings ? { LOYLY_BUILDER_PI_SETTINGS: piSettings } : {}),
+      LOYLY_ROOM_READONLY_INPUTS: readonlyInputs ? "1" : "0",
       ...(imageAdditionsPath ? { LOYLY_IMAGE_ADDITIONS_PATH: imageAdditionsPath } : {}) },
   });
   closeSync(out); closeSync(err);
@@ -119,7 +122,7 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
       child.once("exit", (code, sig) => resolve(code ?? (sig ? 128 : 1)));
     });
     found = await readyLaunch(evidenceDir, sessionId);
-    validateReceipt(found, instructionSha256, model, room, image);
+    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs);
     if (timedOut) throw new Error("builder host exceeded deadline");
     if (!found || found.receipt.exit === undefined)
       throw new Error("builder host exited without a completed launch receipt");

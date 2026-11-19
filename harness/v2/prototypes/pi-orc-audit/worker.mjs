@@ -278,7 +278,8 @@ const Grade = defineTask({
             stateRoot: join(ROOT, ".pi/harness/.state"),
             piSettings: grader.settings, prompt: "Grade your selected checklist scope now, as the attached instruction says.",
             roomLabel: `the ${shard.id} grading room`,
-            imageAdditionsPath: "/workspace/work/image-additions.txt" })));
+            imageAdditionsPath: "/workspace/work/image-additions.txt",
+            readonlyInputs: true })));
           const failures = launches.flatMap((launch, i) => launch.status === "rejected"
             ? [`${shards[i].id}: ${launch.reason}`]
             : launch.value.exit !== 0 ? [`${shards[i].id}: exit ${launch.value.exit}`] : []);

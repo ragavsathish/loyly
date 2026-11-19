@@ -120,6 +120,7 @@ function installCommand(): string | undefined {
 /** The builder's environment as a prompt section, generated from what the VM and tools enforce. */
 export function environmentText(tools: readonly string[], roomLabel = "the builder room",
 	timeoutFloor = BASH_TIMEOUT_FLOOR, imageAdditionsPath = IMAGE_ADDITIONS): string {
+	const readonlyInputs = process.env.LOYLY_ROOM_READONLY_INPUTS === "1";
 	const network =
 		ALLOWED_HOSTS.length === 0
 			? "Network: none. Every outbound connection from the VM is refused; nothing can be downloaded, so work with what the image already has."
@@ -127,7 +128,8 @@ export function environmentText(tools: readonly string[], roomLabel = "the build
 	return [
 		`You run as ${GUEST_USER} (superuser) in ${imageLine()}.`,
 		network,
-		`Your working directory is ${GUEST_WORKSPACE}: ${roomLabel}, read-write, and the only host directory the VM can see.`,
+		`Your working directory is ${GUEST_WORKSPACE}: ${roomLabel}, and the only host directory the VM can see.`,
+		readonlyInputs ? "The plan and impl directories are mounted read-only; put every writable runtime copy and observation under /workspace/work." : "The room is read-write.",
 		"The image already carries the toolchain; use it first.",
 		...(installCommand()
 			? [

@@ -38,6 +38,8 @@ test("rule scopes merge exactly once into the attached Allure contract", () => {
   const shards = prepareShards({ gradingRoom: full, sourceRoom: source, scratch: root,
     schemaFile: schema, candidateSha256, schemaSha256, count: 2 });
   for (const shard of shards) {
+    mkdirSync(join(shard.out, "work", "runtime-01-001"));
+    writeFileSync(join(shard.out, "work", "runtime-01-001", "bookings.json"), "{}\n");
     const evidence = join(root, "evidence", shard.id);
     const result = spawnSync("sh", [stub, shard.out, instruction, root], {
       env: { ...process.env, BUILDER_EVIDENCE_DIR: evidence,
@@ -48,6 +50,7 @@ test("rule scopes merge exactly once into the attached Allure contract", () => {
   assert.equal(merged.verdicts.length, 4);
   assert.deepEqual(merged.verdicts.map((v) => v.verdict), ["pass", "pass", "pass", "fail"]);
   assert.equal(readdirSync(join(full, "work", "allure-results")).length, 8);
+  assert.ok(!readdirSync(join(full, "work", "shards", shards[0].id)).includes("runtime-01-001"));
   assert.throws(() => combineShards({ gradingRoom: full, shards: [shards[0], shards[0]],
     candidateSha256, schemaSha256 }), /exactly once/);
   const resultFile = readdirSync(join(shards[0].out, "work", "allure-results"))

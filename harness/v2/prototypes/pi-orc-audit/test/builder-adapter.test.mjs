@@ -24,6 +24,7 @@ l="$BUILDER_EVIDENCE_DIR/launch-1/launch.txt"
   echo "builder_image=$3"
   echo "instruction_sha256=$(shasum -a 256 "$2" | cut -d' ' -f1)"
   echo "model=$LOYLY_PI_MODEL"
+  echo "room_readonly_inputs=$LOYLY_ROOM_READONLY_INPUTS"
   echo "wrapper_pid=$$"
 } > "$l"
 sleep ${sleep}
@@ -46,6 +47,14 @@ test("completed builder launch is reconciled without a second process", async ()
   const second = await runBuilder(args);
   assert.deepEqual([second.exit, second.reconciled], [0, true]);
   assert.equal(launches(args.evidenceDir).length, 1);
+  await assert.rejects(() => runBuilder({ ...args, readonlyInputs: true }), /approved room/);
+});
+
+test("grader receipt pins its read-only VM policy on reopening", async () => {
+  const args = { ...fixture(), readonlyInputs: true };
+  assert.equal((await runBuilder(args)).exit, 0);
+  assert.equal((await runBuilder(args)).reconciled, true);
+  await assert.rejects(() => runBuilder({ ...args, readonlyInputs: false }), /approved room/);
 });
 
 test("a killed controller waits for the original builder, then reads its receipt", async () => {

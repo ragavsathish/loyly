@@ -70,7 +70,8 @@ export function readAllureResults(room) {
     if (!ids.length || ids.some((id) => !byId.has(id))
         || typeof surprise.observation !== "string"
         || typeof evidenceFile !== "string" || !/^work\/[A-Za-z0-9._/-]+$/.test(evidenceFile)
-        || evidenceFile.includes("..") || !existsSync(join(room, evidenceFile))
+        || evidenceFile.includes("..") || /^work\/runtime-[^/]+\//.test(evidenceFile)
+        || !existsSync(join(room, evidenceFile))
         || !lstatSync(join(room, evidenceFile)).isFile())
       throw new Error("invalid surprise evidence");
     for (const id of ids) surprises.push({ item: id, observation: surprise.observation,

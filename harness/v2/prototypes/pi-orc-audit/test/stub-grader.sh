@@ -11,6 +11,7 @@ launch="$BUILDER_EVIDENCE_DIR/launch-1/launch.txt"
   echo "builder_image=$3"
   echo "instruction_sha256=$(shasum -a 256 "$instruction" | cut -d' ' -f1)"
   echo "model=$LOYLY_PI_MODEL"
+  echo "room_readonly_inputs=${LOYLY_ROOM_READONLY_INPUTS:-0}"
   echo "wrapper_pid=$$"
 } > "$launch"
 node -e '

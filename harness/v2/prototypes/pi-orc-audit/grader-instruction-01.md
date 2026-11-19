@@ -5,8 +5,12 @@ You are a fresh grader. You did not build this candidate. Work only in this grad
 `allure-lifecycle-result.schema.json`; these define your selected rule scopes and the result
 contract.
 The candidate is under `impl/`. Do not read its source, tests, build files, notes, or any builder
-claim. You may run `impl/test.sh` to prepare the app, but its result is never an item verdict.
-Observe product behavior through HTTP after starting `impl/start.sh PORT`. The prior gate passed;
+claim. Treat `impl/` as immutable: do not execute its scripts or start the app from that path,
+because the app may write runtime state beside its code. For each independent item, first copy
+`impl/` to a fresh `work/runtime-<item-id>/` (for example, `cp -R impl work/runtime-01-001`).
+Run the copied `test.sh` there if preparation is needed, and start the copied `start.sh PORT`.
+Use a separate fresh copy for each item. A test result is never an item verdict.
+Observe product behavior through HTTP after starting the copied app. The prior gate passed;
 you must still make your own observations on fresh state. Write all your files under `work/`.
 
 Grade only the items in this room's `checklist.json`. For each item, set up the stated Given conditions from fresh state, make the When request, and

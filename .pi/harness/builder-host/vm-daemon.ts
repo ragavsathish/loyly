@@ -7,8 +7,8 @@
 // Network, mount and user follow policy.ts: HTTP(S) only to ALLOWED_HOSTS (none: no egress at all),
 // the room alone at GUEST_WORKSPACE, and the daemon refuses to serve unless it runs as GUEST_USER.
 import { readFileSync } from "node:fs";
-import { basename, resolve } from "node:path";
-import { createHttpHooks, type HttpHooks, RealFSProvider, VM } from "@earendil-works/gondolin";
+import { basename, join, resolve } from "node:path";
+import { createHttpHooks, type HttpHooks, RealFSProvider, ReadonlyProvider, VM } from "@earendil-works/gondolin";
 import { packagedDaemon } from "@earendil-works/pi-env";
 import { ALLOWED_HOSTS, GUEST_USER, GUEST_WORKSPACE } from "./policy.ts";
 const GUEST_DAEMON = "/opt/pi-env/pi-env";
@@ -19,6 +19,7 @@ if (!roomArg || daemonArgs[0] !== "serve") {
 	process.exit(2);
 }
 const room = resolve(roomArg);
+const readonlyInputs = process.env.LOYLY_ROOM_READONLY_INPUTS === "1";
 
 // HTTP(S) only to ALLOWED_HOSTS, by exact name. The request check runs before the host resolves the
 // name (Gondolin checks `allowedHosts` itself only after resolving, which would leak other names to
@@ -51,7 +52,13 @@ if (!/^[1-9]\d*$/.test(vmCpus)) {
 const vm = await VM.create({
 	httpHooks,
 	sessionLabel: `loyly-builder ${basename(room)}`,
-	vfs: { mounts: { [GUEST_WORKSPACE]: new RealFSProvider(room) } },
+	vfs: { mounts: {
+		[GUEST_WORKSPACE]: new RealFSProvider(room),
+		...(readonlyInputs ? {
+			[`${GUEST_WORKSPACE}/impl`]: new ReadonlyProvider(new RealFSProvider(join(room, "impl"))),
+			[`${GUEST_WORKSPACE}/plan`]: new ReadonlyProvider(new RealFSProvider(join(room, "plan"))),
+		} : {}),
+	} },
 	memory: vmMemory,
 	cpus: Number(vmCpus),
 });

@@ -81,8 +81,12 @@ export function combineShards({ gradingRoom, shards, candidateSha256, schemaSha2
     const evidence = join(work, "shards", shard.id);
     mkdirSync(evidence, { recursive: true });
     for (const name of readdirSync(join(shard.out, "work"))) {
-      if (name !== "allure-results" && name !== "surprises.json")
-        copySafeTree(join(shard.out, "work", name), join(evidence, name));
+      const source = join(shard.out, "work", name);
+      // Runtime copies are execution sandboxes, retained in the raw shard room.
+      // The combined evidence carries observations, not duplicate app binaries.
+      if (name !== "allure-results" && name !== "surprises.json"
+          && !(name.startsWith("runtime-") && lstatSync(source).isDirectory()))
+        copySafeTree(source, join(evidence, name));
     }
     for (const surprise of judged.surprises) surprises.push({ ...surprise,
       evidence_file: `work/shards/${shard.id}/${surprise.evidence_file.slice(5)}` });
