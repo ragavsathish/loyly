@@ -1,5 +1,5 @@
-// THROWAWAY PROTOTYPE on scope-impact/master. Pi durable owns the original
-// legacy harness cycle. Builder and grader are explicitly deterministic fixtures.
+// Pi durable candidate cycle over the unchanged legacy harness reference.
+// Fixture mode is explicit; live mode pins every model and VM instrument.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, cpSync, rmSync, chmodSync } from "node:fs";
@@ -18,6 +18,7 @@ import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer,
 import { runBlindAgent } from "./blind-agent-adapter.mjs";
 import { bindScoreInput, verifyScoredCycle } from "./score-receipt.mjs";
 import { MAX_CONTINUATIONS, continuationPrompt, selectedUncarried } from "./continuation.mjs";
+import { runDurablePanel, runDurablePanelReport } from "./panel-adapter.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
@@ -26,6 +27,8 @@ const attachedSchemaSha256 = createHash("sha256").update(readFileSync(schemaFile
 const ctx = BACKGROUND_CONTEXT;
 const Audit = defineEntry("loyly.proto.audit.v1");
 const scratch = resolve(process.argv[2] ?? join(HERE, "scratch"));
+const runId = process.env.LOYLY_RUN_ID ?? "prototype-cycle-1";
+if (!/^[A-Za-z0-9._-]+$/.test(runId)) throw new Error("LOYLY_RUN_ID contains unsafe characters");
 const storePath = join(scratch, "cycle.PROTOTYPE.sqlite");
 const room = join(scratch, "fenced-room");
 const gradingRoom = join(scratch, "grading-room");
@@ -85,6 +88,16 @@ if (blindAgent && [blindAgent.commandSha256, blindAgent.imageSha256,
   blindAgent.settingsSha256, blindAgent.instructionSha256]
   .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? "")))
   throw new Error("blind agent needs approved command, image, settings and instruction digests");
+const panel = live && process.env.LOYLY_PANEL_IMAGE ? {
+  image: resolve(process.env.LOYLY_PANEL_IMAGE),
+  planSha256: process.env.LOYLY_PANEL_PLAN_SHA256,
+  imageSha256: process.env.LOYLY_PANEL_IMAGE_SHA256,
+} : null;
+if (live && process.env.LOYLY_PANEL_REQUIRED === "1" && !panel)
+  throw new Error("production live cycle requires the approved grading panel");
+if (panel && [panel.planSha256, panel.imageSha256]
+  .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? "")))
+  throw new Error("grading panel needs approved plan and image manifest digests");
 mkdirSync(scratch, { recursive: true });
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -103,7 +116,7 @@ function command(name, program, args, options = {}) {
 }
 async function audit(tx, task, stage, outcome, extra = {}) {
   const data = {
-    schema: "loyly.proto.audit.v1", run_id: "prototype-cycle-1", stage, outcome,
+    schema: "loyly.proto.audit.v1", run_id: runId, stage, outcome,
     at: new Date().toISOString(), task_id: String(task.id), ...extra,
   };
   const entry = await tx.appendEntry(Audit, task.conversationId, { data });
@@ -179,7 +192,7 @@ const Builder = defineTask({
     materialize: async (task, runtime) => {
       if (live) {
         const attempt = task.input.attempt;
-        const sessionId = `prototype-cycle-1-attempt-${attempt}`;
+        const sessionId = `${runId}-attempt-${attempt}`;
         let instruction = join(scratch, "prompt.txt"), r, digest, reason;
         try {
           if (hash(readFileSync(instruction)) !== builder.instructionSha256
@@ -249,7 +262,7 @@ const Builder = defineTask({
       await runtime.commit(async (tx) => {
         if (!ids.length || continuation >= MAX_CONTINUATIONS) {
           await audit(tx, task, "builder-continuation", "stopped", {
-            attempt: task.input.attempt, session_id: `prototype-cycle-1-attempt-${task.input.attempt}`,
+            attempt: task.input.attempt, session_id: `${runId}-attempt-${task.input.attempt}`,
             continuations: continuation, remaining_uncarried: ids,
             reason: ids.length ? "limit" : "all-carried", fixture: builder.model.startsWith("test/") });
           return { status: "terminal", outcome: { status: "completed", result: {
@@ -266,7 +279,7 @@ const Builder = defineTask({
     continue: async (task, runtime) => {
       const { continuation, candidateDigest: before, ids } = task.state.checkpoint;
       const attempt = task.input.attempt;
-      const sessionId = `prototype-cycle-1-attempt-${attempt}`;
+      const sessionId = `${runId}-attempt-${attempt}`;
       const requestId = `${sessionId}-c${continuation}`;
       const instruction = join(scratch, `continuation-${attempt}-${continuation}.md`);
       const evidenceDir = join(scratch, `builder-${attempt}-evidence`);
@@ -365,7 +378,7 @@ const Grade = defineTask({
           const launches = await Promise.allSettled(shards.map((shard) => runBuilder({
             command: grader.command, room: shard.out, instruction,
             image: grader.image, evidenceDir: join(scratch, "grader-evidence", shard.id),
-            sessionId: `prototype-cycle-1-grade-${shard.id}`, model: grader.model,
+            sessionId: `${runId}-grade-${shard.id}`, model: grader.model,
             stateRoot: join(ROOT, ".pi/harness/.state"),
             piSettings: grader.settings, prompt: "Grade your selected checklist scope now, as the attached instruction says.",
             roomLabel: `the ${shard.id} grading room`,
@@ -421,6 +434,43 @@ const Grade = defineTask({
           verdicts_sha256: hash(readFileSync(join(scratch, "verdicts.json"))),
         });
         return { status: "terminal", outcome: { status: "completed", result: { count: verdicts.length } } };
+      }, ctx);
+    },
+  },
+  abort: (_task, runtime) => runtime.commit(() => ({ status: "terminal", outcome: { status: "aborted" } }), ctx),
+});
+
+const Panel = defineTask({
+  name: "loyly.proto.panel", version: 1,
+  initial: () => ({ phase: "run" }),
+  phases: {
+    run: async (task, runtime) => {
+      let result, reason;
+      try {
+        if (!panel) throw new Error("grading panel not configured");
+        result = await runDurablePanel({ scratch, image: panel.image,
+          approvedPlanSha256: panel.planSha256,
+          approvedImageSha256: panel.imageSha256 });
+        if (result.manifest.candidate_sha256 !== task.input.candidateSha256)
+          throw new Error("panel VM candidate differs from gated candidate");
+      } catch (error) {
+        reason = String(error.stack ?? error);
+        writeFileSync(join(scratch, "panel-error.log"), `${reason}\n`);
+      }
+      await runtime.commit(async (tx) => {
+        await audit(tx, task, "panel", result ? "completed" : "failed", {
+          candidate_sha256: task.input.candidateSha256,
+          plan_sha256: panel?.planSha256 ?? null,
+          image_sha256: panel?.imageSha256 ?? null,
+          manifest_sha256: result ? hash(readFileSync(join(result.out, "manifest.json"))) : null,
+          attempt: result?.attempt ?? null,
+          workers: result?.manifest.producers.map((row) => ({ id: row.id, status: row.status })) ?? [],
+          reconciled: result?.reconciled ?? false,
+          reason_code: reason ? "panel-vm-effect" : null,
+        });
+        return { status: "terminal", outcome: result
+          ? { status: "completed", result: { attempt: result.attempt } }
+          : { status: "failed", error: "panel" } };
       }, ctx);
     },
   },
@@ -631,7 +681,7 @@ const Cycle = defineTask({
             settings: blindAgent.settings, model: blindAgent.model,
             evidenceDir: join(scratch, "blind-agent-evidence"),
             stateRoot: join(ROOT, ".pi/harness/.state"),
-            sessionId: "prototype-cycle-1-blind-011",
+            sessionId: `${runId}-blind-011`,
             instructionSha256: blindAgent.instructionSha256,
             commandSha256: blindAgent.commandSha256,
             imageSha256: blindAgent.imageSha256,
@@ -695,9 +745,27 @@ const Cycle = defineTask({
           agent_reconciled: agentLaunch?.reconciled ?? false,
           final_verdicts_sha256: projected ? hash(readFileSync(join(scratch, "final-verdicts.json"))) : null,
           reason_code: reason ? "blind-agent-evidence" : null });
-        return projected ? { status: "running", checkpoint: { phase: "score",
+        return projected ? { status: "running", checkpoint: { phase: panel ? "panel" : "score",
           attempt: task.state.checkpoint.attempt } }
           : { status: "terminal", outcome: { status: "failed", error: "blind-review" } };
+      }, ctx);
+    },
+    panel: async (task, runtime) => runtime.commit(async (tx) => {
+      const id = await tx.createTask(Panel,
+        { candidateSha256: candidateDigest(room) },
+        { ownership: { kind: "task", taskId: task.id } });
+      return { status: "waiting", checkpoint: { phase: "after-panel", panel: id,
+        attempt: task.state.checkpoint.attempt }, on: [id], policy: "failFast" };
+    }, ctx),
+    "after-panel": async (task, runtime) => {
+      const [outcome] = await runtime.outcomes([task.state.checkpoint.panel], ctx);
+      await runtime.commit(async (tx) => {
+        if (outcome?.status !== "completed") {
+          await audit(tx, task, "cycle", "failed", { reason: "panel-vm-effect" });
+          return { status: "terminal", outcome: { status: "failed", error: "panel" } };
+        }
+        return { status: "running", checkpoint: { phase: "score",
+          attempt: task.state.checkpoint.attempt } };
       }, ctx);
     },
     score: async (task, runtime) => {
@@ -759,11 +827,47 @@ const Cycle = defineTask({
           fixture_grader: !live || grader?.model.startsWith("test/") });
         if (!reason) await audit(tx, task, "scoreboard", "reported", {
           cycle: "02", log_sha256: board.sha256 });
-        await audit(tx, task, "cycle", reason ? "failed" : live ? "measured" : "completed", {
-          reason: reason ? "score" : blindAgentReviewFailed ? "blind-agent-review-failed" : null });
-        return reason ? { status: "terminal", outcome: { status: "failed", error: "score" } }
-          : { status: "terminal", outcome: { status: "completed", result: {
-            passed: !live, scored: true, blindAgentReviewFailed, attempts: attempt, score } } };
+        if (reason) {
+          await audit(tx, task, "cycle", "failed", { reason: "score" });
+          return { status: "terminal", outcome: { status: "failed", error: "score" } };
+        }
+        if (panel) return { status: "running", checkpoint: { phase: "panel-report",
+          attempt, score, blindAgentReviewFailed } };
+        await audit(tx, task, "cycle", live ? "measured" : "completed", {
+          reason: blindAgentReviewFailed ? "blind-agent-review-failed" : null });
+        return { status: "terminal", outcome: { status: "completed", result: {
+          passed: !live, scored: true, blindAgentReviewFailed, attempts: attempt, score } } };
+      }, ctx);
+    },
+    "panel-report": async (task, runtime) => {
+      let report, reason;
+      try {
+        const selected = JSON.parse(readFileSync(join(scratch, "panel-vm", "selected.json"), "utf8"));
+        const specialists = join(scratch, "panel-vm", `attempt-${String(selected.attempt).padStart(2, "0")}`);
+        report = await runDurablePanelReport({ scratch, specialists });
+      } catch (error) {
+        reason = String(error.stack ?? error);
+        writeFileSync(join(scratch, "panel-report-error.log"), `${reason}\n`);
+      }
+      await runtime.commit(async (tx) => {
+        await audit(tx, task, "panel-report", report ? "completed" : "failed", {
+          manifest_sha256: report ? hash(readFileSync(join(report.out, "panel-manifest.json"))) : null,
+          plan_sha256: panel.planSha256,
+          score: task.state.checkpoint.score,
+          panel_outcome: report?.summary.panel_outcome ?? null,
+          reconciled: report?.reconciled ?? false,
+          reason_code: reason ? "panel-report-effect" : null });
+        if (!report) {
+          await audit(tx, task, "cycle", "failed", { reason: "panel-report-effect" });
+          return { status: "terminal", outcome: { status: "failed", error: "panel-report" } };
+        }
+        const { attempt, score, blindAgentReviewFailed } = task.state.checkpoint;
+        await audit(tx, task, "cycle", "measured", {
+          reason: blindAgentReviewFailed ? "blind-agent-review-failed" : null,
+          panel_outcome: report.summary.panel_outcome });
+        return { status: "terminal", outcome: { status: "completed", result: {
+          passed: false, scored: true, blindAgentReviewFailed, attempts: attempt, score,
+          panelOutcome: report.summary.panel_outcome } } };
       }, ctx);
     },
   },
@@ -771,14 +875,14 @@ const Cycle = defineTask({
 });
 
 const registry = createRegistry();
-registry.install(defineExtension({ name: "loyly-prototype", tasks: [Builder, Gate, Grade, Cycle] }));
+registry.install(defineExtension({ name: "loyly-prototype", tasks: [Builder, Gate, Grade, Panel, Cycle] }));
 const harness = await Harness.open(await openNodeSqliteStorage(storePath), { models: createModels(), registry }, ctx);
 try {
   const root = await harness.root(ctx);
   const existing = await harness.commit((tx) => tx.scanTasks({ kind: "loyly.proto.cycle" }, 10), ctx);
   let id = existing.items[0]?.id;
-  const cycleInput = { approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder,
-    grader, blindAgent, graderShardCount: live ? graderShardCount : null };
+  const cycleInput = { runId, approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder,
+    grader, blindAgent, panel, graderShardCount: live ? graderShardCount : null };
   if (id && JSON.stringify(existing.items[0].input) !== JSON.stringify(cycleInput))
     throw new Error("this Pi store belongs to a different approved cut, checklist or mode");
   if (!id) id = await harness.commit((tx) => tx.createTask(Cycle, cycleInput,

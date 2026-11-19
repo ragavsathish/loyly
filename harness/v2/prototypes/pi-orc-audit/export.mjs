@@ -1,4 +1,4 @@
-// THROWAWAY PROTOTYPE: rebuild an audit page from stored Pi entries, never a live watch.
+// Rebuild an audit page from stored Pi entries, never a live watch.
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
@@ -52,12 +52,12 @@ button[aria-selected=true]{background:#173129;color:white}header p{max-width:850
 `;
 const safe = JSON.stringify(runs).replaceAll("<", "\\u003c");
 const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pi durable cycle audit prototype</title><style>${styles}</style>
-<header><h1>Legacy cycle audit · throwaway prototype</h1><p>The original harness self-check, fence, checklist, gate, score and scoreboard run as recorded. Pi events come from committed entries. Individual grader and blind-review results are separately labelled Allure evidence projections, checked against those committed digests; they are not invented Pi events or ORC ticks.</p></header>
+<header><h1>Pi durable cycle audit</h1><p>The original harness self-check, fence, checklist, gate, score and scoreboard run as recorded. Pi events come from committed entries. Grader, blind-review and panel results are separately labelled Allure evidence projections, checked against those committed digests; they are not invented Pi events or ORC ticks.</p></header>
 <nav class="tabs" aria-label="Run examples"></nav><div class="controls"><button id="play">Play</button><button id="reset">Reset</button><input id="scrub" type="range" min="0" value="0"><span id="count"></span></div>
 <section class="story" aria-label="Legacy cycle stages"></section><section class="lane"><h2>Pi durable task and decision lane</h2><div class="stickies"></div></section><section class="lane"><h2>Bound Allure evidence</h2><p>Each item appears when its committed grade or blind-review event is reached.</p><div class="evidence"></div></section><h2>Selected evidence</h2><pre id="detail">Select an event or item.</pre><p class="meta" id="manifest"></p>
 <script type="application/json" id="runs">${safe}</script><script>
 const runs=JSON.parse(document.querySelector('#runs').textContent);let current=0,position=0,timer;
-const stages=['cut','self-check','fence','checklist','render','build','builder-continuation','gate','retry','repair','grading-room','grade','blind-review','score','scoreboard','cycle'];
+const stages=['cut','self-check','fence','checklist','render','build','builder-continuation','gate','retry','repair','grading-room','grade','blind-review','panel','score','scoreboard','panel-report','cycle'];
 const tabs=document.querySelector('.tabs'),story=document.querySelector('.story'),stickies=document.querySelector('.stickies'),evidence=document.querySelector('.evidence'),scrub=document.querySelector('#scrub');
 const esc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 function draw(){const run=runs[current],rows=run.rows;tabs.innerHTML=runs.map((r,i)=>'<button data-run="'+i+'" aria-selected="'+(i===current)+'">'+esc(r.name)+' · '+esc(r.provenance)+'</button>').join('');

@@ -12,13 +12,26 @@ function head(path) {
   if (result.status !== 0) throw new Error(`cannot read instrument cut at ${path}`);
   return result.stdout.trim();
 }
+function panelManifestHash(scratch) {
+  const selection = join(scratch, "panel-vm", "selected.json");
+  if (!existsSync(selection)) return null;
+  const selected = JSON.parse(readFileSync(selection, "utf8"));
+  if (!Number.isInteger(selected.attempt) || selected.attempt < 1 || selected.attempt > 2)
+    throw new Error("invalid panel VM selection");
+  const manifest = join(scratch, "panel-vm", `attempt-${String(selected.attempt).padStart(2, "0")}`, "manifest.json");
+  const digest = fileHash(manifest);
+  if (selected.manifest_sha256 !== digest) throw new Error("selected panel manifest changed");
+  return digest;
+}
 
 export function bindScoreInput({ scratch, sourceRoot, instrument, candidateSha256, verdictsFile }) {
   if (head(instrument) !== head(sourceRoot)) throw new Error("instrument clone is from another source cut");
   const checklistFile = join(scratch, "checklist.json");
+  const panelSha256 = panelManifestHash(scratch);
   const input = { schema: "loyly.score-input.v1", source_commit: head(sourceRoot),
     candidate_sha256: candidateSha256, checklist_sha256: fileHash(checklistFile),
-    verdicts_sha256: fileHash(verdictsFile) };
+    verdicts_sha256: fileHash(verdictsFile),
+    ...(panelSha256 ? { panel_manifest_sha256: panelSha256 } : {}) };
   const receipt = join(scratch, "score-input.json");
   const bytes = `${JSON.stringify(input)}\n`;
   if (existsSync(receipt) && readFileSync(receipt, "utf8") !== bytes)
@@ -35,7 +48,9 @@ export function verifyScoredCycle({ scratch, instrument, verdictsFile, cycle = "
   if (input.schema !== "loyly.score-input.v1" || head(instrument) !== input.source_commit
       || fileHash(checklistFile) !== input.checklist_sha256
       || fileHash(instrumentChecklist) !== input.checklist_sha256
-      || fileHash(verdictsFile) !== input.verdicts_sha256)
+      || fileHash(verdictsFile) !== input.verdicts_sha256
+      || (input.panel_manifest_sha256 !== undefined
+        && panelManifestHash(scratch) !== input.panel_manifest_sha256))
     throw new Error("scored cycle inputs differ from the bound cut, checklist or verdicts");
   const items = JSON.parse(readFileSync(checklistFile, "utf8")).items;
   const verdicts = JSON.parse(readFileSync(verdictsFile, "utf8"));

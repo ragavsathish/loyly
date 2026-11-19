@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { readAllureResults } from "./allure-results.mjs";
 import { readBlindAgentAllure } from "./blind-review.mjs";
 import { verifyGradingRoom } from "./grading-room.mjs";
+import { verifyPanelVmRun } from "./panel-vm-run.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 function summary(result, item, afterSeq, kind, sourceDigest, dir) {
@@ -53,6 +54,21 @@ export function projectReplayEvidence(dir, rows) {
     out: join(dir, "blind-agent-allure") });
   if (supplemental.reviewSha256 !== blind.review_sha256)
     throw new Error("blind Allure evidence differs from the committed review digest");
-  return [...raw, summary(supplemental.result, "01-011", blind.seq, "blind-review",
+  const projected = [...raw, summary(supplemental.result, "01-011", blind.seq, "blind-review",
     supplemental.reviewSha256, join(dir, "blind-agent-allure"))];
+  const panel = rows.findLast((row) => row.stage === "panel" && row.outcome === "completed");
+  if (!panel) return projected;
+  const selected = JSON.parse(readFileSync(join(dir, "panel-vm", "selected.json"), "utf8"));
+  const out = join(dir, "panel-vm", `attempt-${String(selected.attempt).padStart(2, "0")}`);
+  const verified = verifyPanelVmRun({ original: dir, out });
+  if (selected.manifest_sha256 !== panel.manifest_sha256
+      || hash(readFileSync(join(out, "manifest.json"))) !== panel.manifest_sha256)
+    throw new Error("panel Allure evidence differs from committed Pi audit");
+  for (const worker of verified.manifest.producers) {
+    const evidenceDir = join(out, worker.id);
+    const result = JSON.parse(readFileSync(join(evidenceDir, worker.result), "utf8"));
+    projected.push(summary(result, worker.item.slice(6), panel.seq, "panel-specialist",
+      panel.manifest_sha256, evidenceDir));
+  }
+  return projected;
 }

@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -49,4 +50,36 @@ test("an existing legacy score is reconciled only against its original cut and v
   } finally {
     rmSync(scratch, { recursive: true, force: true });
   }
+});
+
+test("a filed score binds the selected pre-score panel manifest", () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-panel-score-receipt-"));
+  const instrument = join(scratch, "instrument");
+  try {
+    run("git", ["clone", "-q", `file://${root}`, instrument], root);
+    const cycle = join(instrument, "harness", "cycles", "02");
+    mkdirSync(cycle, { recursive: true });
+    const checklistFile = join(scratch, "checklist.json");
+    run("bb", ["harness/gen_checklist.clj", "--out", checklistFile], instrument);
+    cpSync(checklistFile, join(cycle, "checklist.json"));
+    const verdictsFile = join(scratch, "verdicts.json");
+    const verdicts = JSON.parse(readFileSync(checklistFile)).items.map((item) => ({
+      id: item.id, verdict: "pass", evidence: `observed ${item.id}` }));
+    writeFileSync(verdictsFile, JSON.stringify(verdicts));
+    const attempt = join(scratch, "panel-vm", "attempt-01");
+    mkdirSync(attempt, { recursive: true });
+    const manifest = join(attempt, "manifest.json");
+    writeFileSync(manifest, '{"candidate":"frozen"}');
+    const digest = createHash("sha256").update(readFileSync(manifest)).digest("hex");
+    writeFileSync(join(scratch, "panel-vm", "selected.json"),
+      JSON.stringify({ attempt: 1, manifest_sha256: digest }));
+    const bound = bindScoreInput({ scratch, sourceRoot: root, instrument,
+      candidateSha256: "a".repeat(64), verdictsFile });
+    assert.equal(bound.panel_manifest_sha256, digest);
+    run("bb", ["harness/score.clj", "02", "--verdicts", verdictsFile], instrument);
+    assert.equal(verifyScoredCycle({ scratch, instrument, verdictsFile }).score, "11/11");
+    writeFileSync(manifest, '{"candidate":"changed"}');
+    assert.throws(() => verifyScoredCycle({ scratch, instrument, verdictsFile }),
+      /selected panel manifest changed/);
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
 });

@@ -1,4 +1,16 @@
-# THROWAWAY: Pi durable over the original Löyly harness
+# Pi durable harness candidate for the original Löyly cycle
+
+`run-live.mjs` is the pinned live entrypoint for booking core. It checks a
+`live-run.schema.json` contract, the source and controller commits, the exact
+checklist, instructions, settings and VM image assets before starting. The
+cycle now runs the approved panel in three Gondolin VMs **before** filing the
+legacy score, binds the panel manifest into the score input, then renders one
+Allure report from five ordinary result directories. A controller restart
+reuses a complete panel receipt or preserves a partial attempt and makes one
+fresh isolated attempt. See [PRODUCTION-CANDIDATE.md](PRODUCTION-CANDIDATE.md).
+
+This branch is a production candidate. The last published panel report is
+historical grading-only evidence; it does not prove this integrated cycle.
 
 For the latest candidate-bound, multi-tool Gondolin grading panel and its
 direct-directory Allure report, see [GRADING-PANEL.md](GRADING-PANEL.md).

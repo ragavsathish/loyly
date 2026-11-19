@@ -17,6 +17,19 @@ const WORKERS = [
   { id: 'telemetry', script: 'panel-telemetry.mjs', tool: 'OpenTelemetry', item: '01-003' },
 ];
 const label = (result, name) => result.labels?.find((entry) => entry.name === name)?.value;
+function runBinding(original) {
+  const input = join(original, 'score-input.json');
+  if (existsSync(input)) return JSON.parse(readFileSync(input, 'utf8'));
+  const cut = join(original, 'cut', 'project');
+  const git = spawnSync('git', ['-C', cut, 'rev-parse', 'HEAD'], { encoding: 'utf8' });
+  if (git.status !== 0 || !/^[0-9a-f]{40}$/.test(git.stdout.trim()))
+    throw new Error('panel needs a pinned source cut');
+  return { source_commit: git.stdout.trim(), candidate_sha256: candidateDigest(join(original, 'fenced-room')) };
+}
+function scoreDigest(original) {
+  const score = join(original, 'instrument', 'harness', 'cycles', '02', 'scores.json');
+  return existsSync(score) ? fileSha(score) : null;
+}
 
 async function runWorker(worker, image, candidate, out, candidateSha256, sourceFilesSha256,
   imageDigest, validate) {
@@ -80,12 +93,11 @@ async function runWorker(worker, image, candidate, out, candidateSha256, sourceF
 export async function runPanelVms({ original, image, out }) {
   original = resolve(original); image = resolve(image); out = resolve(out);
   if (existsSync(out)) throw new Error('panel VM output already exists');
-  const scoreInput = JSON.parse(readFileSync(join(original, 'score-input.json'), 'utf8'));
+  const scoreInput = runBinding(original);
   const candidateSha256 = candidateDigest(join(original, 'fenced-room'));
   if (candidateSha256 !== scoreInput.candidate_sha256)
     throw new Error('candidate differs from the scored cut');
-  const scoreFile = join(original, 'instrument', 'harness', 'cycles', '02', 'scores.json');
-  const scoreSha256 = fileSha(scoreFile);
+  const scoreSha256 = scoreDigest(original);
   const candidate = join(original, 'fenced-room', 'impl');
   const sourceHash = createHash('sha256');
   for (const name of ['server.mjs', 'web.mjs', 'model.mjs', 'style.css', 'contract.json']) {
@@ -113,12 +125,76 @@ export async function runPanelVms({ original, image, out }) {
   const overlap = Math.min(...producers.map((row) => row.stopped))
     - Math.max(...producers.map((row) => row.started));
   if (overlap <= 0) throw new Error('panel VMs did not overlap');
-  if (fileSha(scoreFile) !== scoreSha256) throw new Error('original score changed during VM grading');
+  if (scoreDigest(original) !== scoreSha256) throw new Error('score changed during VM grading');
   const manifest = { schema: 'loyly.panel-vm-run.v1', source_commit: scoreInput.source_commit,
     candidate_sha256: candidateSha256, original_score_sha256: scoreSha256,
     allure_schema_sha256: fileSha(schemaFile), plan_sha256: fileSha(planFile), image_digest: imageDigest,
-    parallel_overlap_ms: overlap, original_score_unchanged: true, producers };
+    parallel_overlap_ms: overlap, original_score_unchanged: true,
+    score_state: scoreSha256 ? 'filed' : 'pre-score', producers };
   writeFileSync(join(out, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+  return verifyPanelVmRun({ original, out, imageDigest });
+}
+
+// Reopen a completed panel after a controller restart without launching VMs
+// again. A partial output is not a receipt and must be kept as failed evidence.
+export function verifyPanelVmRun({ original, out, imageDigest }) {
+  original = resolve(original); out = resolve(out);
+  const manifest = JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8'));
+  const scoreInput = runBinding(original);
+  const candidateSha256 = candidateDigest(join(original, 'fenced-room'));
+  const scoreSha256 = scoreDigest(original);
+  const planSha256 = fileSha(join(HERE, 'booking-core.panel.json'));
+  const schemaFile = join(HERE, 'allure-lifecycle-result.schema.json');
+  const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, 'utf8')));
+  if (manifest.schema !== 'loyly.panel-vm-run.v1'
+      || manifest.source_commit !== scoreInput.source_commit
+      || manifest.candidate_sha256 !== candidateSha256
+      || ((manifest.score_state ?? 'filed') === 'filed' && manifest.original_score_sha256 !== scoreSha256)
+      || (manifest.score_state === 'pre-score' && manifest.original_score_sha256 !== null)
+      || manifest.plan_sha256 !== planSha256
+      || manifest.allure_schema_sha256 !== fileSha(schemaFile)
+      || manifest.original_score_unchanged !== true
+      || (imageDigest && manifest.image_digest !== imageDigest)
+      || manifest.producers?.length !== WORKERS.length)
+    throw new Error('panel VM manifest differs from the scored cut, plan, schema or image');
+  for (const worker of WORKERS) {
+    const producer = manifest.producers.find((row) => row.id === worker.id);
+    if (!producer || producer.tool !== worker.tool || producer.item !== `@item-${worker.item}`
+        || producer.image_digest !== manifest.image_digest
+        || !Number.isInteger(producer.started) || !Number.isInteger(producer.stopped)
+        || producer.stopped < producer.started)
+      throw new Error(`${worker.id}: panel producer receipt differs`);
+    const dir = join(out, worker.id);
+    const results = readdirSync(dir).filter((name) => /^[0-9a-f-]{36}-result\.json$/.test(name));
+    if (results.length !== 1 || results[0] !== producer.result)
+      throw new Error(`${worker.id}: expected one result`);
+    const result = JSON.parse(readFileSync(join(dir, producer.result), 'utf8'));
+    const receiptFile = result.attachments?.find((attachment) =>
+      attachment.name === 'Gondolin VM execution receipt')?.source;
+    const files = [producer.result, ...(result.attachments ?? []).map((attachment) => attachment.source)];
+    if (!validate(result) || result.uuid + '-result.json' !== producer.result
+        || result.status !== producer.status || result.stage !== 'finished'
+        || label(result, 'tool') !== worker.tool || label(result, 'tag') !== producer.item
+        || result.parameters?.find((entry) => entry.name === 'candidate_sha256')?.value !== candidateSha256
+        || !receiptFile || new Set(files).size !== files.length
+        || files.length !== Object.keys(producer.files).length
+        || files.some((name) => !existsSync(join(dir, name))
+          || producer.files[name] !== fileSha(join(dir, name)))
+        || producer.execution_receipt_sha256 !== fileSha(join(dir, receiptFile)))
+      throw new Error(`${worker.id}: Allure result or attachment changed`);
+    const receipt = JSON.parse(readFileSync(join(dir, receiptFile), 'utf8'));
+    if (receipt.worker !== worker.id || receipt.candidate_sha256 !== candidateSha256
+        || receipt.imageDigest !== manifest.image_digest
+        || receipt.isolation !== 'gondolin-qemu-vm'
+        || receipt.mounts?.candidate !== 'read-only'
+        || receipt.mounts?.worker !== 'read-only'
+        || (receipt.vm_exit_code === 0) !== (result.status === 'passed'))
+      throw new Error(`${worker.id}: Gondolin execution receipt changed`);
+  }
+  const overlap = Math.min(...manifest.producers.map((row) => row.stopped))
+    - Math.max(...manifest.producers.map((row) => row.started));
+  if (overlap <= 0 || overlap !== manifest.parallel_overlap_ms)
+    throw new Error('panel VM overlap receipt changed');
   return { out, manifest };
 }
 

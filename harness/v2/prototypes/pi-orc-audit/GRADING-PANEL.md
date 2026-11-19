@@ -1,5 +1,10 @@
 # Booking-core grading panel
 
+The production-candidate cycle now runs this panel as a durable task before
+scoring and compiles the five Allure directories after scoring. The historical
+last-run demonstration below remains separate from that new cycle; see
+[PRODUCTION-CANDIDATE.md](PRODUCTION-CANDIDATE.md).
+
 The panel is a project-specific evaluation plan, not another agent that talks
 about a build. The original independent Pi grader remains the scored black-box
 judge for the stamped Gherkin items. A fresh blind subagent judges item 01-011

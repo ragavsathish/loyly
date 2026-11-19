@@ -32,7 +32,10 @@ function specialistResults({ specialists, plan, planSha256, manifest, candidateS
       || manifest.source_commit !== sourceCommit
       || manifest.candidate_sha256 !== candidateSha256
       || manifest.allure_schema_sha256 !== schemaSha256
-      || manifest.original_score_sha256 !== scoreSha256
+      || (manifest.schema === "loyly.supplemental-grade.v1" && manifest.original_score_sha256 !== scoreSha256)
+      || (manifest.schema === "loyly.panel-vm-run.v1"
+        && !((manifest.score_state === "pre-score" && manifest.original_score_sha256 === null)
+          || ((manifest.score_state ?? "filed") === "filed" && manifest.original_score_sha256 === scoreSha256)))
       || (manifest.schema === "loyly.supplemental-grade.v1" && manifest.original_score_unchanged !== true)
       || (manifest.schema === "loyly.panel-vm-run.v1" && manifest.plan_sha256 !== planSha256)
       || manifest.producers.length !== specs.length)
@@ -121,16 +124,15 @@ export async function compilePanel({ original, specialists, out,
   if (JSON.stringify(finalVerdictsFromBlindReview(blindArgs).verdicts)
       !== readFileSync(join(original, "final-verdicts.json"), "utf8"))
     throw new Error("blind result differs from scored verdicts");
-  const originalManifest = json(join(original, "allure-report", "loyly-report-manifest.json"));
   const rows = await readAuditRows(original);
-  if (originalManifest.source_commit !== scoreInput.source_commit
-      || originalManifest.candidate_sha256 !== candidateSha256
-      || originalManifest.score_sha256 !== scored.scoreSha256
-      || originalManifest.score !== scored.score
-      || originalManifest.raw_allure_sha256 !== raw.allureSha256
-      || originalManifest.blind_review_sha256 !== blind.reviewSha256
-      || originalManifest.audit_entries_sha256 !== sha(rows.map((row) => JSON.stringify(row)).join("\n")))
-    throw new Error("original Allure manifest differs from the scored Pi audit");
+  const stage = (name, outcome) => rows.findLast((row) => row.stage === name && row.outcome === outcome);
+  if (stage("cut", "pinned")?.approved_commit !== scoreInput.source_commit
+      || stage("grade", "completed")?.allure_results_sha256 !== raw.allureSha256
+      || stage("blind-review", "completed")?.raw_allure_sha256 !== raw.allureSha256
+      || stage("blind-review", "completed")?.review_sha256 !== blind.reviewSha256
+      || stage("score", "filed")?.score_file_sha256 !== scored.scoreSha256
+      || stage("score", "filed")?.score_input_sha256 !== fileSha(join(original, "score-input.json")))
+    throw new Error("scored evidence differs from committed Pi audit entries");
   const schemaFile = join(HERE, "allure-lifecycle-result.schema.json");
   const schemaSha256 = fileSha(schemaFile);
   if (fileSha(join(room, "allure-lifecycle-result.schema.json")) !== schemaSha256)
@@ -191,11 +193,30 @@ export async function compilePanel({ original, specialists, out,
   const manifest = { schema: "loyly.grading-panel-report.v1",
     panel_summary_sha256: fileSha(join(out, "panel-summary.json")),
     report_html_sha256: fileSha(join(report, "index.html")),
-    original_report_manifest_sha256: fileSha(join(original, "allure-report", "loyly-report-manifest.json")),
+    audit_entries_sha256: sha(rows.map((row) => JSON.stringify(row)).join("\n")),
     specialist_manifest_sha256: fileSha(specialistManifestFile),
     result_count: observations.length, original_score_unchanged: true };
   writeFileSync(join(out, "panel-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
   return { out, summary, manifest, stats };
+}
+
+export function verifyCompiledPanel({ original, out }) {
+  original = resolve(original); out = resolve(out);
+  const summary = json(join(out, "panel-summary.json"));
+  checked(schemaValidator(join(HERE, "panel-summary.schema.json")), summary, "panel summary");
+  const manifest = json(join(out, "panel-manifest.json"));
+  const score = verifyScoredCycle({ scratch: original, instrument: join(original, "instrument"),
+    verdictsFile: join(original, "final-verdicts.json") });
+  if (manifest.schema !== "loyly.grading-panel-report.v1"
+      || manifest.panel_summary_sha256 !== fileSha(join(out, "panel-summary.json"))
+      || manifest.report_html_sha256 !== fileSha(join(out, "allure-report", "index.html"))
+      || manifest.result_count !== summary.checks.length
+      || manifest.original_score_unchanged !== true
+      || summary.original_score_sha256 !== score.scoreSha256
+      || summary.candidate_sha256 !== candidateDigest(join(original, "fenced-room"))
+      || summary.plan_sha256 !== fileSha(join(HERE, "booking-core.panel.json")))
+    throw new Error("compiled panel report changed after filing");
+  return { out, summary, manifest, stats: json(join(out, "allure-report", "summary.json")).stats };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
