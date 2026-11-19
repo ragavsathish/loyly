@@ -7,7 +7,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readAuditRows } from "./audit-rows.mjs";
 import { readAllureResults } from "./allure-results.mjs";
-import { finalVerdictsFromBlindReview } from "./blind-review.mjs";
+import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
 import { candidateDigest } from "./grading-room.mjs";
 import { verifyScoredCycle } from "./score-receipt.mjs";
 
@@ -35,6 +35,10 @@ export async function renderScoredAllure(scratch) {
   const raw = readAllureResults(gradingRoom);
   if (raw.allureSha256 !== projected.rawAllureSha256)
     throw new Error("raw grader Allure changed after blind review");
+  const supplemental = readBlindAgentAllure({ packetDir: join(scratch, "blind-agent-packet"),
+    reviewFile, gradingRoom,
+    verificationDir: review.verdict === "pass" ? join(scratch, "blind-agent-verification") : undefined,
+    out: join(scratch, "blind-agent-allure") });
   const rows = await readAuditRows(scratch);
   const stage = (name, outcome) => rows.findLast((row) => row.stage === name && row.outcome === outcome);
   const cut = stage("cut", "pinned"), grade = stage("grade", "completed");
@@ -58,12 +62,11 @@ export async function renderScoredAllure(scratch) {
   if (rendered.error || rendered.status !== 0)
     throw new Error(`Allure render failed: ${rendered.error ?? rendered.stderr}`);
   const summary = JSON.parse(readFileSync(join(out, "summary.json"), "utf8"));
-  const expected = { total: score.items.length + 1,
-    passed: raw.pass + (review.verdict === "pass" ? 1 : 0),
-    skipped: 1,
-    failed: score.items.filter((item) => item.verdict === "fail").length };
-  for (const [key, value] of Object.entries(expected)) {
-    if ((summary.stats[key] ?? 0) !== value)
+  const expected = { total: score.items.length + 1 };
+  for (const result of [...raw.results, supplemental.result])
+    expected[result.status] = (expected[result.status] ?? 0) + 1;
+  for (const key of new Set([...Object.keys(expected), ...Object.keys(summary.stats)])) {
+    if ((summary.stats[key] ?? 0) !== (expected[key] ?? 0))
       throw new Error(`Allure report ${key} count differs from scored evidence`);
   }
   const report = join(out, "index.html");
