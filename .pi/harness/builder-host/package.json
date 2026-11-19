@@ -4,7 +4,8 @@
   "type": "module",
   "engines": { "node": ">=24" },
   "scripts": {
-    "check": "tsc -p tsconfig.json"
+    "check": "tsc -p tsconfig.json",
+    "test": "node --test fork.test.ts timeout.test.mjs"
   },
   "dependencies": {
     "@earendil-works/chord": "1.5.1",

@@ -16,6 +16,8 @@ launch="$BUILDER_EVIDENCE_DIR/launch-$n/launch.txt"
   echo "builder_image=$3"
   echo "instruction_sha256=$(shasum -a 256 "$instruction" | cut -d' ' -f1)"
   echo "model=$LOYLY_PI_MODEL"
+  echo "store=${LOYLY_BUILDER_STORE:-}"
+  echo "parent_conversation_receipt=${LOYLY_PI_PARENT_RECEIPT:-}"
   echo "wrapper_pid=$$"
 } > "$launch"
 if [ "$rid" != "$LOYLY_BUILDER_SESSION_ID" ] && [ -n "${LOYLY_TEST_CONTINUATION_DELAY_SECONDS:-}" ]; then

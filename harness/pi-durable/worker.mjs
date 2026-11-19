@@ -33,6 +33,28 @@ const storePath = join(scratch, "cycle.PROTOTYPE.sqlite");
 const room = join(scratch, "fenced-room");
 const gradingRoom = join(scratch, "grading-room");
 const instrument = join(scratch, "instrument");
+const builderStore = join(scratch, "builder-lineage", "session.sqlite");
+const builderReceipt = (attempt) => join(scratch, `builder-${attempt}-evidence`, "session.json");
+function builderLineage(attempt) {
+  const path = builderReceipt(attempt);
+  if (!existsSync(path)) return {};
+  try {
+    const raw = readFileSync(path);
+    const receipt = JSON.parse(raw.toString("utf8"));
+    return { conversation_id: receipt.conversationId,
+      parent_conversation_id: receipt.parentConversationId,
+      fork_entry_id: receipt.forkEntryId,
+      session_receipt_sha256: hash(raw) };
+  } catch { return {}; }
+}
+function canForkBuilderAttempt(attempt) {
+  const path = builderReceipt(attempt);
+  if (!existsSync(path)) return false;
+  const receipt = JSON.parse(readFileSync(path, "utf8"));
+  return receipt.store === builderStore && Number.isSafeInteger(receipt.conversationId)
+    && receipt.conversationId > 0 && Number.isSafeInteger(receipt.lastEntryId)
+    && receipt.lastEntryId > 0;
+}
 const approvedCommit = process.env.LOYLY_APPROVED_COMMIT;
 if (approvedCommit && !/^[0-9a-f]{40}$/.test(approvedCommit))
   throw new Error("LOYLY_APPROVED_COMMIT must be a full 40-character commit ID");
@@ -151,8 +173,9 @@ function clearBuilderTestArtifacts() {
   for (const name of ["node_modules", ".tmp"])
     rmSync(join(room, "impl", name), { recursive: true, force: true });
 }
-function verifyBuilderScope() {
-  if (!existsSync(join(room, "impl", "start.sh")) || !existsSync(join(room, "impl", "test.sh")))
+function verifyBuilderScope(requireEntrypoints = true) {
+  if (requireEntrypoints && (!existsSync(join(room, "impl", "start.sh"))
+      || !existsSync(join(room, "impl", "test.sh"))))
     throw new Error("builder did not leave both legacy app entrypoints");
   const result = spawnSync("git", ["status", "--porcelain=v1", "-z", "--untracked-files=all"],
     { cwd: room, encoding: "buffer" });
@@ -190,7 +213,8 @@ const Builder = defineTask({
       await audit(tx, task, task.input.attempt === 1 ? "build" : "repair", "started", {
         attempt: task.input.attempt, session_id: `builder-${task.input.attempt}`,
         fixture: !live || builder?.model.startsWith("test/"), model: builder?.model ?? null,
-        previous_gate_log_sha256: task.input.previousGateSha256 ?? null,
+        previous_failure_kind: task.input.previousFailureKind ?? null,
+        previous_failure_log_sha256: task.input.previousFailureSha256 ?? null,
       });
       return live ? { status: "running", checkpoint: { phase: "materialize" } }
         : { status: "sleeping", until: Date.now() + 1200, checkpoint: { phase: "materialize" } };
@@ -199,25 +223,37 @@ const Builder = defineTask({
       if (live) {
         const attempt = task.input.attempt;
         const sessionId = `${runId}-attempt-${attempt}`;
-        let instruction = join(scratch, "prompt.txt"), r, digest, reason;
+        let instruction = join(scratch, "prompt.txt"), r, digest, reason, retryable = false;
         try {
           if (hash(readFileSync(instruction)) !== builder.instructionSha256
               || hash(readFileSync(builder.command)) !== builder.commandSha256
               || hash(readFileSync(join(builder.image, "manifest.json"))) !== builder.imageSha256)
             throw new Error("builder inputs changed after render");
           if (attempt > 1) {
-            const log = task.input.previousGateLog;
+            const log = task.input.previousFailureLog;
             if (!log?.startsWith(`${scratch}/`) || !existsSync(log)
-                || hash(readFileSync(log)) !== task.input.previousGateSha256)
-              throw new Error("repair gate evidence differs from committed receipt");
+                || hash(readFileSync(log)) !== task.input.previousFailureSha256
+                || !["gate", "builder"].includes(task.input.previousFailureKind))
+              throw new Error("repair evidence differs from committed receipt");
             instruction = join(scratch, `repair-${attempt}.md`);
-            writeFileSync(instruction, `${readFileSync(join(scratch, "prompt.txt"), "utf8")}\n\n# Previous gate failure\n\n${readFileSync(log, "utf8")}\n`);
+            writeFileSync(instruction, `${readFileSync(join(scratch, "prompt.txt"), "utf8")}\n\n# Previous ${task.input.previousFailureKind} failure\n\nContinue the existing impl/ from the prior attempt. Repair the failure below, then run the suite and HTTP probe.\n\n${readFileSync(log, "utf8")}\n`);
           }
           r = await runBuilder({ command: builder.command, room, instruction,
             image: builder.image, evidenceDir: join(scratch, `builder-${attempt}-evidence`),
-            sessionId, model: builder.model, stateRoot: join(ROOT, ".pi/harness/.state") });
-          if (r.exit !== 0) throw new Error(`builder host exited ${r.exit}`);
-          verifyBuilderScope();
+            sessionId, model: builder.model, stateRoot: join(ROOT, ".pi/harness/.state"),
+            storePath: builderStore,
+            parentConversationReceipt: attempt > 1 ? builderReceipt(attempt - 1) : undefined });
+          if (r.exit !== 0) {
+            verifyBuilderScope(false);
+            retryable = canForkBuilderAttempt(attempt);
+            throw new Error(`builder host exited ${r.exit}`);
+          }
+          verifyBuilderScope(false);
+          if (!existsSync(join(room, "impl", "start.sh"))
+              || !existsSync(join(room, "impl", "test.sh"))) {
+            retryable = canForkBuilderAttempt(attempt);
+            throw new Error("builder did not leave both legacy app entrypoints");
+          }
           clearBuilderTestArtifacts();
           digest = candidateDigest();
         } catch (error) {
@@ -229,12 +265,17 @@ const Builder = defineTask({
             attempt, session_id: sessionId, candidate_digest: digest ?? null,
             instruction_sha256: existsSync(instruction) ? hash(readFileSync(instruction)) : null,
             reconciled: r?.reconciled ?? false, reason_code: reason ? "builder-effect-or-scope" : null,
+            failure_log: reason ? join(scratch, `builder-${attempt}-error.log`) : null,
+            failure_log_sha256: reason ? hash(readFileSync(join(scratch, `builder-${attempt}-error.log`))) : null,
+            retryable, ...builderLineage(attempt),
             fixture: builder.model.startsWith("test/"),
           });
           return digest
             ? { status: "running", checkpoint: { phase: "maybe-continue", continuation: 0,
               candidateDigest: digest } }
-            : { status: "terminal", outcome: { status: "failed", error: "build" } };
+            : { status: "terminal", outcome: { status: "failed", error: "build", result: {
+              retryable, failureLog: join(scratch, `builder-${attempt}-error.log`),
+              failureSha256: hash(readFileSync(join(scratch, `builder-${attempt}-error.log`))) } } };
         }, ctx);
         return;
       }
@@ -290,7 +331,7 @@ const Builder = defineTask({
       const requestId = `${sessionId}-c${continuation}`;
       const instruction = join(scratch, `continuation-${attempt}-${continuation}.md`);
       const evidenceDir = join(scratch, `builder-${attempt}-evidence`);
-      let r, digest, reason;
+      let r, digest, reason, retryable = false;
       try {
         verifyBuilderScope();
         if (!hasBuilderLaunch(evidenceDir, sessionId, requestId)
@@ -307,9 +348,19 @@ const Builder = defineTask({
         r = await runBuilder({ command: builder.command, room, instruction,
           image: builder.image, evidenceDir,
           sessionId, requestId, model: builder.model, stateRoot: join(ROOT, ".pi/harness/.state"),
-          prompt: "Continue this same builder session now." });
-        if (r.exit !== 0) throw new Error(`builder continuation exited ${r.exit}`);
-        verifyBuilderScope();
+          prompt: "Continue this same builder session now.", storePath: builderStore,
+          parentConversationReceipt: attempt > 1 ? builderReceipt(attempt - 1) : undefined });
+        if (r.exit !== 0) {
+          verifyBuilderScope(false);
+          retryable = canForkBuilderAttempt(attempt);
+          throw new Error(`builder continuation exited ${r.exit}`);
+        }
+        verifyBuilderScope(false);
+        if (!existsSync(join(room, "impl", "start.sh"))
+            || !existsSync(join(room, "impl", "test.sh"))) {
+          retryable = canForkBuilderAttempt(attempt);
+          throw new Error("builder continuation removed a legacy app entrypoint");
+        }
         clearBuilderTestArtifacts();
         digest = candidateDigest();
       } catch (error) {
@@ -324,8 +375,13 @@ const Builder = defineTask({
           reconciled: r?.reconciled ?? false, changed: digest ? digest !== before : null,
           remaining_uncarried: digest ? selectedUncarried(room, join(scratch, "checklist.json")) : null,
           reason_code: reason ? "builder-continuation-effect-or-scope" : null,
+          failure_log: reason ? join(scratch, `continuation-${attempt}-${continuation}-error.log`) : null,
+          failure_log_sha256: reason ? hash(readFileSync(join(scratch, `continuation-${attempt}-${continuation}-error.log`))) : null,
+          retryable, ...builderLineage(attempt),
           fixture: builder.model.startsWith("test/") });
-        if (!digest) return { status: "terminal", outcome: { status: "failed", error: "continuation" } };
+        if (!digest) return { status: "terminal", outcome: { status: "failed", error: "continuation", result: {
+          retryable, failureLog: join(scratch, `continuation-${attempt}-${continuation}-error.log`),
+          failureSha256: hash(readFileSync(join(scratch, `continuation-${attempt}-${continuation}-error.log`))) } } };
         if (digest === before) return { status: "terminal", outcome: { status: "completed", result: {
           candidateDigest: digest, continuations: continuation,
           remainingUncarried: selectedUncarried(room, join(scratch, "checklist.json")) } } };
@@ -564,8 +620,9 @@ const Cycle = defineTask({
       }, ctx);
     },
     build: async (task, runtime) => runtime.commit(async (tx) => {
-      const { attempt, previousGateLog, previousGateSha256 } = task.state.checkpoint;
-      const id = await tx.createTask(Builder, { attempt, previousGateLog, previousGateSha256 },
+      const { attempt, previousFailureLog, previousFailureSha256, previousFailureKind } = task.state.checkpoint;
+      const id = await tx.createTask(Builder,
+        { attempt, previousFailureLog, previousFailureSha256, previousFailureKind },
         { ownership: { kind: "task", taskId: task.id } });
       return { status: "waiting", checkpoint: { phase: "after-build", attempt, builder: id }, on: [id], policy: "failFast" };
     }, ctx),
@@ -574,6 +631,20 @@ const Cycle = defineTask({
       const [outcome] = await runtime.outcomes([builder], ctx);
       await runtime.commit(async (tx) => {
         if (outcome?.status !== "completed") {
+          if (outcome?.result?.retryable && attempt < 3) {
+            await audit(tx, task, "retry", "scheduled", { attempt: attempt + 1,
+              previous_builder_log: outcome.result.failureLog,
+              previous_builder_log_sha256: outcome.result.failureSha256,
+              fork_from: builderReceipt(attempt) });
+            return { status: "running", checkpoint: { phase: "build", attempt: attempt + 1,
+              previousFailureLog: outcome.result.failureLog,
+              previousFailureSha256: outcome.result.failureSha256,
+              previousFailureKind: "builder" } };
+          }
+          if (outcome?.result?.retryable && attempt === 3) {
+            await audit(tx, task, "cycle", "failed", { reason: "builder-attempts-exhausted", attempt });
+            return { status: "terminal", outcome: { status: "completed", result: { passed: false, attempts: attempt } } };
+          }
           await audit(tx, task, "cycle", "failed", { reason: "builder-attempt-failed", attempt });
           return { status: "terminal", outcome: { status: "failed", error: "build" } };
         }
@@ -601,7 +672,8 @@ const Cycle = defineTask({
         if (attempt < 3) {
           await audit(tx, task, "retry", "scheduled", { attempt: attempt + 1, previous_gate_log: result.log });
           return { status: "running", checkpoint: { phase: "build", attempt: attempt + 1,
-            previousGateLog: result.log, previousGateSha256: result.logSha256 } };
+            previousFailureLog: result.log, previousFailureSha256: result.logSha256,
+            previousFailureKind: "gate" } };
         }
         await audit(tx, task, "cycle", "failed", { reason: "gate-attempts-exhausted", attempt });
         return { status: "terminal", outcome: { status: "completed", result: { passed: false, attempts: attempt } } };

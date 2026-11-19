@@ -30,7 +30,7 @@ test("uncarried selection names only approved item lines", () => {
   } finally { rmSync(scratch, { recursive: true, force: true }); }
 });
 
-function fixtureEnv(scratch, mode = "carry") {
+function fixtureEnv(scratch, mode = "carry", builderCommand) {
     const checklist = join(scratch, "approved-checklist.json");
     const generated = spawnSync("bb", ["harness/gen_checklist.clj", "--out", checklist],
       { cwd: root, encoding: "utf8" });
@@ -38,7 +38,7 @@ function fixtureEnv(scratch, mode = "carry") {
     const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
     assert.equal(head.status, 0, head.stderr);
     const image = join(root, ".pi/harness/.state/assets/builder-clojure");
-    const command = join(here, "test/stub-continuation-builder.sh");
+    const command = builderCommand ?? join(here, "test/stub-continuation-builder.sh");
     return { ...process.env,
       LOYLY_APPROVED_COMMIT: head.stdout.trim(), LOYLY_APPROVED_CHECKLIST_SHA256: sha(checklist),
       LOYLY_BUILDER_COMMAND: command, LOYLY_BUILDER_IMAGE: image,
@@ -114,6 +114,69 @@ test("continuation stops at three turns with remaining IDs recorded", async () =
   assert.equal(stop.reason, "limit");
   assert.deepEqual(stop.remaining_uncarried, ["01-001", "01-002"]);
   assert.ok(rows.find((row) => row.stage === "gate" && row.outcome === "passed").seq > stop.seq);
+});
+
+test("failed builder turn forks its partial candidate and retries before grading", async () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-builder-fork-"));
+  try {
+    const command = join(here, "test/stub-fork-builder.sh");
+    const env = fixtureEnv(scratch, "carry", command);
+    await finish(startWorker(scratch, env));
+    const rows = await readAuditRows(scratch);
+    assert.deepEqual(rows.filter((row) => row.stage === "build" || row.stage === "repair")
+      .map((row) => [row.attempt, row.outcome]),
+      [[1, "started"], [1, "failed"], [2, "started"], [2, "completed"]]);
+    assert.deepEqual(rows.filter((row) => row.stage === "retry").map((row) => row.attempt), [2]);
+    assert.equal(rows.find((row) => row.stage === "gate")?.outcome, "passed");
+    assert.ok(rows.find((row) => row.stage === "retry").seq
+      < rows.find((row) => row.stage === "gate").seq);
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
+});
+
+test("red gate forks the old build with its gate log before the second verify", async () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-gate-fork-"));
+  try {
+    const command = join(here, "test/stub-fork-builder.sh");
+    const env = { ...fixtureEnv(scratch, "carry", command), LOYLY_TEST_FORK_MODE: "gate-red" };
+    await finish(startWorker(scratch, env));
+    const rows = await readAuditRows(scratch);
+    assert.deepEqual(rows.filter((row) => row.stage === "gate")
+      .map((row) => [row.attempt, row.outcome]), [[1, "failed"], [2, "passed"]]);
+    assert.deepEqual(rows.filter((row) => row.stage === "retry").map((row) => row.attempt), [2]);
+    const parent = JSON.parse(readFileSync(join(scratch, "builder-1-evidence", "session.json"), "utf8"));
+    const fork = JSON.parse(readFileSync(join(scratch, "builder-2-evidence", "session.json"), "utf8"));
+    assert.equal(fork.conversationId, parent.conversationId + 1);
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
+});
+
+test("completed but incomplete builder forks before any gate", async () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-incomplete-fork-"));
+  try {
+    const command = join(here, "test/stub-fork-builder.sh");
+    const env = { ...fixtureEnv(scratch, "carry", command), LOYLY_TEST_FORK_MODE: "incomplete" };
+    await finish(startWorker(scratch, env));
+    const rows = await readAuditRows(scratch);
+    assert.deepEqual(rows.filter((row) => row.stage === "build" || row.stage === "repair")
+      .filter((row) => row.outcome === "failed" || row.outcome === "completed")
+      .map((row) => [row.attempt, row.outcome]), [[1, "failed"], [2, "completed"]]);
+    assert.deepEqual(rows.filter((row) => row.stage === "gate")
+      .map((row) => [row.attempt, row.outcome]), [[2, "passed"]]);
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
+});
+
+test("three failed forked builder turns stop without a gate or grader", async () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-builder-fork-red-"));
+  try {
+    const command = join(here, "test/stub-fork-builder.sh");
+    const env = { ...fixtureEnv(scratch, "carry", command), LOYLY_TEST_FORK_MODE: "alwaysfail" };
+    const worker = startWorker(scratch, env);
+    assert.equal(await worker.closed, 1, worker.output());
+    const rows = await readAuditRows(scratch);
+    assert.deepEqual(rows.filter((row) => row.stage === "build" || row.stage === "repair")
+      .filter((row) => row.outcome === "failed").map((row) => row.attempt), [1, 2, 3]);
+    assert.equal(rows.findLast((row) => row.stage === "cycle").reason, "builder-attempts-exhausted");
+    assert.ok(!rows.some((row) => row.stage === "gate" || row.stage === "grade"));
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
 });
 
 test("controller restart rejoins an in-flight continuation without a duplicate request", async () => {

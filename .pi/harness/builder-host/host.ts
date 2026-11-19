@@ -23,12 +23,12 @@
 //                    and answered with <name>.steered (the submission id) or <name>.refused (why).
 //                    pi-durable allows one writer per store, so a steer goes through this process.
 //
-// ORC owns the workflow (attempts, retries, timeouts); this host owns only the session. Rerunning it
+// The active cycle driver owns attempts and retries; this host owns the session. Rerunning it
 // with the same store and request id reopens the session, resumes unfinished work, and finds the
 // existing submission instead of submitting again. Exit: 0 answered, 1 unanswered (reason printed;
 // SIGTERM aborts the run, which ends unanswered with reason aborted), 2 setup error.
 import { basename, dirname, join, resolve } from "node:path";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import type { Models } from "@earendil-works/pi-ai";
@@ -187,6 +187,33 @@ export interface BuilderRun {
 	/** Optional hard maximum for each bash call. */
 	timeoutCeiling?: number;
 	log?: (text: string) => void;
+	/** Host-side receipt for this conversation, shared by its continuation turns. */
+	conversationReceipt?: string;
+	/** Completed prior attempt's receipt; fork at its last committed entry. */
+	parentConversationReceipt?: string;
+}
+
+type ConversationReceipt = {
+	store: string;
+	conversationId: number;
+	parentConversationId: number | null;
+	forkEntryId: number | null;
+	lastEntryId: number | null;
+};
+
+function readConversationReceipt(path: string): ConversationReceipt {
+	const value = JSON.parse(readFileSync(path, "utf8")) as ConversationReceipt;
+	if (!value.store || !Number.isSafeInteger(value.conversationId) || value.conversationId < 1
+		|| (value.lastEntryId !== null
+		&& (!Number.isSafeInteger(value.lastEntryId) || value.lastEntryId < 1)))
+		throw new Error(`invalid Pi conversation receipt: ${path}`);
+	return value;
+}
+
+function saveConversationReceipt(path: string, value: ConversationReceipt): void {
+	const temporary = `${path}.tmp.${process.pid}`;
+	writeFileSync(temporary, `${JSON.stringify(value)}\n`);
+	renameSync(temporary, path);
 }
 
 /** Open (or reopen) the session, submit once by request id, wait. Resolves with the settled submission and answer. */
@@ -221,9 +248,43 @@ export async function runBuilder(run: BuilderRun) {
 	let steering: ReturnType<typeof setInterval> | undefined;
 	try {
 		harness.resume();
-		root = await harness.root(context, {
-			agent: { model: run.model ?? MODEL, thinkingLevel: "high", cwd: GUEST_WORKSPACE },
-		});
+		let lineage: ConversationReceipt | undefined;
+		if (run.conversationReceipt && existsSync(run.conversationReceipt)) {
+			lineage = readConversationReceipt(run.conversationReceipt);
+			if (lineage.store !== run.store) throw new Error("Pi conversation receipt names another store");
+			if (run.parentConversationReceipt) {
+				const parent = readConversationReceipt(run.parentConversationReceipt);
+				if (parent.store !== run.store || lineage.parentConversationId !== parent.conversationId
+					|| lineage.forkEntryId !== parent.lastEntryId)
+					throw new Error("Pi fork receipt differs from prior completed session");
+			} else if (lineage.parentConversationId !== null) {
+				throw new Error("Pi fork receipt reopened without its parent");
+			}
+			const existing = await harness.conversation(lineage.conversationId as never, context);
+			if (!existing) throw new Error("Pi conversation receipt names a missing conversation");
+			root = existing;
+		} else if (run.parentConversationReceipt) {
+			if (!run.conversationReceipt) throw new Error("fork requires a conversation receipt path");
+			const parent = readConversationReceipt(run.parentConversationReceipt);
+			if (parent.store !== run.store || parent.lastEntryId === null)
+				throw new Error("prior Pi session has no completed fork point in this store");
+			const source = await harness.conversation(parent.conversationId as never, context);
+			if (!source) throw new Error("prior Pi conversation is missing");
+			root = await source.fork(parent.lastEntryId as never,
+				{ ownership: { kind: "ownerless" } }, context);
+			lineage = { store: run.store, conversationId: root.id,
+				parentConversationId: source.id, forkEntryId: parent.lastEntryId, lastEntryId: null };
+			saveConversationReceipt(run.conversationReceipt, lineage!);
+		} else {
+			root = await harness.root(context, {
+				agent: { model: run.model ?? MODEL, thinkingLevel: "high", cwd: GUEST_WORKSPACE },
+			});
+			if (run.conversationReceipt) {
+				lineage = { store: run.store, conversationId: root.id,
+					parentConversationId: null, forkEntryId: null, lastEntryId: null };
+				saveConversationReceipt(run.conversationReceipt, lineage!);
+			}
+		}
 		if (terminated) throw new Error("SIGTERM before the submission; nothing submitted");
 		const content = `${readFileSync(run.instruction, "utf8")}\n\n${run.prompt ?? PROMPT}`;
 		const submission = await root.submit({ type: "input", content, requestId: run.requestId }, context);
@@ -247,6 +308,11 @@ export async function runBuilder(run: BuilderRun) {
 				.filter((c: { type?: string }) => c.type === "text")
 				.map((c: { text?: string }) => c.text ?? "")
 				.join("\n");
+		}
+		if (lineage && run.conversationReceipt) {
+			const latest = await root.entries({}, 1, undefined, context);
+			lineage.lastEntryId = latest.items[0]?.id ?? null;
+			saveConversationReceipt(run.conversationReceipt, lineage);
 		}
 		return { settled, answer };
 	} finally {
@@ -339,7 +405,9 @@ async function main(argv: string[]) {
 	}
 	try {
 		const { settled, answer } = await runBuilder({ room, instruction, store, requestId, models, model,
-			tools, prompt, roomLabel, imageAdditionsPath, steerDir, timeoutFloor, timeoutCeiling });
+			tools, prompt, roomLabel, imageAdditionsPath, steerDir, timeoutFloor, timeoutCeiling,
+			conversationReceipt: process.env.LOYLY_PI_CONVERSATION_RECEIPT,
+			parentConversationReceipt: process.env.LOYLY_PI_PARENT_RECEIPT });
 		if (answer) process.stdout.write(`${answer}\n`);
 		if (settled.status === "done") {
 			process.stderr.write("status=done\n");

@@ -23,9 +23,12 @@ checklist, agent wrappers and instructions, model names, Allure schema, panel
 plan and both VM images. The builder and grader use different models. The
 controller clones the source cut into private scratch, sends the builder at
 most three same-session continuations on selected uncarried items, and runs
-the legacy gate independently after each build. A red gate starts a fresh
-repair builder with the gate log; the cycle stops after three build and gate
-attempts. It then grades rule scopes in separate VMs, launches a
+the legacy gate independently after each completed build. A red gate or a
+failed builder process with a completed Pi session receipt starts a repair
+attempt: Pi forks the prior conversation at its last committed entry, keeps
+the existing `impl/`, and gives the fork the failure log. The cycle stops
+after three attempts; a changed approved input or invalid receipt stops it
+immediately. It then grades rule scopes in separate VMs, launches a
 fresh blind Pi reviewer for `01-011`, and runs three specialist VMs in
 parallel. The selected panel manifest is bound into the filed score input.
 Five Allure result directories then generate one 15-case report.

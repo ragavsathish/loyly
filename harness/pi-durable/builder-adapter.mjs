@@ -50,12 +50,16 @@ function livePid(pid, expectedCommand) {
   return r.status === 0 && r.stdout.includes(expectedCommand);
 }
 function validateReceipt(found, instructionSha256, model, room, image, readonlyInputs,
-  sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds) {
+  sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds,
+  storePath, parentConversationReceipt) {
   if (!found) return;
   const { receipt } = found;
   if (receipt.session_id !== sessionId || receipt.request_id !== requestId
       || receipt.instruction_sha256 !== instructionSha256 || receipt.model !== model
       || receipt.room !== room || receipt.builder_image !== image
+      || (storePath !== undefined && receipt.store !== storePath)
+      || (parentConversationReceipt !== undefined
+        && receipt.parent_conversation_receipt !== parentConversationReceipt)
       || (bashTimeoutFloorSeconds !== undefined
         && receipt.bash_timeout_floor !== String(bashTimeoutFloorSeconds))
       || (bashTimeoutCeilingSeconds !== undefined
@@ -76,7 +80,8 @@ function stopGroup(pid, expectedCommand) {
 
 export async function runBuilder({ command, room, instruction, image, evidenceDir, sessionId,
   requestId = sessionId, model, stateRoot, timeoutMs = 14_400_000, signal, prompt, roomLabel, piSettings,
-  imageAdditionsPath, readonlyInputs = false, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds }) {
+  imageAdditionsPath, readonlyInputs = false, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds,
+  storePath, parentConversationReceipt }) {
   for (const path of [command, room, instruction, image, evidenceDir, stateRoot])
     if (!isAbsolute(path)) throw new Error(`builder path must be absolute: ${path}`);
   if (!/^[A-Za-z0-9._-]+$/.test(sessionId)) throw new Error("unsafe builder session ID");
@@ -91,12 +96,17 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
     throw new Error("invalid bash timeout ceiling");
   if (!existsSync(room) || !existsSync(instruction) || !existsSync(image))
     throw new Error("builder room, instruction, or image missing");
+  if (storePath && !isAbsolute(storePath)) throw new Error("Pi store path must be absolute");
+  if (parentConversationReceipt && (!isAbsolute(parentConversationReceipt)
+      || !existsSync(parentConversationReceipt)))
+    throw new Error("prior Pi conversation receipt missing");
   if (signal?.aborted) throw new Error("builder launch already aborted");
   const instructionSha256 = sha256(readFileSync(instruction));
   mkdirSync(evidenceDir, { recursive: true });
   let found = await readyLaunch(evidenceDir, sessionId, requestId);
   validateReceipt(found, instructionSha256, model, room, image, readonlyInputs,
-    sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds);
+    sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds,
+    storePath, parentConversationReceipt);
   if (found?.receipt.exit !== undefined)
     return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
 
@@ -114,7 +124,8 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
     await pause(1000);
     found = await readyLaunch(evidenceDir, sessionId, requestId);
     validateReceipt(found, instructionSha256, model, room, image, readonlyInputs,
-      sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds);
+      sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds,
+      storePath, parentConversationReceipt);
     if (found?.receipt.exit !== undefined)
       return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
   }
@@ -126,6 +137,8 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
     cwd: room, detached: true, stdio: ["ignore", out, err],
     env: { ...process.env, BUILDER_EVIDENCE_DIR: evidenceDir,
       LOYLY_BUILDER_SESSION_ID: sessionId, LOYLY_BUILDER_REQUEST_ID: requestId,
+      ...(storePath ? { LOYLY_BUILDER_STORE: storePath } : {}),
+      ...(parentConversationReceipt ? { LOYLY_PI_PARENT_RECEIPT: parentConversationReceipt } : {}),
       LOYLY_PI_MODEL: model,
       PI_HARNESS_STATE_ROOT: stateRoot,
       ...(prompt ? { LOYLY_PI_PROMPT: prompt } : {}),
@@ -150,7 +163,8 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
     });
     found = await readyLaunch(evidenceDir, sessionId, requestId);
     validateReceipt(found, instructionSha256, model, room, image, readonlyInputs,
-      sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds);
+      sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds,
+      storePath, parentConversationReceipt);
     if (timedOut) throw new Error("builder host exceeded deadline");
     if (!found || found.receipt.exit === undefined)
       throw new Error("builder host exited without a completed launch receipt");

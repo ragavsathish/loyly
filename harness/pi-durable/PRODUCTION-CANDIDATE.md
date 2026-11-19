@@ -18,6 +18,13 @@ pinned source and instrument digests
   -> legacy score and scoreboard -> one Allure report -> Pi audit conclusion
 ```
 
+The build and gate stage has at most three attempts. On a red gate or a
+completed Pi builder process that exits unsuccessfully, the next attempt
+forks the prior Pi conversation at its last committed entry and continues
+the same `impl/` with the recorded failure log. Each attempt has a distinct
+conversation and launch receipt in one SQLite store. A missing or mismatched
+fork point stops the cycle; no attempt is treated as a fresh generation.
+
 The specialist VM stage is an actual Pi durable task. It has a maximum of two
 isolated attempts. A complete manifest is verified and reused after a
 controller restart; an interrupted attempt remains on disk as evidence and
