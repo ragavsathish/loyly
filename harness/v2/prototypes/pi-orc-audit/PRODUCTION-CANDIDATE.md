@@ -45,6 +45,17 @@ legacy gate passed after this cleanup. The three specialist VMs were also run
 against that candidate: Playwright, protocol races and OpenTelemetry passed in
 parallel. These diagnostics are not a filed cycle score.
 
+The next fresh run passed the gate and three independent grader shards, then
+stopped at the panel before scoring: its server-rendered app has no
+`contract.json`, which the probe had assumed. The separate blind Pi agent
+read only the refusal and named the right room, weekday and time; the HTTP
+adapter submitted an assumed internal room ID and received 400. Against this
+same candidate, revised probes passed in three parallel Gondolin VMs, and
+the unchanged blind answer was confirmed over fresh HTTP with status 201
+after resolving the room through the public booking form. Those are
+diagnostics for the revised instrument, not retrospective changes to the
+failed run's audit or score.
+
 ## Pinned launch
 
 Create an ignored JSON contract matching `live-run.schema.json` with the

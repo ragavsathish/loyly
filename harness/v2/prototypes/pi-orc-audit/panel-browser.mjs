@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -16,7 +17,9 @@ await mkdir(allure, { recursive: true });
 const sourceFilesSha256 = treeDigest(candidate, 'impl');
 const expectedSourceFilesSha256 = config.source_files_sha256;
 const candidateSha256 = config.candidate_sha256;
-const modern = JSON.parse(await readFile(join(candidate, 'contract.json'), 'utf8')).request?.path === '/api/bookings';
+const serverRendered = existsSync(join(candidate, 'web.mjs'));
+const modern = !serverRendered && existsSync(join(candidate, 'contract.json'))
+  && JSON.parse(await readFile(join(candidate, 'contract.json'), 'utf8')).request?.path === '/api/bookings';
 const uuid = randomUUID();
 const now = () => Date.now();
 const result = {
@@ -76,7 +79,8 @@ try {
   const base = `http://127.0.0.1:${port}`;
   server = spawn(process.execPath, ['server.mjs', String(port)], {
     cwd: candidate,
-    env: { ...process.env, LOYLY_DATA: join(artifacts, 'record.json') },
+    env: { ...process.env, LOYLY_DATA: join(artifacts, 'record.json'),
+      LOYLY_DATA_FILE: join(artifacts, 'record.json') },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let serverOutput = '';
@@ -86,7 +90,7 @@ try {
     for (let i = 0; i < 100; i++) {
       if (server.exitCode !== null) throw new Error(`Server exited: ${serverOutput}`);
       try {
-        const response = await fetch(`${base}${modern ? '/api/state' : '/health'}`);
+        const response = await fetch(`${base}${serverRendered ? '/' : modern ? '/api/state' : '/health'}`);
         if (response.ok) return;
       } catch { /* waiting for listener */ }
       await delay(100);
@@ -104,19 +108,29 @@ try {
   await step('Open the schedule and inspect free Tuesday room 8 slot', async () => {
     await page.goto(base, { waitUntil: 'networkidle' });
     assert((await page.title()).includes('Löyly'), 'Unexpected page title');
-    const free = modern ? page.locator('button.slot[data-slot="ph8|Tuesday|17:00"]')
+    const free = serverRendered
+      ? page.getByRole('link', { name: /Request pukuhuone 8, Tuesday, 17:00/ })
+      : modern ? page.locator('button.slot[data-slot="ph8|Tuesday|17:00"]')
       : page.getByRole('link', { name: 'Request Tuesday 17:00 in Pukuhuone 8' });
     assert(await free.count() === 1, 'Expected one free room 8 Tuesday 17:00 slot');
     observations.checks.initialFreeSlot = true;
     await page.screenshot({ path: join(artifacts, 'before.png'), fullPage: true });
   });
   await step('Submit the native booking form as apartment 12', async () => {
-    if (modern) await page.locator('button.slot[data-slot="ph8|Tuesday|17:00"]').click();
+    if (serverRendered) await page.getByRole('link', { name: /Request pukuhuone 8, Tuesday, 17:00/ }).click();
+    else if (modern) await page.locator('button.slot[data-slot="ph8|Tuesday|17:00"]').click();
     else await page.getByRole('link', { name: 'Request Tuesday 17:00 in Pukuhuone 8' }).click();
-    assert(await page.locator('#resource').inputValue() === 'ph8', 'Room selection failed');
-    assert(await page.locator('#weekday').inputValue() === 'Tuesday', 'Weekday selection failed');
-    assert(await page.locator('#start').inputValue() === '17:00', 'Start selection failed');
-    if (modern) {
+    const selector = serverRendered ? (name) => page.locator(`[name="${name}"]`) : (name) => page.locator(`#${name}`);
+    assert(await selector('resource').inputValue() === (serverRendered ? 'pukuhuone 8' : 'ph8'), 'Room selection failed');
+    assert(await selector('weekday').inputValue() === 'Tuesday', 'Weekday selection failed');
+    assert(await selector('start').inputValue() === '17:00', 'Start selection failed');
+    if (serverRendered) {
+      const navigation = page.waitForNavigation();
+      await page.getByRole('button', { name: /Request standing slot/ }).click();
+      const response = await navigation;
+      assert(response?.status() === 201, `Booking form status ${response?.status()}`);
+      assert(await page.getByRole('status').getByText('All set').count() === 1, 'Confirmation notice missing');
+    } else if (modern) {
       const response = page.waitForResponse(r => r.url().endsWith('/api/bookings') && r.request().method() === 'POST');
       await page.getByRole('button', { name: /Confirm standing slot/ }).click();
       assert((await response).status() === 201, 'Booking form did not confirm over HTTP');
@@ -131,19 +145,28 @@ try {
     observations.checks.formConfirmation = true;
   });
   await step('Inspect holding, schedule, posted list, heater and billing views', async () => {
-    if (modern) await page.locator('[data-tab="mine"]').click();
-    const holdings = modern ? page.locator('#my-bookings .booking-card') : page.locator('#holdings .holding-card');
+    if (serverRendered) await page.goto(`${base}/my-slots?household=12`);
+    else if (modern) await page.locator('[data-tab="mine"]').click();
+    const holdings = serverRendered ? page.locator('.booking-card')
+      : modern ? page.locator('#my-bookings .booking-card') : page.locator('#holdings .holding-card');
     assert(await holdings.count() === 1, 'Expected one standing holding card');
     assert((await holdings.innerText()).includes('Tuesday'), 'Holding weekday missing');
     assert((await holdings.innerText()).includes('17:00'), 'Holding time missing');
     const schedule = await page.request.get(`${base}/api/schedule`).then(r => r.json());
-    const slot = schedule.slots.find(s => s.resource === 'ph8' && s.weekday === 'Tuesday' && s.start === '17:00');
+    const slot = schedule.slots.find(s => s.resource === (serverRendered ? 'pukuhuone 8' : 'ph8')
+      && s.weekday === 'Tuesday' && s.start === '17:00');
     assert((slot?.status ?? slot?.state) === 'held' && slot.household === '12', `Schedule mismatch: ${JSON.stringify(slot)}`);
     const views = await page.request.get(`${base}/api/views`).then(r => r.json());
     assert(views.postedList.length === 1 && views.heaterSchedule.length === 1 && views.invoicingSignals.length === 1, `Derived view counts: ${JSON.stringify(views)}`);
     assert(views.postedList[0].household === '12', 'Posted list household mismatch');
     assert(views.invoicingSignals[0].payer === '12', 'Billing payer mismatch');
-    if (modern) {
+    if (serverRendered) {
+      await page.goto(`${base}/views`);
+      const view = await page.locator('main').innerText();
+      assert(view.includes('Apartment 12') && view.includes('17:00')
+        && view.includes('Posted slot list') && view.includes('Heater schedule')
+        && view.includes('Invoicing signals'), 'Derived views are not visible together');
+    } else if (modern) {
       await page.locator('[data-tab="views"]').click();
       const view = page.locator('#panel-views');
       assert((await view.innerText()).includes('Apartment 12'), 'Posted view does not name apartment 12');

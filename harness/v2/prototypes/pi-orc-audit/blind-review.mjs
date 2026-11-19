@@ -107,6 +107,21 @@ function bookingFormAction(html) {
     throw new Error("booking form action must be a same-origin path");
   return path;
 }
+function resolveRoomInPublicForm(html, body, answer) {
+  const params = new URLSearchParams(body);
+  const token = /^@room:(\d+)$/.exec(params.get("resource") ?? "");
+  if (!token) return body;
+  if (!new RegExp(`^REQUEST:\\s*pukuhuone\\s+${token[1]}\\s*\\|`, "i").test(answer))
+    throw new Error("blind answer and requested room differ");
+  const select = /<select\b[^>]*\bname\s*=\s*["']resource["'][^>]*>([\s\S]*?)<\/select>/i.exec(html);
+  if (!select) throw new Error("public booking form has no resource selection");
+  const options = [...select[1].matchAll(/<option\b[^>]*\bvalue\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/option>/gi)];
+  const matching = options.filter(([, , label]) => label.replace(/<[^>]+>/g, "").trim().toLowerCase()
+    === `pukuhuone ${token[1]}`);
+  if (matching.length !== 1) throw new Error("blind room is not a unique public form option");
+  params.set("resource", matching[0][1]);
+  return params.toString();
+}
 async function freePort() {
   const server = createServer();
   await new Promise((resolve, reject) => server.once("error", reject).listen(0, "127.0.0.1", resolve));
@@ -150,10 +165,12 @@ export async function probeBlindAnswer({ packetDir, reviewFile, gradingRoom, req
     }
     if (!ready) throw new Error("review probe app did not start within ten seconds");
     const resolvedPath = request.path === "@booking-form" ? bookingFormAction(homepage) : request.path;
+    const resolvedBody = request.path === "@booking-form"
+      ? resolveRoomInPublicForm(homepage, request.body, review.answer) : request.body;
     const http = await fetch(`http://127.0.0.1:${port}${resolvedPath}`, {
       method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" },
-      body: request.body, signal: AbortSignal.timeout(10_000) });
-    response = { status: http.status, body: await http.text(), resolvedPath };
+      body: resolvedBody, signal: AbortSignal.timeout(10_000) });
+    response = { status: http.status, body: await http.text(), resolvedPath, resolvedBody };
   } finally {
     if (child.exitCode === null && child.signalCode === null && !spawnError)
       child.kill("SIGTERM");
@@ -163,7 +180,8 @@ export async function probeBlindAnswer({ packetDir, reviewFile, gradingRoom, req
   writeFileSync(join(out, "response.txt"), response.body);
   const verification = { schema: "loyly.blind-review-probe.v1", item: REVIEW_ID,
     candidate_sha256: packet.candidate_sha256, packet_sha256: packetSha256,
-    review_sha256: reviewSha256, request: { ...request, resolved_path: response.resolvedPath },
+    review_sha256: reviewSha256, request: { ...request,
+      resolved_path: response.resolvedPath, resolved_body: response.resolvedBody },
     http_status: response.status,
     response_sha256: hash(response.body), accepted: response.status >= 200 && response.status < 300,
     observed_at: Date.now() };

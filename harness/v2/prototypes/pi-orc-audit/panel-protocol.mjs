@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -8,11 +9,13 @@ import { treeDigest } from './grading-room.mjs';
 
 const out = '/out';
 const config = JSON.parse(await readFile(join(out, 'config.json'), 'utf8'));
-const modern = JSON.parse(await readFile('/candidate/contract.json', 'utf8')).request?.path === '/api/bookings';
+const serverRendered = existsSync('/candidate/web.mjs');
+const modern = !serverRendered && existsSync('/candidate/contract.json')
+  && JSON.parse(await readFile('/candidate/contract.json', 'utf8')).request?.path === '/api/bookings';
 const uuid = randomUUID();
 const start = Date.now();
 const base = 'http://127.0.0.1:8901';
-const slot = { resource: 'ph8', weekday: 'Tuesday', start: '17:00' };
+const slot = { resource: serverRendered ? 'pukuhuone 8' : 'ph8', weekday: 'Tuesday', start: '17:00' };
 const cases = [];
 const steps = [];
 const record = join(out, 'record.json');
@@ -43,7 +46,7 @@ async function oneRace(index) {
   const booking = await request('/api/bookings');
   const views = await request('/api/views');
   const schedule = await request('/api/schedule');
-  const selected = schedule.slots.find((value) => value.resource === 'ph8'
+  const selected = schedule.slots.find((value) => value.resource === slot.resource
     && value.weekday === 'Tuesday' && value.start === '17:00');
   const row = { index, overlapped, responses: [a.status, b.status],
     codes: [a.code ?? a.reason ?? null, b.code ?? b.reason ?? null], holder: selected?.household,
@@ -67,9 +70,9 @@ async function oneRace(index) {
   const released = await request(`/api/bookings/${winner.id}`, 'DELETE', { household: winner.household });
   assert.equal(released.status, 200);
   const after = await request('/api/schedule');
-  assert.equal(after.slots.find((value) => value.resource === 'ph8'
+  assert.equal(after.slots.find((value) => value.resource === slot.resource
     && value.weekday === 'Tuesday' && value.start === '17:00')?.state
-    ?? after.slots.find((value) => value.resource === 'ph8'
+    ?? after.slots.find((value) => value.resource === slot.resource
       && value.weekday === 'Tuesday' && value.start === '17:00')?.status, 'free');
 }
 
@@ -77,14 +80,18 @@ try {
   if (treeDigest('/candidate', 'impl') !== config.candidate_sha256)
     throw Error('Mounted candidate differs from the bound source digest');
   server = spawn(process.execPath, ['/candidate/server.mjs', '8901'], {
-    cwd: '/candidate', env: { ...process.env, LOYLY_DATA: record }, stdio: ['ignore', 'pipe', 'pipe'],
+    cwd: '/candidate', env: { ...process.env, LOYLY_DATA: record,
+      LOYLY_DATA_FILE: record }, stdio: ['ignore', 'pipe', 'pipe'],
   });
   let stderr = '';
   server.stderr.on('data', (chunk) => { stderr += chunk; });
   await step('Start fresh candidate in the Gondolin VM', async () => {
     for (let i = 0; i < 100; i++) {
       if (server.exitCode !== null) throw Error(`candidate exited: ${stderr}`);
-      try { if ((await request(modern ? '/api/state' : '/health')).status === 200) return; } catch { /* wait */ }
+      try {
+        if (serverRendered ? (await fetch(base + '/')).ok
+          : (await request(modern ? '/api/state' : '/health')).status === 200) return;
+      } catch { /* wait */ }
       await delay(100);
     }
     throw Error(`candidate did not start: ${stderr}`);

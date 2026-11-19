@@ -22,7 +22,7 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   mkdirSync(results, { recursive: true });
   writeFileSync(join(room, "impl", "start.sh"), '#!/bin/sh\ncd "$(dirname "$0")"\nexec node server.js "$1"\n');
   chmodSync(join(room, "impl", "start.sh"), 0o755);
-  writeFileSync(join(room, "impl", "server.js"), 'require("http").createServer((req,res)=>{let body="";req.on("data",x=>body+=x);req.on("end",()=>{if(req.url==="/"){res.statusCode=200;res.end(`<form method="post" action="/request"><input name="household"><select name="resource"></select><select name="weekday"></select><select name="start"></select></form>`);return}res.statusCode=req.url==="/request"?(body.includes("Thursday")?201:409):404;res.end(String(res.statusCode))})}).listen(Number(process.argv[2]),"127.0.0.1")\n');
+  writeFileSync(join(room, "impl", "server.js"), 'require("http").createServer((req,res)=>{let body="";req.on("data",x=>body+=x);req.on("end",()=>{if(req.url==="/"){res.statusCode=200;res.end(`<form method="post" action="/request"><input name="household"><select name="resource"><option value="ph9">pukuhuone 9</option></select><select name="weekday"></select><select name="start"></select></form>`);return}res.statusCode=req.url==="/request"?(body.includes("Thursday")?201:409):404;res.end(String(res.statusCode))})}).listen(Number(process.argv[2]),"127.0.0.1")\n');
   cpSync(schema, join(room, "allure-lifecycle-result.schema.json"));
   writeFileSync(join(room, "checklist.json"), JSON.stringify({ items: [
     { id: "01-011", name: "The refusal for a closed day is judged usable",
@@ -74,6 +74,13 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
     request: { ...parsed.request, body: "weekday=Thursday" }, out: verificationDir });
   assert.equal(verification.http_status, 201);
   assert.equal(verification.request.resolved_path, "/request");
+  const mappedReviewFile = join(root, "mapped-review.json");
+  writeFileSync(mappedReviewFile, JSON.stringify({ ...review,
+    answer: "REQUEST: pukuhuone 9 | Thursday | 17:00 | 18:30" }));
+  const mapped = await probeBlindAnswer({ packetDir, reviewFile: mappedReviewFile,
+    gradingRoom: room, request: parsed.request, out: join(root, "mapped-probe") });
+  assert.equal(mapped.http_status, 201);
+  assert.equal(new URLSearchParams(mapped.request.resolved_body).get("resource"), "ph9");
   const agent = writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom: room,
     verificationDir, out: agentDir });
   assert.equal(agent.result.status, "passed");

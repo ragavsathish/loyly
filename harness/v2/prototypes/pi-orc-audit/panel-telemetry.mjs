@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -8,7 +9,9 @@ import { treeDigest } from './grading-room.mjs';
 
 const out = '/out';
 const config = JSON.parse(await readFile(join(out, 'config.json'), 'utf8'));
-const modern = JSON.parse(await readFile('/candidate/contract.json', 'utf8')).request?.path === '/api/bookings';
+const serverRendered = existsSync('/candidate/web.mjs');
+const modern = !serverRendered && existsSync('/candidate/contract.json')
+  && JSON.parse(await readFile('/candidate/contract.json', 'utf8')).request?.path === '/api/bookings';
 const uuid = randomUUID(), start = Date.now();
 const events = [], steps = [];
 let server, failure, observed;
@@ -44,7 +47,8 @@ try {
     '--experimental-loader=/worker/node_modules/@opentelemetry/instrumentation/hook.mjs',
     '--import=/worker/panel-otel-instrumentation.mjs', '/candidate/server.mjs', '8902',
   ], { cwd: '/candidate', env: { ...process.env,
-    LOYLY_DATA: join(out, 'record.json'), CANDIDATE_SHA256: config.candidate_sha256,
+    LOYLY_DATA: join(out, 'record.json'), LOYLY_DATA_FILE: join(out, 'record.json'),
+    CANDIDATE_SHA256: config.candidate_sha256,
     PROBE_RUN_ID: uuid, OTLP_RECEIVER: `http://127.0.0.1:${receiverPort}` },
     stdio: ['ignore', 'pipe', 'pipe'] });
   let stderr = '';
@@ -52,7 +56,10 @@ try {
   await step('Start instrumented candidate and local OTLP receiver in Gondolin VM', async () => {
     for (let i = 0; i < 100; i++) {
       if (server.exitCode !== null) throw Error(`candidate exited: ${stderr}`);
-      try { if ((await request(modern ? '/api/state' : '/health')).status === 200) return; } catch { /* wait */ }
+      try {
+        if (serverRendered ? (await fetch(base + '/')).ok
+          : (await request(modern ? '/api/state' : '/health')).status === 200) return;
+      } catch { /* wait */ }
       await delay(100);
     }
     throw Error(`candidate did not start: ${stderr}`);
@@ -60,7 +67,8 @@ try {
   await step('Confirm one durable booking and all three derived views', async () => {
     const booked = await request('/api/bookings', { method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ household: 'Probe-17', resource: 'ph8', weekday: 'Tuesday', start: '17:00' }) });
+      body: JSON.stringify({ household: 'Probe-17', resource: serverRendered ? 'pukuhuone 8' : 'ph8',
+        weekday: 'Tuesday', start: '17:00' }) });
     const views = await request('/api/views');
     const stored = JSON.parse(await readFile(join(out, 'record.json'), 'utf8'));
     observed = { status: booked.status, recurrence: booked.body.booking?.recurrence,
