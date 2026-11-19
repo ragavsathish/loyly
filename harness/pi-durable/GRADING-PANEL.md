@@ -41,11 +41,11 @@ with the image manifest digest, candidate digest, mount policy, exit code and
 timing. It validates each result with the Allure schema before writing the run
 manifest. No API key or model call is needed for these deterministic probes.
 
-From `harness/v2/prototypes/pi-orc-audit` after `npm ci`:
+From `harness/pi-durable` after `npm ci`:
 
 ```sh
 gondolin build --config panel-vm-build.json \
-  --output ../../../../.pi/harness/.state/assets/panel-browser-node \
+  --output ../../.pi/harness/.state/assets/panel-browser-node \
   --tag loyly-panel:chromium-v1
 node panel-vm-run.mjs <scored-cycle-scratch> \
   <Gondolin-image-assets> <new-panel-vm-output>

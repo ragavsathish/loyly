@@ -1,5 +1,5 @@
 {
-  "name": "loyly-pi-orc-audit-prototype",
+  "name": "@loyly/pi-durable-harness",
   "private": true,
   "type": "module",
   "scripts": {

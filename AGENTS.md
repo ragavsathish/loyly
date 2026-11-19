@@ -1,7 +1,7 @@
 # Löyly agent instructions
 
 The active cycle driver is Pi durable. Start at `README.md`, then read
-`harness/v2/prototypes/pi-orc-audit/README.md` when preparing or operating a
+`harness/pi-durable/README.md` when preparing or operating a
 cycle. `bin/loyly-cycle` checks and runs a pinned live contract. The driver
 records checkpoints and audit entries in Pi; its replay projects committed
 entries and bound Allure evidence. The original `harness/` scripts still
@@ -25,7 +25,7 @@ Promotion of a generated app requires a passing gate, reviewed item evidence,
 a filed score and an explicit acceptance decision. The current Pi driver is
 the repository's active workflow by operator direction; its latest integrated
 cross-stack grading and specialist panel remain under review. Read
-`harness/v2/prototypes/pi-orc-audit/PRODUCTION-CANDIDATE.md` before claiming
+`harness/pi-durable/PRODUCTION-CANDIDATE.md` before claiming
 the app or grading panel is accepted.
 
 The directly shared legacy files in `harness/` are a three-repository module;

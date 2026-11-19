@@ -67,7 +67,7 @@ worktrees must be clean. `--check` derives and checks the selected checklist;
 `--run` then launches the durable cycle with the panel required.
 
 ```sh
-cd harness/v2/prototypes/pi-orc-audit
+cd harness/pi-durable
 npm ci --ignore-scripts --no-audit --no-fund
 node run-live.mjs --check scratch-production/live-run.json
 node run-live.mjs --run scratch-production/live-run.json

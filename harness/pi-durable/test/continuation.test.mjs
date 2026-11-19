@@ -10,7 +10,7 @@ import { readAuditRows } from "../audit-rows.mjs";
 import { continuationPrompt, selectedUncarried } from "../continuation.mjs";
 
 const here = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const root = resolve(here, "../../../..");
+const root = resolve(here, "../..");
 const sha = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
 
 test("uncarried selection names only approved item lines", () => {

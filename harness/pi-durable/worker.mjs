@@ -21,7 +21,7 @@ import { MAX_CONTINUATIONS, continuationPrompt, selectedUncarried } from "./cont
 import { runDurablePanel, runDurablePanelReport } from "./panel-adapter.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(HERE, "../../../..");
+const ROOT = resolve(HERE, "../..");
 const schemaFile = join(HERE, "allure-lifecycle-result.schema.json");
 const attachedSchemaSha256 = createHash("sha256").update(readFileSync(schemaFile)).digest("hex");
 const ctx = BACKGROUND_CONTEXT;

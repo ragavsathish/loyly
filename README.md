@@ -25,11 +25,11 @@ bin/loyly-cycle --check /absolute/path/to/ignored-live-run.json
 bin/loyly-cycle --run /absolute/path/to/ignored-live-run.json
 ```
 
-See the [Pi harness guide](harness/v2/prototypes/pi-orc-audit/README.md) for
+See the [Pi harness guide](harness/pi-durable/README.md) for
 the run contract and evidence. The original scripts in `harness/` remain the
 self-check, fence, gate and scoring authority. The latest cross-stack grader
 and specialist panel limits are recorded in the
-[production candidate review](harness/v2/prototypes/pi-orc-audit/PRODUCTION-CANDIDATE.md).
+[production candidate review](harness/pi-durable/PRODUCTION-CANDIDATE.md).
 
 Everything in it is real. The domain documents are redacted transcriptions of a real
 Finnish housing cooperative's 2022 email threads plus verified public sources from

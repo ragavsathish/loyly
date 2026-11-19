@@ -13,7 +13,7 @@ import { verifyScoredCycle } from './score-receipt.mjs';
 import { readAuditRows } from './audit-rows.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(HERE, '../../../..');
+const ROOT = resolve(HERE, '../..');
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const fileSha = (path) => sha(readFileSync(path));
 function git(...args) {

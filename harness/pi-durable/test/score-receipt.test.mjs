@@ -8,7 +8,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { bindScoreInput, verifyScoredCycle } from "../score-receipt.mjs";
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../../../..");
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 function run(program, args, cwd) {
   const result = spawnSync(program, args, { cwd, encoding: "utf8" });
   assert.equal(result.status, 0, `${program}: ${result.stdout}${result.stderr}`);

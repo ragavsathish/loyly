@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(HERE, '../../../..');
+const ROOT = resolve(HERE, '../..');
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const fileSha = (path) => sha(readFileSync(path));
 function git(path, ...args) {

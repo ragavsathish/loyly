@@ -8,7 +8,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const root = resolve(here, "../../../..");
+const root = resolve(here, "../..");
 const sha = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
 const pause = (ms) => new Promise((resolveWait) => setTimeout(resolveWait, ms));
 async function until(predicate, deadlineMs = 60_000) {

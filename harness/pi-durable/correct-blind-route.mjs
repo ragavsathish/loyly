@@ -108,7 +108,7 @@ command("bb", ["harness/score.clj", "03", "--verdicts", verdictsFile], instrumen
 const score = verifyScoredCycle({ scratch: out, instrument, verdictsFile, cycle: "03" });
 if (score.score !== "11/11") throw new Error("correction score is not 11/11");
 command("bb", ["harness/scoreboard.clj", "03"], instrument, "scoreboard.log");
-const controller = head(resolve(import.meta.dirname, "../../../.."));
+const controller = head(resolve(import.meta.dirname, "../.."));
 const allureDir = join(out, "blind-agent-allure");
 const correctedAllureSha256 = hash(readdirSync(allureDir).sort()
   .map((name) => `${name}\0${fileHash(join(allureDir, name))}`).join("\0"));
