@@ -15,6 +15,8 @@
 //   LOYLY_BASH_TIMEOUT_FLOOR_SECONDS  the least timeout a bash call runs with (default 1800): a smaller
 //                    `timeout` the model passes is raised to it, a larger one kept, a missing one stays
 //                    missing (no timeout). A full suite in the VM outlasts the 600 s a model tends to pass.
+//   LOYLY_BASH_TIMEOUT_CEILING_SECONDS optional maximum for every bash call, including one with no
+//                    model timeout. Grader sessions use this to recover from a wait on a live server.
 //   LOYLY_STEER_DIR  a steer inbox: every <name>.md file that appears there while the run works is
 //                    submitted to the running session as a steer (pi-durable's `whenBusy: "steer"`,
 //                    `whenIdle: "reject"`, request id `steer-<name>`, so a rerun never steers twice),
@@ -71,13 +73,26 @@ export function timeoutFloorFromEnv(value = process.env.LOYLY_BASH_TIMEOUT_FLOOR
 	return n;
 }
 
-/** The tool with a model-given `timeout` below `floor` raised to it; a larger one is kept, a missing one stays missing. */
-export function withTimeoutFloor(tool: ToolRegistration, floor: number): ToolRegistration {
+/** An optional hard maximum for each bash call. It must not contradict the floor. */
+export function timeoutCeilingFromEnv(floor: number,
+	value = process.env.LOYLY_BASH_TIMEOUT_CEILING_SECONDS?.trim()): number | undefined {
+	if (!value) return undefined;
+	const n = Number(value);
+	if (!Number.isInteger(n) || n < floor)
+		throw new Error(`LOYLY_BASH_TIMEOUT_CEILING_SECONDS=${value}: expected integer >= floor ${floor}`);
+	return n;
+}
+
+/** Apply the builder's timeout floor and an optional grader ceiling to each bash call. */
+export function withTimeoutFloor(tool: ToolRegistration, floor: number, ceiling?: number): ToolRegistration {
 	return {
 		...tool,
 		execute: (args, api, ctx) => {
 			const t = (args as { timeout?: unknown }).timeout;
-			return tool.execute(typeof t === "number" && t < floor ? { ...(args as object), timeout: floor } : args, api, ctx);
+			const bounded = ceiling === undefined
+				? (typeof t === "number" && t < floor ? floor : undefined)
+				: Math.min(Math.max(typeof t === "number" ? t : floor, floor), ceiling);
+			return tool.execute(bounded === undefined ? args : { ...(args as object), timeout: bounded }, api, ctx);
 		},
 	};
 }
@@ -119,7 +134,8 @@ function installCommand(): string | undefined {
 
 /** The builder's environment as a prompt section, generated from what the VM and tools enforce. */
 export function environmentText(tools: readonly string[], roomLabel = "the builder room",
-	timeoutFloor = BASH_TIMEOUT_FLOOR, imageAdditionsPath = IMAGE_ADDITIONS): string {
+	timeoutFloor = BASH_TIMEOUT_FLOOR, imageAdditionsPath = IMAGE_ADDITIONS,
+	timeoutCeiling?: number): string {
 	const readonlyInputs = process.env.LOYLY_ROOM_READONLY_INPUTS === "1";
 	const network =
 		ALLOWED_HOSTS.length === 0
@@ -138,7 +154,9 @@ export function environmentText(tools: readonly string[], roomLabel = "the build
 			: []),
 		`Your tools, all running inside the VM: ${tools.join(", ")}.`,
 		...(tools.includes("bash")
-			? [`A bash command may run up to ${minutes(timeoutFloor)}: whatever timeout you pass is raised to at least that.`]
+			? [timeoutCeiling === undefined
+				? `A bash command may run up to ${minutes(timeoutFloor)}: whatever timeout you pass is raised to at least that.`
+				: `Every bash command has a ${minutes(timeoutCeiling)} timeout, including commands without an explicit timeout.`]
 			: []),
 	].join("\n");
 }
@@ -166,6 +184,8 @@ export interface BuilderRun {
 	steerDir?: string;
 	/** The bash timeout floor in seconds (default BASH_TIMEOUT_FLOOR). */
 	timeoutFloor?: number;
+	/** Optional hard maximum for each bash call. */
+	timeoutCeiling?: number;
 	log?: (text: string) => void;
 }
 
@@ -175,11 +195,12 @@ export async function runBuilder(run: BuilderRun) {
 	const { env, close: closeEnv } = gondolinEnv(run.room, (text) => log(`[pi-env] ${text.trimEnd()}`));
 	const registry = createRegistry();
 	const floor = run.timeoutFloor ?? BASH_TIMEOUT_FLOOR;
-	const prompt = environmentText(run.tools, run.roomLabel, floor, run.imageAdditionsPath);
+	const ceiling = run.timeoutCeiling;
+	const prompt = environmentText(run.tools, run.roomLabel, floor, run.imageAdditionsPath, ceiling);
 	registry.install(
 		defineExtension({
 			name: "loyly-builder",
-			tools: run.tools.map((name) => (name === "bash" ? withTimeoutFloor(ALL_TOOLS[name]!, floor) : ALL_TOOLS[name]!)),
+			tools: run.tools.map((name) => (name === "bash" ? withTimeoutFloor(ALL_TOOLS[name]!, floor, ceiling) : ALL_TOOLS[name]!)),
 			sections: [section("environment", () => prompt, { tag: false })],
 		}),
 	);
@@ -281,9 +302,11 @@ async function main(argv: string[]) {
 	}
 	let model: { provider: string; modelId: string };
 	let timeoutFloor: number;
+	let timeoutCeiling: number | undefined;
 	try {
 		model = modelFromEnv();
 		timeoutFloor = timeoutFloorFromEnv();
+		timeoutCeiling = timeoutCeilingFromEnv(timeoutFloor);
 	} catch (error) {
 		process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
 		return 2;
@@ -299,7 +322,8 @@ async function main(argv: string[]) {
 	const steerDir = process.env.LOYLY_STEER_DIR?.trim() || undefined;
 	process.stderr.write(`model: ${model.provider}/${model.modelId}\n`);
 	process.stderr.write(`bash timeout floor: ${timeoutFloor}s\n`);
-	process.stderr.write(`environment prompt:\n${environmentText(tools, roomLabel, timeoutFloor, imageAdditionsPath)}\n`);
+	if (timeoutCeiling !== undefined) process.stderr.write(`bash timeout ceiling: ${timeoutCeiling}s\n`);
+	process.stderr.write(`environment prompt:\n${environmentText(tools, roomLabel, timeoutFloor, imageAdditionsPath, timeoutCeiling)}\n`);
 	// pi's own model runtime over pi's own auth store (~/.pi/agent/auth.json, or PI_CODING_AGENT_DIR):
 	// the existing openai-codex login, read the way pi reads it. Nothing here logs in or writes a credential;
 	// pi's store itself persists a rotated OAuth token when the access token needs a refresh, as pi does.
@@ -315,7 +339,7 @@ async function main(argv: string[]) {
 	}
 	try {
 		const { settled, answer } = await runBuilder({ room, instruction, store, requestId, models, model,
-			tools, prompt, roomLabel, imageAdditionsPath, steerDir, timeoutFloor });
+			tools, prompt, roomLabel, imageAdditionsPath, steerDir, timeoutFloor, timeoutCeiling });
 		if (answer) process.stdout.write(`${answer}\n`);
 		if (settled.status === "done") {
 			process.stderr.write("status=done\n");

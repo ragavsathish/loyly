@@ -391,7 +391,8 @@ const Grade = defineTask({
             piSettings: grader.settings, prompt: "Grade your selected checklist scope now, as the attached instruction says.",
             roomLabel: `the ${shard.id} grading room`,
             imageAdditionsPath: "/workspace/work/image-additions.txt",
-            readonlyInputs: true })));
+            readonlyInputs: true, bashTimeoutFloorSeconds: 300,
+            bashTimeoutCeilingSeconds: 300 })));
           const failures = launches.flatMap((launch, i) => launch.status === "rejected"
             ? [`${shards[i].id}: ${launch.reason}`]
             : launch.value.exit !== 0 ? [`${shards[i].id}: exit ${launch.value.exit}`] : []);

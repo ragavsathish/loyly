@@ -106,3 +106,35 @@ needs review of the candidate and attachments, a clean product profile, the
 controller kill/restart matrix on the live path, itemwise comparison with the
 accepted instrument, and an operator decision. The historical Pi cycle's
 10/11 score is calibration evidence only.
+
+## Promotion review, 2026-11-20
+
+A fresh pinned cycle 04 at controller `84218c0` selected the same 11 booking-core
+items and generated a **Babashka/Clojure** app. Its self-check, fence, builder
+continuation and independent legacy gate passed on attempt 1. Two Terra grader
+shards returned seven behavioral passes and a pending blind-review item. The
+third shard started four long-lived test servers in one shell command and
+called an unbounded `wait`; we terminated that stuck shard and Pi recorded
+`grade failed` and `cycle failed`. No cycle-04 score was filed. The raw scratch
+and launch receipts remain intact.
+
+The grader now has a five-minute shell-call recovery bound, and its instruction
+requires explicit server cleanup. The controller records that bound in the
+launch receipt and rejects a different value on resume. This correction has
+adapter regression coverage; it has **not** been exercised in a new live cycle.
+
+The specialist panel remains specific to Node candidates: its workers launch
+`server.mjs`, assume particular JSON routes and record files, and its image
+does not contain Babashka. Cycle 03's successful reassessment proves that
+panel on one Node candidate only. The booking spec deliberately leaves the
+implementation stack open, so this is an instrument limitation, not a failed
+booking behavior. Before production cutover, the panel must launch the public
+`start.sh` seam in a suitable pinned runtime image and report project-specific
+observations honestly across both generated shapes.
+
+`ragavsathish/main` still runs the accepted ORC harness over the wider spec-v2
+system. This Pi candidate covers the original booking-core 11-item plan, not
+the other accepted contexts. Promotion of the **full** harness requires those
+contexts to migrate and be compared against the accepted instrument; a
+booking-core-only entrypoint could be promoted separately after a complete
+integrated live cycle, product profile, restart checks and review.

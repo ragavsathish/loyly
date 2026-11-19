@@ -52,6 +52,11 @@ receipt. It never changes the original cycle's audit, score or outcome. See
   and OpenTelemetry in three overlapping Gondolin VMs. It reused the frozen
   scored candidate and generated **15 Allure cases, ready-for-review**, with
   no gaps. Reopening the reassessment reused its verified receipts.
+- A later fresh cycle generated a Babashka/Clojure app and passed the legacy
+  gate. A grader shard stalled while waiting on its own long-lived servers;
+  the cycle recorded a grade failure and filed no score. The bounded grader
+  recovery fix and remaining panel portability work are tracked in
+  [`PRODUCTION-CANDIDATE.md`](PRODUCTION-CANDIDATE.md).
 
 The candidate is not yet the accepted running harness. The original cycle
 failure remains visible; the reassessment is separately labelled. Review the

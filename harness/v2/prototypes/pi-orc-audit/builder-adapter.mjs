@@ -49,12 +49,17 @@ function livePid(pid, expectedCommand) {
   const r = spawnSync("ps", ["-p", pid, "-o", "command="], { encoding: "utf8" });
   return r.status === 0 && r.stdout.includes(expectedCommand);
 }
-function validateReceipt(found, instructionSha256, model, room, image, readonlyInputs, sessionId, requestId) {
+function validateReceipt(found, instructionSha256, model, room, image, readonlyInputs,
+  sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds) {
   if (!found) return;
   const { receipt } = found;
   if (receipt.session_id !== sessionId || receipt.request_id !== requestId
       || receipt.instruction_sha256 !== instructionSha256 || receipt.model !== model
       || receipt.room !== room || receipt.builder_image !== image
+      || (bashTimeoutFloorSeconds !== undefined
+        && receipt.bash_timeout_floor !== String(bashTimeoutFloorSeconds))
+      || (bashTimeoutCeilingSeconds !== undefined
+        && receipt.bash_timeout_ceiling !== String(bashTimeoutCeilingSeconds))
       || (readonlyInputs ? receipt.room_readonly_inputs !== "1"
         : receipt.room_readonly_inputs !== undefined && receipt.room_readonly_inputs !== "0"))
     throw new Error("builder launch receipt differs from approved room, instruction, image or model");
@@ -71,18 +76,27 @@ function stopGroup(pid, expectedCommand) {
 
 export async function runBuilder({ command, room, instruction, image, evidenceDir, sessionId,
   requestId = sessionId, model, stateRoot, timeoutMs = 14_400_000, signal, prompt, roomLabel, piSettings,
-  imageAdditionsPath, readonlyInputs = false }) {
+  imageAdditionsPath, readonlyInputs = false, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds }) {
   for (const path of [command, room, instruction, image, evidenceDir, stateRoot])
     if (!isAbsolute(path)) throw new Error(`builder path must be absolute: ${path}`);
   if (!/^[A-Za-z0-9._-]+$/.test(sessionId)) throw new Error("unsafe builder session ID");
   if (!/^[A-Za-z0-9._-]+$/.test(requestId)) throw new Error("unsafe builder request ID");
+  if (bashTimeoutFloorSeconds !== undefined
+      && (!Number.isInteger(bashTimeoutFloorSeconds) || bashTimeoutFloorSeconds < 1
+        || bashTimeoutFloorSeconds > 1800))
+    throw new Error("invalid bash timeout floor");
+  if (bashTimeoutCeilingSeconds !== undefined
+      && (!Number.isInteger(bashTimeoutCeilingSeconds)
+        || bashTimeoutCeilingSeconds < (bashTimeoutFloorSeconds ?? 1800)))
+    throw new Error("invalid bash timeout ceiling");
   if (!existsSync(room) || !existsSync(instruction) || !existsSync(image))
     throw new Error("builder room, instruction, or image missing");
   if (signal?.aborted) throw new Error("builder launch already aborted");
   const instructionSha256 = sha256(readFileSync(instruction));
   mkdirSync(evidenceDir, { recursive: true });
   let found = await readyLaunch(evidenceDir, sessionId, requestId);
-  validateReceipt(found, instructionSha256, model, room, image, readonlyInputs, sessionId, requestId);
+  validateReceipt(found, instructionSha256, model, room, image, readonlyInputs,
+    sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds);
   if (found?.receipt.exit !== undefined)
     return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
 
@@ -99,7 +113,8 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
     }
     await pause(1000);
     found = await readyLaunch(evidenceDir, sessionId, requestId);
-    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs, sessionId, requestId);
+    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs,
+      sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds);
     if (found?.receipt.exit !== undefined)
       return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
   }
@@ -117,6 +132,10 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
       ...(roomLabel ? { LOYLY_ROOM_LABEL: roomLabel } : {}),
       ...(piSettings ? { LOYLY_BUILDER_PI_SETTINGS: piSettings } : {}),
       LOYLY_ROOM_READONLY_INPUTS: readonlyInputs ? "1" : "0",
+      ...(bashTimeoutFloorSeconds !== undefined
+        ? { LOYLY_BASH_TIMEOUT_FLOOR_SECONDS: String(bashTimeoutFloorSeconds) } : {}),
+      ...(bashTimeoutCeilingSeconds !== undefined
+        ? { LOYLY_BASH_TIMEOUT_CEILING_SECONDS: String(bashTimeoutCeilingSeconds) } : {}),
       ...(imageAdditionsPath ? { LOYLY_IMAGE_ADDITIONS_PATH: imageAdditionsPath } : {}) },
   });
   closeSync(out); closeSync(err);
@@ -130,7 +149,8 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
       child.once("exit", (code, sig) => resolve(code ?? (sig ? 128 : 1)));
     });
     found = await readyLaunch(evidenceDir, sessionId, requestId);
-    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs, sessionId, requestId);
+    validateReceipt(found, instructionSha256, model, room, image, readonlyInputs,
+      sessionId, requestId, bashTimeoutFloorSeconds, bashTimeoutCeilingSeconds);
     if (timedOut) throw new Error("builder host exceeded deadline");
     if (!found || found.receipt.exit === undefined)
       throw new Error("builder host exited without a completed launch receipt");

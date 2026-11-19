@@ -13,6 +13,8 @@ launch="$BUILDER_EVIDENCE_DIR/launch-1/launch.txt"
   echo "instruction_sha256=$(shasum -a 256 "$instruction" | cut -d' ' -f1)"
   echo "model=$LOYLY_PI_MODEL"
   echo "room_readonly_inputs=${LOYLY_ROOM_READONLY_INPUTS:-0}"
+  echo "bash_timeout_floor=${LOYLY_BASH_TIMEOUT_FLOOR_SECONDS:-1800}"
+  echo "bash_timeout_ceiling=${LOYLY_BASH_TIMEOUT_CEILING_SECONDS:-none}"
   echo "wrapper_pid=$$"
 } > "$launch"
 node -e '

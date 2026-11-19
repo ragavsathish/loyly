@@ -28,6 +28,8 @@ l="$BUILDER_EVIDENCE_DIR/launch-$n/launch.txt"
   echo "instruction_sha256=$(shasum -a 256 "$2" | cut -d' ' -f1)"
   echo "model=$LOYLY_PI_MODEL"
   echo "room_readonly_inputs=$LOYLY_ROOM_READONLY_INPUTS"
+  echo "bash_timeout_floor=\${LOYLY_BASH_TIMEOUT_FLOOR_SECONDS:-1800}"
+  echo "bash_timeout_ceiling=\${LOYLY_BASH_TIMEOUT_CEILING_SECONDS:-none}"
   echo "wrapper_pid=$$"
 } > "$l"
 sleep ${sleep}
@@ -54,10 +56,13 @@ test("completed builder launch is reconciled without a second process", async ()
 });
 
 test("grader receipt pins its read-only VM policy on reopening", async () => {
-  const args = { ...fixture(), readonlyInputs: true };
+  const args = { ...fixture(), readonlyInputs: true,
+    bashTimeoutFloorSeconds: 300, bashTimeoutCeilingSeconds: 300 };
   assert.equal((await runBuilder(args)).exit, 0);
   assert.equal((await runBuilder(args)).reconciled, true);
   await assert.rejects(() => runBuilder({ ...args, readonlyInputs: false }), /approved room/);
+  await assert.rejects(() => runBuilder({ ...args, bashTimeoutFloorSeconds: 120 }), /approved room/);
+  await assert.rejects(() => runBuilder({ ...args, bashTimeoutCeilingSeconds: 600 }), /approved room/);
 });
 
 test("distinct requests in one session each keep their own launch receipt", async () => {

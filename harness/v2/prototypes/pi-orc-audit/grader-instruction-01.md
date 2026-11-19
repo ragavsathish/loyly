@@ -12,6 +12,10 @@ Run the copied `test.sh` there if preparation is needed, and start the copied `s
 Use a separate fresh copy for each item. A test result is never an item verdict.
 Observe product behavior through HTTP after starting the copied app. The prior gate passed;
 you must still make your own observations on fresh state. Write all your files under `work/`.
+Keep each app process bounded: start it, wait for HTTP readiness, make the observations, stop it,
+and reap it. Never use a bare shell `wait` on a long-lived server; that waits until the server
+exits and can hold the grader for the full tool timeout. The grading VM caps each shell call at
+five minutes as a recovery bound, not as permission to leave a server running.
 
 Grade only the items in this room's `checklist.json`. For each item, set up the stated Given conditions from fresh state, make the When request, and
 observe every Then. Discover the public interactions from the served app, not its source. Use a
