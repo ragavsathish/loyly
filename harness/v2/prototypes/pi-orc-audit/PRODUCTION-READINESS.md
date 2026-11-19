@@ -26,9 +26,13 @@ Acceptance and publication remain unauthorized.
 
 The controller fix discovers the action of the single public booking form containing
 the household, resource, weekday, and start fields. It records the resolved path in
-the probe evidence. This change needs a newly sealed controller and a fresh score
-before the candidate can be considered for acceptance. The previous run and its
-artifacts remain on the pinned `44776a6` controller.
+the probe evidence. A separate same-candidate correction verifies the original Pi
+audit, Terra Allure, blind agent launch and answer, and original 10/11 score. It runs
+the corrected HTTP probe against a fresh candidate copy and files cycle 03 with the
+unchanged legacy scorer: **11/11**, one newly passing item, zero newly failing.
+The original Pi cycle and its 10/11 score remain untouched on the pinned `44776a6`
+controller. The correction is supplementary evidence, not a new Pi cycle or an
+acceptance decision. A product-bound profile and operator review still remain.
 
 ## Preparation snapshot before the live cycle
 
