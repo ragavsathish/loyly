@@ -37,7 +37,11 @@ async function readAudit(dir) {
     const rows = entries.map((e, i) => portable({ seq: i + 1, entry_id: String(e.id), ...e.data }));
     const jsonl = rows.map((r) => JSON.stringify(r)).join("\n") + "\n";
     writeFileSync(join(dir, "audit.v1.jsonl"), jsonl);
-    return { name: dir.split("/").at(-1), rows, sha256: createHash("sha256").update(jsonl).digest("hex") };
+    const agentFacts = rows.filter((r) => r.stage === "build" || r.stage === "repair" || r.stage === "grade");
+    const provenance = agentFacts.some((r) => r.fixture === true || r.fixture_grader === true)
+      ? "fixture evidence" : agentFacts.some((r) => r.model) ? "live path" : "pre-agent refusal";
+    return { name: dir.split("/").at(-1), rows, provenance,
+      sha256: createHash("sha256").update(jsonl).digest("hex") };
   } finally { await harness.close(ctx); }
 }
 const runs = await Promise.all(dirs.map(readAudit));
@@ -56,18 +60,18 @@ button[aria-selected=true]{background:#173129;color:white}header p{max-width:850
 `;
 const safe = JSON.stringify(runs).replaceAll("<", "\\u003c");
 const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pi durable cycle audit prototype</title><style>${styles}</style>
-<header><h1>Legacy cycle audit · throwaway prototype</h1><p>The original harness self-check, fence, checklist, gate, score and scoreboard are real. The instruction bundle, builder, grading view and grader are explicit fixtures. Every visible Pi fact was read back from committed entries; these are Pi tasks, not ORC ticks.</p></header>
+<header><h1>Legacy cycle audit · throwaway prototype</h1><p>The original harness self-check, fence, checklist, gate, score and scoreboard run as recorded. Each run names fixture evidence. Every visible Pi fact was read back from committed entries; these are Pi tasks, not ORC ticks.</p></header>
 <nav class="tabs" aria-label="Run examples"></nav><div class="controls"><button id="play">Play</button><button id="reset">Reset</button><input id="scrub" type="range" min="0" value="0"><span id="count"></span></div>
 <section class="story" aria-label="Legacy cycle stages"></section><section class="lane"><h2>Pi durable task and decision lane</h2><div class="stickies"></div></section><h2>Selected evidence</h2><pre id="detail">Select an event.</pre><p class="meta" id="manifest"></p>
 <script type="application/json" id="runs">${safe}</script><script>
 const runs=JSON.parse(document.querySelector('#runs').textContent);let current=0,position=0,timer;
-const stages=['self-check','fence','checklist','render','build','builder-continuation','gate','retry','repair','grading-room','grade','score','scoreboard','cycle'];
+const stages=['cut','self-check','fence','checklist','render','build','builder-continuation','gate','retry','repair','grading-room','grade','score','scoreboard','cycle'];
 const tabs=document.querySelector('.tabs'),story=document.querySelector('.story'),stickies=document.querySelector('.stickies'),scrub=document.querySelector('#scrub');
-function draw(){const run=runs[current],rows=run.rows;tabs.innerHTML=runs.map((r,i)=>'<button data-run="'+i+'" aria-selected="'+(i===current)+'">'+r.name+'</button>').join('');
+function draw(){const run=runs[current],rows=run.rows;tabs.innerHTML=runs.map((r,i)=>'<button data-run="'+i+'" aria-selected="'+(i===current)+'">'+r.name+' · '+r.provenance+'</button>').join('');
 scrub.max=String(rows.length);scrub.value=String(position);document.querySelector('#count').textContent=position+' / '+rows.length;
 story.innerHTML=stages.map(s=>{const matching=rows.filter((r,i)=>i<position&&r.stage===s),last=matching.at(-1);return '<div class="stage '+(last?'active':'')+'"><strong>'+s+'</strong><small>'+(last?last.outcome+(last.attempt?' · attempt '+last.attempt:''):'not reached')+'</small></div>'}).join('');
 stickies.innerHTML=rows.map((r,i)=>'<button class="sticky '+(i<position?'active ':'')+(r.outcome==='failed'?'fail':'')+'" data-event="'+i+'"><b>'+r.stage+' · '+r.outcome+'</b><small>#'+r.seq+' '+(r.attempt?'attempt '+r.attempt:'')+'</small></button>').join('');
-document.querySelector('#manifest').textContent='Pi committed audit entry export SHA-256 '+run.sha256+' · '+rows.length+' facts';}
+document.querySelector('#manifest').textContent='Pi committed audit entry export SHA-256 '+run.sha256+' · '+rows.length+' facts · '+run.provenance;}
 tabs.onclick=e=>{const b=e.target.closest('[data-run]');if(!b)return;clearInterval(timer);current=Number(b.dataset.run);position=0;draw()};
 stickies.onclick=e=>{const b=e.target.closest('[data-event]');if(!b)return;const r=runs[current].rows[Number(b.dataset.event)];document.querySelector('#detail').textContent=JSON.stringify(r,null,2)};
 scrub.oninput=()=>{position=Number(scrub.value);draw()};document.querySelector('#reset').onclick=()=>{clearInterval(timer);position=0;draw()};

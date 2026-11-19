@@ -144,7 +144,7 @@ const Builder = defineTask({
     announce: async (task, runtime) => runtime.commit(async (tx) => {
       await audit(tx, task, task.input.attempt === 1 ? "build" : "repair", "started", {
         attempt: task.input.attempt, session_id: `builder-${task.input.attempt}`,
-        fixture: !live, model: builder?.model ?? null,
+        fixture: !live || builder?.model.startsWith("test/"), model: builder?.model ?? null,
         previous_gate_log_sha256: task.input.previousGateSha256 ?? null,
       });
       return live ? { status: "running", checkpoint: { phase: "materialize" } }
@@ -183,7 +183,7 @@ const Builder = defineTask({
             attempt, session_id: sessionId, candidate_digest: digest ?? null,
             instruction_sha256: existsSync(instruction) ? hash(readFileSync(instruction)) : null,
             reconciled: r?.reconciled ?? false, reason_code: reason ? "builder-effect-or-scope" : null,
-            fixture: false,
+            fixture: builder.model.startsWith("test/"),
           });
           return { status: "terminal", outcome: digest
             ? { status: "completed", result: { candidateDigest: digest } }
