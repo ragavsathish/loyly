@@ -8,6 +8,8 @@ The branch also carries the existing Pi builder host under `.pi/harness/`, plus 
 
 The demo still uses fixture builders and a fixture grader. A gate pass in `live` mode stops with `grader-not-connected` until a separate black-box grader is implemented; it cannot file the fixture verdicts as a real score. No live model has been launched on this branch.
 
+The first live-grade boundary is now exercised with a gate-green stub. It creates a separate grading room with only the selected `01-booking-core` plan, the gated `impl/`, the approved checklist, and empty `work/`; it omits builder evidence, prototype fixtures, prior verdicts, and score files. The room's candidate and checklist digests are checked on creation and reopening. The green stub exits at the explicit grader block with no score filed.
+
 For a pinned fixture trial, set `LOYLY_APPROVED_COMMIT` to a full commit ID and `LOYLY_APPROVED_CHECKLIST_SHA256` to the expected checklist file digest, then run `node worker.mjs scratch-pinned repair`. The cycle clones that commit into `scratch-pinned/cut/project`, runs the original self-check and fence there, and records both approval values in its Pi task input. A wrong checklist digest stops before building; reopening the store with changed approval values is refused. At `17d68d2`, the checklist digest is `4acbadbce0e08cafd19ac89d2a0d909a564abd242ffecdb06b6184a1bbe631cc`. This is still a fixture trial and is not an approved scored product run.
 
 ```bash

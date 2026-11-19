@@ -2,7 +2,7 @@
 // legacy harness cycle. Builder and grader are explicitly deterministic fixtures.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync, chmodSync, readdirSync, lstatSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync, chmodSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
@@ -11,6 +11,7 @@ import { Harness, createRegistry, defineEntry, defineExtension, defineTask } fro
 import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite/node";
 import { runGate } from "./gate-adapter.mjs";
 import { runBuilder } from "./builder-adapter.mjs";
+import { candidateDigest as digestCandidate, prepareGradingRoom, verifyGradingRoom } from "./grading-room.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
@@ -88,20 +89,7 @@ function proveCut() {
     && gitAt(sourceRoot, "status", "--porcelain") === "";
 }
 function candidateDigest(candidateRoom = room) {
-  const digest = createHash("sha256");
-  const walk = (dir, prefix) => {
-    for (const name of readdirSync(dir).sort()) {
-      const path = `${prefix}/${name}`, file = join(dir, name), stat = lstatSync(file);
-      if (stat.isDirectory()) walk(file, path);
-      else if (stat.isFile()) {
-        digest.update(path); digest.update("\0");
-        digest.update(String(stat.mode & 0o777)); digest.update("\0");
-        digest.update(readFileSync(file)); digest.update("\0");
-      } else throw new Error(`candidate has a symlink or special file: ${path}`);
-    }
-  };
-  walk(join(candidateRoom, "impl"), "impl");
-  return digest.digest("hex");
+  return digestCandidate(candidateRoom);
 }
 function verifyBuilderScope() {
   if (!existsSync(join(room, "impl", "start.sh")) || !existsSync(join(room, "impl", "test.sh")))
@@ -232,7 +220,7 @@ const Gate = defineTask({
           candidate_digest: digest, reconciled: r.reconciled,
         });
         return { status: "terminal", outcome: { status: "completed", result: {
-          passed: r.exit === 0, log, logSha256: r.logSha256,
+          passed: r.exit === 0, log, logSha256: r.logSha256, candidateSha256: digest,
         } } };
       }, ctx);
     },
@@ -364,11 +352,8 @@ const Cycle = defineTask({
       const result = outcome.result;
       await runtime.commit(async (tx) => {
         if (result.passed) {
-          if (live) {
-            await audit(tx, task, "grade", "blocked", { reason: "independent-live-grader-not-connected" });
-            return { status: "terminal", outcome: { status: "failed", error: "grader-not-connected" } };
-          }
-          return { status: "running", checkpoint: { phase: "grading-room", attempt } };
+          return { status: "running", checkpoint: { phase: "grading-room", attempt,
+            candidateSha256: result.candidateSha256 } };
         }
         if (attempt < 3) {
           await audit(tx, task, "retry", "scheduled", { attempt: attempt + 1, previous_gate_log: result.log });
@@ -380,6 +365,30 @@ const Cycle = defineTask({
       }, ctx);
     },
     "grading-room": async (task, runtime) => {
+      if (live) {
+        const candidateSha256 = task.state.checkpoint.candidateSha256;
+        const checklistFile = join(scratch, "checklist.json");
+        const args = { sourceRoom: room, candidateRoom: room, checklistFile,
+          out: gradingRoom, candidateSha256, checklistSha256: approvedChecklistSha256 };
+        let reason;
+        try {
+          if (existsSync(gradingRoom)) verifyGradingRoom(args);
+          else prepareGradingRoom(args);
+        } catch (error) {
+          reason = String(error.stack ?? error);
+          writeFileSync(join(scratch, "grading-room-error.log"), `${reason}\n`);
+        }
+        await runtime.commit(async (tx) => {
+          await audit(tx, task, "grading-room", reason ? "failed" : "prepared", {
+            candidate_sha256: candidateSha256, checklist_sha256: approvedChecklistSha256,
+            reason_code: reason ? "grading-room-copy" : null });
+          if (!reason) await audit(tx, task, "grade", "blocked", {
+            reason: "independent-live-grader-not-connected" });
+          return { status: "terminal", outcome: { status: "failed",
+            error: reason ? "grading-room" : "grader-not-connected" } };
+        }, ctx);
+        return;
+      }
       let r;
       if (existsSync(join(gradingRoom, ".grading-room.txt"))) {
         r = { code: 0, sha256: hash(readFileSync(join(gradingRoom, ".grading-room.txt"))) };
