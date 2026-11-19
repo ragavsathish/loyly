@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: A run starts once, one at a time, on a commit of the project repository
-
-    @minimum @allium-rule-failure.StartRun.5 @item-06-050
-    Scenario: A start whose configured builder image is not in the builder images directory is refused
-      Given the configuration's builder image is "builder-clojure" and the builder images directory holds no folder of that name
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then the start is refused "builder-image-missing"
-      And no run R-1 exists, and no builder was launched

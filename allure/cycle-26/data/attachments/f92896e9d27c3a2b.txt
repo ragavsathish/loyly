@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: The runner stamps, pins and derives the checklist, on the one store
-
-    @minimum @allium-boundary.ASliceLinkIsReadAtItsTarget @item-06-047
-    Scenario: A slice that is a symbolic link in the plan is read at its target
-      Given the plan at the commit holds its slice "01-a" as a symbolic link to "../spec/a", whose spec file holds the two stamped scenarios
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then the stamp effect of run R-1 was recorded, as specification answered, and the run did not halt
-      And the checklist effect's events name the items 01-001 and 01-002, each with its source under "01-a"

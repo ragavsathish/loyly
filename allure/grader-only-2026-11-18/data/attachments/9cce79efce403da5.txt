@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: No clean room is built over a failed harness self-check
-
-    @minimum @allium-rule-success.RecordEffect @item-06-038
-    Scenario: A skipped check is recorded with the whole text after SKIP
-      Given the self-check exits 0 and prints legacy check.sh's line "SKIP  the oracle cannot judge this tree: a tool it grades is absent."
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then the first self-check effect of run R-1 was recorded with the event "regeneration-cycle/harness-self-check-passed"
-      And its detail names the skipped check "the oracle cannot judge this tree: a tool it grades is absent.", that legacy line's whole text after SKIP

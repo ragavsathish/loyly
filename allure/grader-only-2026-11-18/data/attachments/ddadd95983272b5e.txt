@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: The gate grades a copy of the candidate on the host, in legacy verify.sh's order
-
-    @balance @allium-boundary.TheGateGradesACopy @item-06-022
-    Scenario: What a builder writes after it ended does not reach the gate
-      Given the stub builder leaves a candidate the gate passes and, after it exits, keeps writing a file that turns its suite red
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then the gate effect of run R-1 for attempt 1 was recorded with the event "regeneration-cycle/gate-attempt-passed"
-      And the install effect's candidate digest is the regenerate effect's

@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: The judge grades each item of the gated candidate, its scores are filed as scored, and the run ends as its cycle ends
-
-    @minimum @allium-boundary.EachItemStartsClear @item-06-065
-    Scenario: Each item's grading starts with no other item's evidence
-      Given the stub model records every request it is sent, and as the researcher of 01-001 records the evidence "E-ONE"
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then no request sent for the researcher or the judge of 01-002 holds "E-ONE"
-      And the request sent for the judge of 01-001 holds "E-ONE"

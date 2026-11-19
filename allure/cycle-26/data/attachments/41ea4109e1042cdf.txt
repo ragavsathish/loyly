@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: No clean room is built over a failed harness self-check
-
-    @minimum @allium-rule-success.ConcludeWithTheCycle @allium-rule-success.ConcludeRunFailed @item-06-010
-    Scenario: A failing self-check fails the cycle at the fence, and the run with it
-      Given the self-check exits non-zero and its last line is "golden checklist differs"
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then run R-1 failed, its cycle failed at the fence for "harness-self-check-failed" with detail "golden checklist differs"
-      And its last effect result is the self-check, and it has no fence effect and no regenerate effect

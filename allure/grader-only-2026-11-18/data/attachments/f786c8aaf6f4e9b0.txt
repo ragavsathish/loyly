@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: The builder instruction is rendered by the model, and the builder is handed nothing more
-
-    @balance @allium-rule-success.HaltRun @item-06-072
-    Scenario: A render the model does not reply to halts the run before any builder
-      Given the stub model fails every request to render the builder instruction
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then run R-1 is halted at the render because an effect could not run
-      And it has no regenerate effect, no builder was launched, and its progress has no fail-cycle effect and no cycle

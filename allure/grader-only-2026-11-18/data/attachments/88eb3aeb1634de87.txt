@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: No clean room is built over a failed harness self-check
-
-    @balance @allium-rule-success.RecordEffect @item-06-011
-    Scenario: A check the self-check skips is recorded as a listed skip
-      Given the self-check exits 0 and prints "SKIP bb-tools"
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then the first self-check effect of run R-1 was recorded with the event "regeneration-cycle/harness-self-check-passed"
-      And its detail names the skipped check "bb-tools"

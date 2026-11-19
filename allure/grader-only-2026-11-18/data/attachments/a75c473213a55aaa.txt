@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: The gate grades a copy of the candidate on the host, in legacy verify.sh's order
-
-    @minimum @allium-boundary.TheGateGradesACopy @item-06-037
-    Scenario: A candidate whose suite writes inside its own directory passes the gate
-      Given the stub builder leaves a candidate whose suite creates and removes a temporary directory inside its own directory, then exits 0, and whose launch entrypoint serves the marker on the port
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then the gate effect of run R-1 for attempt 1 was recorded with the event "regeneration-cycle/gate-attempt-passed"
-      And the install effect's candidate digest is the regenerate effect's

@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: The gate grades a copy of the candidate on the host, in legacy verify.sh's order
-
-    @balance @allium-boundary.TheLegacyGateOrder @item-06-020
-    Scenario: A candidate with no launch entrypoint fails the attempt for a missing contract
-      Given the stub builder leaves a candidate with a test.sh and no start.sh
-      And the budget allows 1 gate attempt
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then the gate effect of run R-1 for attempt 1 was recorded with the event "regeneration-cycle/gate-attempt-failed" for "contract-missing"

@@ -1,9 +1,0 @@
-Feature: Cycle runner
-  Rule: A regenerate runs one fresh builder session and records what it left in its candidate scope
-
-    @minimum @allium-boundary.TheBuilderExitIsNoVerdict @allium-rule-success.ConcludeRunFailed @item-06-016
-    Scenario: A builder that leaves nothing fails the cycle at regenerate
-      Given the stub builder exits 0 and leaves the candidate scope empty
-      When the operator starts run R-1 of cycle C-1 at source cut K-1
-      Then run R-1 has no regenerate effect, and its fail-cycle effect was recorded
-      And run R-1 failed with its cycle at the regenerate stage for "candidate-not-regenerated"
