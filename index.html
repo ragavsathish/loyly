@@ -19,11 +19,11 @@
       <div class="eyebrow"><span class="live-dot"></span> Live prototype · 19 November 2026</div>
       <h1>The original Löyly cycle, <em>resumed by Pi.</em></h1>
       <p class="lede">Pi durable runs the original harness sequence, launches isolated builder and grader agents, and keeps a committed audit trail that can be played back. This is a measured prototype, awaiting acceptance.</p>
-      <div class="actions"><a class="button primary" href="replay/latest.html">Play the live cycle <span aria-hidden="true">↗</span></a><a class="button" href="allure/">Explore parallel grading <span aria-hidden="true">↗</span></a></div>
+      <div class="actions"><a class="button primary" href="replay/latest.html">Play the live cycle <span aria-hidden="true">↗</span></a><a class="button" href="allure/specialist-grade/index.html">Open specialist Allure <span aria-hidden="true">↗</span></a></div>
       <div class="score-row" aria-label="Current results">
         <div><strong>10<span>/11</span></strong><small>Original Pi score · immutable</small></div>
         <div><strong>11<span>/11</span></strong><small>Same-candidate correction · supplementary</small></div>
-        <div><strong>22<span>/22</span></strong><small>Prototype tests passing</small></div>
+        <div><strong>3<span>/3</span></strong><small>Parallel specialist probes · supplemental</small></div>
       </div>
     </section>
 
@@ -52,9 +52,9 @@
     </section>
 
     <section class="band" id="graders"><div class="wrap section">
-      <div class="section-heading"><span class="kicker">03 / Parallel grading</span><h2>Three VM shards. One validated result set.</h2><p>The controller starts all three Terra graders concurrently with <code>Promise.allSettled</code>. Each receives a private read-only candidate view and a subset of Gherkin Rules. The collector requires exactly one result for every approved item before scoring. This run used the same HTTP-oriented toolset in all three VMs; browser and telemetry VMs are the next design step.</p></div>
+      <div class="section-heading"><span class="kicker">03 / Parallel grading</span><h2>One candidate. Two grading passes.</h2><p>The original scored cycle launched three Terra HTTP graders concurrently, splitting the approved Gherkin Rules. A later grading-only pass launched three different specialist workers concurrently on the same frozen candidate; it did not change the original Pi score.</p></div>
       <div class="shard-grid"><article><small>shard-01 · 4 items</small><strong>01-001 · 01-002<br>01-007 · 01-008</strong><span>4 passed</span></article><article><small>shard-02 · 4 items</small><strong>01-003 · 01-004<br>01-009 · 01-010</strong><span>4 passed</span></article><article><small>shard-03 · 3 items</small><strong>01-005 · 01-006<br>01-011</strong><span>2 passed · 1 pending blind review</span></article></div>
-      <div class="schema-callout"><div><span class="kicker">Your Allure lifecycle schema</span><h3>The attached contract is the grader output format.</h3><p>The checked-in file is byte-for-byte identical to your attachment (SHA-256 <code>0eef607c5d9e…</code>). Every result is JSON Schema validated, carries <code>feature</code>, <code>story</code> and <code>@item</code> labels, Gherkin steps, an observation, timing, and evidence attachments. The merged set is checked against the checklist before the legacy scorer receives verdicts. Playwright and OpenTelemetry examples in the schema are not evidence that those tools ran.</p></div><div class="schema-actions"><a class="button primary" href="allure/#coverage">Inspect tool coverage ↗</a><a class="text-link" href="evidence/allure-lifecycle-result.schema.json">Read the exact schema ↗</a></div></div>
+      <div class="schema-callout"><div><span class="kicker">Your Allure lifecycle schema</span><h3>Playwright, protocol and OTel now have real evidence.</h3><p>Three specialist results passed the exact attached schema (SHA-256 <code>0eef607c5d9e…</code>) and ran with <strong>1,504 ms of measured overlap</strong>. Playwright captured screenshots and a trace; Gondolin measured 101 concurrent booking races; OpenTelemetry captured three candidate-bound spans and 14 metric rows. Each result has an image-bound execution receipt. Docker workers used separate containers in a shared Linux VM; protocol used its own Gondolin VM.</p></div><div class="schema-actions"><a class="button primary" href="allure/#specialists">Inspect specialist results ↗</a><a class="text-link" href="evidence/allure-lifecycle-result.schema.json">Read the exact schema ↗</a></div></div>
     </div></section>
 
     <section class="band" id="evidence"><div class="wrap section">
@@ -63,7 +63,7 @@
       <div class="provenance"><div><span>Source cut</span><code>b97e4eda0151…</code></div><div><span>Candidate SHA-256</span><code>79481d7eb90f…</code></div><div><span>Controller fix</span><code>655f5d25fdd6…</code></div><div><span>Checklist</span><code>11 items · 4acbadbc…</code></div></div>
     </div></section>
 
-    <section class="wrap section next" id="next"><div class="section-heading"><span class="kicker">05 / Next decision</span><h2>Measured. Not yet accepted.</h2></div><p>The prototype has real builder and grader evidence, a passing legacy gate, restart tests and a same-candidate correction. A product-bound profile, remaining crash recovery checks, and operator review are still needed before promotion. The site is an audit view of the current prototype, not a claim that it replaced the accepted runner.</p><a class="text-link" href="https://github.com/ragavsathish/loyly/tree/fix/pi-blind-form-route/harness/v2/prototypes/pi-orc-audit">Browse the prototype source ↗</a></section>
+    <section class="wrap section next" id="next"><div class="section-heading"><span class="kicker">05 / Next decision</span><h2>Measured. Not yet accepted.</h2></div><p>The prototype has real builder and grader evidence, a passing legacy gate, a same-candidate correction, and now a bounded Playwright, protocol and OTel grading pass. A release profile with explicit budgets, remaining crash recovery checks, and operator review are still needed before promotion. The supplemental pass is not a new Pi cycle or a replacement score.</p><a class="text-link" href="https://github.com/ragavsathish/loyly/tree/fix/pi-blind-form-route/harness/v2/prototypes/pi-orc-audit">Browse the prototype source ↗</a></section>
   </main>
   <footer class="wrap"><span>Löyly · Pi durable prototype</span><span>Evidence from the 19 November 2026 live cycle</span></footer>
 </body>
