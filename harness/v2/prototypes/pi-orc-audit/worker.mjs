@@ -535,17 +535,17 @@ const Cycle = defineTask({
       const board = r.code === 0 ? command("scoreboard", "bb", ["harness/scoreboard.clj", "02"], { cwd: instrument }) : r;
       const scored = board.code === 0 ? JSON.parse(readFileSync(join(cycleDir, "scores.json"), "utf8")).items : [];
       const score = `${scored.filter((item) => item.verdict === "pass").length}/${scored.length}`;
-      const humanReviewRequired = live && scored.some((item) => item.id === "01-011" && item.verdict === "fail");
+      const blindAgentReviewRequired = live && scored.some((item) => item.id === "01-011" && item.verdict === "fail");
       const attempt = task.state.checkpoint.attempt ?? 2;
       await runtime.commit(async (tx) => {
         await audit(tx, task, "score", r.code === 0 ? "filed" : "failed", {
           log_sha256: r.sha256, fixture_grader: !live || grader?.model.startsWith("test/") });
         if (board.code === 0) await audit(tx, task, "scoreboard", "reported", { cycle: "02", log_sha256: board.sha256 });
         await audit(tx, task, "cycle", board.code === 0 ? (live ? "measured" : "completed") : "failed", {
-          reason: board.code === 0 ? (humanReviewRequired ? "blind-human-review-required" : null) : "score" });
+          reason: board.code === 0 ? (blindAgentReviewRequired ? "blind-agent-review-required" : null) : "score" });
         return { status: "terminal", outcome: { status: "completed", result: {
           passed: board.code === 0 && !live, scored: board.code === 0,
-          humanReviewRequired, attempts: attempt, score: board.code === 0 ? score : null } } };
+          blindAgentReviewRequired, attempts: attempt, score: board.code === 0 ? score : null } } };
       }, ctx);
     },
   },

@@ -29,12 +29,14 @@ suite, a fixed answer, or another item's result.
   requests is not this test. Record both responses and the final holder and derived views.
 - `01-010`: run that same in-flight race one hundred times with a free slot at the start of each
   run. Record the one-confirmed, both-confirmed, and neither-confirmed counts. One violation fails.
-- `01-011`: the spec requires a person who has **not** read the sauna-day configuration to judge
-  whether the refusal is actionable. You have read the spec, so you cannot be that person. Collect
+- `01-011`: the spec requires a fresh independent subagent with **no prior context or
+  configuration** to judge whether the refusal is actionable. You have read the spec, so you
+  cannot be that subagent. Collect
   the exact refusal text in `work/blind-review-011.txt`, without the configuration or your answer.
   File this item's Allure result as `skipped`, `stage: "pending"`, with a `statusDetails.message`
-  beginning `not reached: blind human review required`.
-  The operator can later arrange that separate review and file its verdict with its own evidence.
+  beginning `not reached: blind subagent review required`.
+  The controller gives only this refusal to a fresh subagent, then probes its suggested request
+  over HTTP and files a separate review result. Do not guess its verdict.
 
 Write one `{uuid}-result.json` per item under `work/allure-results/`, with fresh UUIDs and actual
 attachment files beside the results. Each JSON object must validate against the attached schema.

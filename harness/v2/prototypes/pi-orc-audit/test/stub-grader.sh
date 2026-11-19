@@ -31,7 +31,7 @@ for (const item of items) {
   const status = pending ? "skipped" : "passed";
   const result = {uuid, historyId:fullName, testCaseId:fullName, fullName,
     name:item.name, status, stage:pending ? "pending" : "finished",
-    statusDetails:{message:pending ? "not reached: blind human review required" : "stub fixture, no behavioral observation"},
+    statusDetails:{message:pending ? "not reached: blind subagent review required" : "stub fixture, no behavioral observation"},
     start:Date.now(), stop:Date.now(),
     labels:[{name:"lifecycle",value:"pre-production"},{name:"technique",value:pending ? "usability" : "acceptance"},
       {name:"tool",value:"test stub"},{name:"feature",value:"Booking core"},

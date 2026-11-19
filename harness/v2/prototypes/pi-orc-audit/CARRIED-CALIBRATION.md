@@ -40,4 +40,34 @@ These are **calibration observations**, not an approved scored cycle or acceptan
 is a single-process demo without household authentication, as its own README states. Raw
 candidate, gate and grader rooms are ignored local artifacts under `scratch-real-builder-01/`
 and `scratch-carried-terra-3/`. The grader instruction digest is a draft until operator approval;
-the named-person review, same-candidate legacy shadow, and release decision remain open.
+the revised subagent review on a new pinned cut, same-candidate legacy shadow, and release decision remain open.
+
+The candidate-bound blind packet is under `scratch-real-builder-01/blind-review-packet/`.
+Its `refusal.txt` is the exact grader-captured refusal (SHA-256
+`c98f2ea982409d5b25e8bc57f474ac646d4cb7735b036c6c252765d0ae103f28`); the packet
+manifest SHA-256 is `6d1523849854e8dca562ed1419e6f8532670ac779617793de55c928f905b7f07`.
+Only `refusal.txt` and `question.txt` should be shown to the blind reviewer. Under the
+operator-approved revision, the reviewer is a fresh subagent with no inherited context or
+tools. `blind-review-cli.mjs` validates its separate response against the packet and probes
+the named request against a fresh candidate copy before it can file a passed agent Allure
+result. It does not change the grader's pending result or auto-accept the build. The old
+grader result remains pending under its original human-worded cut. The checklist digest
+remains `4acbadbce0e08cafd19ac89d2a0d909a564abd242ffecdb06b6184a1bbe631cc`
+because the item ID, title, rule, and source line did not change; the spec bytes did change.
+
+### Blind subagent calibration on the old candidate
+
+The operator authorized a fresh blind subagent. It was launched with no inherited history,
+tools, project files, or configuration; its prompt held only the exact refusal above and the
+question of what request to make. It answered: “Book pukuhuone 9 on Thursday from 17:00 to
+18:30.” It also noted that the refusal did not say which calendar Thursday. The controller
+transcribed the suggested recurring slot to `POST /book` with household 12, resource `ph9`,
+weekday `Thursday`, and start `17:00`. A separate fresh candidate copy returned HTTP 201 and
+confirmed every Thursday from 17:00 to 18:30. The new packet, review response, HTTP receipt,
+and supplemental schema-valid Allure result are under `scratch-real-builder-01/blind-agent-*`
+(ignored local artifacts). Packet SHA-256:
+`6d1523849854e8dca562ed1419e6f8532670ac779617793de55c928f905b7f07`;
+review response SHA-256:
+`81194a65633971882c66c44dc3042e1ecb72b9390ad2f90abad961855c7e02d7`.
+This calibrated the revised method on a previously built candidate. It did not alter the
+old raw grader result, produce a scored cycle, or approve that candidate under the new spec.

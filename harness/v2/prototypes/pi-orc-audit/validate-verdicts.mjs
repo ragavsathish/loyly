@@ -17,9 +17,9 @@ export function validateVerdicts(room) {
   }
   const blind = verdicts.find((v) => v.id === "01-011");
   if (blind && (blind.verdict !== "fail"
-      || !blind.evidence.startsWith("not reached: blind human review required")
+      || !blind.evidence.startsWith("not reached: blind subagent review required")
       || !existsSync(join(room, "work", "blind-review-011.txt"))))
-    throw new Error("01-011 needs a separate blind human review");
+    throw new Error("01-011 needs a separate blind subagent review");
   if (!Array.isArray(surprises)) throw new Error("surprises must be a JSON array");
   for (const surprise of surprises) {
     if (!ids.includes(surprise?.item) || typeof surprise.observation !== "string"

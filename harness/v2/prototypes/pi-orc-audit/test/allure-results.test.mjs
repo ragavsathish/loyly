@@ -23,7 +23,7 @@ function fixture() {
     const result = { uuid, historyId: fullName, testCaseId: fullName, fullName,
       name: item.name, status, stage: item.id === "01-011" ? "pending" : "finished",
       statusDetails: { message: item.id === "01-011"
-        ? "not reached: blind human review required" : "Observed the weekly schedule over HTTP" },
+        ? "not reached: blind subagent review required" : "Observed the weekly schedule over HTTP" },
       start: 1000, stop: 1001,
       labels: [{ name: "lifecycle", value: "pre-production" },
         { name: "technique", value: "acceptance" }, { name: "tool", value: "Pi grader" },
@@ -43,7 +43,7 @@ test("attached lifecycle schema is the grader contract and projects honest legac
   assert.deepEqual(readAllureResults(room).verdicts.map((v) => v.verdict), ["pass", "fail"]);
   blind.result.status = "passed";
   writeFileSync(blind.path, JSON.stringify(blind.result));
-  assert.throws(() => readAllureResults(room), /blind human review/);
+  assert.throws(() => readAllureResults(room), /blind subagent review/);
   blind.result.status = "skipped";
   writeFileSync(blind.path, JSON.stringify(blind.result));
   first.result.labels = first.result.labels.filter((label) => label.name !== "lifecycle");

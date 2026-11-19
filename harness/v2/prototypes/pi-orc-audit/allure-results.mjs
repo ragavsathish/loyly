@@ -49,8 +49,10 @@ export function readAllureResults(room) {
       expectedFiles.add(attachment.source);
     }
     if (id === "01-011" && (result.status !== "skipped" || result.stage !== "pending"
-        || !result.statusDetails.message.startsWith("not reached: blind human review required")))
-      throw new Error("01-011 needs a separate blind human review");
+        || !["not reached: blind subagent review required",
+          "not reached: blind human review required"].some((prefix) =>
+          result.statusDetails.message.startsWith(prefix))))
+      throw new Error("01-011 needs a separate blind subagent review");
     byId.set(id, result);
   }
   const verdicts = items.map((item) => {
