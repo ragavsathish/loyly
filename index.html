@@ -31,7 +31,7 @@
       <div class="section-heading"><span class="kicker">01 / The cycle</span><h2>From approved source to evidence</h2><p>The active driver uses the original booking-core plan's 11 stamped items. The legacy modules remain the fence, gate and scoring authority.</p></div>
       <ol class="flow">
         <li><span class="step-number">01</span><div><h3>Pin and fence</h3><p>Check the source, checklist, instructions and VM images; run the original self-check and physical fence.</p></div><span class="tag">legacy</span></li>
-        <li><span class="step-number">02</span><div><h3>Build and verify</h3><p>A fresh Pi builder works inside Gondolin. The legacy gate follows each build, with at most three attempts and bounded same-session continuation.</p></div><span class="tag">Pi durable</span></li>
+        <li><span class="step-number">02</span><div><h3>Build and verify</h3><p>A fresh Pi builder works inside Gondolin. On a failed builder turn or red legacy gate, the next attempt forks its Pi transcript and continues the same app with the failure log. At most three attempts precede grading.</p></div><span class="tag">Pi durable</span></li>
         <li><span class="step-number">03</span><div><h3>Grade independently</h3><p>Three Terra shards get private read-only rooms and write schema-valid Allure results. A fresh blind reviewer sees only the refusal and question.</p></div><span class="tag">Gondolin VMs</span></li>
         <li><span class="step-number">04</span><div><h3>Probe and score</h3><p>Specialist VMs add browser, protocol and telemetry observations. The original scorer files the item verdicts; Pi commits the lifecycle audit.</p></div><span class="tag">Allure + Pi</span></li>
       </ol>
