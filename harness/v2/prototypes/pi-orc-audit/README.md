@@ -1,5 +1,8 @@
 # THROWAWAY: Pi durable over the original Löyly harness
 
+For the latest candidate-bound, multi-tool Gondolin grading panel and its
+direct-directory Allure report, see [GRADING-PANEL.md](GRADING-PANEL.md).
+
 This branch starts at `scope-impact/master` (`17d68d2`). It asks whether Pi durable can run the **original legacy cycle** and preserve an interactive audit playback. It does not change `ragavsathish/main`, the accepted spec-v2 runner, or the upstream branch.
 
 For the revised 01-011 run, the source is the separate spec-only cut
