@@ -6,6 +6,8 @@ The integration branch keeps that baseline and replaces the prototype's gate-log
 
 The same directory also contains a process adapter for a future live Pi builder. Its stable session ID and launch receipt survive controller SIGKILL in tests. The demo still uses fixture builders and a fixture grader; the live builder host has not been connected to this clean-base branch. A live room must be cut from the approved original commit so it cannot see these prototype fixtures.
 
+For a pinned fixture trial, set `LOYLY_APPROVED_COMMIT` to a full commit ID and `LOYLY_APPROVED_CHECKLIST_SHA256` to the expected checklist file digest, then run `node worker.mjs scratch-pinned repair`. The cycle clones that commit into `scratch-pinned/cut/project`, runs the original self-check and fence there, and records both approval values in its Pi task input. A wrong checklist digest stops before building; reopening the store with changed approval values is refused. At `17d68d2`, the checklist digest is `4acbadbce0e08cafd19ac89d2a0d909a564abd242ffecdb06b6184a1bbe631cc`. This is still a fixture trial and is not an approved scored product run.
+
 ```bash
 cd harness/v2/prototypes/pi-orc-audit
 npm ci --ignore-scripts --no-audit --no-fund

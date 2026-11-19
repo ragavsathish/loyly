@@ -20,6 +20,14 @@ const storePath = join(scratch, "cycle.PROTOTYPE.sqlite");
 const room = join(scratch, "fenced-room");
 const gradingRoom = join(scratch, "grading-room");
 const instrument = join(scratch, "instrument");
+const approvedCommit = process.env.LOYLY_APPROVED_COMMIT;
+if (approvedCommit && !/^[0-9a-f]{40}$/.test(approvedCommit))
+  throw new Error("LOYLY_APPROVED_COMMIT must be a full 40-character commit ID");
+const approvedChecklistSha256 = process.env.LOYLY_APPROVED_CHECKLIST_SHA256 ?? null;
+if (approvedCommit && !/^[0-9a-f]{64}$/.test(approvedChecklistSha256 ?? ""))
+  throw new Error("a pinned cut needs LOYLY_APPROVED_CHECKLIST_SHA256");
+const cut = join(scratch, "cut");
+const sourceRoot = approvedCommit ? join(cut, "project") : ROOT;
 const mode = process.argv[3] ?? "repair"; // repair: red first gate, green second; three-red: all red
 mkdirSync(scratch, { recursive: true });
 
@@ -27,7 +35,7 @@ const hash = (value) => createHash("sha256").update(value).digest("hex");
 const resultPath = (name) => join(scratch, `${name}.log`);
 function command(name, program, args, options = {}) {
   const r = spawnSync(program, args, {
-    cwd: options.cwd ?? ROOT,
+    cwd: options.cwd ?? sourceRoot,
     env: { ...process.env, ...options.env },
     encoding: "utf8",
     timeout: options.timeout ?? 900_000,
@@ -51,6 +59,19 @@ function proofOfFence() {
   const roots = spawnSync("git", ["-C", room, "rev-list", "--count", "--all"], { encoding: "utf8" });
   return roots.status === 0 && roots.stdout.trim() === "1"
     && !existsSync(join(room, "impl")) && !existsSync(join(room, "harness", "cycles"));
+}
+function gitAt(path, ...args) {
+  const r = spawnSync("git", ["-C", path, ...args], { encoding: "utf8" });
+  return r.status === 0 ? r.stdout.trim() : null;
+}
+function proveCut() {
+  if (!approvedCommit) return true;
+  const receipt = join(cut, "cut.json");
+  if (!existsSync(receipt) || !existsSync(sourceRoot)) return false;
+  const recorded = JSON.parse(readFileSync(receipt, "utf8"));
+  return recorded.commit === approvedCommit && recorded.project === sourceRoot
+    && gitAt(sourceRoot, "rev-parse", "HEAD") === approvedCommit
+    && gitAt(sourceRoot, "status", "--porcelain") === "";
 }
 function candidateDigest(candidateRoom = room) {
   const digest = createHash("sha256");
@@ -177,8 +198,27 @@ const Grade = defineTask({
 
 const Cycle = defineTask({
   name: "loyly.proto.cycle", version: 1,
-  initial: () => ({ phase: "preflight" }),
+  initial: () => ({ phase: "cut" }),
   phases: {
+    cut: async (task, runtime) => {
+      let r = { code: 0, sha256: hash("original source: no cut requested") };
+      if (approvedCommit && !proveCut()) {
+        if (existsSync(cut)) throw new Error("incomplete or changed original-source cut");
+        mkdirSync(cut, { recursive: true });
+        r = command("cut-clone", "git", ["clone", "-q", "--no-local", "--no-checkout", ROOT, sourceRoot], { cwd: ROOT });
+        if (r.code === 0) r = command("cut-checkout", "git", ["checkout", "-q", "--detach", approvedCommit], { cwd: sourceRoot });
+        if (r.code === 0 && gitAt(sourceRoot, "rev-parse", "HEAD") === approvedCommit
+            && gitAt(sourceRoot, "status", "--porcelain") === "")
+          writeFileSync(join(cut, "cut.json"), JSON.stringify({ commit: approvedCommit, project: sourceRoot }));
+        if (!proveCut()) r = { ...r, code: 1 };
+      }
+      await runtime.commit(async (tx) => {
+        await audit(tx, task, "cut", r.code === 0 ? "pinned" : "failed", {
+          approved_commit: approvedCommit ?? null, source_root: sourceRoot, log_sha256: r.sha256 });
+        return r.code === 0 ? { status: "running", checkpoint: { phase: "preflight" } }
+          : { status: "terminal", outcome: { status: "failed", error: "cut" } };
+      }, ctx);
+    },
     preflight: async (task, runtime) => {
       const r = command("preflight", "bash", ["harness/check.sh", "--local"]);
       await runtime.commit(async (tx) => {
@@ -200,17 +240,21 @@ const Cycle = defineTask({
     checklist: async (task, runtime) => {
       const r = command("checklist", "bb", ["harness/gen_checklist.clj", "--out", join(scratch, "checklist.json")]);
       const n = r.code === 0 ? JSON.parse(readFileSync(join(scratch, "checklist.json"), "utf8")).items.length : 0;
+      const actual = r.code === 0 ? hash(readFileSync(join(scratch, "checklist.json"))) : null;
+      const approved = !approvedCommit || actual === approvedChecklistSha256;
       await runtime.commit(async (tx) => {
-        await audit(tx, task, "checklist", r.code === 0 ? "derived" : "failed", { item_count: n, log_sha256: r.sha256 });
-        return r.code === 0 ? { status: "running", checkpoint: { phase: "render" } }
+        await audit(tx, task, "checklist", r.code === 0 && approved ? "derived" : "refused", {
+          item_count: n, checklist_sha256: actual, approved_sha256: approvedChecklistSha256,
+          log_sha256: r.sha256 });
+        return r.code === 0 && approved ? { status: "running", checkpoint: { phase: "render" } }
           : { status: "terminal", outcome: { status: "failed", error: "checklist" } };
       }, ctx);
     },
     render: async (task, runtime) => {
       // The original harness has no prompt renderer. Record the exact legacy
       // README and plan the fixture builder would receive, without inventing a v2 tool.
-      const plan = readFileSync(join(ROOT, "docs", "plan", "01-booking-core", "spec.feature"), "utf8");
-      const instruction = `${readFileSync(join(ROOT, "harness", "README.md"), "utf8")}\n\n${plan}`;
+      const plan = readFileSync(join(sourceRoot, "docs", "plan", "01-booking-core", "spec.feature"), "utf8");
+      const instruction = `${readFileSync(join(sourceRoot, "harness", "README.md"), "utf8")}\n\n${plan}`;
       writeFileSync(join(scratch, "prompt.txt"), instruction);
       const r = { code: 0, sha256: hash(instruction) };
       await runtime.commit(async (tx) => {
@@ -277,7 +321,7 @@ const Cycle = defineTask({
       await runtime.commit(() => ({ status: "running", checkpoint: { phase: "score", attempt: task.state.checkpoint.attempt } }), ctx);
     },
     score: async (task, runtime) => {
-      if (!existsSync(instrument)) command("instrument-clone", "git", ["clone", "-q", "--depth", "1", `file://${ROOT}`, instrument]);
+      if (!existsSync(instrument)) command("instrument-clone", "git", ["clone", "-q", "--depth", "1", `file://${sourceRoot}`, instrument]);
       const cycleDir = join(instrument, "harness", "cycles", "02");
       mkdirSync(cycleDir, { recursive: true });
       const checklist = existsSync(join(cycleDir, "checklist.json"))
@@ -308,7 +352,11 @@ try {
   const root = await harness.root(ctx);
   const existing = await harness.commit((tx) => tx.scanTasks({ kind: "loyly.proto.cycle" }, 10), ctx);
   let id = existing.items[0]?.id;
-  if (!id) id = await harness.commit((tx) => tx.createTask(Cycle, {}, { ownership: { kind: "conversation" }, conversationId: root.id }), ctx);
+  const cycleInput = { approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode };
+  if (id && JSON.stringify(existing.items[0].input) !== JSON.stringify(cycleInput))
+    throw new Error("this Pi store belongs to a different approved cut, checklist or mode");
+  if (!id) id = await harness.commit((tx) => tx.createTask(Cycle, cycleInput,
+    { ownership: { kind: "conversation" }, conversationId: root.id }), ctx);
   writeFileSync(join(scratch, "task-id"), String(id));
   console.log(`cycle task ${id}; mode ${mode}; store ${storePath}`);
   harness.resume();
