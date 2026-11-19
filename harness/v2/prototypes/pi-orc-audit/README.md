@@ -2,9 +2,12 @@
 
 This branch starts at `scope-impact/master` (`17d68d2`). It asks whether Pi durable can run the **original legacy cycle** and preserve an interactive audit playback. It does not change `ragavsathish/main`, the accepted spec-v2 runner, or the upstream branch.
 
+The integration branch keeps that baseline and replaces the prototype's gate-log inference with a detached host that runs the unchanged `harness/verify.sh` in an independent copy of each candidate. The host writes an exit-code receipt tied to the candidate digest and gate log. If the controller dies, Pi reopens the same gate task and reads that receipt; it cannot treat a line of log prose as a gate verdict.
+
 ```bash
 cd harness/v2/prototypes/pi-orc-audit
 npm ci --ignore-scripts --no-audit --no-fund
+npm test
 npm run demo
 open replay.PROTOTYPE.html
 ```
@@ -18,7 +21,7 @@ The demo runs a repaired cycle, a cycle with three failed gates, and a SIGKILL/r
 | Checklist | Unchanged `harness/gen_checklist.clj` derives the **11** stamped items in the original sauna spec. |
 | Builder instruction | The prototype saves the original harness README and `docs/plan/01-booking-core/spec.feature`. The legacy harness has no prompt renderer. |
 | Build, continuation, repair | Separate Pi child tasks. The builder is a fixture that copies a tiny sauna HTTP app into the fenced `impl/`. Attempt 1 is deliberately red; a fresh repair child sees the prior gate log. The continuation is a labeled fixture fact in the same child session. |
-| Ratifying gate | Unchanged `harness/verify.sh` runs **inside the fenced clone**. It repeats the instrument check, runs `impl/test.sh`, boots `impl/start.sh`, and calls the original `harness/probe.sh`. At most three attempts; no grading after three failures. |
+| Ratifying gate | Unchanged `harness/verify.sh` runs in an independent copy of the fenced candidate. It repeats the instrument check, runs `impl/test.sh`, boots `impl/start.sh`, and calls the original `harness/probe.sh`. At most three attempts; no grading after three failures. |
 | Grading | The prototype makes a small read-only view of the app, spec, and checklist, then a separate Pi child task files deterministic fixture verdicts. The original harness says to grade “however you grade”; it has no grading-room script. |
 | Measurement | Unchanged `harness/score.clj` and `harness/scoreboard.clj` run in a scratch instrument clone, filing cycle 02. One fixture item fails, producing 10/11. No score files enter the fenced builder room. |
 | Audit | Each stage appends a versioned Pi entry in the same transaction as its checkpoint. `export.mjs` opens the store read-only and rebuilds the self-contained replay and JSONL from committed entries. It does not invent ORC ticks. |

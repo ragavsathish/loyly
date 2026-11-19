@@ -2,13 +2,14 @@
 // legacy harness cycle. Builder and grader are explicitly deterministic fixtures.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync, chmodSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync, chmodSync, readdirSync, lstatSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai";
 import { Harness, createRegistry, defineEntry, defineExtension, defineTask } from "@earendil-works/pi-durable";
 import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite/node";
+import { runGate } from "./gate-adapter.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
@@ -50,6 +51,39 @@ function proofOfFence() {
   const roots = spawnSync("git", ["-C", room, "rev-list", "--count", "--all"], { encoding: "utf8" });
   return roots.status === 0 && roots.stdout.trim() === "1"
     && !existsSync(join(room, "impl")) && !existsSync(join(room, "harness", "cycles"));
+}
+function candidateDigest(candidateRoom = room) {
+  const digest = createHash("sha256");
+  const walk = (dir, prefix) => {
+    for (const name of readdirSync(dir).sort()) {
+      const path = `${prefix}/${name}`, file = join(dir, name), stat = lstatSync(file);
+      if (stat.isDirectory()) walk(file, path);
+      else if (stat.isFile()) {
+        digest.update(path); digest.update("\0");
+        digest.update(String(stat.mode & 0o777)); digest.update("\0");
+        digest.update(readFileSync(file)); digest.update("\0");
+      } else throw new Error(`candidate has a symlink or special file: ${path}`);
+    }
+  };
+  walk(join(candidateRoom, "impl"), "impl");
+  return digest.digest("hex");
+}
+function gateRoomFor(attempt, digest) {
+  const base = join(scratch, `gate-${attempt}`), gateRoom = join(base, "room");
+  const marker = join(base, "copy.json");
+  if (existsSync(gateRoom) && !existsSync(marker))
+    throw new Error("gate-room copy was interrupted; inspect its scratch directory");
+  if (!existsSync(gateRoom)) {
+    mkdirSync(base, { recursive: true });
+    cpSync(room, gateRoom, { recursive: true });
+    if (candidateDigest(gateRoom) !== digest) throw new Error("gate copy differs from candidate");
+    writeFileSync(marker, JSON.stringify({ candidateSha256: digest }));
+  } else if (JSON.parse(readFileSync(marker, "utf8")).candidateSha256 !== digest
+      || (!existsSync(join(scratch, `gate-${attempt}-evidence`, "intent.json"))
+        && candidateDigest(gateRoom) !== digest)) {
+    throw new Error("gate-room copy receipt differs from candidate");
+  }
+  return gateRoom;
 }
 
 const Builder = defineTask({
@@ -97,22 +131,18 @@ const Gate = defineTask({
   phases: {
     verify: async (task, runtime) => {
       const attempt = task.input.attempt;
-      const name = `gate-${attempt}`;
-      const log = resultPath(name);
-      // A complete log is a reconciliation receipt if this process died after verify.sh.
-      let r;
-      if (existsSync(log) && /=== verify OK:|FATAL:/.test(readFileSync(log, "utf8"))) {
-        const output = readFileSync(log, "utf8");
-        r = { code: output.includes("=== verify OK:") ? 0 : 1, output, sha256: hash(output), log };
-      } else {
-        r = command(name, "bash", ["harness/verify.sh"], { cwd: room, timeout: 900_000 });
-      }
+      const out = join(scratch, `gate-${attempt}-evidence`);
+      const digest = candidateDigest();
+      const gateRoom = gateRoomFor(attempt, digest);
+      const r = await runGate({ room: gateRoom, out, candidateSha256: digest, timeoutMs: 900_000 });
+      const log = join(out, "gate.log");
       await runtime.commit(async (tx) => {
-        await audit(tx, task, "gate", r.code === 0 ? "passed" : "failed", {
-          attempt, gate_log: r.log, gate_log_sha256: r.sha256, exit: r.code,
+        await audit(tx, task, "gate", r.exit === 0 ? "passed" : "failed", {
+          attempt, gate_log: log, gate_log_sha256: r.logSha256, exit: r.exit,
+          candidate_digest: digest, reconciled: r.reconciled,
         });
         return { status: "terminal", outcome: { status: "completed", result: {
-          passed: r.code === 0, log: r.log,
+          passed: r.exit === 0, log,
         } } };
       }, ctx);
     },

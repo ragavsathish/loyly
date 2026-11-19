@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "demo": "node demo.mjs",
-    "export": "node export.mjs"
+    "export": "node export.mjs",
+    "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "@earendil-works/chord": "1.5.1",
