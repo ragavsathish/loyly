@@ -1,11 +1,11 @@
 # Löyly Pi durable harness
 
-This directory is the production candidate derived from the Pi durable
-prototype. Pi owns cycle checkpoints and committed audit entries. The original
+This directory contains the active Pi durable cycle driver. Pi owns cycle
+checkpoints and committed audit entries. The original
 `harness/` scripts still perform the self-check, physical fence, checklist,
 gate, score and scoreboard. Gondolin runs the Pi builder, independent grader
-shards, blind reviewer and project-specific specialist probes. The accepted
-ORC runner is a comparison instrument, not the base of this harness.
+shards, blind reviewer and project-specific specialist probes. The former
+ORC runner remains historical comparison evidence.
 
 ## Run a pinned live cycle
 
@@ -58,10 +58,9 @@ receipt. It never changes the original cycle's audit, score or outcome. See
   recovery fix and remaining panel portability work are tracked in
   [`PRODUCTION-CANDIDATE.md`](PRODUCTION-CANDIDATE.md).
 
-The candidate is not yet the accepted running harness. The original cycle
-failure remains visible; the reassessment is separately labelled. Review the
-candidate and Allure attachments, compare with the accepted and legacy
-instruments, and complete the acceptance checks in
+Pi is the active driver by operator direction. The original cycle failure
+remains visible; the reassessment is separately labelled. The generated app
+and grading panel still need the acceptance checks in
 [`PRODUCTION-CANDIDATE.md`](PRODUCTION-CANDIDATE.md).
 
 ## Audit playback

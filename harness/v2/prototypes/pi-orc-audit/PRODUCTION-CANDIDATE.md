@@ -1,7 +1,8 @@
 # Pi durable production candidate
 
-This branch continues the Pi prototype itself. The accepted ORC runner and
-the legacy harness are comparison instruments, not the implementation base.
+This branch promotes the Pi prototype itself as the active cycle driver. The
+former ORC runner is historical comparison evidence; the legacy harness is
+still the ratifying and scoring instrument.
 The original `harness/` tools still perform the self-check, fence, gate,
 score and scoreboard. Pi durable owns the cycle checkpoint and audit; Gondolin
 executes the builder, agent grader and three deterministic specialist probes.
@@ -96,7 +97,8 @@ node reassess-panel.mjs --run scratch-production-cycle-03/reassessment-01/config
 
 ## Acceptance boundary
 
-This candidate is **not yet the running harness**. Cycle 03 filed a real
+Pi is the active harness by operator direction. This is a workflow cutover,
+not acceptance of a generated app or the specialist panel. Cycle 03 filed a real
 **11/11** score and passed the legacy gate, but its original panel checks
 failed and its report phase ended the cycle failed. The pinned panel-only
 reassessment on the frozen candidate passed Playwright, protocol and OTel
@@ -132,9 +134,9 @@ booking behavior. Before production cutover, the panel must launch the public
 `start.sh` seam in a suitable pinned runtime image and report project-specific
 observations honestly across both generated shapes.
 
-`ragavsathish/main` still runs the accepted ORC harness over the wider spec-v2
-system. This Pi candidate covers the original booking-core 11-item plan, not
-the other accepted contexts. Promotion of the **full** harness requires those
-contexts to migrate and be compared against the accepted instrument; a
-booking-core-only entrypoint could be promoted separately after a complete
-integrated live cycle, product profile, restart checks and review.
+The pre-reset `ragavsathish/main` ran the ORC harness over the wider spec-v2
+system. Its exact tip `a733b7e` is preserved at
+`ragavsathish/archive/orc-main-a733b7e`. This Pi driver currently covers the original booking-core 11-item plan,
+not the other contexts. Those contexts still need to migrate and be compared
+with the archived instrument. The next booking-core acceptance review needs a
+complete integrated live cycle, product profile and restart checks.

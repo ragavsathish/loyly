@@ -11,6 +11,26 @@ the implementation is deliberately disposable, and deleting and regenerating it 
 catastrophe but a measurement. What this repo actually ships is a specification you can
 build from and an instrument that tells you how good the build was.
 
+## Active harness: Pi durable
+
+`bin/loyly-cycle` is the cycle entrypoint. It checks a pinned JSON contract,
+then runs a clean-room Pi durable cycle: legacy self-check and fence, fresh
+builder with up to three build-and-gate attempts, independent rule-sharded
+grading in Gondolin VMs, blind review, specialist probes, legacy scoring and
+Allure reporting. Pi owns the durable checkpoints and audit playback.
+
+```sh
+export JAVA_HOME=/path/to/java-21
+bin/loyly-cycle --check /absolute/path/to/ignored-live-run.json
+bin/loyly-cycle --run /absolute/path/to/ignored-live-run.json
+```
+
+See the [Pi harness guide](harness/v2/prototypes/pi-orc-audit/README.md) for
+the run contract and evidence. The original scripts in `harness/` remain the
+self-check, fence, gate and scoring authority. The latest cross-stack grader
+and specialist panel limits are recorded in the
+[production candidate review](harness/v2/prototypes/pi-orc-audit/PRODUCTION-CANDIDATE.md).
+
 Everything in it is real. The domain documents are redacted transcriptions of a real
 Finnish housing cooperative's 2022 email threads plus verified public sources from
 Finland, Sweden and Norway. Nothing is invented scaffolding, and that is a rule with an
@@ -54,7 +74,7 @@ from what precedes it.
 | 2 | `docs/wiki/` | the domain, distilled from the sources. Every claim footnotes the source it came from. Start at `index.md` |
 | 3 | `docs/wow/` | the method itself: the way of working, five invariants each with a named enforcement point, and the agent harness |
 | 4 | `docs/plan/01-booking-core/` | one slice of work: a plan, an executable Gherkin spec, tickets, and recorded decisions |
-| 5 | `harness/` | the instrument: the fence, the gate, the derived checklist, the scorer, the scoreboard. Start at its `README.md` |
+| 5 | `bin/loyly-cycle`, `harness/` | the Pi cycle driver and the original fence, gate, checklist, scorer and scoreboard |
 | 6 | `impl/` | the build product. Intentionally empty: you generate it |
 
 Two conventions you will notice everywhere:
@@ -66,9 +86,9 @@ Two conventions you will notice everywhere:
   under `docs/`. You could build Löyly as a web app, a mobile app, or a phone-in voice
   service without changing a line of them.
 
-## The tutorial: one full loop
+## The original manual tutorial
 
-This is the flow the repo exists to demonstrate. You can walk it with an AI agent doing
+This is the legacy reference flow the Pi driver now executes. You can walk it with an AI agent doing
 the building (point it at the read order above; `docs/wow/harness.md` says how) or by
 hand. Either way the machinery treats you identically, which is rather the point.
 

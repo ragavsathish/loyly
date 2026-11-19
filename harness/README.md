@@ -1,5 +1,9 @@
 # The harness: regenerate, ratify, measure
 
+The active cycle entrypoint is `bin/loyly-cycle` at the repository root. Pi
+durable drives the sequence and records its audit. The scripts documented here
+remain the original ratifying and scoring modules invoked by that cycle.
+
 A minimal, working demonstration of the machinery this method runs on, applied to the
 sauna example. Distilled 2026-08-27 from a production pipeline that destroys and rebuilds
 a full application from its specification every week, unsupervised, and scores the result
