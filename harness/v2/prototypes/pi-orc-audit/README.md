@@ -4,6 +4,8 @@ This branch starts at `scope-impact/master` (`17d68d2`). It asks whether Pi dura
 
 The integration branch keeps that baseline and replaces the prototype's gate-log inference with a detached host that runs the unchanged `harness/verify.sh` in an independent copy of each candidate. The host writes an exit-code receipt tied to the candidate digest and gate log. If the controller dies, Pi reopens the same gate task and reads that receipt; it cannot treat a line of log prose as a gate verdict.
 
+The same directory also contains a process adapter for a future live Pi builder. Its stable session ID and launch receipt survive controller SIGKILL in tests. The demo still uses fixture builders and a fixture grader; the live builder host has not been connected to this clean-base branch. A live room must be cut from the approved original commit so it cannot see these prototype fixtures.
+
 ```bash
 cd harness/v2/prototypes/pi-orc-audit
 npm ci --ignore-scripts --no-audit --no-fund
