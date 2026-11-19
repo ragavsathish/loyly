@@ -13,6 +13,9 @@ const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const fileHash = (path) => hash(readFileSync(path));
 const REVIEW_ID = "01-011";
 const SPEC = join("plan", "01-booking-core", "spec.feature");
+const PERSON_SPEC_SHA256 = "b28ee83dfaada8df0ed99b90121a50f3c55885ade4db323b68e03c4d5f15005e";
+const QUESTION = "Without reading the sauna-day configuration or another project file, read only refusal.txt. "
+  + "Name a request you expect to be accepted using that refusal alone.\n";
 
 export function prepareBlindReview({ gradingRoom, out }) {
   if (existsSync(out)) throw new Error("blind review packet already exists");
@@ -42,9 +45,7 @@ export function prepareBlindReview({ gradingRoom, out }) {
   };
   mkdirSync(out, { recursive: true });
   writeFileSync(join(out, "refusal.txt"), refusal);
-  writeFileSync(join(out, "question.txt"),
-    "Without reading the sauna-day configuration or another project file, read only refusal.txt. "
-    + "Name a request you expect to be accepted using that refusal alone.\n");
+  writeFileSync(join(out, "question.txt"), QUESTION);
   writeFileSync(join(out, "packet.json"), `${JSON.stringify(packet, null, 2)}\n`);
   writeFileSync(join(out, "response-template.json"), `${JSON.stringify({
     schema: "loyly.blind-review-response.v1",
@@ -55,20 +56,32 @@ export function prepareBlindReview({ gradingRoom, out }) {
   return packet;
 }
 
-export function validateBlindReview({ packetDir, reviewFile, gradingRoom }) {
+export function verifyBlindReviewPacket({ packetDir, gradingRoom }) {
   const packetFile = join(packetDir, "packet.json");
   const packet = JSON.parse(readFileSync(packetFile, "utf8"));
-  const review = JSON.parse(readFileSync(reviewFile, "utf8"));
   const judged = readAllureResults(gradingRoom);
+  const pending = judged.results.find((result) => result.labels.some((label) =>
+    label.name === "tag" && label.value === `@item-${REVIEW_ID}`));
+  const refusal = readFileSync(join(packetDir, "refusal.txt"));
   if (packet.schema !== "loyly.blind-review-packet.v1" || packet.item !== REVIEW_ID
       || packet.candidate_sha256 !== candidateDigest(gradingRoom)
       || packet.checklist_sha256 !== fileHash(join(gradingRoom, "checklist.json"))
       || packet.spec_sha256 !== fileHash(join(gradingRoom, SPEC))
       || packet.allure_results_sha256 !== judged.allureSha256
-      || packet.refusal_sha256 !== fileHash(join(packetDir, "refusal.txt")))
-    throw new Error("blind review packet no longer matches candidate, checklist or grader result");
+      || packet.refusal_sha256 !== hash(refusal)
+      || readFileSync(join(packetDir, "question.txt"), "utf8") !== QUESTION
+      || pending?.status !== "skipped" || pending.stage !== "pending"
+      || !pending.attachments?.some((attachment) => readFileSync(join(gradingRoom, "work",
+        "allure-results", attachment.source)).equals(refusal)))
+    throw new Error("blind review packet no longer matches candidate, spec, checklist or grader result");
+  return { packet, packetSha256: fileHash(packetFile) };
+}
+
+export function validateBlindReview({ packetDir, reviewFile, gradingRoom }) {
+  const { packet, packetSha256 } = verifyBlindReviewPacket({ packetDir, gradingRoom });
+  const review = JSON.parse(readFileSync(reviewFile, "utf8"));
   if (review.schema !== "loyly.blind-review-response.v1"
-      || review.packet_sha256 !== fileHash(packetFile)
+      || review.packet_sha256 !== packetSha256
       || review.reviewer_kind !== "agent"
       || typeof review.reviewer !== "string" || !review.reviewer.trim()
       || review.had_not_read_configuration !== true || review.saw_only_refusal !== true
@@ -77,7 +90,7 @@ export function validateBlindReview({ packetDir, reviewFile, gradingRoom }) {
       || typeof review.reason !== "string" || !review.reason.trim()
       || !Number.isInteger(review.reviewed_at) || review.reviewed_at <= 0)
     throw new Error("invalid or unbound blind subagent review");
-  return { packet, review, packetSha256: fileHash(packetFile), reviewSha256: fileHash(reviewFile) };
+  return { packet, review, packetSha256, reviewSha256: fileHash(reviewFile) };
 }
 
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -144,7 +157,7 @@ export async function probeBlindAnswer({ packetDir, reviewFile, gradingRoom, req
 
 export function writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verificationDir, out }) {
   const { packet, review, packetSha256, reviewSha256 } = validateBlindReview({ packetDir, reviewFile, gradingRoom });
-  if (existsSync(out)) throw new Error("blind subagent Allure result already exists");
+  if (existsSync(out)) return readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verificationDir, out });
   let verification;
   if (review.verdict === "pass") {
     if (!verificationDir) throw new Error("positive blind review needs an independent HTTP probe");
@@ -193,4 +206,63 @@ export function writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom, veri
     writeFileSync(join(out, responseAttachment), readFileSync(join(verificationDir, "response.txt")));
   writeFileSync(join(out, `${uuid}-result.json`), JSON.stringify(result));
   return { result, packetSha256, reviewSha256 };
+}
+
+export function readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verificationDir, out }) {
+  const { packet, review, packetSha256, reviewSha256 } = validateBlindReview({ packetDir, reviewFile, gradingRoom });
+  const names = readdirSync(out).sort();
+  const resultFiles = names.filter((name) => /^[0-9a-f-]{36}-result\.json$/.test(name));
+  if (resultFiles.length !== 1) throw new Error("blind subagent Allure result is incomplete");
+  const result = JSON.parse(readFileSync(join(out, resultFiles[0]), "utf8"));
+  const item = JSON.parse(readFileSync(join(gradingRoom, "checklist.json"), "utf8"))
+    .items.find((value) => value.id === REVIEW_ID);
+  const fullName = `loyly.booking-core.${REVIEW_ID}.blind-agent-review`;
+  const expectedStatus = review.verdict === "pass" ? "passed" : "failed";
+  const schema = JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8"));
+  const validate = new Ajv2020({ strict: false }).compile(schema);
+  if (!validate(result) || resultFiles[0] !== `${result.uuid}-result.json`
+      || result.name !== item?.name || result.fullName !== fullName
+      || result.testCaseId !== fullName || result.historyId !== fullName
+      || result.status !== expectedStatus || result.stage !== "finished"
+      || result.labels?.filter((label) => label.name === "tag" && label.value === `@item-${REVIEW_ID}`).length !== 1
+      || result.parameters?.find((p) => p.name === "candidate_sha256")?.value !== packet.candidate_sha256
+      || result.parameters?.find((p) => p.name === "grader_allure_sha256")?.value !== packet.allure_results_sha256)
+    throw new Error("blind subagent Allure result differs from the bound review");
+  const attachmentNames = result.attachments.map((a) => a.source);
+  if (new Set(attachmentNames).size !== attachmentNames.length
+      || names.length !== attachmentNames.length + 1
+      || attachmentNames.some((name) => !names.includes(name) || !lstatSync(join(out, name)).isFile()))
+    throw new Error("blind subagent Allure attachments are incomplete");
+  const evidence = JSON.parse(readFileSync(join(out, result.attachments[0].source), "utf8"));
+  if (evidence.packet_sha256 !== packetSha256 || evidence.review_sha256 !== reviewSha256
+      || JSON.stringify(evidence.review) !== JSON.stringify(review))
+    throw new Error("blind subagent Allure evidence differs from the bound review");
+  if (review.verdict === "pass") {
+    if (!verificationDir) throw new Error("positive blind review needs an independent HTTP probe");
+    const verification = JSON.parse(readFileSync(join(verificationDir, "verification.json"), "utf8"));
+    if (result.attachments.length !== 2 || evidence.verification?.review_sha256 !== reviewSha256
+        || JSON.stringify(evidence.verification) !== JSON.stringify(verification)
+        || verification.packet_sha256 !== packetSha256 || verification.accepted !== true
+        || verification.http_status < 200 || verification.http_status >= 300
+        || verification.response_sha256 !== fileHash(join(verificationDir, "response.txt"))
+        || !readFileSync(join(out, result.attachments[1].source)).equals(
+          readFileSync(join(verificationDir, "response.txt"))))
+      throw new Error("blind subagent Allure probe differs from the bound HTTP response");
+  } else if (result.attachments.length !== 1 || evidence.verification !== undefined) {
+    throw new Error("failed blind review must not claim an HTTP confirmation");
+  }
+  return { result, packetSha256, reviewSha256 };
+}
+
+export function finalVerdictsFromBlindReview(args) {
+  const { packetDir, reviewFile, gradingRoom } = args;
+  const { packet } = validateBlindReview({ packetDir, reviewFile, gradingRoom });
+  if (packet.spec_sha256 === PERSON_SPEC_SHA256)
+    throw new Error("the historical person-worded cut cannot be scored with a blind subagent");
+  const raw = readAllureResults(gradingRoom);
+  const supplemental = readBlindAgentAllure(args);
+  return { verdicts: raw.verdicts.map((v) => v.id === REVIEW_ID
+    ? { id: REVIEW_ID, verdict: supplemental.result.status === "passed" ? "pass" : "fail",
+      evidence: supplemental.result.statusDetails.message } : v),
+    rawAllureSha256: raw.allureSha256, reviewSha256: supplemental.reviewSha256 };
 }

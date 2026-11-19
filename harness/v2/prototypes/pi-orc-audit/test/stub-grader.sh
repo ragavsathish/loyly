@@ -22,7 +22,8 @@ const items = JSON.parse(fs.readFileSync(`${path}/checklist.json`, "utf8")).item
 const out = `${path}/work/allure-results`;
 fs.mkdirSync(out, {recursive: true});
 fs.writeFileSync(`${path}/work/surprises.json`, "[]");
-fs.writeFileSync(`${path}/work/blind-review-011.txt`, "Try Thursday in room 9.\n");
+if (items.some((item) => item.id === "01-011"))
+  fs.writeFileSync(`${path}/work/blind-review-011.txt`, "Try Thursday in room 9.\n");
 for (const item of items) {
   const pending = item.id === "01-011", uuid = crypto.randomUUID();
   const source = `${crypto.randomUUID()}-attachment.txt`;

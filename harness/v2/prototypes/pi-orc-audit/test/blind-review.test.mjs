@@ -4,7 +4,9 @@ import { randomUUID } from "node:crypto";
 import { chmodSync, cpSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { prepareBlindReview, probeBlindAnswer, validateBlindReview, writeBlindAgentAllure } from "../blind-review.mjs";
+import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer, validateBlindReview,
+  verifyBlindReviewPacket,
+  writeBlindAgentAllure } from "../blind-review.mjs";
 
 const schema = new URL("../allure-lifecycle-result.schema.json", import.meta.url).pathname;
 test("a blind subagent's Allure result is separate, bound and confirmed over HTTP", async () => {
@@ -43,8 +45,14 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   const graderFile = join(results, `${uuid}-result.json`);
   writeFileSync(graderFile, JSON.stringify(result));
   prepareBlindReview({ gradingRoom: room, out: packetDir });
+  assert.equal(verifyBlindReviewPacket({ packetDir, gradingRoom: room }).packet.item, "01-011");
   assert.equal(readFileSync(join(packetDir, "refusal.txt"), "utf8"),
     "Try Thursday at 17:00 in pukuhuone 9.\n");
+  const question = readFileSync(join(packetDir, "question.txt"), "utf8");
+  writeFileSync(join(packetDir, "question.txt"), "Tell me the configured answer.\n");
+  assert.throws(() => verifyBlindReviewPacket({ packetDir, gradingRoom: room }),
+    /packet no longer matches/);
+  writeFileSync(join(packetDir, "question.txt"), question);
   const review = JSON.parse(readFileSync(join(packetDir, "response-template.json"), "utf8"));
   Object.assign(review, { reviewer: "fresh independent subagent", had_not_read_configuration: true,
     saw_only_refusal: true, answer: "Thursday at 17:00 in pukuhuone 9",
@@ -66,6 +74,10 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
     verificationDir, out: agentDir });
   assert.equal(agent.result.status, "passed");
   assert.equal(readdirSync(agentDir).length, 3);
+  assert.equal(writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom: room,
+    verificationDir, out: agentDir }).result.uuid, agent.result.uuid);
+  assert.deepEqual(finalVerdictsFromBlindReview({ packetDir, reviewFile, gradingRoom: room,
+    verificationDir, out: agentDir }).verdicts.map((v) => v.verdict), ["pass"]);
   assert.equal(JSON.parse(readFileSync(graderFile)).status, "skipped");
   const badReview = { ...review, answer: "Tuesday at 17:00 in pukuhuone 9" };
   const badFile = join(root, "bad-review.json"), badProbe = join(root, "bad-probe");
