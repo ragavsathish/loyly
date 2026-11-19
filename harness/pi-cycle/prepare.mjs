@@ -2,10 +2,11 @@
 // the original legacy harness's clean room before launching any agent.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runBuilder } from "./builder-adapter.mjs";
+import { runGate } from "./gate-adapter.mjs";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai";
 import { Harness, createRegistry, defineEntry, defineExtension, defineTask } from "@earendil-works/pi-durable";
@@ -30,8 +31,8 @@ function options(args) {
       || !/^[0-9a-f]{64}$/.test(checklistSha256 ?? ""))
     throw new Error("usage: node prepare.mjs --state-dir DIR --commit 40-HEX --run-id ID --checklist-sha256 64-HEX");
   const stage = found.stage ?? "prepare";
-  if (!["prepare", "build"].includes(stage)) throw new Error("--stage must be prepare or build");
-  const build = stage === "build" ? {
+  if (!["prepare", "build", "gate"].includes(stage)) throw new Error("--stage must be prepare, build or gate");
+  const build = stage === "build" || stage === "gate" ? {
     command: resolve(found["builder-command"] ?? join(ROOT, ".pi/harness/bin/builder.sh")),
     image: resolve(found["builder-image"] ?? ""),
     model: found["builder-model"],
@@ -92,12 +93,12 @@ async function audit(tx, task, stage, outcome, detail = {}) {
 }
 const fail = (stage) => ({ status: "terminal", outcome: { status: "failed", error: stage } });
 
-function candidateDigest() {
-  const app = join(room, "impl");
+function candidateDigest(candidateRoom = room) {
+  const app = join(candidateRoom, "impl");
   const start = join(app, "start.sh"), test = join(app, "test.sh");
   if (!existsSync(start) || !existsSync(test)) throw new Error("builder did not leave both legacy app entrypoints");
   const status = spawnSync("git", ["status", "--porcelain=v1", "-z", "--untracked-files=all"],
-    { cwd: room, encoding: "buffer" });
+    { cwd: candidateRoom, encoding: "buffer" });
   if (status.status !== 0) throw new Error("cannot check builder write scope");
   for (const line of status.stdout.toString("utf8").split("\0").filter(Boolean)) {
     if (line.slice(0, 2) !== "??") throw new Error("builder modified a tracked clean-room file");
@@ -245,8 +246,65 @@ const Build = defineTask({
   abort: (_task, runtime) => runtime.commit(() => ({ status: "terminal", outcome: { status: "aborted" } }), ctx),
 });
 
+const Gate = defineTask({
+  name: "loyly.pi.cycle.gate", version: 1,
+  initial: () => ({ phase: "room" }),
+  phases: {
+    room: async (task, runtime) => {
+      const gateRoom = join(input.state, "gate", "attempt-1", "room");
+      const marker = join(input.state, "gate", "attempt-1", "copy.json");
+      const source = candidateDigest();
+      if (source.sha256 !== task.input.candidateSha256
+          || git(room, "rev-parse", "HEAD") !== task.input.fenceCommit)
+        throw new Error("candidate changed after the builder completed");
+      if (existsSync(gateRoom) && !existsSync(marker))
+        throw new Error("gate-room copy was interrupted; inspect and replace its scratch directory");
+      if (!existsSync(gateRoom)) {
+        mkdirSync(dirname(gateRoom), { recursive: true });
+        cpSync(room, gateRoom, { recursive: true });
+        if (candidateDigest(gateRoom).sha256 !== source.sha256)
+          throw new Error("gate copy differs from the builder candidate");
+        writeFileSync(marker, JSON.stringify({ candidateSha256: source.sha256,
+          fenceCommit: task.input.fenceCommit }));
+      } else {
+        const copy = JSON.parse(readFileSync(marker, "utf8"));
+        if (copy.candidateSha256 !== source.sha256 || copy.fenceCommit !== task.input.fenceCommit)
+          throw new Error("gate-room copy receipt differs from the builder candidate");
+        if (candidateDigest(gateRoom).sha256 !== source.sha256)
+          throw new Error("gate-room copy changed before verification");
+      }
+      await runtime.commit(async (tx) => {
+        await audit(tx, task, "gate-room", "prepared", { attempt: 1,
+          candidate_sha256: source.sha256, fence_commit: task.input.fenceCommit });
+        return { status: "running", checkpoint: { phase: "verify" } };
+      }, ctx);
+    },
+    verify: async (task, runtime) => {
+      const base = join(input.state, "gate", "attempt-1");
+      let result, reason;
+      try {
+        result = await runGate({ room: join(base, "room"), out: join(base, "evidence"),
+          candidateSha256: task.input.candidateSha256 });
+      } catch (error) {
+        reason = "gate-effect-incomplete";
+        writeFileSync(join(base, "error.log"), `${error.stack ?? error}\n`);
+      }
+      await runtime.commit(async (tx) => {
+        await audit(tx, task, "gate", result?.exit === 0 ? "passed" : "failed", {
+          attempt: 1, candidate_sha256: task.input.candidateSha256,
+          log_sha256: result?.logSha256 ?? null, exit: result?.exit ?? null,
+          reconciled: result?.reconciled ?? false, reason_code: reason ?? null });
+        return result ? { status: "terminal", outcome: { status: "completed", result: {
+          passed: result.exit === 0, attempt: 1, logSha256: result.logSha256 } } }
+          : fail("gate");
+      }, ctx);
+    },
+  },
+  abort: (_task, runtime) => runtime.commit(() => ({ status: "terminal", outcome: { status: "aborted" } }), ctx),
+});
+
 const registry = createRegistry();
-registry.install(defineExtension({ name: "loyly-pi-cycle", tasks: [Prepare, Build] }));
+registry.install(defineExtension({ name: "loyly-pi-cycle", tasks: [Prepare, Build, Gate] }));
 const harness = await Harness.open(await openNodeSqliteStorage(join(input.state, "cycle.sqlite")),
   { models: createModels(), registry }, ctx);
 try {
@@ -261,7 +319,7 @@ try {
   const final = await harness.waitForTask(id, ctx);
   console.log(JSON.stringify(final.state.outcome));
   if (final.state.outcome?.status !== "completed") process.exitCode = 1;
-  if (cli.stage === "build" && final.state.outcome?.status === "completed") {
+  if ((cli.stage === "build" || cli.stage === "gate") && final.state.outcome?.status === "completed") {
     const buildInput = { ...cli.build, runId: input.runId, cut: final.state.outcome.result.cut,
       fenceCommit: final.state.outcome.result.fenceCommit ?? git(room, "rev-parse", "HEAD"),
       checklistSha256: input.checklistSha256 };
@@ -275,6 +333,22 @@ try {
     const built = await harness.waitForTask(buildId, ctx);
     console.log(JSON.stringify(built.state.outcome));
     if (built.state.outcome?.status !== "completed") process.exitCode = 1;
+    if (cli.stage === "gate" && built.state.outcome?.status === "completed") {
+      const gateInput = { runId: input.runId,
+        fenceCommit: buildInput.fenceCommit,
+        candidateSha256: built.state.outcome.result.sha256 };
+      const gates = await harness.commit((tx) => tx.scanTasks({ kind: "loyly.pi.cycle.gate" }, 10), ctx);
+      let gateId = gates.items[0]?.id;
+      if (gateId && JSON.stringify(gates.items[0].input) !== JSON.stringify(gateInput))
+        throw new Error("this store belongs to another gated candidate");
+      if (!gateId) gateId = await harness.commit((tx) => tx.createTask(Gate, gateInput,
+        { ownership: { kind: "conversation" }, conversationId: root.id }), ctx);
+      harness.resume();
+      const gated = await harness.waitForTask(gateId, ctx);
+      console.log(JSON.stringify(gated.state.outcome));
+      if (gated.state.outcome?.status !== "completed" || !gated.state.outcome.result?.passed)
+        process.exitCode = 1;
+    }
   }
 } finally {
   await harness.close(ctx);
