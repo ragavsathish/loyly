@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -133,13 +133,56 @@ test("live stub cycle launches a separate blind process and scores its HTTP-conf
     const scores = JSON.parse(readFileSync(join(scratch, "instrument", "harness", "cycles", "02", "scores.json")));
     assert.equal(scores.items.filter((item) => item.verdict === "pass").length, 11);
     const agentRoom = join(scratch, "blind-agent-room");
-    assert.deepEqual((await import("node:fs")).readdirSync(agentRoom).sort(), ["question.txt", "refusal.txt"]);
+    assert.deepEqual(readdirSync(agentRoom).sort(), ["question.txt", "refusal.txt"]);
     const review = JSON.parse(readFileSync(join(scratch, "blind-agent-review.json")));
     assert.equal(review.reviewer_kind, "agent");
     assert.equal(review.verdict, "pass");
     assert.match(review.launch_receipt_sha256, /^[0-9a-f]{64}$/);
   } finally {
     if (run?.child.exitCode === null) run.child.kill("SIGTERM");
+    rmSync(scratch, { recursive: true, force: true });
+  }
+});
+
+test("controller restart joins the still-running blind process without launching another", async () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-live-blind-process-kill-"));
+  const env = liveEnv(scratch);
+  const command = join(here, "test/stub-blind-agent.sh");
+  const settings = join(root, ".pi/harness/config/pi.blind-review.settings.json");
+  Object.assign(env, {
+    LOYLY_BLIND_AGENT_COMMAND: command, LOYLY_BLIND_AGENT_IMAGE: env.LOYLY_BUILDER_IMAGE,
+    LOYLY_BLIND_AGENT_SETTINGS: settings, LOYLY_BLIND_AGENT_MODEL: "test/fresh-blind-agent",
+    LOYLY_BLIND_AGENT_COMMAND_SHA256: sha(command),
+    LOYLY_BLIND_AGENT_IMAGE_SHA256: env.LOYLY_BUILDER_IMAGE_SHA256,
+    LOYLY_BLIND_AGENT_SETTINGS_SHA256: sha(settings),
+    LOYLY_BLIND_AGENT_INSTRUCTION_SHA256: sha(join(here, "blind-agent-instruction.md")),
+    LOYLY_TEST_BLIND_DELAY_SECONDS: "4",
+  });
+  let first, resumed;
+  try {
+    first = worker(scratch, env);
+    const evidence = join(scratch, "blind-agent-evidence");
+    const launch = join(evidence, "launch-1", "launch.txt");
+    await until(() => existsSync(launch) || first.output().includes("FINAL"));
+    assert.ok(existsSync(launch), first.output());
+    assert.ok(!readFileSync(launch, "utf8").includes("exit="), "blind process already finished");
+    first.child.kill("SIGKILL");
+    assert.equal((await first.closed).signal, "SIGKILL");
+    resumed = worker(scratch, env);
+    const deadline = new Promise((_, reject) => {
+      const timer = setTimeout(() => reject(new Error(`blind process was not rejoined: ${resumed.output()}`)),
+        60_000);
+      timer.unref();
+    });
+    const done = await Promise.race([resumed.closed, deadline]);
+    assert.equal(done.code, 1, done.output);
+    assert.match(done.output, /blind-review completed/);
+    assert.deepEqual(readdirSync(evidence).filter((name) => name.startsWith("launch-")), ["launch-1"]);
+    const scores = JSON.parse(readFileSync(join(scratch, "instrument", "harness", "cycles", "02", "scores.json")));
+    assert.equal(scores.items.filter((item) => item.verdict === "pass").length, 11);
+  } finally {
+    if (first?.child.exitCode === null) first.child.kill("SIGTERM");
+    if (resumed?.child.exitCode === null) resumed.child.kill("SIGTERM");
     rmSync(scratch, { recursive: true, force: true });
   }
 });
