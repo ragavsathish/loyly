@@ -59,14 +59,22 @@ export function readAllureResults(room) {
     return { id: item.id, verdict: result.status === "passed" ? "pass" : "fail",
       evidence: result.statusDetails.message };
   });
-  const surprises = JSON.parse(readFileSync(join(room, "work", "surprises.json"), "utf8"));
-  if (!Array.isArray(surprises)) throw new Error("surprises must be a JSON array");
-  for (const surprise of surprises) {
-    if (!byId.has(surprise?.item) || typeof surprise.observation !== "string"
-        || typeof surprise.evidence_file !== "string" || !/^work\/[A-Za-z0-9._/-]+$/.test(surprise.evidence_file)
-        || surprise.evidence_file.includes("..") || !existsSync(join(room, surprise.evidence_file))
-        || !lstatSync(join(room, surprise.evidence_file)).isFile())
+  const rawSurprises = JSON.parse(readFileSync(join(room, "work", "surprises.json"), "utf8"));
+  if (!Array.isArray(rawSurprises)) throw new Error("surprises must be a JSON array");
+  const surprises = [];
+  for (const surprise of rawSurprises) {
+    const ids = typeof surprise?.item === "string" ? surprise.item.split(/,\s*/) : [];
+    const rawPath = surprise?.evidence_file;
+    const evidenceFile = typeof rawPath === "string" && !rawPath.startsWith("work/")
+      ? `work/${rawPath}` : rawPath;
+    if (!ids.length || ids.some((id) => !byId.has(id))
+        || typeof surprise.observation !== "string"
+        || typeof evidenceFile !== "string" || !/^work\/[A-Za-z0-9._/-]+$/.test(evidenceFile)
+        || evidenceFile.includes("..") || !existsSync(join(room, evidenceFile))
+        || !lstatSync(join(room, evidenceFile)).isFile())
       throw new Error("invalid surprise evidence");
+    for (const id of ids) surprises.push({ item: id, observation: surprise.observation,
+      evidence_file: evidenceFile });
   }
   const digest = createHash("sha256");
   for (const name of readdirSync(dir).sort()) {

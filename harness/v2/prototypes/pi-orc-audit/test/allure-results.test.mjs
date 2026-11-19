@@ -50,3 +50,14 @@ test("attached lifecycle schema is the grader contract and projects honest legac
   writeFileSync(first.path, JSON.stringify(first.result));
   assert.throws(() => readAllureResults(room), /Allure schema rejected/);
 });
+test("surprise projection accepts only local evidence and selected item IDs", () => {
+  const { room } = fixture();
+  writeFileSync(join(room, "work", "probe.txt"), "HTTP observation\n");
+  writeFileSync(join(room, "work", "surprises.json"), JSON.stringify([{
+    item: "01-001, 01-011", observation: "Same missing interaction", evidence_file: "probe.txt" }]));
+  assert.deepEqual(readAllureResults(room).surprises.map((s) => s.item), ["01-001", "01-011"]);
+  assert.ok(readAllureResults(room).surprises.every((s) => s.evidence_file === "work/probe.txt"));
+  writeFileSync(join(room, "work", "surprises.json"), JSON.stringify([{
+    item: "01-001", observation: "Unsafe", evidence_file: "../outside.txt" }]));
+  assert.throws(() => readAllureResults(room), /invalid surprise evidence/);
+});
