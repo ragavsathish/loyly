@@ -10,6 +10,7 @@ import { createModels } from "@earendil-works/pi-ai";
 import { Harness, createRegistry, defineEntry, defineExtension, defineTask } from "@earendil-works/pi-durable";
 import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite/node";
 import { runGate } from "./gate-adapter.mjs";
+import { runBuilder } from "./builder-adapter.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
@@ -29,6 +30,19 @@ if (approvedCommit && !/^[0-9a-f]{64}$/.test(approvedChecklistSha256 ?? ""))
 const cut = join(scratch, "cut");
 const sourceRoot = approvedCommit ? join(cut, "project") : ROOT;
 const mode = process.argv[3] ?? "repair"; // repair: red first gate, green second; three-red: all red
+const live = mode === "live";
+const builder = live ? {
+  command: resolve(process.env.LOYLY_BUILDER_COMMAND ?? join(ROOT, ".pi/harness/bin/builder.sh")),
+  image: resolve(process.env.LOYLY_BUILDER_IMAGE ?? ""),
+  model: process.env.LOYLY_BUILDER_MODEL,
+  commandSha256: process.env.LOYLY_BUILDER_COMMAND_SHA256,
+  imageSha256: process.env.LOYLY_BUILDER_IMAGE_SHA256,
+  instructionSha256: process.env.LOYLY_BUILDER_INSTRUCTION_SHA256,
+} : null;
+if (live && (!approvedCommit || !process.env.LOYLY_BUILDER_IMAGE || !builder.model
+    || [builder.commandSha256, builder.imageSha256, builder.instructionSha256]
+      .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? ""))))
+  throw new Error("live build needs approved cut/checklist, model, command, image, and three SHA-256 values");
 mkdirSync(scratch, { recursive: true });
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -89,6 +103,19 @@ function candidateDigest(candidateRoom = room) {
   walk(join(candidateRoom, "impl"), "impl");
   return digest.digest("hex");
 }
+function verifyBuilderScope() {
+  if (!existsSync(join(room, "impl", "start.sh")) || !existsSync(join(room, "impl", "test.sh")))
+    throw new Error("builder did not leave both legacy app entrypoints");
+  const result = spawnSync("git", ["status", "--porcelain=v1", "-z", "--untracked-files=all"],
+    { cwd: room, encoding: "buffer" });
+  if (result.status !== 0) throw new Error("cannot check builder write scope");
+  for (const line of result.stdout.toString("utf8").split("\0").filter(Boolean)) {
+    if (line.slice(0, 2) !== "??") throw new Error("builder modified a tracked clean-room file");
+    const path = line.slice(3);
+    if (!path.startsWith("impl/") && !path.startsWith(".builder/"))
+      throw new Error(`builder wrote outside declared scope: ${path}`);
+  }
+}
 function gateRoomFor(attempt, digest) {
   const base = join(scratch, `gate-${attempt}`), gateRoom = join(base, "room");
   const marker = join(base, "copy.json");
@@ -114,11 +141,53 @@ const Builder = defineTask({
     announce: async (task, runtime) => runtime.commit(async (tx) => {
       await audit(tx, task, task.input.attempt === 1 ? "build" : "repair", "started", {
         attempt: task.input.attempt, session_id: `builder-${task.input.attempt}`,
-        fixture: true, previous_gate_log: task.input.previousGateLog ?? null,
+        fixture: !live, model: builder?.model ?? null,
+        previous_gate_log_sha256: task.input.previousGateSha256 ?? null,
       });
-      return { status: "sleeping", until: Date.now() + 1200, checkpoint: { phase: "materialize" } };
+      return live ? { status: "running", checkpoint: { phase: "materialize" } }
+        : { status: "sleeping", until: Date.now() + 1200, checkpoint: { phase: "materialize" } };
     }, ctx),
     materialize: async (task, runtime) => {
+      if (live) {
+        const attempt = task.input.attempt;
+        const sessionId = `prototype-cycle-1-attempt-${attempt}`;
+        let instruction = join(scratch, "prompt.txt"), r, digest, reason;
+        try {
+          if (hash(readFileSync(instruction)) !== builder.instructionSha256
+              || hash(readFileSync(builder.command)) !== builder.commandSha256
+              || hash(readFileSync(join(builder.image, "manifest.json"))) !== builder.imageSha256)
+            throw new Error("builder inputs changed after render");
+          if (attempt > 1) {
+            const log = task.input.previousGateLog;
+            if (!log?.startsWith(`${scratch}/`) || !existsSync(log)
+                || hash(readFileSync(log)) !== task.input.previousGateSha256)
+              throw new Error("repair gate evidence differs from committed receipt");
+            instruction = join(scratch, `repair-${attempt}.md`);
+            writeFileSync(instruction, `${readFileSync(join(scratch, "prompt.txt"), "utf8")}\n\n# Previous gate failure\n\n${readFileSync(log, "utf8")}\n`);
+          }
+          r = await runBuilder({ command: builder.command, room, instruction,
+            image: builder.image, evidenceDir: join(scratch, `builder-${attempt}-evidence`),
+            sessionId, model: builder.model, stateRoot: join(ROOT, ".pi/harness/.state") });
+          if (r.exit !== 0) throw new Error(`builder host exited ${r.exit}`);
+          verifyBuilderScope();
+          digest = candidateDigest();
+        } catch (error) {
+          reason = String(error.stack ?? error);
+          writeFileSync(join(scratch, `builder-${attempt}-error.log`), `${reason}\n`);
+        }
+        await runtime.commit(async (tx) => {
+          await audit(tx, task, attempt === 1 ? "build" : "repair", digest ? "completed" : "failed", {
+            attempt, session_id: sessionId, candidate_digest: digest ?? null,
+            instruction_sha256: existsSync(instruction) ? hash(readFileSync(instruction)) : null,
+            reconciled: r?.reconciled ?? false, reason_code: reason ? "builder-effect-or-scope" : null,
+            fixture: false,
+          });
+          return { status: "terminal", outcome: digest
+            ? { status: "completed", result: { candidateDigest: digest } }
+            : { status: "failed", error: "build" } };
+        }, ctx);
+        return;
+      }
       const target = join(room, "impl");
       rmSync(target, { recursive: true, force: true });
       mkdirSync(dirname(target), { recursive: true });
@@ -163,7 +232,7 @@ const Gate = defineTask({
           candidate_digest: digest, reconciled: r.reconciled,
         });
         return { status: "terminal", outcome: { status: "completed", result: {
-          passed: r.exit === 0, log,
+          passed: r.exit === 0, log, logSha256: r.logSha256,
         } } };
       }, ctx);
     },
@@ -254,18 +323,29 @@ const Cycle = defineTask({
       // The original harness has no prompt renderer. Record the exact legacy
       // README and plan the fixture builder would receive, without inventing a v2 tool.
       const plan = readFileSync(join(sourceRoot, "docs", "plan", "01-booking-core", "spec.feature"), "utf8");
-      const instruction = `${readFileSync(join(sourceRoot, "harness", "README.md"), "utf8")}\n\n${plan}`;
-      writeFileSync(join(scratch, "prompt.txt"), instruction);
-      const r = { code: 0, sha256: hash(instruction) };
+      const instruction = live ? readFileSync(join(HERE, "builder-instruction.md"), "utf8")
+        : `${readFileSync(join(sourceRoot, "harness", "README.md"), "utf8")}\n\n${plan}`;
+      const commandSha256 = live && existsSync(builder.command) ? hash(readFileSync(builder.command)) : null;
+      const manifest = live ? join(builder.image, "manifest.json") : null;
+      const imageSha256 = manifest && existsSync(manifest) ? hash(readFileSync(manifest)) : null;
+      const instructionSha256 = hash(instruction);
+      const approved = !live || (instructionSha256 === builder.instructionSha256
+        && commandSha256 === builder.commandSha256 && imageSha256 === builder.imageSha256);
+      if (approved) writeFileSync(join(scratch, "prompt.txt"), instruction);
       await runtime.commit(async (tx) => {
-        await audit(tx, task, "render", r.code === 0 ? "completed" : "failed", { log_sha256: r.sha256 });
-        return r.code === 0 ? { status: "running", checkpoint: { phase: "build", attempt: 1, previousGateLog: null } }
+        await audit(tx, task, "render", approved ? "completed" : "refused", {
+          instruction_sha256: instructionSha256, approved_instruction_sha256: builder?.instructionSha256 ?? null,
+          builder_command_sha256: commandSha256, approved_command_sha256: builder?.commandSha256 ?? null,
+          builder_image_sha256: imageSha256, approved_image_sha256: builder?.imageSha256 ?? null,
+          model: builder?.model ?? null });
+        return approved ? { status: "running", checkpoint: { phase: "build", attempt: 1, previousGateLog: null } }
           : { status: "terminal", outcome: { status: "failed", error: "render" } };
       }, ctx);
     },
     build: async (task, runtime) => runtime.commit(async (tx) => {
-      const { attempt, previousGateLog } = task.state.checkpoint;
-      const id = await tx.createTask(Builder, { attempt, previousGateLog }, { ownership: { kind: "task", taskId: task.id } });
+      const { attempt, previousGateLog, previousGateSha256 } = task.state.checkpoint;
+      const id = await tx.createTask(Builder, { attempt, previousGateLog, previousGateSha256 },
+        { ownership: { kind: "task", taskId: task.id } });
       return { status: "waiting", checkpoint: { phase: "after-build", attempt, builder: id }, on: [id], policy: "failFast" };
     }, ctx),
     "after-build": async (task, runtime) => {
@@ -283,10 +363,17 @@ const Cycle = defineTask({
       const [outcome] = await runtime.outcomes([gate], ctx);
       const result = outcome.result;
       await runtime.commit(async (tx) => {
-        if (result.passed) return { status: "running", checkpoint: { phase: "grading-room", attempt } };
+        if (result.passed) {
+          if (live) {
+            await audit(tx, task, "grade", "blocked", { reason: "independent-live-grader-not-connected" });
+            return { status: "terminal", outcome: { status: "failed", error: "grader-not-connected" } };
+          }
+          return { status: "running", checkpoint: { phase: "grading-room", attempt } };
+        }
         if (attempt < 3) {
           await audit(tx, task, "retry", "scheduled", { attempt: attempt + 1, previous_gate_log: result.log });
-          return { status: "running", checkpoint: { phase: "build", attempt: attempt + 1, previousGateLog: result.log } };
+          return { status: "running", checkpoint: { phase: "build", attempt: attempt + 1,
+            previousGateLog: result.log, previousGateSha256: result.logSha256 } };
         }
         await audit(tx, task, "cycle", "failed", { reason: "gate-attempts-exhausted", attempt });
         return { status: "terminal", outcome: { status: "completed", result: { passed: false, attempts: attempt } } };
@@ -352,7 +439,7 @@ try {
   const root = await harness.root(ctx);
   const existing = await harness.commit((tx) => tx.scanTasks({ kind: "loyly.proto.cycle" }, 10), ctx);
   let id = existing.items[0]?.id;
-  const cycleInput = { approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode };
+  const cycleInput = { approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder };
   if (id && JSON.stringify(existing.items[0].input) !== JSON.stringify(cycleInput))
     throw new Error("this Pi store belongs to a different approved cut, checklist or mode");
   if (!id) id = await harness.commit((tx) => tx.createTask(Cycle, cycleInput,
@@ -362,7 +449,8 @@ try {
   harness.resume();
   const final = await harness.waitForTask(id, ctx);
   console.log("FINAL", JSON.stringify(final));
-  if (final.state.outcome?.status !== "completed") process.exitCode = 1;
+  if (final.state.outcome?.status !== "completed"
+      || (live && final.state.outcome.result?.passed !== true)) process.exitCode = 1;
 } finally {
   await harness.close(ctx);
 }
