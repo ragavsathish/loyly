@@ -31,6 +31,15 @@ npm run demo
 open replay.PROTOTYPE.html
 ```
 
+After a **scored** cycle, run `node render-allure.mjs <scratch-directory>`. It checks the
+candidate and score receipts against the committed Pi audit, validates both Allure sources,
+and uses the pinned Allure 3 CLI to write `<scratch-directory>/allure-report/index.html`
+plus a binding manifest. The report has one extra case: 01-011's raw pending grader result
+and its separate blind-review result both remain visible, while the score has one final
+verdict for that item. A disposable stub run rendered 11 passed and one skipped Allure case
+from an 11/11 **fixture** score. Its manifest says `evidence_kind: fixture`; it is not a
+product report. Review real observations and attachments before publishing a report.
+
 The demo runs a repaired cycle, a cycle with three failed gates, and a SIGKILL/restart. Its generated `scratch*/` directories contain the Pi SQLite ledger, fenced clone, logs, fixture verdicts, and an instrument clone. They are ignored by Git. [`example-replay.html`](example-replay.html) is a sanitized playback from a completed demo.
 
 `export.mjs` writes `audit.v1.jsonl` from committed Pi entries and `evidence.v1.json` from

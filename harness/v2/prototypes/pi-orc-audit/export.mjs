@@ -2,29 +2,14 @@
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
-import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
-import { createModels } from "@earendil-works/pi-ai";
-import { Harness, createRegistry, ROOT_CONVERSATION_ID } from "@earendil-works/pi-durable";
-import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite/node";
+import { readAuditRows } from "./audit-rows.mjs";
 import { projectReplayEvidence } from "./replay-evidence.mjs";
 
-const ctx = BACKGROUND_CONTEXT;
 const dirs = process.argv.slice(2).map((p) => resolve(p));
 if (dirs.length === 0) dirs.push(resolve("scratch"));
 
 async function readAudit(dir) {
-  const harness = await Harness.open(await openNodeSqliteStorage(join(dir, "cycle.PROTOTYPE.sqlite")),
-    { models: createModels(), registry: createRegistry(), readOnly: true }, ctx);
-  try {
-    const conversation = await harness.conversation(ROOT_CONVERSATION_ID, ctx);
-    if (!conversation) throw new Error(`no root conversation in ${dir}`);
-    const entries = [];
-    let cursor;
-    do {
-      const page = await conversation.entries({ order: "ascending" }, 100, cursor, ctx);
-      entries.push(...page.items.filter((e) => e.kind === "loyly.proto.audit.v1"));
-      cursor = page.next;
-    } while (cursor);
+    const raw = await readAuditRows(dir);
     // The stored ledger keeps local paths for reconciliation; exported replay
     // artifacts use stable relative names and never publish the host username.
     const portable = (value) => {
@@ -35,7 +20,7 @@ async function readAudit(dir) {
         Object.entries(value).map(([k, v]) => [k, portable(v)]));
       return value;
     };
-    const rows = entries.map((e, i) => portable({ seq: i + 1, entry_id: String(e.id), ...e.data }));
+    const rows = raw.map(portable);
     const evidence = portable(projectReplayEvidence(dir, rows));
     const jsonl = rows.map((r) => JSON.stringify(r)).join("\n") + "\n";
     writeFileSync(join(dir, "audit.v1.jsonl"), jsonl);
@@ -47,7 +32,6 @@ async function readAudit(dir) {
     return { name: dir.split("/").at(-1), rows, evidence, provenance,
       sha256: createHash("sha256").update(jsonl).digest("hex"),
       evidenceSha256: createHash("sha256").update(evidenceJson).digest("hex") };
-  } finally { await harness.close(ctx); }
 }
 const runs = await Promise.all(dirs.map(readAudit));
 const styles = `
