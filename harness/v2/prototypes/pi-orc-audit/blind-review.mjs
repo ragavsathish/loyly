@@ -12,6 +12,7 @@ import { candidateDigest } from "./grading-room.mjs";
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const fileHash = (path) => hash(readFileSync(path));
 const REVIEW_ID = "01-011";
+const SPEC = join("plan", "01-booking-core", "spec.feature");
 
 export function prepareBlindReview({ gradingRoom, out }) {
   if (existsSync(out)) throw new Error("blind review packet already exists");
@@ -35,6 +36,7 @@ export function prepareBlindReview({ gradingRoom, out }) {
     schema: "loyly.blind-review-packet.v1", item: REVIEW_ID,
     candidate_sha256: candidateDigest(gradingRoom),
     checklist_sha256: fileHash(join(gradingRoom, "checklist.json")),
+    spec_sha256: fileHash(join(gradingRoom, SPEC)),
     allure_results_sha256: judged.allureSha256,
     refusal_sha256: hash(refusal),
   };
@@ -61,6 +63,7 @@ export function validateBlindReview({ packetDir, reviewFile, gradingRoom }) {
   if (packet.schema !== "loyly.blind-review-packet.v1" || packet.item !== REVIEW_ID
       || packet.candidate_sha256 !== candidateDigest(gradingRoom)
       || packet.checklist_sha256 !== fileHash(join(gradingRoom, "checklist.json"))
+      || packet.spec_sha256 !== fileHash(join(gradingRoom, SPEC))
       || packet.allure_results_sha256 !== judged.allureSha256
       || packet.refusal_sha256 !== fileHash(join(packetDir, "refusal.txt")))
     throw new Error("blind review packet no longer matches candidate, checklist or grader result");

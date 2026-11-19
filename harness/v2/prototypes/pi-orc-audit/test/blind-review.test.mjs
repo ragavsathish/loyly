@@ -12,6 +12,9 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   const room = join(root, "room"), packetDir = join(root, "packet"), agentDir = join(root, "agent");
   const results = join(room, "work", "allure-results");
   mkdirSync(join(room, "impl"), { recursive: true });
+  mkdirSync(join(room, "plan", "01-booking-core"), { recursive: true });
+  const specFile = join(room, "plan", "01-booking-core", "spec.feature");
+  writeFileSync(specFile, "Scenario: The refusal for a closed day is judged usable\n");
   mkdirSync(join(room, "work", "shards", "shard-01"), { recursive: true });
   mkdirSync(results, { recursive: true });
   writeFileSync(join(room, "impl", "start.sh"), '#!/bin/sh\ncd "$(dirname "$0")"\nexec node server.js "$1"\n');
@@ -76,6 +79,11 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   review.packet_sha256 = "0".repeat(64);
   writeFileSync(reviewFile, JSON.stringify(review));
   assert.throws(() => validateBlindReview({ packetDir, reviewFile, gradingRoom: room }), /unbound/);
+  review.packet_sha256 = JSON.parse(readFileSync(join(packetDir, "response-template.json"))).packet_sha256;
+  writeFileSync(reviewFile, JSON.stringify(review));
+  writeFileSync(specFile, "Scenario: The refusal for a closed day is judged usable\n# changed wording\n");
+  assert.throws(() => validateBlindReview({ packetDir, reviewFile, gradingRoom: room }),
+    /packet no longer matches/);
   writeFileSync(join(room, "work", "shards", "shard-01", "blind-review-011.txt"), "Different refusal\n");
   assert.throws(() => prepareBlindReview({ gradingRoom: room, out: join(root, "changed-packet") }),
     /differs from the pending Allure refusal attachment/);

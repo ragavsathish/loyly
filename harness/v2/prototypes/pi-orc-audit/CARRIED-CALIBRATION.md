@@ -65,9 +65,12 @@ transcribed the suggested recurring slot to `POST /book` with household 12, reso
 weekday `Thursday`, and start `17:00`. A separate fresh candidate copy returned HTTP 201 and
 confirmed every Thursday from 17:00 to 18:30. The new packet, review response, HTTP receipt,
 and supplemental schema-valid Allure result are under `scratch-real-builder-01/blind-agent-*`
-(ignored local artifacts). Packet SHA-256:
-`6d1523849854e8dca562ed1419e6f8532670ac779617793de55c928f905b7f07`;
-review response SHA-256:
-`81194a65633971882c66c44dc3042e1ecb72b9390ad2f90abad961855c7e02d7`.
+(ignored local artifacts). The corrected packet also binds the original spec SHA-256
+`b28ee83dfaada8df0ed99b90121a50f3c55885ade4db323b68e03c4d5f15005e`.
+Its packet SHA-256 is
+`3b344c829213f51f67f4bd6e5d432477fe20aeace853306b681d57f457ab9b63`;
+the rebound review response SHA-256 is
+`95fd32704bfc63de3f0abc89cfab0c30c9acfb0f58430f25659a5f53b974ffbb`.
+The ignored `-v2` artifacts hold this binding and another HTTP 201 confirmation.
 This calibrated the revised method on a previously built candidate. It did not alter the
 old raw grader result, produce a scored cycle, or approve that candidate under the new spec.

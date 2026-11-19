@@ -41,7 +41,7 @@ The prototype on `proto/pi-orc-audit` uses the later slice-06 spec and v2 adapte
 For the revised `01-011` usability check, a fresh independent subagent receives only the
 exact `refusal.txt` and `question.txt`; the packet manifest, candidate, configuration, and
 grader transcript stay outside its context. `blind-review-cli.mjs prepare` binds the packet
-to the candidate and grader Allure digest. After the agent answers, `probe` confirms its
+to the candidate, exact spec, checklist, and grader Allure digest. After the agent answers, `probe` confirms its
 suggested request against a fresh candidate copy, and `file` writes a separate Allure result.
 The operator checks that the HTTP request faithfully expresses the agent's answer. This
 supplement does not edit the grader's pending result or automatically change a score.

@@ -11,6 +11,9 @@ function fixture() {
   const room = mkdtempSync(join(tmpdir(), "loyly-allure-result-"));
   const dir = join(room, "work", "allure-results");
   mkdirSync(dir, { recursive: true });
+  mkdirSync(join(room, "plan", "01-booking-core"), { recursive: true });
+  writeFileSync(join(room, "plan", "01-booking-core", "spec.feature"),
+    "Scenario: A fresh subagent judges the refusal\n");
   cpSync(schema, join(room, "allure-lifecycle-result.schema.json"));
   const items = [{ id: "01-001", name: "The schedule", rule: "Availability" },
     { id: "01-011", name: "Usable refusal", rule: "Actionable refusal" }];
@@ -41,6 +44,11 @@ function fixture() {
 test("attached lifecycle schema is the grader contract and projects honest legacy verdicts", () => {
   const { room, first, blind } = fixture();
   assert.deepEqual(readAllureResults(room).verdicts.map((v) => v.verdict), ["pass", "fail"]);
+  blind.result.statusDetails.message = "not reached: blind human review required";
+  writeFileSync(blind.path, JSON.stringify(blind.result));
+  assert.throws(() => readAllureResults(room), /blind subagent review/);
+  blind.result.statusDetails.message = "not reached: blind subagent review required";
+  writeFileSync(blind.path, JSON.stringify(blind.result));
   blind.result.status = "passed";
   writeFileSync(blind.path, JSON.stringify(blind.result));
   assert.throws(() => readAllureResults(room), /blind subagent review/);

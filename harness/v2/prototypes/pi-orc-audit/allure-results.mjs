@@ -5,12 +5,17 @@ import { join } from "node:path";
 import Ajv2020 from "ajv/dist/2020.js";
 
 const RESULT = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-result\.json$/;
+// Preserve the old calibration room, while requiring the revised handoff in every new cut.
+const PERSON_SPEC_SHA256 = "b28ee83dfaada8df0ed99b90121a50f3c55885ade4db323b68e03c4d5f15005e";
 const labelValues = (result, name) => result.labels.filter((label) => label.name === name).map((label) => label.value);
 
 export function readAllureResults(room) {
   const schema = JSON.parse(readFileSync(join(room, "allure-lifecycle-result.schema.json"), "utf8"));
   const validate = new Ajv2020({ strict: false }).compile(schema);
   const checklist = JSON.parse(readFileSync(join(room, "checklist.json"), "utf8"));
+  const specSha256 = createHash("sha256").update(readFileSync(join(room, "plan", "01-booking-core", "spec.feature"))).digest("hex");
+  const pendingPrefix = specSha256 === PERSON_SPEC_SHA256
+    ? "not reached: blind human review required" : "not reached: blind subagent review required";
   const items = checklist.items;
   if (!Array.isArray(items) || !items.length || new Set(items.map((item) => item.id)).size !== items.length)
     throw new Error("invalid grading checklist");
@@ -49,9 +54,7 @@ export function readAllureResults(room) {
       expectedFiles.add(attachment.source);
     }
     if (id === "01-011" && (result.status !== "skipped" || result.stage !== "pending"
-        || !["not reached: blind subagent review required",
-          "not reached: blind human review required"].some((prefix) =>
-          result.statusDetails.message.startsWith(prefix))))
+        || !result.statusDetails.message.startsWith(pendingPrefix)))
       throw new Error("01-011 needs a separate blind subagent review");
     byId.set(id, result);
   }
