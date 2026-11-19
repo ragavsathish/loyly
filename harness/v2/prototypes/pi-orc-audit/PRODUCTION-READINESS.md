@@ -8,7 +8,7 @@ of Pi's committed audit entries; it never invents ORC ticks.
 
 | Requirement | Current evidence | Still required |
 | --- | --- | --- |
-| Original harness | `harness/check.sh --local` passes; the pinned room is one commit with no prototype files. The root `harness/*` files are byte unchanged from the pinned original cut. | Repeat the byte comparison at release. |
+| Original harness | The new spec-only source cut `b97e4eda015167c571eb3296fa03fe4fea366130` differs from the original `17d68d2` in only `spec.feature` and `decisions.md`; all root `harness/*` bytes are unchanged. Its clean legacy preflight passes, and it contains no prototype tooling. The Pi controller stays on the separate integration branch. | Run the approved real cycle from this cut and repeat the byte comparison at release. |
 | Live builder | A fresh Sol Pi/Gondolin builder regenerated the pinned original cut on attempt 1. The candidate digest and launch receipt are recorded in `CARRIED-CALIBRATION.md`. The earlier no-model smoke passed seven tools and session reopening; adapter controller-kill tests pass. | Approve an exact scored cycle, prove bounded same-session continuation and the full crash matrix, and review host, settings and image provenance. |
 | Gate and repair | The unchanged `verify.sh` ran in a separate copy of the real candidate: 20 tests and the HTTP identity probe passed. Receipt-backed retries stopped at three failures in a stub trial. | Real failure repair with a fresh Pi session and the full crash matrix. The original identity probe only checks the word `sauna`, so behavioral grading remains essential. |
 | Independent grader | Three fresh Terra VM shards merged eleven schema-valid Allure results on the real gated candidate: 10 behavioral passes and 01-011 pending. The uncarried fixture produced zero passes. The carried run exposed runtime writes in the source room; fresh per-item runtime copies fixed that. A third carried run with enforced read-only Gondolin mounts also merged 10 behavioral passes and 01-011 pending. See both calibration records. | Seal and obtain approval of the grader instruction digest, then perform an approved scored cycle. Review each black-box observation. |
@@ -21,3 +21,10 @@ instruction passed both uncarried and carried exploratory calibrations. The live
 waits for the blind review before scoring and still exits nonzero after measurement until a
 separate acceptance decision. The grader instruction in this branch is a draft, not a sealed
 or operator-approved instrument.
+
+The next source cut is published at `ragavsathish/spec/pi-booking-agent`. It selects the same
+eleven item IDs (`01-001` through `01-011`) and checklist SHA-256
+`4acbadbce0e08cafd19ac89d2a0d909a564abd242ffecdb06b6184a1bbe631cc`.
+The exact revised `spec.feature` SHA-256 is
+`8dfa0eb3369fd1176e188bb84fbd229593ac6fe20aca3afce5f70d02807cc89e`.
+This cut has not yet been built or scored.

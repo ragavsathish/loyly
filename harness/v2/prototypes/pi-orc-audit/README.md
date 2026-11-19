@@ -2,6 +2,12 @@
 
 This branch starts at `scope-impact/master` (`17d68d2`). It asks whether Pi durable can run the **original legacy cycle** and preserve an interactive audit playback. It does not change `ragavsathish/main`, the accepted spec-v2 runner, or the upstream branch.
 
+For the revised 01-011 run, the source is the separate spec-only cut
+`b97e4eda015167c571eb3296fa03fe4fea366130` on `ragavsathish/spec/pi-booking-agent`.
+That cut changes only `docs/plan/01-booking-core/spec.feature` and `decisions.md` from the
+original baseline; the controller and test fixtures remain on this integration branch.
+The new cut passes the unchanged legacy preflight and has not yet been built or scored.
+
 The integration branch keeps that baseline and replaces the prototype's gate-log inference with a detached host that runs the unchanged `harness/verify.sh` in an independent copy of each candidate. The host writes an exit-code receipt tied to the candidate digest and gate log. If the controller dies, Pi reopens the same gate task and reads that receipt; it cannot treat a line of log prose as a gate verdict.
 
 The branch also carries the existing Pi builder host under `.pi/harness/`, plus a process adapter with a stable session ID and launch receipt. Its controller SIGKILL test passes. The host's no-model smoke passed inside the `builder-clojure` Gondolin image: all seven selected tools ran, egress and host-path restrictions held, and reopening the same request made no second model call. `worker.mjs` has a `live` mode that requires the approved source commit, checklist digest, builder instruction digest, wrapper digest, image-manifest digest, image path, and model. It builds from the pinned original-source cut, so the builder room contains none of these prototype fixtures. A wrong instruction digest is refused before launch; a stub build produced three failed legacy gates and never reached grading.

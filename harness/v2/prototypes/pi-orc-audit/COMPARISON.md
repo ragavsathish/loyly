@@ -19,4 +19,9 @@ Pi durable can own the **original** sequence of fence, regeneration attempt, rat
 
 It does **not** show that the original baseline can replace the accepted spec-v2 runner today. Upstream `master` has no built Löyly app, no slice-06 spec, no live agent adapters, and only a name-based identity probe. The fixture grader's 10/11 does not judge product behavior. A migration would next need live Pi builder/grader hosts, the actual Löyly app and spec, provenance-preserving audit projection into Grain, and a same-candidate comparison against the accepted runner before changing `main`.
 
+The revised booking source cut is kept separate from the controller: `ragavsathish/spec/pi-booking-agent`
+adds only the approved 01-011 wording and decision to the original baseline. The original
+root harness modules remain byte identical. The Pi adapter, sharded grader, blind reviewer,
+and replay code are an overlay on the integration branch, outside the fenced product cut.
+
 The evidence is reproducible with `npm run demo`; `scratch/gate-2.log` contains `=== verify OK`, `scratch/scoreboard.log` reports 10/11, and the exporter reads the three Pi stores to make `example-replay.html`. Scratch evidence remains local and is not committed.
