@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer, validateBlindReview,
   verifyBlindReviewPacket,
   writeBlindAgentAllure } from "../blind-review.mjs";
+import { parseBlindAgentAnswer } from "../blind-agent-adapter.mjs";
 
 const schema = new URL("../allure-lifecycle-result.schema.json", import.meta.url).pathname;
 test("a blind subagent's Allure result is separate, bound and confirmed over HTTP", async () => {
@@ -21,7 +22,7 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   mkdirSync(results, { recursive: true });
   writeFileSync(join(room, "impl", "start.sh"), '#!/bin/sh\ncd "$(dirname "$0")"\nexec node server.js "$1"\n');
   chmodSync(join(room, "impl", "start.sh"), 0o755);
-  writeFileSync(join(room, "impl", "server.js"), 'require("http").createServer((req,res)=>{let body="";req.on("data",x=>body+=x);req.on("end",()=>{res.statusCode=req.url==="/book"?(body.includes("Thursday")?201:409):200;res.end(String(res.statusCode))})}).listen(Number(process.argv[2]),"127.0.0.1")\n');
+  writeFileSync(join(room, "impl", "server.js"), 'require("http").createServer((req,res)=>{let body="";req.on("data",x=>body+=x);req.on("end",()=>{if(req.url==="/"){res.statusCode=200;res.end(`<form method="post" action="/request"><input name="household"><select name="resource"></select><select name="weekday"></select><select name="start"></select></form>`);return}res.statusCode=req.url==="/request"?(body.includes("Thursday")?201:409):404;res.end(String(res.statusCode))})}).listen(Number(process.argv[2]),"127.0.0.1")\n');
   cpSync(schema, join(room, "allure-lifecycle-result.schema.json"));
   writeFileSync(join(room, "checklist.json"), JSON.stringify({ items: [
     { id: "01-011", name: "The refusal for a closed day is judged usable",
@@ -66,10 +67,13 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   assert.throws(() => writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom: room, out: agentDir }),
     /independent HTTP probe/);
   const verificationDir = join(root, "probe");
+  const parsed = parseBlindAgentAnswer("REQUEST: pukuhuone 9 | Thursday | 17:00 | 18:30",
+    "Try Thursday at 17:00 to 18:30 in pukuhuone 9.\n");
+  assert.equal(parsed.request.path, "@booking-form");
   const verification = await probeBlindAnswer({ packetDir, reviewFile, gradingRoom: room,
-    request: { method: "POST", path: "/book", body: "weekday=Thursday",
-      matches_answer: true }, out: verificationDir });
+    request: { ...parsed.request, body: "weekday=Thursday" }, out: verificationDir });
   assert.equal(verification.http_status, 201);
+  assert.equal(verification.request.resolved_path, "/request");
   const agent = writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom: room,
     verificationDir, out: agentDir });
   assert.equal(agent.result.status, "passed");
@@ -83,9 +87,10 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   const badFile = join(root, "bad-review.json"), badProbe = join(root, "bad-probe");
   writeFileSync(badFile, JSON.stringify(badReview));
   const rejected = await probeBlindAnswer({ packetDir, reviewFile: badFile, gradingRoom: room,
-    request: { method: "POST", path: "/book", body: "weekday=Tuesday",
+    request: { method: "POST", path: "@booking-form", body: "weekday=Tuesday",
       matches_answer: true }, out: badProbe });
   assert.equal(rejected.http_status, 409);
+  assert.equal(rejected.request.resolved_path, "/request");
   const badAgent = writeBlindAgentAllure({ packetDir, reviewFile: badFile, gradingRoom: room,
     verificationDir: badProbe, out: join(root, "bad-agent") });
   assert.equal(badAgent.result.status, "failed");

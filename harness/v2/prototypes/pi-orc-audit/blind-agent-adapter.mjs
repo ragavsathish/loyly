@@ -42,7 +42,7 @@ export function parseBlindAgentAnswer(answer, refusal) {
       || !refusal.includes(start) || !refusal.includes(end))
     throw new Error("blind agent named a room, day or time absent from the refusal");
   return { verdict: "pass", reason: "The fresh agent named a request from the refusal; HTTP confirmation follows.",
-    request: { method: "POST", path: "/book",
+    request: { method: "POST", path: "@booking-form",
       body: new URLSearchParams({ household: "12", resource: `ph${number}`,
         weekday, start }).toString(), matches_answer: true } };
 }
