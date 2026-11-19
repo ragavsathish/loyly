@@ -4,7 +4,7 @@ import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, wr
 import { basename, isAbsolute, join } from "node:path";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
-function treeDigest(root, prefix) {
+export function treeDigest(root, prefix) {
   const digest = createHash("sha256");
   const walk = (dir, prefix) => {
     for (const name of readdirSync(dir).sort()) {

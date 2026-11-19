@@ -4,9 +4,11 @@ import { randomUUID } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
+import { treeDigest } from './grading-room.mjs';
 
 const out = '/out';
 const config = JSON.parse(await readFile(join(out, 'config.json'), 'utf8'));
+const modern = JSON.parse(await readFile('/candidate/contract.json', 'utf8')).request?.path === '/api/bookings';
 const uuid = randomUUID(), start = Date.now();
 const events = [], steps = [];
 let server, failure, observed;
@@ -36,6 +38,8 @@ async function request(path, init) {
 const attributes = (resource) => Object.fromEntries((resource?.attributes ?? [])
   .map((entry) => [entry.key, entry.value.stringValue ?? entry.value.intValue]));
 try {
+  if (treeDigest('/candidate', 'impl') !== config.candidate_sha256)
+    throw Error('Mounted candidate differs from the bound source digest');
   server = spawn(process.execPath, [
     '--experimental-loader=/worker/node_modules/@opentelemetry/instrumentation/hook.mjs',
     '--import=/worker/panel-otel-instrumentation.mjs', '/candidate/server.mjs', '8902',
@@ -48,7 +52,7 @@ try {
   await step('Start instrumented candidate and local OTLP receiver in Gondolin VM', async () => {
     for (let i = 0; i < 100; i++) {
       if (server.exitCode !== null) throw Error(`candidate exited: ${stderr}`);
-      try { if ((await request('/health')).status === 200) return; } catch { /* wait */ }
+      try { if ((await request(modern ? '/api/state' : '/health')).status === 200) return; } catch { /* wait */ }
       await delay(100);
     }
     throw Error(`candidate did not start: ${stderr}`);

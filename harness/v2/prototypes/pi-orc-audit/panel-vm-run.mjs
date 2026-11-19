@@ -99,11 +99,7 @@ export async function runPanelVms({ original, image, out }) {
     throw new Error('candidate differs from the scored cut');
   const scoreSha256 = scoreDigest(original);
   const candidate = join(original, 'fenced-room', 'impl');
-  const sourceHash = createHash('sha256');
-  for (const name of ['server.mjs', 'web.mjs', 'model.mjs', 'style.css', 'contract.json']) {
-    sourceHash.update(name); sourceHash.update(readFileSync(join(candidate, name)));
-  }
-  const sourceFilesSha256 = sourceHash.digest('hex');
+  const sourceFilesSha256 = candidateSha256;
   const verify = spawnSync('gondolin', ['build', '--verify', image], { encoding: 'utf8' });
   if (verify.status !== 0) throw new Error(`Gondolin image verification failed: ${verify.stderr}`);
   const imageDigest = `sha256:${fileSha(join(image, 'manifest.json'))}`;

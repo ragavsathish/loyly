@@ -4,9 +4,11 @@ import { randomUUID } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
+import { treeDigest } from './grading-room.mjs';
 
 const out = '/out';
 const config = JSON.parse(await readFile(join(out, 'config.json'), 'utf8'));
+const modern = JSON.parse(await readFile('/candidate/contract.json', 'utf8')).request?.path === '/api/bookings';
 const uuid = randomUUID();
 const start = Date.now();
 const base = 'http://127.0.0.1:8901';
@@ -22,7 +24,7 @@ async function request(path, method = 'GET', body) {
     method, headers: body === undefined ? {} : { 'content-type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  return { status: response.status, ...(await response.json()) };
+  return { ...(await response.json()), status: response.status };
 }
 async function step(name, action) {
   const row = { name, status: 'passed', stage: 'finished', start: Date.now() };
@@ -44,7 +46,7 @@ async function oneRace(index) {
   const selected = schedule.slots.find((value) => value.resource === 'ph8'
     && value.weekday === 'Tuesday' && value.start === '17:00');
   const row = { index, overlapped, responses: [a.status, b.status],
-    codes: [a.code ?? null, b.code ?? null], holder: selected?.household,
+    codes: [a.code ?? a.reason ?? null, b.code ?? b.reason ?? null], holder: selected?.household,
     bookingCount: booking.bookings?.length,
     viewCounts: Object.fromEntries(['postedList', 'heaterSchedule', 'invoicingSignals']
       .map((name) => [name, views[name]?.length])) };
@@ -52,10 +54,11 @@ async function oneRace(index) {
   assert.equal(overlapped, true, `race ${index} requests did not overlap`);
   assert.deepEqual(row.responses.sort(), [201, 409], `race ${index} responses`);
   const winner = [a, b].find((value) => value.status === 201).booking;
-  assert.equal([a, b].find((value) => value.status === 409).code, 'held');
+  assert.equal([a, b].find((value) => value.status === 409).code
+    ?? [a, b].find((value) => value.status === 409).reason, 'held');
   assert.equal(booking.bookings?.length, 1);
   assert.equal(booking.bookings[0].id, winner.id);
-  assert.equal(selected?.state, 'held');
+  assert.equal(selected?.state ?? selected?.status, 'held');
   assert.equal(selected.household, winner.household);
   for (const name of ['postedList', 'heaterSchedule', 'invoicingSignals'])
     assert.equal(views[name]?.length, 1, name);
@@ -65,10 +68,14 @@ async function oneRace(index) {
   assert.equal(released.status, 200);
   const after = await request('/api/schedule');
   assert.equal(after.slots.find((value) => value.resource === 'ph8'
-    && value.weekday === 'Tuesday' && value.start === '17:00')?.state, 'free');
+    && value.weekday === 'Tuesday' && value.start === '17:00')?.state
+    ?? after.slots.find((value) => value.resource === 'ph8'
+      && value.weekday === 'Tuesday' && value.start === '17:00')?.status, 'free');
 }
 
 try {
+  if (treeDigest('/candidate', 'impl') !== config.candidate_sha256)
+    throw Error('Mounted candidate differs from the bound source digest');
   server = spawn(process.execPath, ['/candidate/server.mjs', '8901'], {
     cwd: '/candidate', env: { ...process.env, LOYLY_DATA: record }, stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -77,7 +84,7 @@ try {
   await step('Start fresh candidate in the Gondolin VM', async () => {
     for (let i = 0; i < 100; i++) {
       if (server.exitCode !== null) throw Error(`candidate exited: ${stderr}`);
-      try { if ((await request('/health')).status === 200) return; } catch { /* wait */ }
+      try { if ((await request(modern ? '/api/state' : '/health')).status === 200) return; } catch { /* wait */ }
       await delay(100);
     }
     throw Error(`candidate did not start: ${stderr}`);

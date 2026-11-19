@@ -35,6 +35,16 @@ corroboration and diagnostics. A specialist failure remains visible and makes
 the panel `not-ready`; it cannot rewrite the agent's filed verdict. No latency
 threshold is invented where the behavior spec has none.
 
+The builder may install npm packages while testing. After each builder turn,
+the controller removes `impl/node_modules` and `impl/.tmp` before binding the
+authored candidate digest. Gate and grader copies install dependencies from
+the package lock when their tests run. The first integrated run stopped before
+its gate because the earlier controller tried to hash a generated npm symlink;
+its partial audit and VM transcript remain in ignored scratch. A diagnostic
+legacy gate passed after this cleanup. The three specialist VMs were also run
+against that candidate: Playwright, protocol races and OpenTelemetry passed in
+parallel. These diagnostics are not a filed cycle score.
+
 ## Pinned launch
 
 Create an ignored JSON contract matching `live-run.schema.json` with the

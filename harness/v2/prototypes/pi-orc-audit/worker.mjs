@@ -145,6 +145,12 @@ function proveCut() {
 function candidateDigest(candidateRoom = room) {
   return digestCandidate(candidateRoom);
 }
+function clearBuilderTestArtifacts() {
+  // The builder may run npm ci during its own tests. Recreate dependencies in
+  // each gate/grader sandbox from package-lock.json; bind only authored files.
+  for (const name of ["node_modules", ".tmp"])
+    rmSync(join(room, "impl", name), { recursive: true, force: true });
+}
 function verifyBuilderScope() {
   if (!existsSync(join(room, "impl", "start.sh")) || !existsSync(join(room, "impl", "test.sh")))
     throw new Error("builder did not leave both legacy app entrypoints");
@@ -212,6 +218,7 @@ const Builder = defineTask({
             sessionId, model: builder.model, stateRoot: join(ROOT, ".pi/harness/.state") });
           if (r.exit !== 0) throw new Error(`builder host exited ${r.exit}`);
           verifyBuilderScope();
+          clearBuilderTestArtifacts();
           digest = candidateDigest();
         } catch (error) {
           reason = String(error.stack ?? error);
@@ -303,6 +310,7 @@ const Builder = defineTask({
           prompt: "Continue this same builder session now." });
         if (r.exit !== 0) throw new Error(`builder continuation exited ${r.exit}`);
         verifyBuilderScope();
+        clearBuilderTestArtifacts();
         digest = candidateDigest();
       } catch (error) {
         reason = String(error.stack ?? error);
