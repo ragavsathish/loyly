@@ -50,6 +50,11 @@
       --state-dir DIR      default .pi/harness/.state/loyly/ID
       --no-wait            queue start-run and return
 
+  harness/loyly-run cut --commit REV --state-dir DIR [--run-id ID] [--project-repo DIR]
+      Prepare the same scratch legacy-harness cut in DIR/project and write
+      DIR/evidence/cut.json, without starting the ORC runner. This is the cut
+      input for a Pi durable cycle controller. DIR must be fresh.
+
   harness/loyly-run send METHOD ['PARAMS-JSON'] [--run-id ID | --state-dir DIR] [--no-wait]
       Sends one JSON-RPC request through the daemon and prints the runner's response line.
       Exit 0 on a result, 1 on a JSON-RPC error, 2 on a launcher or daemon failure.
@@ -270,6 +275,30 @@ evidence/builder/ the builder launches, runs/ LOYLY_RUNS_DIR, project/ LOYLY_PRO
     (fs/delete-if-exists idx)
     cut))
 
+(defn cut!
+  "Prepare the same immutable legacy-harness cut as start!, without launching ORC.
+  A Pi durable controller can fence this repository and own the following cycle."
+  [opts]
+  (let [rev (or (:commit opts) (die 2 "cut needs --commit REV"))
+        sd (or (:state-dir opts) (die 2 "cut needs --state-dir DIR"))
+        sd (str (fs/absolutize sd))
+        source (str (fs/canonicalize (or (:project-repo opts) root)))
+        run-id (or (:run-id opts) (str "pi-cut-" (System/currentTimeMillis)))
+        _ (when-not (re-matches #"[A-Za-z0-9._-]+" run-id)
+            (die 2 "cut --run-id wants [A-Za-z0-9._-]: " run-id))
+        _ (when (fs/exists? sd) (die 2 sd " exists: a cut is prepared once"))
+        base (sh! {:dir source} "git" "rev-parse" "--verify" (str rev "^{commit}"))
+        repo (str sd "/project")]
+    (fs/create-dirs (str sd "/evidence"))
+    (sh! {} "git" "clone" "-q" "--no-checkout" source repo)
+    (let [cut (base-cut! repo base)]
+      (sh! {:dir repo} "git" "checkout" "-q" "-b" (str "loyly/" run-id) cut)
+      (write-json! (str sd "/evidence/cut.json")
+                   {"run-id" run-id "source" source "base" base "cut" cut
+                    "project" repo "harness" "archive/legacy-harness"})
+      (println (json/generate-string {"run-id" run-id "project" repo "base" base "cut" cut}))
+      0)))
+
 (def default-budget
   {"gate-attempt-limit" 3 "max-outer-cycles" 1 "max-continuations" 0
    "stage-timeouts-seconds" {"fence" 1800 "regenerate" 14400 "gate" 3600 "score" 28800}})
@@ -384,6 +413,7 @@ evidence/builder/ the builder launches, runs/ LOYLY_RUNS_DIR, project/ LOYLY_PRO
   (let [[cmd & more] args opts (parse-args more)]
     (case cmd
       "start" (System/exit (start! opts))
+      "cut" (System/exit (cut! opts))
       "send" (let [[method params] (:pos opts)]
                (when-not method (die 2 "send needs a METHOD"))
                (System/exit (send! (state-dir opts) method

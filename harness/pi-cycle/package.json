@@ -1,0 +1,13 @@
+{
+  "name": "loyly-pi-cycle",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare": "node prepare.mjs"
+  },
+  "dependencies": {
+    "@earendil-works/chord": "1.5.1",
+    "@earendil-works/pi-ai": "1.5.1",
+    "@earendil-works/pi-durable": "1.5.1"
+  }
+}
