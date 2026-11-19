@@ -30,6 +30,9 @@ test("grading room carries only the selected plan, candidate and checklist", () 
   assert.ok(!existsSync(join(out, "plan", "02-private")));
   assert.ok(!existsSync(join(out, ".builder")));
   assert.throws(() => prepareGradingRoom(args), /already exists/);
+  writeFileSync(join(out, "plan", "01-booking-core", "spec.feature"), "changed plan\n");
+  assert.throws(() => verifyGradingRoom(args), /changed/);
+  writeFileSync(join(out, "plan", "01-booking-core", "spec.feature"), "@item-01-001\n");
   writeFileSync(join(out, "impl", "start.sh"), "changed\n");
   assert.throws(() => verifyGradingRoom(args), /changed/);
 });

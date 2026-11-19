@@ -4,7 +4,7 @@ import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, wr
 import { basename, isAbsolute, join } from "node:path";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
-export function candidateDigest(room) {
+function treeDigest(root, prefix) {
   const digest = createHash("sha256");
   const walk = (dir, prefix) => {
     for (const name of readdirSync(dir).sort()) {
@@ -17,9 +17,11 @@ export function candidateDigest(room) {
       } else throw new Error(`candidate has a symlink or special file: ${path}`);
     }
   };
-  walk(join(room, "impl"), "impl");
+  walk(root, prefix);
   return digest.digest("hex");
 }
+export const candidateDigest = (room) => treeDigest(join(room, "impl"), "impl");
+const planDigest = (room) => treeDigest(join(room, "plan"), "plan");
 export function prepareGradingRoom({ sourceRoom, candidateRoom, checklistFile, out,
   candidateSha256, checklistSha256 }) {
   for (const path of [sourceRoom, candidateRoom, checklistFile, out])
@@ -41,6 +43,7 @@ export function prepareGradingRoom({ sourceRoom, candidateRoom, checklistFile, o
       || hash(readFileSync(join(out, "checklist.json"))) !== checklistSha256)
     throw new Error("grading copy differs from the gated candidate or checklist");
   const receipt = { schema: "loyly.grading-room.v1", candidateSha256, checklistSha256,
+    planSha256: planDigest(out),
     sourcePlan: "plan/01-booking-core" };
   writeFileSync(join(out, ".grading-room.json"), JSON.stringify(receipt));
   return receipt;
@@ -49,6 +52,7 @@ export function verifyGradingRoom({ out, candidateSha256, checklistSha256 }) {
   const receipt = JSON.parse(readFileSync(join(out, ".grading-room.json"), "utf8"));
   if (receipt.schema !== "loyly.grading-room.v1" || receipt.candidateSha256 !== candidateSha256
       || receipt.checklistSha256 !== checklistSha256
+      || receipt.planSha256 !== planDigest(out)
       || candidateDigest(out) !== candidateSha256
       || hash(readFileSync(join(out, "checklist.json"))) !== checklistSha256)
     throw new Error("grading room receipt or inputs changed");

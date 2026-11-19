@@ -12,6 +12,7 @@ import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite
 import { runGate } from "./gate-adapter.mjs";
 import { runBuilder } from "./builder-adapter.mjs";
 import { candidateDigest as digestCandidate, prepareGradingRoom, verifyGradingRoom } from "./grading-room.mjs";
+import { validateVerdicts } from "./validate-verdicts.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
@@ -44,6 +45,20 @@ if (live && (!approvedCommit || !process.env.LOYLY_BUILDER_IMAGE || !builder.mod
     || [builder.commandSha256, builder.imageSha256, builder.instructionSha256]
       .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? ""))))
   throw new Error("live build needs approved cut/checklist, model, command, image, and three SHA-256 values");
+const grader = live && process.env.LOYLY_GRADER_MODEL ? {
+  command: resolve(process.env.LOYLY_GRADER_COMMAND ?? builder.command),
+  image: resolve(process.env.LOYLY_GRADER_IMAGE ?? builder.image),
+  settings: resolve(process.env.LOYLY_GRADER_SETTINGS ?? join(ROOT, ".pi/harness/config/pi.grader.settings.json")),
+  model: process.env.LOYLY_GRADER_MODEL,
+  commandSha256: process.env.LOYLY_GRADER_COMMAND_SHA256,
+  imageSha256: process.env.LOYLY_GRADER_IMAGE_SHA256,
+  settingsSha256: process.env.LOYLY_GRADER_SETTINGS_SHA256,
+  instructionSha256: process.env.LOYLY_GRADER_INSTRUCTION_SHA256,
+} : null;
+if (grader && (grader.model === builder.model
+    || [grader.commandSha256, grader.imageSha256, grader.settingsSha256, grader.instructionSha256]
+      .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? ""))))
+  throw new Error("independent grader needs another model and approved command, image, settings and instruction digests");
 mkdirSync(scratch, { recursive: true });
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -233,6 +248,48 @@ const Grade = defineTask({
   initial: () => ({ phase: "file" }),
   phases: {
     file: async (task, runtime) => {
+      if (live) {
+        const instruction = join(HERE, "grader-instruction-01.md");
+        let r, judged, reason;
+        try {
+          if (!grader) throw new Error("independent grader not configured");
+          if (hash(readFileSync(instruction)) !== grader.instructionSha256
+              || hash(readFileSync(grader.command)) !== grader.commandSha256
+              || hash(readFileSync(join(grader.image, "manifest.json"))) !== grader.imageSha256
+              || hash(readFileSync(grader.settings)) !== grader.settingsSha256)
+            throw new Error("grader instruction, command, image or settings differs from approved digest");
+          verifyGradingRoom({ out: gradingRoom, candidateSha256: task.input.candidateSha256,
+            checklistSha256: approvedChecklistSha256 });
+          r = await runBuilder({ command: grader.command, room: gradingRoom, instruction,
+            image: grader.image, evidenceDir: join(scratch, "grader-evidence"),
+            sessionId: "prototype-cycle-1-grade", model: grader.model,
+            stateRoot: join(ROOT, ".pi/harness/.state"),
+            piSettings: grader.settings, prompt: "Grade it now, as the attached instruction says.",
+            roomLabel: "the grading room" });
+          if (r.exit !== 0) throw new Error(`grader host exited ${r.exit}`);
+          verifyGradingRoom({ out: gradingRoom, candidateSha256: task.input.candidateSha256,
+            checklistSha256: approvedChecklistSha256 });
+          judged = validateVerdicts(gradingRoom);
+          cpSync(join(gradingRoom, "work", "verdicts.json"), join(scratch, "verdicts.json"));
+          cpSync(join(gradingRoom, "work", "surprises.json"), join(scratch, "surprises.json"));
+        } catch (error) {
+          reason = String(error.stack ?? error);
+          writeFileSync(join(scratch, "grade-error.log"), `${reason}\n`);
+        }
+        await runtime.commit(async (tx) => {
+          await audit(tx, task, "grade", judged ? "completed" : "failed", {
+            model: grader?.model ?? null, fixture: grader?.model.startsWith("test/") ?? false,
+            item_count: judged?.verdicts.length ?? 0, pass_count: judged?.pass ?? 0,
+            verdicts_sha256: judged ? hash(readFileSync(join(scratch, "verdicts.json"))) : null,
+            surprises_sha256: judged ? hash(readFileSync(join(scratch, "surprises.json"))) : null,
+            reconciled: r?.reconciled ?? false,
+            reason_code: reason ? "grader-effect-or-verdict" : null });
+          return { status: "terminal", outcome: judged
+            ? { status: "completed", result: { count: judged.verdicts.length, pass: judged.pass } }
+            : { status: "failed", error: "grade" } };
+        }, ctx);
+        return;
+      }
       // Independent grader task is a deterministic fixture. The legacy score and
       // scoreboard below are real; no grader claim is treated as a gate verdict.
       const selected = readFileSync(join(gradingRoom, "checklist.txt"), "utf8").trim().split("\n")
@@ -338,8 +395,14 @@ const Cycle = defineTask({
     }, ctx),
     "after-build": async (task, runtime) => {
       const { attempt, builder } = task.state.checkpoint;
-      await runtime.outcomes([builder], ctx);
-      await runtime.commit(() => ({ status: "running", checkpoint: { phase: "gate", attempt } }), ctx);
+      const [outcome] = await runtime.outcomes([builder], ctx);
+      await runtime.commit(async (tx) => {
+        if (outcome?.status !== "completed") {
+          await audit(tx, task, "cycle", "failed", { reason: "builder-attempt-failed", attempt });
+          return { status: "terminal", outcome: { status: "failed", error: "build" } };
+        }
+        return { status: "running", checkpoint: { phase: "gate", attempt } };
+      }, ctx);
     },
     gate: async (task, runtime) => runtime.commit(async (tx) => {
       const { attempt } = task.state.checkpoint;
@@ -349,8 +412,12 @@ const Cycle = defineTask({
     "after-gate": async (task, runtime) => {
       const { attempt, gate } = task.state.checkpoint;
       const [outcome] = await runtime.outcomes([gate], ctx);
-      const result = outcome.result;
       await runtime.commit(async (tx) => {
+        if (outcome?.status !== "completed") {
+          await audit(tx, task, "cycle", "failed", { reason: "gate-effect-failed", attempt });
+          return { status: "terminal", outcome: { status: "failed", error: "gate" } };
+        }
+        const result = outcome.result;
         if (result.passed) {
           return { status: "running", checkpoint: { phase: "grading-room", attempt,
             candidateSha256: result.candidateSha256 } };
@@ -382,10 +449,13 @@ const Cycle = defineTask({
           await audit(tx, task, "grading-room", reason ? "failed" : "prepared", {
             candidate_sha256: candidateSha256, checklist_sha256: approvedChecklistSha256,
             reason_code: reason ? "grading-room-copy" : null });
-          if (!reason) await audit(tx, task, "grade", "blocked", {
+          if (!reason && !grader) await audit(tx, task, "grade", "blocked", {
             reason: "independent-live-grader-not-connected" });
-          return { status: "terminal", outcome: { status: "failed",
+          if (reason || !grader) return { status: "terminal", outcome: { status: "failed",
             error: reason ? "grading-room" : "grader-not-connected" } };
+          return { status: "running", checkpoint: { phase: "grade",
+            attempt: task.state.checkpoint.attempt,
+            candidateSha256 } };
         }, ctx);
         return;
       }
@@ -409,12 +479,21 @@ const Cycle = defineTask({
       }, ctx);
     },
     grade: async (task, runtime) => runtime.commit(async (tx) => {
-      const id = await tx.createTask(Grade, {}, { ownership: { kind: "task", taskId: task.id } });
+      const id = await tx.createTask(Grade,
+        { candidateSha256: task.state.checkpoint.candidateSha256 ?? null },
+        { ownership: { kind: "task", taskId: task.id } });
       return { status: "waiting", checkpoint: { phase: "after-grade", grader: id, attempt: task.state.checkpoint.attempt }, on: [id], policy: "failFast" };
     }, ctx),
     "after-grade": async (task, runtime) => {
-      await runtime.outcomes([task.state.checkpoint.grader], ctx);
-      await runtime.commit(() => ({ status: "running", checkpoint: { phase: "score", attempt: task.state.checkpoint.attempt } }), ctx);
+      const [outcome] = await runtime.outcomes([task.state.checkpoint.grader], ctx);
+      await runtime.commit(async (tx) => {
+        if (outcome?.status !== "completed") {
+          await audit(tx, task, "cycle", "failed", { reason: "grader-effect-or-verdict" });
+          return { status: "terminal", outcome: { status: "failed", error: "grade" } };
+        }
+        return { status: "running", checkpoint: { phase: "score",
+          attempt: task.state.checkpoint.attempt } };
+      }, ctx);
     },
     score: async (task, runtime) => {
       if (!existsSync(instrument)) command("instrument-clone", "git", ["clone", "-q", "--depth", "1", `file://${sourceRoot}`, instrument]);
@@ -429,12 +508,17 @@ const Cycle = defineTask({
       const board = r.code === 0 ? command("scoreboard", "bb", ["harness/scoreboard.clj", "02"], { cwd: instrument }) : r;
       const scored = board.code === 0 ? JSON.parse(readFileSync(join(cycleDir, "scores.json"), "utf8")).items : [];
       const score = `${scored.filter((item) => item.verdict === "pass").length}/${scored.length}`;
+      const humanReviewRequired = live && scored.some((item) => item.id === "01-011" && item.verdict === "fail");
       const attempt = task.state.checkpoint.attempt ?? 2;
       await runtime.commit(async (tx) => {
-        await audit(tx, task, "score", r.code === 0 ? "filed" : "failed", { log_sha256: r.sha256, fixture_grader: true });
+        await audit(tx, task, "score", r.code === 0 ? "filed" : "failed", {
+          log_sha256: r.sha256, fixture_grader: !live || grader?.model.startsWith("test/") });
         if (board.code === 0) await audit(tx, task, "scoreboard", "reported", { cycle: "02", log_sha256: board.sha256 });
-        await audit(tx, task, "cycle", board.code === 0 ? "completed" : "failed", { reason: board.code === 0 ? null : "score" });
-        return { status: "terminal", outcome: { status: "completed", result: { passed: board.code === 0, attempts: attempt, score: board.code === 0 ? score : null } } };
+        await audit(tx, task, "cycle", board.code === 0 ? (live ? "measured" : "completed") : "failed", {
+          reason: board.code === 0 ? (humanReviewRequired ? "blind-human-review-required" : null) : "score" });
+        return { status: "terminal", outcome: { status: "completed", result: {
+          passed: board.code === 0 && !live, scored: board.code === 0,
+          humanReviewRequired, attempts: attempt, score: board.code === 0 ? score : null } } };
       }, ctx);
     },
   },
@@ -448,7 +532,7 @@ try {
   const root = await harness.root(ctx);
   const existing = await harness.commit((tx) => tx.scanTasks({ kind: "loyly.proto.cycle" }, 10), ctx);
   let id = existing.items[0]?.id;
-  const cycleInput = { approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder };
+  const cycleInput = { approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder, grader };
   if (id && JSON.stringify(existing.items[0].input) !== JSON.stringify(cycleInput))
     throw new Error("this Pi store belongs to a different approved cut, checklist or mode");
   if (!id) id = await harness.commit((tx) => tx.createTask(Cycle, cycleInput,
