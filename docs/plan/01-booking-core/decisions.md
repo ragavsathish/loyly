@@ -48,3 +48,15 @@ views are therefore derived from the booking record at read time. A view that is
 written separately from the record it claims to reflect is the defect this project
 exists to remove. *Pruned:* any write path that updates a view directly, and any
 "sync" mechanism between views (there is nothing to sync when there is one record).
+
+## D6: The closed-day refusal is judged by a fresh blind subagent
+
+On 2026-11-19 the operator replaced the named person in `@item-01-011` with a fresh
+independent subagent. The judged quality remains whether a newcomer can act from the
+refusal alone. The subagent receives only the exact refusal and a question, in a new
+session with no inherited context, plan, configuration, candidate or prior verdicts.
+It names a request; a separate HTTP probe must confirm that request against a fresh
+copy of the gated app. The subagent's claim alone is not a pass. A failed or unclear
+answer fails the item and requires a wording change before acceptance. This change
+alters the scenario text and therefore requires a new approved cut and build; the
+earlier human-worded candidate remains calibration evidence only.

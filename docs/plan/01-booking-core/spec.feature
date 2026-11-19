@@ -155,10 +155,11 @@ Feature: Booking core
     @item-01-011
     Scenario: The refusal for a closed day is judged usable
       Given the household in apartment 12 has been refused a standing slot on Tuesday at 17:00 in pukuhuone 9
-      When one person who has not read the sauna day configuration reads the refusal
-      Then they can name a request that would be accepted, using nothing but the refusal
-      And a refusal they cannot act on fails this budget, and its wording is changed before the slice is called done
-      # WHO JUDGES: one person, at the slice review, who has not read the configuration.
-      # That last condition is the whole check. Anybody who already knows the schedule can
-      # act on a bare "no", so a judge who knows the answer cannot fail this scenario, and
-      # a scenario that cannot fail is the defect this file is being repaired for.
+      When a fresh independent subagent with no prior context or configuration reads only the refusal
+      Then it can name a request that the app confirms from fresh state, using nothing but the refusal
+      And a refusal it cannot act on fails this budget, and its wording is changed before the slice is called done
+      # WHO JUDGES: a fresh subagent whose room holds only the exact refusal and question,
+      # with no plan, configuration, candidate, prior transcript or tools to inspect them.
+      # Its suggested request is checked over HTTP against a fresh candidate copy.
+      # An agent that already knows the schedule can act on a bare "no", so context
+      # isolation and the independent replay are both part of this check.
