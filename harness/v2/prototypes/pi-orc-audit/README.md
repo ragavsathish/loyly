@@ -33,6 +33,12 @@ open replay.PROTOTYPE.html
 
 The demo runs a repaired cycle, a cycle with three failed gates, and a SIGKILL/restart. Its generated `scratch*/` directories contain the Pi SQLite ledger, fenced clone, logs, fixture verdicts, and an instrument clone. They are ignored by Git. [`example-replay.html`](example-replay.html) is a sanitized playback from a completed demo.
 
+`export.mjs` writes `audit.v1.jsonl` from committed Pi entries and `evidence.v1.json` from
+candidate-bound Allure results. The playback shows each grader item only after the committed
+grade and the separate 01-011 review only after its committed blind-review event. It labels
+those results as Allure projections, not Pi events. The generated local replay can contain
+grader observations, so review it before publishing it anywhere.
+
 | Stage | What actually runs |
 | --- | --- |
 | Instrument preflight | Unchanged `harness/check.sh --local`, including the oracle, stamper checks, scorer checks, and module adoption check. |
