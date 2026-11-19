@@ -16,6 +16,7 @@ import { prepareShards, combineShards } from "./grader-shards.mjs";
 import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer,
   verifyBlindReviewPacket, writeBlindAgentAllure } from "./blind-review.mjs";
 import { runBlindAgent } from "./blind-agent-adapter.mjs";
+import { bindScoreInput, verifyScoredCycle } from "./score-receipt.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
@@ -627,30 +628,69 @@ const Cycle = defineTask({
       }, ctx);
     },
     score: async (task, runtime) => {
-      if (!existsSync(instrument)) command("instrument-clone", "git", ["clone", "-q", "--depth", "1", `file://${sourceRoot}`, instrument]);
-      const cycleDir = join(instrument, "harness", "cycles", "02");
-      mkdirSync(cycleDir, { recursive: true });
-      const checklist = existsSync(join(cycleDir, "checklist.json"))
-        ? { code: 0 } : command("score-checklist", "bb", ["harness/gen_checklist.clj", "--out", join(cycleDir, "checklist.json")], { cwd: instrument });
-      const existing = existsSync(join(cycleDir, "scores.json"));
-      const r = checklist.code !== 0 ? checklist
-        : existing ? { code: 0, sha256: hash("score: reconciled cycle 02") }
-        : command("score", "bb", ["harness/score.clj", "02", "--verdicts",
-          join(scratch, live ? "final-verdicts.json" : "verdicts.json")], { cwd: instrument });
-      const board = r.code === 0 ? command("scoreboard", "bb", ["harness/scoreboard.clj", "02"], { cwd: instrument }) : r;
-      const scored = board.code === 0 ? JSON.parse(readFileSync(join(cycleDir, "scores.json"), "utf8")).items : [];
-      const score = `${scored.filter((item) => item.verdict === "pass").length}/${scored.length}`;
+      const verdictsFile = join(scratch, live ? "final-verdicts.json" : "verdicts.json");
+      let r, board, scoreReceipt, scoreInput, reason, reconciled = false;
+      try {
+        const candidateSha256 = candidateDigest(room);
+        if (live) {
+          verifyGradingRoom({ out: gradingRoom, candidateSha256,
+            checklistSha256: approvedChecklistSha256, schemaSha256: grader.schemaSha256 });
+          const reviewFile = join(scratch, "blind-agent-review.json");
+          const review = JSON.parse(readFileSync(reviewFile, "utf8"));
+          const projected = finalVerdictsFromBlindReview({ packetDir: join(scratch, "blind-agent-packet"),
+            reviewFile, gradingRoom,
+            verificationDir: review.verdict === "pass" ? join(scratch, "blind-agent-verification") : undefined,
+            out: join(scratch, "blind-agent-allure") });
+          if (JSON.stringify(projected.verdicts) !== readFileSync(verdictsFile, "utf8"))
+            throw new Error("final verdicts changed after blind review");
+        }
+        if (!existsSync(instrument)) {
+          const cloned = command("instrument-clone", "git", ["clone", "-q", "--depth", "1",
+            `file://${sourceRoot}`, instrument]);
+          if (cloned.code !== 0) throw new Error("instrument clone failed");
+        }
+        scoreInput = bindScoreInput({ scratch, sourceRoot, instrument,
+          candidateSha256, verdictsFile });
+        const cycleDir = join(instrument, "harness", "cycles", "02");
+        mkdirSync(cycleDir, { recursive: true });
+        if (!existsSync(join(cycleDir, "checklist.json"))) {
+          const checklist = command("score-checklist", "bb", ["harness/gen_checklist.clj",
+            "--out", join(cycleDir, "checklist.json")], { cwd: instrument });
+          if (checklist.code !== 0) throw new Error("score checklist derivation failed");
+        }
+        if (existsSync(join(cycleDir, "scores.json"))) {
+          scoreReceipt = verifyScoredCycle({ scratch, instrument, verdictsFile });
+          r = { code: 0, sha256: scoreReceipt.scoreSha256 };
+          reconciled = true;
+        } else {
+          r = command("score", "bb", ["harness/score.clj", "02", "--verdicts", verdictsFile],
+            { cwd: instrument });
+          if (r.code !== 0) throw new Error("legacy scorer failed");
+          scoreReceipt = verifyScoredCycle({ scratch, instrument, verdictsFile });
+        }
+        board = command("scoreboard", "bb", ["harness/scoreboard.clj", "02"], { cwd: instrument });
+        if (board.code !== 0) throw new Error("legacy scoreboard failed");
+      } catch (error) {
+        reason = String(error.stack ?? error);
+        writeFileSync(join(scratch, "score-error.log"), `${reason}\n`);
+      }
+      const scored = scoreReceipt?.items ?? [];
+      const score = scoreReceipt?.score ?? null;
       const blindAgentReviewFailed = live && scored.some((item) => item.id === "01-011" && item.verdict === "fail");
       const attempt = task.state.checkpoint.attempt ?? 2;
       await runtime.commit(async (tx) => {
-        await audit(tx, task, "score", r.code === 0 ? "filed" : "failed", {
-          log_sha256: r.sha256, fixture_grader: !live || grader?.model.startsWith("test/") });
-        if (board.code === 0) await audit(tx, task, "scoreboard", "reported", { cycle: "02", log_sha256: board.sha256 });
-        await audit(tx, task, "cycle", board.code === 0 ? (live ? "measured" : "completed") : "failed", {
-          reason: board.code === 0 ? (blindAgentReviewFailed ? "blind-agent-review-failed" : null) : "score" });
-        return { status: "terminal", outcome: { status: "completed", result: {
-          passed: board.code === 0 && !live, scored: board.code === 0,
-          blindAgentReviewFailed, attempts: attempt, score: board.code === 0 ? score : null } } };
+        await audit(tx, task, "score", reason ? "failed" : "filed", {
+          log_sha256: r?.sha256 ?? null, score_input_sha256: scoreInput
+            ? hash(readFileSync(join(scratch, "score-input.json"))) : null,
+          score_file_sha256: scoreReceipt?.scoreSha256 ?? null, reconciled,
+          fixture_grader: !live || grader?.model.startsWith("test/") });
+        if (!reason) await audit(tx, task, "scoreboard", "reported", {
+          cycle: "02", log_sha256: board.sha256 });
+        await audit(tx, task, "cycle", reason ? "failed" : live ? "measured" : "completed", {
+          reason: reason ? "score" : blindAgentReviewFailed ? "blind-agent-review-failed" : null });
+        return reason ? { status: "terminal", outcome: { status: "failed", error: "score" } }
+          : { status: "terminal", outcome: { status: "completed", result: {
+            passed: !live, scored: true, blindAgentReviewFailed, attempts: attempt, score } } };
       }, ctx);
     },
   },
