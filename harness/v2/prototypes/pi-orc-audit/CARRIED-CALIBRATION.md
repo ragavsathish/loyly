@@ -90,3 +90,16 @@ HTTP 201. Its separate Allure result passed the supplied lifecycle schema and re
 `passed`; the bound response SHA-256 is
 `36ffb3c8924c05e80b180f94ee8be59567a46fa0fcbab94b69753cef3951c8c8`.
 The raw grader result remains `skipped` and `pending`, and no score was filed.
+
+### Direct legacy gate shadow on the same candidate
+
+A separate copy of the fenced candidate was checked directly with the unchanged
+`harness/verify.sh`, outside the Pi gate adapter. Its `impl/` digest before and after was
+`0281e10451682a30ef14a82902a035530d03beb8c6074900b60a19181221c547`, matching the
+adapter's candidate receipt. The direct gate exited 0, ran 20 passing tests, answered on poll
+2 of 20, and passed the Löyly HTTP identity probe. Its log SHA-256 is
+`c7fae67a11c87f2e6388d6bd2cf37b068e7d89ccbd55097b4de4c4117f1d0e54`; the adapter's
+independent log is `bfa1bfb286e635204b58e694d4b494041455c4ee9bd8ac4ced07fb84c1e043e9`.
+The logs differ in timings and paths, while their gate verdicts agree. Raw shadow evidence is
+under ignored `scratch-shadow-old-candidate/`. This compares gate execution on the old
+calibration cut; it does not validate the revised spec-only cut or release the candidate.
