@@ -96,10 +96,13 @@ node reassess-panel.mjs --run scratch-production-cycle-03/reassessment-01/config
 
 ## Acceptance boundary
 
-This candidate is **not yet the running harness**. It needs a fresh scored
-live run with the integrated panel, a clean product profile, the controller
-kill/restart matrix, itemwise comparison with the legacy and accepted
-instruments on the same candidate, and an operator acceptance decision.
-The historical Pi cycle filed 10/11 because its blind HTTP confirmation used
-the wrong route; a separate same-candidate correction showed 11/11. Neither
-historical result substitutes for the new integrated scored run.
+This candidate is **not yet the running harness**. Cycle 03 filed a real
+**11/11** score and passed the legacy gate, but its original panel checks
+failed and its report phase ended the cycle failed. The pinned panel-only
+reassessment on the frozen candidate passed Playwright, protocol and OTel
+probes in parallel and compiled 15 Allure cases with no gaps and
+`ready-for-review`. It preserves the original failed audit. Acceptance still
+needs review of the candidate and attachments, a clean product profile, the
+controller kill/restart matrix on the live path, itemwise comparison with the
+accepted instrument, and an operator decision. The historical Pi cycle's
+10/11 score is calibration evidence only.

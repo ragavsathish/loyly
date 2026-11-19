@@ -15,6 +15,6 @@ createServer((request, response) => {
   response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
   response.end('<!doctype html><title>sauna fixture</title><h1>sauna</h1>'
     + '<form method="post" action="/request"><input name="household">'
-    + '<select name="resource"></select><select name="weekday"></select>'
+    + '<select name="resource"><option value="ph9">pukuhuone 9</option></select><select name="weekday"></select>'
     + '<select name="start"></select></form>');
 }).listen(port, "127.0.0.1");
