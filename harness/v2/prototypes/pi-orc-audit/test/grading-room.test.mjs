@@ -11,6 +11,7 @@ test("grading room carries only the selected plan, candidate and checklist", () 
   const root = mkdtempSync(join(tmpdir(), "loyly-grading-room-"));
   const sourceRoom = join(root, "source"), candidateRoom = join(root, "candidate");
   const out = join(root, "grade"), checklistFile = join(root, "checklist.json");
+  const schemaFile = join(root, "allure-lifecycle-result.schema.json");
   mkdirSync(join(sourceRoom, "docs", "plan", "01-booking-core"), { recursive: true });
   mkdirSync(join(sourceRoom, "docs", "plan", "02-private"), { recursive: true });
   mkdirSync(join(candidateRoom, "impl"), { recursive: true });
@@ -20,12 +21,15 @@ test("grading room carries only the selected plan, candidate and checklist", () 
   writeFileSync(join(candidateRoom, "impl", "start.sh"), "#!/bin/sh\nexit 0\n");
   writeFileSync(join(candidateRoom, ".builder", "transcript"), "builder-only\n");
   writeFileSync(checklistFile, '{"items":[{"id":"01-001"}]}\n');
-  const args = { sourceRoom, candidateRoom, checklistFile, out,
-    candidateSha256: candidateDigest(candidateRoom), checklistSha256: sha(readFileSync(checklistFile)) };
+  writeFileSync(schemaFile, '{"type":"object"}\n');
+  const args = { sourceRoom, candidateRoom, checklistFile, schemaFile, out,
+    candidateSha256: candidateDigest(candidateRoom), checklistSha256: sha(readFileSync(checklistFile)),
+    schemaSha256: sha(readFileSync(schemaFile)) };
   prepareGradingRoom(args);
   verifyGradingRoom(args);
   assert.deepEqual(readdirSync(out).sort(),
-    [".grading-room.json", "checklist.json", "impl", "plan", "work"].sort());
+    [".grading-room.json", "checklist.json", "allure-lifecycle-result.schema.json",
+      "impl", "plan", "work"].sort());
   assert.ok(existsSync(join(out, "plan", "01-booking-core", "spec.feature")));
   assert.ok(!existsSync(join(out, "plan", "02-private")));
   assert.ok(!existsSync(join(out, ".builder")));

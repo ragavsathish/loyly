@@ -12,10 +12,12 @@ import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite
 import { runGate } from "./gate-adapter.mjs";
 import { runBuilder } from "./builder-adapter.mjs";
 import { candidateDigest as digestCandidate, prepareGradingRoom, verifyGradingRoom } from "./grading-room.mjs";
-import { validateVerdicts } from "./validate-verdicts.mjs";
+import { prepareShards, combineShards } from "./grader-shards.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
+const schemaFile = join(HERE, "allure-lifecycle-result.schema.json");
+const attachedSchemaSha256 = createHash("sha256").update(readFileSync(schemaFile)).digest("hex");
 const ctx = BACKGROUND_CONTEXT;
 const Audit = defineEntry("loyly.proto.audit.v1");
 const scratch = resolve(process.argv[2] ?? join(HERE, "scratch"));
@@ -54,11 +56,16 @@ const grader = live && process.env.LOYLY_GRADER_MODEL ? {
   imageSha256: process.env.LOYLY_GRADER_IMAGE_SHA256,
   settingsSha256: process.env.LOYLY_GRADER_SETTINGS_SHA256,
   instructionSha256: process.env.LOYLY_GRADER_INSTRUCTION_SHA256,
+  schemaSha256: process.env.LOYLY_GRADER_SCHEMA_SHA256,
 } : null;
+const graderShardCount = Number(process.env.LOYLY_GRADER_SHARDS ?? 3);
+if (live && (!Number.isInteger(graderShardCount) || graderShardCount < 1 || graderShardCount > 16))
+  throw new Error("LOYLY_GRADER_SHARDS must be an integer from 1 to 16");
 if (grader && (grader.model === builder.model
-    || [grader.commandSha256, grader.imageSha256, grader.settingsSha256, grader.instructionSha256]
+    || [grader.commandSha256, grader.imageSha256, grader.settingsSha256,
+      grader.instructionSha256, grader.schemaSha256]
       .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? ""))))
-  throw new Error("independent grader needs another model and approved command, image, settings and instruction digests");
+  throw new Error("independent grader needs another model and approved command, image, settings, schema and instruction digests");
 mkdirSync(scratch, { recursive: true });
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -250,27 +257,41 @@ const Grade = defineTask({
     file: async (task, runtime) => {
       if (live) {
         const instruction = join(HERE, "grader-instruction-01.md");
-        let r, judged, reason;
+        let r, judged, reason, shardReceipts;
         try {
           if (!grader) throw new Error("independent grader not configured");
           if (hash(readFileSync(instruction)) !== grader.instructionSha256
               || hash(readFileSync(grader.command)) !== grader.commandSha256
               || hash(readFileSync(join(grader.image, "manifest.json"))) !== grader.imageSha256
-              || hash(readFileSync(grader.settings)) !== grader.settingsSha256)
-            throw new Error("grader instruction, command, image or settings differs from approved digest");
+              || hash(readFileSync(grader.settings)) !== grader.settingsSha256
+              || attachedSchemaSha256 !== grader.schemaSha256)
+            throw new Error("grader instruction, command, image, settings or schema differs from approved digest");
           verifyGradingRoom({ out: gradingRoom, candidateSha256: task.input.candidateSha256,
-            checklistSha256: approvedChecklistSha256 });
-          r = await runBuilder({ command: grader.command, room: gradingRoom, instruction,
-            image: grader.image, evidenceDir: join(scratch, "grader-evidence"),
-            sessionId: "prototype-cycle-1-grade", model: grader.model,
+            checklistSha256: approvedChecklistSha256, schemaSha256: grader.schemaSha256 });
+          const shards = prepareShards({ gradingRoom, sourceRoom: room, scratch, schemaFile,
+            candidateSha256: task.input.candidateSha256, schemaSha256: grader.schemaSha256,
+            count: graderShardCount });
+          const launches = await Promise.allSettled(shards.map((shard) => runBuilder({
+            command: grader.command, room: shard.out, instruction,
+            image: grader.image, evidenceDir: join(scratch, "grader-evidence", shard.id),
+            sessionId: `prototype-cycle-1-grade-${shard.id}`, model: grader.model,
             stateRoot: join(ROOT, ".pi/harness/.state"),
-            piSettings: grader.settings, prompt: "Grade it now, as the attached instruction says.",
-            roomLabel: "the grading room" });
-          if (r.exit !== 0) throw new Error(`grader host exited ${r.exit}`);
+            piSettings: grader.settings, prompt: "Grade your selected checklist scope now, as the attached instruction says.",
+            roomLabel: `the ${shard.id} grading room`,
+            imageAdditionsPath: "/workspace/work/image-additions.txt" })));
+          const failures = launches.flatMap((launch, i) => launch.status === "rejected"
+            ? [`${shards[i].id}: ${launch.reason}`]
+            : launch.value.exit !== 0 ? [`${shards[i].id}: exit ${launch.value.exit}`] : []);
+          if (failures.length) throw new Error(`grader shards failed: ${failures.join("; ")}`);
           verifyGradingRoom({ out: gradingRoom, candidateSha256: task.input.candidateSha256,
-            checklistSha256: approvedChecklistSha256 });
-          judged = validateVerdicts(gradingRoom);
-          cpSync(join(gradingRoom, "work", "verdicts.json"), join(scratch, "verdicts.json"));
+            checklistSha256: approvedChecklistSha256, schemaSha256: grader.schemaSha256 });
+          judged = combineShards({ gradingRoom, shards, candidateSha256: task.input.candidateSha256,
+            schemaSha256: grader.schemaSha256 });
+          shardReceipts = shards.map((shard, i) => ({ id: shard.id, items: shard.items,
+            checklist_sha256: shard.checklistSha256,
+            reconciled: launches[i].value.reconciled }));
+          r = { reconciled: launches.some((launch) => launch.value.reconciled), shardCount: shards.length };
+          writeFileSync(join(scratch, "verdicts.json"), JSON.stringify(judged.verdicts));
           cpSync(join(gradingRoom, "work", "surprises.json"), join(scratch, "surprises.json"));
         } catch (error) {
           reason = String(error.stack ?? error);
@@ -280,6 +301,10 @@ const Grade = defineTask({
           await audit(tx, task, "grade", judged ? "completed" : "failed", {
             model: grader?.model ?? null, fixture: grader?.model.startsWith("test/") ?? false,
             item_count: judged?.verdicts.length ?? 0, pass_count: judged?.pass ?? 0,
+            shard_count: r?.shardCount ?? 0,
+            shards: shardReceipts ?? [],
+            allure_results_sha256: judged?.allureSha256 ?? null,
+            schema_sha256: grader?.schemaSha256 ?? null,
             verdicts_sha256: judged ? hash(readFileSync(join(scratch, "verdicts.json"))) : null,
             surprises_sha256: judged ? hash(readFileSync(join(scratch, "surprises.json"))) : null,
             reconciled: r?.reconciled ?? false,
@@ -435,8 +460,9 @@ const Cycle = defineTask({
       if (live) {
         const candidateSha256 = task.state.checkpoint.candidateSha256;
         const checklistFile = join(scratch, "checklist.json");
-        const args = { sourceRoom: room, candidateRoom: room, checklistFile,
-          out: gradingRoom, candidateSha256, checklistSha256: approvedChecklistSha256 };
+        const args = { sourceRoom: room, candidateRoom: room, checklistFile, schemaFile,
+          out: gradingRoom, candidateSha256, checklistSha256: approvedChecklistSha256,
+          schemaSha256: grader?.schemaSha256 ?? attachedSchemaSha256 };
         let reason;
         try {
           if (existsSync(gradingRoom)) verifyGradingRoom(args);
@@ -532,7 +558,8 @@ try {
   const root = await harness.root(ctx);
   const existing = await harness.commit((tx) => tx.scanTasks({ kind: "loyly.proto.cycle" }, 10), ctx);
   let id = existing.items[0]?.id;
-  const cycleInput = { approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder, grader };
+  const cycleInput = { approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder,
+    grader, graderShardCount: live ? graderShardCount : null };
   if (id && JSON.stringify(existing.items[0].input) !== JSON.stringify(cycleInput))
     throw new Error("this Pi store belongs to a different approved cut, checklist or mode");
   if (!id) id = await harness.commit((tx) => tx.createTask(Cycle, cycleInput,

@@ -1,13 +1,15 @@
 # Grade the Löyly booking core through its public surface
 
 You are a fresh grader. You did not build this candidate. Work only in this grading room. Read
-`plan/01-booking-core/spec.feature` and `checklist.json`; these define the eleven selected items.
+`plan/01-booking-core/spec.feature`, `checklist.json`, and
+`allure-lifecycle-result.schema.json`; these define your selected rule scopes and the result
+contract.
 The candidate is under `impl/`. Do not read its source, tests, build files, notes, or any builder
 claim. You may run `impl/test.sh` to prepare the app, but its result is never an item verdict.
 Observe product behavior through HTTP after starting `impl/start.sh PORT`. The prior gate passed;
 you must still make your own observations on fresh state. Write all your files under `work/`.
 
-For each item, set up the stated Given conditions from fresh state, make the When request, and
+Grade only the items in this room's `checklist.json`. For each item, set up the stated Given conditions from fresh state, make the When request, and
 observe every Then. Discover the public interactions from the served app, not its source. Use a
 different fresh state for independent examples. A missing interaction or an unobservable result is
 a fail with evidence beginning `not reached:`. Do not infer behavior from a page title, a green
@@ -26,18 +28,32 @@ suite, a fixed answer, or another item's result.
 - `01-011`: the spec requires a person who has **not** read the sauna-day configuration to judge
   whether the refusal is actionable. You have read the spec, so you cannot be that person. Collect
   the exact refusal text in `work/blind-review-011.txt`, without the configuration or your answer.
-  File this item as `fail` with evidence beginning `not reached: blind human review required`.
+  File this item's Allure result as `skipped`, `stage: "pending"`, with a `statusDetails.message`
+  beginning `not reached: blind human review required`.
   The operator can later arrange that separate review and file its verdict with its own evidence.
 
-Write `work/verdicts.json` as a JSON array in checklist order, exactly one object per ID:
+Write one `{uuid}-result.json` per item under `work/allure-results/`, with fresh UUIDs and actual
+attachment files beside the results. Each JSON object must validate against the attached schema.
+Use the following Allure fields for every item:
 
-```json
-{"id":"01-001","verdict":"pass","evidence":"request, observed response, and checked consequence"}
-```
+- `name`: the checklist item's name; `fullName`, `testCaseId`, and `historyId`:
+  `loyly.booking-core.<item-id>` (stable across runs).
+- `status`: `passed` only when you observed every Then; otherwise `failed` or, for `01-011`,
+  `skipped`. `stage`: `finished` except `01-011`'s `pending`.
+- `statusDetails.message`: the request, observed response, and checked consequence; begin with
+  `not reached:` if you could not exercise the scenario.
+- `start` and `stop`: Unix milliseconds for the check, with `stop >= start`.
+- `labels`: exactly one `lifecycle=pre-production`, one `technique=acceptance` (use `usability`
+  for `01-011`), one `tool=Pi black-box grader`, `feature=Booking core`, `story=<the checklist
+  rule>`, and `tag=@item-<item-id>`.
+- `steps`: named Given, When, and Then observations from the Gherkin scenario. Mark their Allure
+  status and stage. A step you could not reach must say so; do not fabricate a passed step.
+- `attachments`: at least one actual request/response or measurement file for each result. Name
+  each copy with a fresh `{uuid}-attachment.<ext>` filename and its MIME type. For `01-011`, attach
+  the blind-review text. The attachment bytes must be in `work/allure-results/` beside the JSON.
 
-Use only `pass` or `fail`. Every evidence string must name the actual request and observation, or
-why that item was not reached. Keep raw requests, responses, and race counts under `work/` and
-refer to those files in the evidence. Do not read or write a prior cycle's verdict or score.
-Write `work/surprises.json` as a JSON array of unexpected observations (empty if none), each with
-`item`, `observation`, and `evidence_file`. Finish after both JSON files are valid and all eleven
-items have verdicts.
+Keep the raw requests, responses, and race counts under `work/`. Write `work/surprises.json` as a
+JSON array of unexpected observations (empty if none), each with `item`, `observation`, and a
+`work/`-relative `evidence_file`. Do not write `work/verdicts.json`: the controller derives that
+legacy scorer input from these validated Allure results. Do not read or write a prior cycle's
+verdict or score. Finish after every selected item's Allure result and `surprises.json` are valid.

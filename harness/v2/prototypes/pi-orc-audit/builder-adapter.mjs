@@ -62,7 +62,8 @@ function stopGroup(pid, expectedCommand) {
 }
 
 export async function runBuilder({ command, room, instruction, image, evidenceDir, sessionId,
-  model, stateRoot, timeoutMs = 14_400_000, signal, prompt, roomLabel, piSettings }) {
+  model, stateRoot, timeoutMs = 14_400_000, signal, prompt, roomLabel, piSettings,
+  imageAdditionsPath }) {
   for (const path of [command, room, instruction, image, evidenceDir, stateRoot])
     if (!isAbsolute(path)) throw new Error(`builder path must be absolute: ${path}`);
   if (!/^[A-Za-z0-9._-]+$/.test(sessionId)) throw new Error("unsafe builder session ID");
@@ -104,7 +105,8 @@ export async function runBuilder({ command, room, instruction, image, evidenceDi
       PI_HARNESS_STATE_ROOT: stateRoot,
       ...(prompt ? { LOYLY_PI_PROMPT: prompt } : {}),
       ...(roomLabel ? { LOYLY_ROOM_LABEL: roomLabel } : {}),
-      ...(piSettings ? { LOYLY_BUILDER_PI_SETTINGS: piSettings } : {}) },
+      ...(piSettings ? { LOYLY_BUILDER_PI_SETTINGS: piSettings } : {}),
+      ...(imageAdditionsPath ? { LOYLY_IMAGE_ADDITIONS_PATH: imageAdditionsPath } : {}) },
   });
   closeSync(out); closeSync(err);
   let timedOut = false;

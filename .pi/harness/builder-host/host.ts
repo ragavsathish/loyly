@@ -118,7 +118,8 @@ function installCommand(): string | undefined {
 }
 
 /** The builder's environment as a prompt section, generated from what the VM and tools enforce. */
-export function environmentText(tools: readonly string[], roomLabel = "the builder room", timeoutFloor = BASH_TIMEOUT_FLOOR): string {
+export function environmentText(tools: readonly string[], roomLabel = "the builder room",
+	timeoutFloor = BASH_TIMEOUT_FLOOR, imageAdditionsPath = IMAGE_ADDITIONS): string {
 	const network =
 		ALLOWED_HOSTS.length === 0
 			? "Network: none. Every outbound connection from the VM is refused; nothing can be downloaded, so work with what the image already has."
@@ -130,7 +131,7 @@ export function environmentText(tools: readonly string[], roomLabel = "the build
 		"The image already carries the toolchain; use it first.",
 		...(installCommand()
 			? [
-					`If something you need is missing, install it with \`${installCommand()}\` as ${GUEST_USER}, and append the exact install command to ${IMAGE_ADDITIONS} (outside the candidate scope) so the image's Dockerfile can be updated.`,
+					`If something you need is missing, install it with \`${installCommand()}\` as ${GUEST_USER}, and append the exact install command to ${imageAdditionsPath} (outside the candidate scope) so the image's Dockerfile can be updated.`,
 				]
 			: []),
 		`Your tools, all running inside the VM: ${tools.join(", ")}.`,
@@ -157,6 +158,8 @@ export interface BuilderRun {
 	prompt?: string;
 	/** What the environment prompt calls the room (default "the builder room"). */
 	roomLabel?: string;
+	/** Writable path in the room for packages added to the guest image. */
+	imageAdditionsPath?: string;
 	/** A steer inbox directory (LOYLY_STEER_DIR), polled while the run works. */
 	steerDir?: string;
 	/** The bash timeout floor in seconds (default BASH_TIMEOUT_FLOOR). */
@@ -170,7 +173,7 @@ export async function runBuilder(run: BuilderRun) {
 	const { env, close: closeEnv } = gondolinEnv(run.room, (text) => log(`[pi-env] ${text.trimEnd()}`));
 	const registry = createRegistry();
 	const floor = run.timeoutFloor ?? BASH_TIMEOUT_FLOOR;
-	const prompt = environmentText(run.tools, run.roomLabel, floor);
+	const prompt = environmentText(run.tools, run.roomLabel, floor, run.imageAdditionsPath);
 	registry.install(
 		defineExtension({
 			name: "loyly-builder",
@@ -284,11 +287,17 @@ async function main(argv: string[]) {
 		return 2;
 	}
 	const roomLabel = process.env.LOYLY_ROOM_LABEL?.trim() || undefined;
+	const imageAdditionsPath = process.env.LOYLY_IMAGE_ADDITIONS_PATH?.trim() || undefined;
+	if (imageAdditionsPath && (!imageAdditionsPath.startsWith(`${GUEST_WORKSPACE}/`)
+		|| imageAdditionsPath.split("/").includes(".."))) {
+		process.stderr.write("LOYLY_IMAGE_ADDITIONS_PATH must be inside /workspace\n");
+		return 2;
+	}
 	const prompt = process.env.LOYLY_PI_PROMPT?.trim() || undefined;
 	const steerDir = process.env.LOYLY_STEER_DIR?.trim() || undefined;
 	process.stderr.write(`model: ${model.provider}/${model.modelId}\n`);
 	process.stderr.write(`bash timeout floor: ${timeoutFloor}s\n`);
-	process.stderr.write(`environment prompt:\n${environmentText(tools, roomLabel, timeoutFloor)}\n`);
+	process.stderr.write(`environment prompt:\n${environmentText(tools, roomLabel, timeoutFloor, imageAdditionsPath)}\n`);
 	// pi's own model runtime over pi's own auth store (~/.pi/agent/auth.json, or PI_CODING_AGENT_DIR):
 	// the existing openai-codex login, read the way pi reads it. Nothing here logs in or writes a credential;
 	// pi's store itself persists a rotated OAuth token when the access token needs a refresh, as pi does.
@@ -303,7 +312,8 @@ async function main(argv: string[]) {
 		return 2;
 	}
 	try {
-		const { settled, answer } = await runBuilder({ room, instruction, store, requestId, models, model, tools, prompt, roomLabel, steerDir, timeoutFloor });
+		const { settled, answer } = await runBuilder({ room, instruction, store, requestId, models, model,
+			tools, prompt, roomLabel, imageAdditionsPath, steerDir, timeoutFloor });
 		if (answer) process.stdout.write(`${answer}\n`);
 		if (settled.status === "done") {
 			process.stderr.write("status=done\n");
