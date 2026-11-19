@@ -167,7 +167,7 @@ export function writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom, veri
         || verification.packet_sha256 !== packetSha256 || verification.review_sha256 !== reviewSha256
         || verification.request?.matches_answer !== true
         || verification.response_sha256 !== fileHash(join(verificationDir, "response.txt"))
-        || verification.accepted !== true || verification.http_status < 200 || verification.http_status >= 300)
+        || verification.accepted !== (verification.http_status >= 200 && verification.http_status < 300))
       throw new Error("blind review HTTP probe is missing, failed or unbound");
   }
   const item = JSON.parse(readFileSync(join(gradingRoom, "checklist.json"), "utf8"))
@@ -176,11 +176,12 @@ export function writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom, veri
   const uuid = randomUUID(), attachment = `${randomUUID()}-attachment.json`;
   const responseAttachment = verification ? `${randomUUID()}-attachment.txt` : null;
   const fullName = `loyly.booking-core.${REVIEW_ID}.blind-agent-review`;
-  const status = review.verdict === "pass" ? "passed" : "failed";
+  const status = review.verdict === "pass" && verification?.accepted === true ? "passed" : "failed";
   const result = {
     uuid, name: item.name, fullName, testCaseId: fullName, historyId: fullName,
     status, stage: "finished", start: review.reviewed_at, stop: review.reviewed_at,
-    statusDetails: { message: `${review.reason} Answer: ${review.answer}` },
+    statusDetails: { message: `${review.reason} Answer: ${review.answer}${verification?.accepted === false
+      ? ` HTTP ${verification.http_status} did not confirm the suggested request.` : ""}` },
     labels: [{ name: "lifecycle", value: "pre-production" },
       { name: "technique", value: "usability" }, { name: "tool", value: "fresh blind subagent" },
       { name: "feature", value: "Booking core" }, { name: "story", value: item.rule },
@@ -217,7 +218,11 @@ export function readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verif
   const item = JSON.parse(readFileSync(join(gradingRoom, "checklist.json"), "utf8"))
     .items.find((value) => value.id === REVIEW_ID);
   const fullName = `loyly.booking-core.${REVIEW_ID}.blind-agent-review`;
-  const expectedStatus = review.verdict === "pass" ? "passed" : "failed";
+  if (review.verdict === "pass" && !verificationDir)
+    throw new Error("positive blind review needs an independent HTTP probe");
+  const verification = review.verdict === "pass"
+    ? JSON.parse(readFileSync(join(verificationDir, "verification.json"), "utf8")) : null;
+  const expectedStatus = review.verdict === "pass" && verification?.accepted === true ? "passed" : "failed";
   const schema = JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8"));
   const validate = new Ajv2020({ strict: false }).compile(schema);
   if (!validate(result) || resultFiles[0] !== `${result.uuid}-result.json`
@@ -238,12 +243,10 @@ export function readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verif
       || JSON.stringify(evidence.review) !== JSON.stringify(review))
     throw new Error("blind subagent Allure evidence differs from the bound review");
   if (review.verdict === "pass") {
-    if (!verificationDir) throw new Error("positive blind review needs an independent HTTP probe");
-    const verification = JSON.parse(readFileSync(join(verificationDir, "verification.json"), "utf8"));
     if (result.attachments.length !== 2 || evidence.verification?.review_sha256 !== reviewSha256
         || JSON.stringify(evidence.verification) !== JSON.stringify(verification)
-        || verification.packet_sha256 !== packetSha256 || verification.accepted !== true
-        || verification.http_status < 200 || verification.http_status >= 300
+        || verification.packet_sha256 !== packetSha256
+        || verification.accepted !== (verification.http_status >= 200 && verification.http_status < 300)
         || verification.response_sha256 !== fileHash(join(verificationDir, "response.txt"))
         || !readFileSync(join(out, result.attachments[1].source)).equals(
           readFileSync(join(verificationDir, "response.txt"))))

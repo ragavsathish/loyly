@@ -23,11 +23,11 @@ const out = `${path}/work/allure-results`;
 fs.mkdirSync(out, {recursive: true});
 fs.writeFileSync(`${path}/work/surprises.json`, "[]");
 if (items.some((item) => item.id === "01-011"))
-  fs.writeFileSync(`${path}/work/blind-review-011.txt`, "Try Thursday in room 9.\n");
+  fs.writeFileSync(`${path}/work/blind-review-011.txt`, "Try Thursday at 17:00 to 18:30 in pukuhuone 9.\n");
 for (const item of items) {
   const pending = item.id === "01-011", uuid = crypto.randomUUID();
   const source = `${crypto.randomUUID()}-attachment.txt`;
-  fs.writeFileSync(`${out}/${source}`, pending ? "Try Thursday in room 9.\n" : "stub fixture, no behavioral observation\n");
+  fs.writeFileSync(`${out}/${source}`, pending ? "Try Thursday at 17:00 to 18:30 in pukuhuone 9.\n" : "stub fixture, no behavioral observation\n");
   const fullName = `loyly.booking-core.${item.id}`;
   const status = pending ? "skipped" : "passed";
   const result = {uuid, historyId:fullName, testCaseId:fullName, fullName,

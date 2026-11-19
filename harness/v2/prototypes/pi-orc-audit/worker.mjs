@@ -2,7 +2,7 @@
 // legacy harness cycle. Builder and grader are explicitly deterministic fixtures.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync, chmodSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, cpSync, rmSync, chmodSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
@@ -15,6 +15,7 @@ import { candidateDigest as digestCandidate, prepareGradingRoom, verifyGradingRo
 import { prepareShards, combineShards } from "./grader-shards.mjs";
 import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer,
   verifyBlindReviewPacket, writeBlindAgentAllure } from "./blind-review.mjs";
+import { runBlindAgent } from "./blind-agent-adapter.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../../..");
@@ -68,6 +69,20 @@ if (grader && (grader.model === builder.model
       grader.instructionSha256, grader.schemaSha256]
       .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? ""))))
   throw new Error("independent grader needs another model and approved command, image, settings, schema and instruction digests");
+const blindAgent = live && process.env.LOYLY_BLIND_AGENT_MODEL ? {
+  command: resolve(process.env.LOYLY_BLIND_AGENT_COMMAND ?? builder.command),
+  image: resolve(process.env.LOYLY_BLIND_AGENT_IMAGE ?? builder.image),
+  settings: resolve(process.env.LOYLY_BLIND_AGENT_SETTINGS ?? join(ROOT, ".pi/harness/config/pi.blind-review.settings.json")),
+  model: process.env.LOYLY_BLIND_AGENT_MODEL,
+  commandSha256: process.env.LOYLY_BLIND_AGENT_COMMAND_SHA256,
+  imageSha256: process.env.LOYLY_BLIND_AGENT_IMAGE_SHA256,
+  settingsSha256: process.env.LOYLY_BLIND_AGENT_SETTINGS_SHA256,
+  instructionSha256: process.env.LOYLY_BLIND_AGENT_INSTRUCTION_SHA256,
+} : null;
+if (blindAgent && [blindAgent.commandSha256, blindAgent.imageSha256,
+  blindAgent.settingsSha256, blindAgent.instructionSha256]
+  .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? "")))
+  throw new Error("blind agent needs approved command, image, settings and instruction digests");
 mkdirSync(scratch, { recursive: true });
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -530,10 +545,43 @@ const Cycle = defineTask({
       const requestFile = join(scratch, "blind-agent-request.json");
       const verificationDir = join(scratch, "blind-agent-verification");
       const allureDir = join(scratch, "blind-agent-allure");
-      let packetSha256, projected, reason;
+      let packetSha256, projected, reason, agentLaunch;
       try {
         if (!existsSync(packetDir)) prepareBlindReview({ gradingRoom, out: packetDir });
         packetSha256 = verifyBlindReviewPacket({ packetDir, gradingRoom }).packetSha256;
+        if (blindAgent) {
+          agentLaunch = await runBlindAgent({ packetDir, gradingRoom,
+            room: join(scratch, "blind-agent-room"),
+            instruction: join(HERE, "blind-agent-instruction.md"),
+            command: blindAgent.command, image: blindAgent.image,
+            settings: blindAgent.settings, model: blindAgent.model,
+            evidenceDir: join(scratch, "blind-agent-evidence"),
+            stateRoot: join(ROOT, ".pi/harness/.state"),
+            sessionId: "prototype-cycle-1-blind-011",
+            instructionSha256: blindAgent.instructionSha256,
+            commandSha256: blindAgent.commandSha256,
+            imageSha256: blindAgent.imageSha256,
+            settingsSha256: blindAgent.settingsSha256 });
+          const expected = agentLaunch.review;
+          if (existsSync(reviewFile)) {
+            const existing = JSON.parse(readFileSync(reviewFile, "utf8"));
+            for (const key of Object.keys(expected)) if (key !== "reviewed_at"
+                && JSON.stringify(existing[key]) !== JSON.stringify(expected[key]))
+              throw new Error(`blind agent response changed after launch: ${key}`);
+          } else {
+            if (agentLaunch.request) {
+              writeFileSync(`${requestFile}.partial`, `${JSON.stringify(agentLaunch.request)}\n`);
+              renameSync(`${requestFile}.partial`, requestFile);
+            }
+            writeFileSync(`${reviewFile}.partial`, `${JSON.stringify(expected)}\n`);
+            renameSync(`${reviewFile}.partial`, reviewFile);
+          }
+          if (agentLaunch.request && JSON.stringify(JSON.parse(readFileSync(requestFile, "utf8")))
+              !== JSON.stringify(agentLaunch.request))
+            throw new Error("blind agent request changed after launch");
+          if (!agentLaunch.request && existsSync(requestFile))
+            throw new Error("unusable blind answer must not supply an HTTP request");
+        }
         if (!existsSync(reviewFile) || (existsSync(reviewFile)
             && JSON.parse(readFileSync(reviewFile, "utf8")).verdict === "pass"
             && !existsSync(requestFile))) {
@@ -569,6 +617,8 @@ const Cycle = defineTask({
           packet_sha256: packetSha256 ?? null,
           raw_allure_sha256: projected?.rawAllureSha256 ?? null,
           review_sha256: projected?.reviewSha256 ?? null,
+          agent_launch_receipt_sha256: agentLaunch?.review.launch_receipt_sha256 ?? null,
+          agent_reconciled: agentLaunch?.reconciled ?? false,
           final_verdicts_sha256: projected ? hash(readFileSync(join(scratch, "final-verdicts.json"))) : null,
           reason_code: reason ? "blind-agent-evidence" : null });
         return projected ? { status: "running", checkpoint: { phase: "score",
@@ -615,7 +665,7 @@ try {
   const existing = await harness.commit((tx) => tx.scanTasks({ kind: "loyly.proto.cycle" }, 10), ctx);
   let id = existing.items[0]?.id;
   const cycleInput = { approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder,
-    grader, graderShardCount: live ? graderShardCount : null };
+    grader, blindAgent, graderShardCount: live ? graderShardCount : null };
   if (id && JSON.stringify(existing.items[0].input) !== JSON.stringify(cycleInput))
     throw new Error("this Pi store belongs to a different approved cut, checklist or mode");
   if (!id) id = await harness.commit((tx) => tx.createTask(Cycle, cycleInput,

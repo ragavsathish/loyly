@@ -74,3 +74,19 @@ the rebound review response SHA-256 is
 The ignored `-v2` artifacts hold this binding and another HTTP 201 confirmation.
 This calibrated the revised method on a previously built candidate. It did not alter the
 old raw grader result, produce a scored cycle, or approve that candidate under the new spec.
+
+The process adapter was then calibrated against that same old packet with a **fresh Pi Sol
+session** (`calibration-blind-011-v1`). Its room contained exactly `refusal.txt` and
+`question.txt`; its pinned Pi settings offered only `read`. It returned the single line
+`REQUEST: pukuhuone 9 | Thursday | 17:00 | 18:30`, which the adapter parsed into the same
+booking request as above. Launch receipt SHA-256:
+`e40170f855b9ea0eb2b0ad48c61f576c1bf1e7d382b3037a892cd5e8d0988174`;
+room SHA-256: `e98d8ef8582b9a5e78a3a90109a7c7f42a6d1c2976f63f64308e7cec7158a0ee`.
+Reopening the adapter reported `reconciled: true` with the same receipt and answer, with no
+second model call. This proves the launch path and isolation against an old calibration
+candidate; it does not make that candidate eligible for the revised scored cycle.
+The adapter's parsed request was then sent over HTTP to another fresh candidate copy:
+HTTP 201. Its separate Allure result passed the supplied lifecycle schema and reports
+`passed`; the bound response SHA-256 is
+`36ffb3c8924c05e80b180f94ee8be59567a46fa0fcbab94b69753cef3951c8c8`.
+The raw grader result remains `skipped` and `pending`, and no score was filed.

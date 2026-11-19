@@ -32,8 +32,7 @@ function worker(scratch, env) {
   return { child, closed, output: () => output };
 }
 
-test("live stub cycle waits across a controller kill, then scores the separate blind result", async () => {
-  const scratch = mkdtempSync(join(tmpdir(), "loyly-live-blind-handoff-"));
+function liveEnv(scratch) {
   const checklist = join(scratch, "approved-checklist.json");
   const generated = spawnSync("bb", ["harness/gen_checklist.clj", "--out", checklist],
     { cwd: root, encoding: "utf8" });
@@ -44,7 +43,7 @@ test("live stub cycle waits across a controller kill, then scores the separate b
   const builderCommand = join(here, "test/stub-green-builder.sh");
   const graderCommand = join(here, "test/stub-grader.sh");
   const settings = join(root, ".pi/harness/config/pi.grader.settings.json");
-  const env = { ...process.env,
+  return { ...process.env,
     LOYLY_APPROVED_COMMIT: commit.stdout.trim(),
     LOYLY_APPROVED_CHECKLIST_SHA256: sha(checklist),
     LOYLY_BUILDER_COMMAND: builderCommand, LOYLY_BUILDER_IMAGE: image,
@@ -61,6 +60,11 @@ test("live stub cycle waits across a controller kill, then scores the separate b
     LOYLY_GRADER_SCHEMA_SHA256: sha(join(here, "allure-lifecycle-result.schema.json")),
     LOYLY_GRADER_SHARDS: "3",
   };
+}
+
+test("live stub cycle waits across a controller kill, then scores the separate blind result", async () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-live-blind-handoff-"));
+  const env = liveEnv(scratch);
   let first, resumed;
   try {
     first = worker(scratch, env);
@@ -95,6 +99,47 @@ test("live stub cycle waits across a controller kill, then scores the separate b
   } finally {
     if (first?.child.exitCode === null) first.child.kill("SIGTERM");
     if (resumed?.child.exitCode === null) resumed.child.kill("SIGTERM");
+    rmSync(scratch, { recursive: true, force: true });
+  }
+});
+
+test("live stub cycle launches a separate blind process and scores its HTTP-confirmed answer", async () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-live-auto-blind-"));
+  const env = liveEnv(scratch);
+  const command = join(here, "test/stub-blind-agent.sh");
+  const settings = join(root, ".pi/harness/config/pi.blind-review.settings.json");
+  Object.assign(env, {
+    LOYLY_BLIND_AGENT_COMMAND: command,
+    LOYLY_BLIND_AGENT_IMAGE: env.LOYLY_BUILDER_IMAGE,
+    LOYLY_BLIND_AGENT_SETTINGS: settings,
+    LOYLY_BLIND_AGENT_MODEL: "test/fresh-blind-agent",
+    LOYLY_BLIND_AGENT_COMMAND_SHA256: sha(command),
+    LOYLY_BLIND_AGENT_IMAGE_SHA256: env.LOYLY_BUILDER_IMAGE_SHA256,
+    LOYLY_BLIND_AGENT_SETTINGS_SHA256: sha(settings),
+    LOYLY_BLIND_AGENT_INSTRUCTION_SHA256: sha(join(here, "blind-agent-instruction.md")),
+  });
+  let run;
+  try {
+    run = worker(scratch, env);
+    const deadline = new Promise((_, reject) => {
+      const timer = setTimeout(() => reject(new Error(`automatic reviewer did not finish: ${run.output()}`)),
+        60_000);
+      timer.unref();
+    });
+    const done = await Promise.race([run.closed, deadline]);
+    assert.equal(done.code, 1, done.output); // live measurement still needs acceptance
+    assert.match(done.output, /blind-review completed/);
+    assert.match(done.output, /score filed/);
+    const scores = JSON.parse(readFileSync(join(scratch, "instrument", "harness", "cycles", "02", "scores.json")));
+    assert.equal(scores.items.filter((item) => item.verdict === "pass").length, 11);
+    const agentRoom = join(scratch, "blind-agent-room");
+    assert.deepEqual((await import("node:fs")).readdirSync(agentRoom).sort(), ["question.txt", "refusal.txt"]);
+    const review = JSON.parse(readFileSync(join(scratch, "blind-agent-review.json")));
+    assert.equal(review.reviewer_kind, "agent");
+    assert.equal(review.verdict, "pass");
+    assert.match(review.launch_receipt_sha256, /^[0-9a-f]{64}$/);
+  } finally {
+    if (run?.child.exitCode === null) run.child.kill("SIGTERM");
     rmSync(scratch, { recursive: true, force: true });
   }
 });

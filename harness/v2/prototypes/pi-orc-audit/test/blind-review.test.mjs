@@ -86,8 +86,12 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
     request: { method: "POST", path: "/book", body: "weekday=Tuesday",
       matches_answer: true }, out: badProbe });
   assert.equal(rejected.http_status, 409);
-  assert.throws(() => writeBlindAgentAllure({ packetDir, reviewFile: badFile, gradingRoom: room,
-    verificationDir: badProbe, out: join(root, "bad-agent") }), /probe is missing, failed or unbound/);
+  const badAgent = writeBlindAgentAllure({ packetDir, reviewFile: badFile, gradingRoom: room,
+    verificationDir: badProbe, out: join(root, "bad-agent") });
+  assert.equal(badAgent.result.status, "failed");
+  assert.deepEqual(finalVerdictsFromBlindReview({ packetDir, reviewFile: badFile,
+    gradingRoom: room, verificationDir: badProbe, out: join(root, "bad-agent") })
+    .verdicts.map((v) => v.verdict), ["fail"]);
   review.packet_sha256 = "0".repeat(64);
   writeFileSync(reviewFile, JSON.stringify(review));
   assert.throws(() => validateBlindReview({ packetDir, reviewFile, gradingRoom: room }), /unbound/);
