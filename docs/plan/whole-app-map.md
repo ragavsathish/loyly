@@ -20,6 +20,9 @@ queue-head decline disposition, notice withdrawal rule, or network heater
 control policy. The builder must not invent them. `02-occurrence-release/`
 holds a first draft of the behavior that *is* stated. Later product slices
 will be drafted and reviewed before they change the scored denominator.
+The proposed choices and their consequences are collected in
+[`whole-app-decisions.md`](whole-app-decisions.md); that page is not an
+approved spec.
 
 ## Whole-product acceptance evidence
 
