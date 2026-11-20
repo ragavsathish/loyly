@@ -117,7 +117,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (process.argv.length !== 4 || !['--check', '--run'].includes(process.argv[2]))
     throw Error('usage: node run-live.mjs --check|--run <pinned-config.json>');
   const config = JSON.parse(readFileSync(process.argv[3], 'utf8'));
-  const { scratch } = checkLiveRun(config);
+  const { source, scratch } = checkLiveRun(config);
   console.log('pinned cycle contract verified');
   if (process.argv[2] === '--run') {
     const env = { ...process.env, PATH: `${process.env.JAVA_HOME}/bin:${process.env.PATH}`,

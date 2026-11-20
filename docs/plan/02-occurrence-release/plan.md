@@ -1,6 +1,6 @@
 # Slice 02: One-week occurrence release
 
-status: planned
+status: ready-for-development
 
 ## Goal
 
@@ -23,7 +23,7 @@ standing holding from slice 01.
 - `docs/plan/01-booking-core/decisions.md` D1 and D5: the release was deferred,
   and all views must derive from the booking record.
 
-## Draft behavior
+## Accepted first-cut behavior
 
 - A release names a particular week and a standing holding owned by the
   releasing household.
@@ -36,11 +36,10 @@ standing holding from slice 01.
 - The next week's occurrence and the standing holding remain with the original
   household. One occurrence has at most one taker. Derived views agree.
 
-## Decisions needed before acceptance
+## Decision record and limits
 
-The source leaves the SALE price and collector unspecified. It also does not
-say whether a release can be withdrawn before taking, or exactly when an
-untaken offer becomes UNCLAIMED. These are product-owner decisions, not
-builder choices. `drafts.feature` deliberately avoids an amount and a
-withdrawal scenario. The plan stays `planned` until the policy is recorded,
-the executable scenarios are accepted and the item IDs are stamped.
+The operator approved the first-cut policies in `../whole-app-decisions.md`
+on 2026-11-20. The billing role resolves the house price reference; this
+slice does not specify a numeric price or who receives sale proceeds.
+An untaken offer may be withdrawn before its occurrence begins and otherwise
+expires at that instant. `spec.feature` carries the executable scenarios.

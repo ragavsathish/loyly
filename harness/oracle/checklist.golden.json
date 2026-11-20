@@ -65,9 +65,225 @@
    "name": "The refusal for a closed day is judged usable",
    "rule": "A refusal is judged by whether a resident can act on it without asking again",
    "source": "docs/plan/01-booking-core/spec.feature:156"
+  },
+  {
+   "id": "02-001",
+   "name": "A free release offers only the selected occurrence",
+   "rule": "Releasing one week preserves the standing holding",
+   "source": "docs/plan/02-occurrence-release/spec.feature:8"
+  },
+  {
+   "id": "02-002",
+   "name": "Releasing one week does not offer a different week",
+   "rule": "Releasing one week preserves the standing holding",
+   "source": "docs/plan/02-occurrence-release/spec.feature:15"
+  },
+  {
+   "id": "02-003",
+   "name": "An untaken release does not cancel the holding or its normal fee",
+   "rule": "Releasing one week preserves the standing holding",
+   "source": "docs/plan/02-occurrence-release/spec.feature:22"
+  },
+  {
+   "id": "02-004",
+   "name": "Taking a free occurrence charges no fee to the taker",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:32"
+  },
+  {
+   "id": "02-005",
+   "name": "Taking a sale occurrence raises a distinct resale signal",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:40"
+  },
+  {
+   "id": "02-006",
+   "name": "Withdrawing an untaken offer before its occurrence begins",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:49"
+  },
+  {
+   "id": "02-007",
+   "name": "An accepted transfer cannot be withdrawn by the original holder",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:57"
+  },
+  {
+   "id": "02-008",
+   "name": "An untaken offer expires when its occurrence begins",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:63"
+  },
+  {
+   "id": "02-009",
+   "name": "A taken occurrence has one taker in every view",
+   "rule": "The three derived views describe one occurrence holder",
+   "source": "docs/plan/02-occurrence-release/spec.feature:72"
+  },
+  {
+   "id": "02-010",
+   "name": "Two households try to take the same released occurrence",
+   "rule": "The three derived views describe one occurrence holder",
+   "source": "docs/plan/02-occurrence-release/spec.feature:80"
+  },
+  {
+   "id": "03-001",
+   "name": "A free eligible slot does not put a multi-slot household under notice",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:7"
+  },
+  {
+   "id": "03-002",
+   "name": "An empty queue does not put a multi-slot household under notice",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:14"
+  },
+  {
+   "id": "03-003",
+   "name": "A released occurrence is not a free standing slot",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:21"
+  },
+  {
+   "id": "03-004",
+   "name": "Waiting in another resource group does not trigger notice here",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:29"
+  },
+  {
+   "id": "03-005",
+   "name": "The queue is ordered by accepted request within its eligible group",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:36"
+  },
+  {
+   "id": "03-014",
+   "name": "One multi-holding household receives only one active notice",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:43"
+  },
+  {
+   "id": "03-006",
+   "name": "The holder chooses before the choose deadline",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:53"
+  },
+  {
+   "id": "03-007",
+   "name": "The choice right passes after the shorter clock",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:61"
+  },
+  {
+   "id": "03-008",
+   "name": "Passing the choose deadline does not pass the loss deadline",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:68"
+  },
+  {
+   "id": "03-009",
+   "name": "Lapse changes only the selected standing holding",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:75"
+  },
+  {
+   "id": "03-010",
+   "name": "A confirmed queue claim takes effect only at lapse",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:83"
+  },
+  {
+   "id": "03-011",
+   "name": "A queue-head decline offers the holding to the next eligible entry",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:90"
+  },
+  {
+   "id": "03-012",
+   "name": "If all claimants decline, the selected holding returns to the pool at lapse",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:97"
+  },
+  {
+   "id": "03-013",
+   "name": "A pending notice retains its original deadlines after the queue empties",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:104"
+  },
+  {
+   "id": "04-001",
+   "name": "Different houses can open different resources and days",
+   "rule": "A house owns its calendars and eligible booker roles",
+   "source": "docs/plan/04-house-policy/spec.feature:7"
+  },
+  {
+   "id": "04-002",
+   "name": "Booker standing is checked within the household's house",
+   "rule": "A house owns its calendars and eligible booker roles",
+   "source": "docs/plan/04-house-policy/spec.feature:15"
+  },
+  {
+   "id": "04-003",
+   "name": "A manager-mediated house does not expose a resident self-service queue",
+   "rule": "A house owns its calendars and eligible booker roles",
+   "source": "docs/plan/04-house-policy/spec.feature:23"
+  },
+  {
+   "id": "04-004",
+   "name": "A rule change records its authority and effective date",
+   "rule": "Policy revisions and disputes preserve their evidence",
+   "source": "docs/plan/04-house-policy/spec.feature:33"
+  },
+  {
+   "id": "04-005",
+   "name": "A dispute can reconstruct one booking's decision",
+   "rule": "Policy revisions and disputes preserve their evidence",
+   "source": "docs/plan/04-house-policy/spec.feature:40"
+  },
+  {
+   "id": "04-006",
+   "name": "A policy revision does not rewrite an earlier refusal",
+   "rule": "Policy revisions and disputes preserve their evidence",
+   "source": "docs/plan/04-house-policy/spec.feature:47"
+  },
+  {
+   "id": "04-007",
+   "name": "A notice keeps the policy version that created its deadlines",
+   "rule": "Policy revisions and disputes preserve their evidence",
+   "source": "docs/plan/04-house-policy/spec.feature:53"
+  },
+  {
+   "id": "05-001",
+   "name": "A household with one family-time booking cannot take another",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:7"
+  },
+  {
+   "id": "05-002",
+   "name": "An unrelated class does not consume the family-time allowance",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:15"
+  },
+  {
+   "id": "05-003",
+   "name": "Family-time allowance does not block a different class",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:22"
+  },
+  {
+   "id": "05-004",
+   "name": "A house without the family-time cap does not inherit it",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:29"
+  },
+  {
+   "id": "05-005",
+   "name": "A completed family-time occurrence no longer uses the allowance",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:36"
   }
  ],
  "counts": {
-  "total": 11
+  "total": 47
  }
 }

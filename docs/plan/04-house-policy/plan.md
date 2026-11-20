@@ -1,6 +1,6 @@
 # Slice 04: House policy, roles and disputes
 
-status: planned
+status: ready-for-development
 
 ## Goal
 
@@ -20,7 +20,7 @@ can point to the booking and the rule that governed it.
 - `raw/domain/soukanvuori/2022-work-order-103016-and-drift.md`: a complaint
   needed the original booking thread after the list and timer diverged.
 
-## Draft behavior
+## Accepted first-cut behavior
 
 - A house policy names the resource calendars and roles used by that house.
   A household's booker standing is checked against its own house policy.
@@ -30,10 +30,11 @@ can point to the booking and the rule that governed it.
 - A dispute names a booking and exposes its confirmation, changes and
   applicable policy history to the configured first-stop role.
 
-## Decisions needed before acceptance
+## Decision record and limits
 
-The product owner must define who can administer a house policy, the
-allowed booker roles for each initial configuration, how already booked
-future occurrences respond to a policy revision, and which party is the
-first stop for a dispute. Third-hand subtenant standing is still open in
-the source. The drafts do not make those choices.
+The operator approved configurable, house-specific roles and effective-dated
+rules for the first cut in `../whole-app-decisions.md` on 2026-11-20. The
+house configuration names its booker, booking operator, billing and dispute
+roles; Soukanvuori remains manager-mediated. The policy authority must be
+recorded. Existing future booking migration and third-hand subtenant standing
+remain outside this cut. `spec.feature` is the executable cut.

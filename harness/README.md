@@ -308,6 +308,12 @@ Three events look alike in a diff and must never be confused:
   #   must print the old "total" line and nothing else
   ```
 
+On 2026-11-20 the operator approved the first whole-product policy cut.
+Slices 02–05 gained 36 stamped scenarios, raising the product checklist from
+11 to 47 items. `harness/oracle.sh record` updated only this repository's
+checklist golden. The diff removed only `"total": 11`; all eleven earlier item
+records remained byte-for-byte unchanged. No shared legacy harness tool changed.
+
 **2026-09-08: the spec grew, in all three repositories.** Scenarios were added under
 `docs/plan/`, so the derived checklist gained items and the golden moved with it. The
 denominators went from 8 to 11 in löyly, 8 to 11 in saunavuoro and 251 to 255 in kalibra,

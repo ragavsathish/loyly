@@ -32,9 +32,14 @@ parallel Gondolin VMs. Existing booking-core
 checks retain their named scripts; each additional check must name a local
 `panel-*.mjs` script and one selected item. Each script writes its own Allure
 directory, and the panel compiler checks the result against the pinned plan.
-The current product selection is still the eleven stamped booking-core items.
-Slices 02 through 05 under `docs/plan/` are drafts and have not entered a
-scored cycle.
+The approved first-cut product selection has 47 stamped items across slices
+01 through 05. `whole-product.panel.json` assigns every selected item to one
+raw grader check and keeps the independent `01-011` blind handoff. It adds
+four parallel specialist VMs for browser, protocol, candidate-emitted Node
+OpenTelemetry and cross-runtime process profiling. The latter four still
+probe booking core; the raw grader shards cover every whole-product rule.
+This expanded selection has not entered a scored cycle. The historical
+cycle-06 score remains an eleven-item booking-core result.
 
 For a candidate that may use Node, Babashka or the JVM, build the optional
 combined specialist image from the Clojure builder OCI image at the digest

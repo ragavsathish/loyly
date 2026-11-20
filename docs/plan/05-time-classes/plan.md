@@ -1,6 +1,6 @@
 # Slice 05: Time classes and class-scoped fairness
 
-status: planned
+status: ready-for-development
 
 ## Goal
 
@@ -18,7 +18,7 @@ as house policy.
 - `raw/domain/public/brf-masthugget.md` provides the public-source
   provenance for that specific configuration.
 
-## Draft behavior
+## Accepted first-cut behavior
 
 - A house assigns a time class to eligible windows and a class-scoped
   active-or-upcoming booking cap to household units.
@@ -27,10 +27,11 @@ as house policy.
 - A refusal explains the class cap and identifies the existing booking
   that makes the household ineligible.
 
-## Decisions needed before acceptance
+## Decision record and limits
 
-The first accepted house configurations, their time-class names and
-limits, and the lifecycle definition of "active or upcoming" must be
-recorded. Transfer surcharges, no-show penalties, discounts and network
-heater control remain outside this slice because their policy or
-compliance rules are open in the source.
+The operator approved the first-cut class-scoped cap in
+`../whole-app-decisions.md` on 2026-11-20. A confirmed occurrence counts
+from confirmation until it ends; another class never consumes that allowance.
+The first house configuration uses the documented Masthugget family-time
+example. Transfer surcharges, no-show penalties, discounts and network heater
+control remain outside this cut. `spec.feature` is the executable cut.

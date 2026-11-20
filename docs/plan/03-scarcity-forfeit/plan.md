@@ -1,6 +1,6 @@
 # Slice 03: Scarcity queue and standing-slot forfeit
 
-status: planned
+status: ready-for-development
 
 ## Goal
 
@@ -19,7 +19,7 @@ This acts on a standing holding, not a single released occurrence.
 - `docs/plan/01-booking-core/spec.feature` covers the second slot while
   there is room; this slice covers the later scarcity case.
 
-## Draft behavior
+## Accepted first-cut behavior
 
 - Scarcity needs both full eligible capacity and a nonempty queue. Neither
   condition alone starts notice.
@@ -32,11 +32,12 @@ This acts on a standing holding, not a single released occurrence.
 - Every transition is recorded so the posted list and billing read the
   same holding history.
 
-## Decisions needed before acceptance
+## Decision record and limits
 
-The source does not settle queue priority, whether fullness is per resource
-or house-wide, how many holdings above two trigger notice, the exact clock
-durations, notice withdrawal if scarcity clears, or what follows a
-queue-head decline. These are policy choices, not builder defaults. The
-draft scenarios cover only invariant behavior and do not enter the
-checklist until those choices are recorded and item IDs are stamped.
+The operator approved the first-cut policies in `../whole-app-decisions.md`
+on 2026-11-20: scoped FIFO queue, one notice per multi-holding household,
+14-day choice and 30-day lapse clocks, next eligible claimant after a
+decline, and a notice that persists after issuance. House policy names the
+eligible resource group. `spec.feature` is the executable cut. Exceptional
+priority, migration of already-held future occurrences, and payment collection
+remain outside it.
