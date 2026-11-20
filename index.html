@@ -51,10 +51,37 @@
     </section>
 
     <section class="band" id="graders"><div class="wrap section">
-      <div class="section-heading"><span class="kicker">03 / Grading</span><h2>Every scored item passed.</h2><p>Cycle 06 filed 11/11. Three Terra shards checked ten behaviors; a fresh Sol blind reviewer named a request from the refusal, and a fresh app confirmed it. The specialist reassessment passed in three Gondolin VMs.</p></div>
+      <div class="section-heading"><span class="kicker">03 / Grading</span><h2>What each grader saw, and how results joined.</h2><p>Cycle 06 filed 11/11. The approved checklist was partitioned by behavior rule so related scenarios stayed together. Three Terra graders worked concurrently in private Gondolin VMs against separate copies of the same gated candidate.</p></div>
+      <figure class="grade-map" aria-labelledby="grade-map-title">
+        <figcaption id="grade-map-title">Cycle 06 · parallel black-box grading and independent follow-up</figcaption>
+        <div class="grade-source"><small>After legacy gate passed</small><strong>One pinned candidate · 11 approved items</strong><span>Same candidate digest and Allure schema in every room</span></div>
+        <div class="grade-connector" aria-hidden="true">↓ split by behavior rule, launch together</div>
+        <div class="grade-workers">
+          <article><small>Terra · shard 01 · private VM</small><strong>Availability and projections</strong><span>01-001, 01-002, 01-007, 01-008</span><b>4 passed</b></article>
+          <article><small>Terra · shard 02 · private VM</small><strong>Holding and races</strong><span>01-003, 01-004, 01-009, 01-010</span><b>4 passed</b></article>
+          <article><small>Terra · shard 03 · private VM</small><strong>Second slot and refusal</strong><span>01-005, 01-006, 01-011</span><b>2 passed · 1 blind handoff</b></article>
+        </div>
+        <div class="grade-connector" aria-hidden="true">↓ verify unique item coverage, schema and evidence; copy Allure directories</div>
+        <div class="grade-followup"><div><small>Fresh Sol blind reviewer</small><strong>01-011: usable refusal?</strong><span>Saw only the refusal and question. Named pukuhuone 8, Tuesday 17:00; a fresh app confirmed that exact request.</span><b>Passed</b></div><div><small>Separate pinned panel reassessment</small><strong>Three specialist VMs</strong><span>Playwright booking journey, 100/100 protocol races, and candidate-bound OpenTelemetry.</span><b>3 passed</b></div></div>
+        <div class="grade-connector" aria-hidden="true">↓ compile bound result directories, then file the original score</div>
+        <div class="grade-total"><strong>11/11 filed score</strong><span>Unified Allure: 15 cases · 14 passed · 1 planned handoff skipped · 0 failed</span></div>
+        <p class="grade-note">The grader's 01-011 result stays <em>skipped/pending</em> as a handoff record; the separate blind-review result passes it. The three specialist results corroborate the build and do not add scored checklist items. The reassessment did not rewrite the original panel failure or score.</p>
+      </figure>
       <div class="shard-grid"><article><small>Filed Pi score</small><strong>11/11</strong><span>Original scorer; 01-011 newly passes</span></article><article><small>Specialist VMs</small><strong>3/3 passed</strong><span>Separate pinned reassessment</span></article><article><small>Unified Allure</small><strong>15 cases</strong><span>14 passed · 0 failed · 1 planned handoff skipped</span></article></div>
       <p class="report-footnote">The reassessed panel says <strong>ready for review</strong> with no gaps. The original cycle-06 panel was not ready and remains in the <a href="replay/latest.html">23-fact Pi replay</a>. This result is not an acceptance decision. Cycle 03's <a href="allure/cycle-03/index.html">historical report</a> remains separate.</p>
       <div class="schema-actions"><a class="button primary" href="allure/panel-grade/index.html">Open Allure report ↗</a><a class="text-link" href="allure/panel-grade/panel-summary.json">Read item-level summary ↗</a></div>
+      <figure class="schema-map" id="allure-schema" aria-labelledby="schema-map-title">
+        <figcaption id="schema-map-title"><span class="kicker">The result contract</span><h3>One check becomes one Allure result</h3><p>Each grader, blind reviewer and specialist writes a result JSON file plus any attachment bytes. The compiler reads the directories and checks each result against the <a href="evidence/allure-lifecycle-result.schema.json">published lifecycle schema</a>.</p></figcaption>
+        <div class="schema-root"><small>One <code>{uuid}-result.json</code></small><strong>Allure result</strong><span><b>Required:</b> <code>uuid</code> · <code>name</code> · <code>status</code> · <code>labels</code></span><span><b>Status:</b> passed / failed / broken / skipped / unknown</span></div>
+        <div class="schema-connector" aria-hidden="true">↓ contains</div>
+        <div class="schema-branches">
+          <article><small>Required array</small><h4>Labels</h4><p>Each label has <code>name</code> and <code>value</code>. The schema requires one <code>lifecycle</code>, at least one <code>technique</code>, and at least one <code>tool</code>.</p><span class="schema-example">pre-production · acceptance · Terra</span></article>
+          <article><small>Optional recursive array</small><h4>Steps</h4><p>Each step requires <code>name</code>; it may carry its own status, stage, nested steps and attachments.</p><span class="schema-example">Given → When → Then</span></article>
+          <article><small>Optional array</small><h4>Attachments</h4><p>Each reference requires <code>name</code>, canonical UUID <code>source</code> filename and media <code>type</code>. Evidence bytes sit beside the JSON.</p><span class="schema-example">HTTP body · screenshot · trace</span></article>
+          <article><small>Optional metadata</small><h4>Identity and context</h4><p><code>historyId</code>, <code>testCaseId</code>, <code>fullName</code>, stage, timestamps, status details, parameters and links.</p><span class="schema-example">stable comparison across runs</span></article>
+        </div>
+        <div class="schema-convention"><strong>Our Gherkin mapping</strong><span><code>feature</code>, <code>story</code> and <code>@item-01-010</code> labels, plus Given/When/Then step names, make the results navigable. These are grading conventions layered on the schema, not top-level required JSON Schema fields.</span></div>
+      </figure>
     </div></section>
 
     <section class="band" id="evidence"><div class="wrap section">
