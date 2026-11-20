@@ -9,7 +9,7 @@ import { readAuditRows } from "./audit-rows.mjs";
 import { readAllureResults } from "./allure-results.mjs";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
 import { candidateDigest } from "./grading-room.mjs";
-import { verifyScoredCycle } from "./score-receipt.mjs";
+import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -24,7 +24,8 @@ export async function renderScoredAllure(scratch) {
   const scoreInput = JSON.parse(readFileSync(join(scratch, "score-input.json"), "utf8"));
   if (candidateDigest(join(scratch, "fenced-room")) !== scoreInput.candidate_sha256)
     throw new Error("current candidate differs from the scored candidate");
-  const score = verifyScoredCycle({ scratch, instrument, verdictsFile });
+  const score = verifyScoredCycle({ scratch, instrument, verdictsFile,
+    cycle: scoreCycleFor(scratch) });
   const review = JSON.parse(readFileSync(reviewFile, "utf8"));
   const projected = finalVerdictsFromBlindReview({ packetDir: join(scratch, "blind-agent-packet"),
     reviewFile, gradingRoom,

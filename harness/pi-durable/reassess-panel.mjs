@@ -9,7 +9,7 @@ import { selectPanelAttempt } from './panel-adapter.mjs';
 import { runPanelVms, verifyPanelVmRun } from './panel-vm-run.mjs';
 import { compilePanel, verifyCompiledPanel } from './panel-compile.mjs';
 import { candidateDigest } from './grading-room.mjs';
-import { verifyScoredCycle } from './score-receipt.mjs';
+import { scoreCycleFor, verifyScoredCycle } from './score-receipt.mjs';
 import { readAuditRows } from './audit-rows.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -39,7 +39,8 @@ export async function checkReassessment(config) {
       || fileSha(join(image, 'manifest.json')) !== config.image_sha256)
     throw Error('panel plan or VM image changed');
   const score = verifyScoredCycle({ scratch: original,
-    instrument: join(original, 'instrument'), verdictsFile: join(original, 'final-verdicts.json') });
+    instrument: join(original, 'instrument'), verdictsFile: join(original, 'final-verdicts.json'),
+    cycle: scoreCycleFor(original) });
   const input = JSON.parse(readFileSync(join(original, 'score-input.json'), 'utf8'));
   const rows = await readAuditRows(original);
   const filed = rows.findLast((row) => row.stage === 'score' && row.outcome === 'filed');

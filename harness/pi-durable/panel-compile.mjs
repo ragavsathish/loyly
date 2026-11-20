@@ -11,7 +11,7 @@ import { readAuditRows } from "./audit-rows.mjs";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
 import { candidateDigest } from "./grading-room.mjs";
 import { evaluatePanel } from "./panel-policy.mjs";
-import { verifyScoredCycle } from "./score-receipt.mjs";
+import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -114,7 +114,7 @@ export async function compilePanel({ original, specialists, out,
   const candidateSha256 = candidateDigest(join(original, "fenced-room"));
   if (candidateSha256 !== scoreInput.candidate_sha256) throw new Error("candidate changed after scoring");
   const scored = verifyScoredCycle({ scratch: original, instrument: join(original, "instrument"),
-    verdictsFile: join(original, "final-verdicts.json") });
+    verdictsFile: join(original, "final-verdicts.json"), cycle: scoreCycleFor(original) });
   const room = join(original, "grading-room"), raw = readAllureResults(room);
   const reviewFile = join(original, "blind-agent-review.json"), review = json(reviewFile);
   const blindArgs = { packetDir: join(original, "blind-agent-packet"), reviewFile,
@@ -187,7 +187,7 @@ export async function compilePanel({ original, specialists, out,
       || ["passed", "failed", "broken", "skipped"].some((status) =>
         (stats[status] ?? 0) !== observations.filter((row) => row.status === status).length))
     throw new Error("Allure omitted or changed a panel result");
-  if (fileSha(join(original, "instrument", "harness", "cycles", "02", "scores.json")) !== scored.scoreSha256)
+  if (fileSha(join(original, "instrument", "harness", "cycles", scoreCycleFor(original), "scores.json")) !== scored.scoreSha256)
     throw new Error("original score changed during panel compilation");
   writeFileSync(join(out, "panel-summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
   const manifest = { schema: "loyly.grading-panel-report.v1",
@@ -206,7 +206,7 @@ export function verifyCompiledPanel({ original, out }) {
   checked(schemaValidator(join(HERE, "panel-summary.schema.json")), summary, "panel summary");
   const manifest = json(join(out, "panel-manifest.json"));
   const score = verifyScoredCycle({ scratch: original, instrument: join(original, "instrument"),
-    verdictsFile: join(original, "final-verdicts.json") });
+    verdictsFile: join(original, "final-verdicts.json"), cycle: scoreCycleFor(original) });
   if (manifest.schema !== "loyly.grading-panel-report.v1"
       || manifest.panel_summary_sha256 !== fileSha(join(out, "panel-summary.json"))
       || manifest.report_html_sha256 !== fileSha(join(out, "allure-report", "index.html"))

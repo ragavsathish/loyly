@@ -7,6 +7,12 @@ import { join } from "node:path";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const fileHash = (path) => hash(readFileSync(path));
+export function scoreCycleFor(scratch) {
+  const input = JSON.parse(readFileSync(join(scratch, "score-input.json"), "utf8"));
+  const cycle = input.score_cycle ?? "02";
+  if (!/^\d\d$/.test(cycle)) throw new Error("bound score cycle is invalid");
+  return cycle;
+}
 function head(path) {
   const result = spawnSync("git", ["-C", path, "rev-parse", "HEAD"], { encoding: "utf8" });
   if (result.status !== 0) throw new Error(`cannot read instrument cut at ${path}`);

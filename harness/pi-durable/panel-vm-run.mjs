@@ -7,6 +7,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { candidateDigest } from './grading-room.mjs';
+import { scoreCycleFor } from './score-receipt.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -27,7 +28,9 @@ function runBinding(original) {
   return { source_commit: git.stdout.trim(), candidate_sha256: candidateDigest(join(original, 'fenced-room')) };
 }
 function scoreDigest(original) {
-  const score = join(original, 'instrument', 'harness', 'cycles', '02', 'scores.json');
+  const input = join(original, 'score-input.json');
+  if (!existsSync(input)) return null;
+  const score = join(original, 'instrument', 'harness', 'cycles', scoreCycleFor(original), 'scores.json');
   return existsSync(score) ? fileSha(score) : null;
 }
 

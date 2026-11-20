@@ -6,7 +6,7 @@ import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } f
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { bindScoreInput, verifyScoredCycle } from "../score-receipt.mjs";
+import { bindScoreInput, scoreCycleFor, verifyScoredCycle } from "../score-receipt.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 function run(program, args, cwd) {
@@ -102,6 +102,7 @@ test("a later product cycle binds its own score directory", () => {
     const input = bindScoreInput({ scratch, sourceRoot: root, instrument,
       candidateSha256: "c".repeat(64), verdictsFile, scoreCycle: "03" });
     assert.equal(input.score_cycle, "03");
+    assert.equal(scoreCycleFor(scratch), "03");
     run("bb", ["harness/score.clj", "03", "--verdicts", verdictsFile], instrument);
     assert.equal(verifyScoredCycle({ scratch, instrument, verdictsFile, cycle: "03" }).score, "11/11");
     assert.throws(() => verifyScoredCycle({ scratch, instrument, verdictsFile }),
