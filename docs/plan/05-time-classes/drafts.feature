@@ -24,3 +24,10 @@ Feature: Time classes and class-scoped caps
       And apartment 12 has an upcoming family-time booking
       When apartment 12 requests a free window in another time class
       Then the family-time cap does not refuse that request
+
+    @draft
+    Scenario: A house without the family-time cap does not inherit it
+      Given house A caps its family-time class at one active or upcoming booking
+      And house B has not configured that cap
+      When an eligible house B household requests a free family-time window
+      Then house A's cap is not used to decide the house B request

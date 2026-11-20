@@ -12,6 +12,13 @@ Feature: One-week occurrence release
       And apartment 12 still holds the standing slot for later Tuesdays
 
     @draft
+    Scenario: Releasing one week does not offer a different week
+      Given apartment 12 holds a Tuesday 17:00 standing slot in pukuhuone 8
+      When apartment 12 releases the occurrence on one named Tuesday
+      Then another household can take that named Tuesday occurrence
+      And the occurrence on the following Tuesday remains assigned to apartment 12
+
+    @draft
     Scenario: An untaken release does not cancel the holding or its normal fee
       Given apartment 12 has released one Tuesday occurrence for free
       When nobody takes it before that occurrence ends
@@ -46,3 +53,10 @@ Feature: One-week occurrence release
       Then no other household can take that same occurrence
       And the posted list names apartment 3 while the heater schedule heats that occurrence
       And the billing signal follows the release mode without a second stored copy
+
+    @draft
+    Scenario: Two households try to take the same released occurrence
+      Given apartment 12 has released one named Tuesday occurrence
+      When apartments 3 and 4 each try to take it before either request is answered
+      Then exactly one request succeeds
+      And the posted list, heater schedule and billing signal agree on that one outcome

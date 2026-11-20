@@ -19,6 +19,14 @@ Feature: Multiple houses and traceable policy
       Then each decision uses that house's role policy
       And neither house inherits the other house's eligibility rule
 
+    @draft
+    Scenario: A manager-mediated house does not expose a resident self-service queue
+      Given house A routes booking requests to its manager
+      And house B permits resident self-service with a waiting queue
+      When residents view the booking route for their own house
+      Then house A directs them to its manager and does not offer the queue
+      And house B offers the route configured for its residents
+
   Rule: Policy revisions and disputes preserve their evidence
 
     @draft
@@ -34,3 +42,9 @@ Feature: Multiple houses and traceable policy
       When the configured first-stop role opens a dispute about that booking
       Then the confirmation and change history identify that booking
       And the governing policy version is visible with each decision
+
+    @draft
+    Scenario: A policy revision does not rewrite an earlier refusal
+      Given a house refused a request under an identified policy version
+      When an authorized party records a later policy revision
+      Then the refusal still names the version and reason used at its decision time
