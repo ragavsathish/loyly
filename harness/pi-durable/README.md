@@ -1,4 +1,4 @@
-# Löyly Pi durable harness
+# Pi durable harness
 
 This directory contains the active Pi durable cycle driver. Pi owns cycle
 checkpoints and committed audit entries. The original
@@ -80,6 +80,41 @@ fresh blind Pi reviewer for `01-011`, and runs the selected specialist VMs in
 parallel. The selected panel manifest is bound into the filed score input.
 The current booking plan has three specialists and produces a 15-case Allure
 report; another pinned plan may add result directories without merging them.
+
+## Use the lifecycle with another project
+
+The reusable control policy lives in [`lifecycle.mjs`](lifecycle.mjs): build,
+independent gate, bounded repair, isolated grader shards, optional assessments,
+then score. `harness.pi-live-run.v2` names a `project` and pins the same source,
+agent, schema, and image inputs. Its builder and grader instructions can have
+project-specific file names. The blind handoff is absent in v2; a direct grader
+result decides every selected item. A panel is optional. Java 21 is required
+only if `runtime.java21` is true or the project's own gate needs it.
+
+The source adapter supplies `harness/check.sh`, `harness/fence.sh`,
+`harness/gen_checklist.clj`, `harness/verify.sh`, `harness/score.clj`, and
+`harness/scoreboard.clj` under
+the same command and file contracts used by this driver. Selected Gherkin
+files follow `docs/plan/NN-name/spec.feature`; checklist items carry stamped
+`NN-NNN` IDs and source line references. The controller keeps these source
+scripts outside its reusable lifecycle module so an existing legacy scorer
+can remain authoritative. The adapter also supplies the app in `impl/` with a
+launch path its grader instruction explains.
+
+For a v2 specialist panel, use `harness.grading-panel-plan.v2`. Every selected
+item appears once in a `raw-grader` check with `scored` role. Specialists use
+`corroborating` or `diagnostic` roles and name a `.mjs` script in the pinned
+`bundle.path` directory. The controller hashes the bundle tree before build;
+Gondolin mounts it read-only at `/worker`, the candidate read-only at
+`/candidate`, core probe helpers at `/harness`, and each result directory
+read-write at `/out`. Each VM writes an Allure case. The panel compiler checks
+the receipts and passes the separate result directories to Allure. No blind
+case is required for v2. The sample `test/fixtures/hello-panel/health.mjs`
+passed a non-Löyly HTTP candidate in a real Gondolin VM.
+
+The older `loyly.pi-live-run.v1` contract and its panel retain their blind
+`01-011` handoff, Java preflight, and historical report identity. A new scored
+live cycle still needs the exact approval described in `AGENTS.md`.
 
 ## Panel-only reassessment
 

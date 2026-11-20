@@ -88,3 +88,26 @@ test("grading room refuses a checklist source outside the numbered product plans
     checklistSha256: sha(readFileSync(checklistFile)),
     schemaSha256: sha(readFileSync(schemaFile)) }), /safe matching plan source/);
 });
+
+test('project identity and blind policy are bound in a reusable grading room', () => {
+  const root = mkdtempSync(join(tmpdir(), 'harness-other-room-'));
+  const sourceRoom = join(root, 'source'), candidateRoom = join(root, 'candidate');
+  const out = join(root, 'grade'), checklistFile = join(root, 'checklist.json');
+  const schemaFile = join(root, 'allure-lifecycle-result.schema.json');
+  mkdirSync(join(sourceRoom, 'docs', 'plan', '01-health'), { recursive: true });
+  mkdirSync(join(candidateRoom, 'impl'), { recursive: true });
+  writeFileSync(join(sourceRoom, 'docs', 'plan', '01-health', 'spec.feature'), 'Feature: Health\n');
+  writeFileSync(join(candidateRoom, 'impl', 'start.sh'), '#!/bin/sh\n');
+  writeFileSync(checklistFile, JSON.stringify({ items: [{ id: '01-001',
+    source: 'docs/plan/01-health/spec.feature:2' }] }));
+  writeFileSync(schemaFile, '{"type":"object"}\n');
+  const args = { sourceRoom, candidateRoom, checklistFile, schemaFile, out,
+    candidateSha256: candidateDigest(candidateRoom), checklistSha256: sha(readFileSync(checklistFile)),
+    schemaSha256: sha(readFileSync(schemaFile)), project: 'hello', blindReview: false };
+  const receipt = prepareGradingRoom(args);
+  assert.equal(receipt.project, 'hello');
+  assert.equal(receipt.blindReview, false);
+  verifyGradingRoom(args);
+  assert.throws(() => verifyGradingRoom({ ...args, project: 'other' }), /changed/);
+  assert.throws(() => verifyGradingRoom({ ...args, blindReview: true }), /changed/);
+});

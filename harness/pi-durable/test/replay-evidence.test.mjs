@@ -92,3 +92,43 @@ test("playback projects bound grader and blind Allure evidence without inventing
     assert.throws(() => projectReplayEvidence(scratch, rows), /committed grade digest/);
   } finally { rmSync(scratch, { recursive: true, force: true }); }
 });
+
+test('another project replays direct grader evidence without a blind event', () => {
+  const scratch = mkdtempSync(join(tmpdir(), 'harness-replay-evidence-'));
+  const sourceRoom = join(scratch, 'source'), candidateRoom = join(scratch, 'candidate');
+  const gradingRoom = join(scratch, 'grading-room'), checklistFile = join(scratch, 'checklist.json');
+  try {
+    mkdirSync(join(sourceRoom, 'docs', 'plan', '01-health'), { recursive: true });
+    mkdirSync(join(candidateRoom, 'impl'), { recursive: true });
+    writeFileSync(join(sourceRoom, 'docs', 'plan', '01-health', 'spec.feature'), 'Feature: Health\n');
+    writeFileSync(join(candidateRoom, 'impl', 'app.txt'), 'candidate');
+    writeFileSync(checklistFile, JSON.stringify({ items: [{ id: '01-001', name: 'Health',
+      rule: 'Responds', source: 'docs/plan/01-health/spec.feature:2' }] }));
+    const candidateSha256 = candidateDigest(candidateRoom);
+    const checklistSha256 = hash(readFileSync(checklistFile));
+    prepareGradingRoom({ sourceRoom, candidateRoom, checklistFile, schemaFile, out: gradingRoom,
+      candidateSha256, checklistSha256, schemaSha256: hash(readFileSync(schemaFile)),
+      project: 'hello', blindReview: false });
+    const dir = join(gradingRoom, 'work', 'allure-results');
+    mkdirSync(dir);
+    writeFileSync(join(gradingRoom, 'work', 'surprises.json'), '[]');
+    const uuid = randomUUID(), attachment = `${randomUUID()}-attachment.txt`;
+    writeFileSync(join(dir, attachment), 'HTTP 200\n');
+    const fullName = 'hello.health.01-001';
+    writeFileSync(join(dir, `${uuid}-result.json`), JSON.stringify({ uuid, fullName,
+      testCaseId: fullName, historyId: fullName, name: 'Health', status: 'passed',
+      stage: 'finished', statusDetails: { message: 'HTTP 200' }, start: 1, stop: 2,
+      labels: [{ name: 'lifecycle', value: 'pre-production' },
+        { name: 'tool', value: 'Pi grader' }, { name: 'technique', value: 'acceptance' },
+        { name: 'feature', value: 'Health' }, { name: 'story', value: 'Responds' },
+        { name: 'tag', value: '@item-01-001' }],
+      steps: [{ name: 'GET /health', status: 'passed', stage: 'finished' }],
+      attachments: [{ name: 'HTTP response', source: attachment, type: 'text/plain' }] }));
+    const judged = readAllureResults(gradingRoom);
+    const rows = [{ seq: 1, stage: 'grading-room', outcome: 'prepared',
+      candidate_sha256: candidateSha256, checklist_sha256: checklistSha256 },
+    { seq: 2, stage: 'grade', outcome: 'completed', allure_results_sha256: judged.allureSha256 }];
+    assert.deepEqual(projectReplayEvidence(scratch, rows).map((row) =>
+      [row.item, row.kind, row.after_seq]), [['01-001', 'grader-item', 2]]);
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
+});

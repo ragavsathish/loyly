@@ -20,6 +20,7 @@ function fixture() {
   { id: "01-011", name: "Usable refusal", rule: "Actionable refusal",
     source: "docs/plan/01-booking-core/spec.feature:3" }];
   writeFileSync(join(room, "checklist.json"), JSON.stringify({ items }));
+  writeFileSync(join(room, '.grading-room.json'), JSON.stringify({ schema: 'loyly.grading-room.v1' }));
   writeFileSync(join(room, "work", "surprises.json"), "[]");
   const make = (item, status) => {
     const uuid = randomUUID(), attachment = `${randomUUID()}-attachment.txt`;
@@ -72,6 +73,7 @@ test("Allure identity follows the selected product slice without a booking-core 
   writeFileSync(join(room, "checklist.json"), JSON.stringify({ items: [{ id: "02-001",
     name: "Release one week", rule: "Standing holding survives",
     source: "docs/plan/02-occurrence-release/spec.feature:2" }] }));
+  writeFileSync(join(room, '.grading-room.json'), JSON.stringify({ schema: 'loyly.grading-room.v1' }));
   writeFileSync(join(room, "work", "surprises.json"), "[]");
   const uuid = randomUUID(), attachment = `${randomUUID()}-attachment.txt`;
   writeFileSync(join(dir, attachment), "Observed release over HTTP\n");
@@ -88,6 +90,14 @@ test("Allure identity follows the selected product slice without a booking-core 
     steps: [{ name: "Observe release", status: "passed", stage: "finished" }],
     attachments: [{ name: "HTTP observation", source: attachment, type: "text/plain" }] };
   const resultPath = join(dir, `${uuid}-result.json`);
+  writeFileSync(resultPath, JSON.stringify(result));
+  assert.deepEqual(readAllureResults(room).verdicts.map((item) => item.verdict), ["pass"]);
+  writeFileSync(join(room, '.grading-room.json'), JSON.stringify({ schema: 'loyly.grading-room.v1',
+    project: 'hello', blindReview: false }));
+  const genericName = 'hello.occurrence-release.02-001';
+  result.fullName = genericName;
+  result.testCaseId = genericName;
+  result.historyId = genericName;
   writeFileSync(resultPath, JSON.stringify(result));
   assert.deepEqual(readAllureResults(room).verdicts.map((item) => item.verdict), ["pass"]);
   result.labels.find((label) => label.name === "feature").value = "Booking core";

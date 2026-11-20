@@ -14,7 +14,8 @@ export function validatePanelSelection(plan, checklist) {
   if (!Array.isArray(ids) || !ids.length || new Set(ids).size !== ids.length)
     throw new Error('panel selection needs a unique scored checklist');
   const selected = new Set(ids);
-  if (!selected.has('01-011'))
+  const legacy = plan.schema === 'loyly.grading-panel-plan.v1';
+  if (legacy && !selected.has('01-011'))
     throw new Error('current Pi blind handoff requires selected item 01-011');
   const checkIds = plan.checks.map((check) => check.id);
   if (new Set(checkIds).size !== checkIds.length)
@@ -25,11 +26,11 @@ export function validatePanelSelection(plan, checklist) {
       || rawIds.some((id) => !selected.has(id)))
     throw new Error('raw grader checks must exactly cover selected checklist items');
   if (raw.some((check) => check.items.some((id) =>
-    check.role !== (id === '01-011' ? 'handoff' : 'scored'))))
+    check.role !== (legacy && id === '01-011' ? 'handoff' : 'scored'))))
     throw new Error('raw grader roles differ from the selected blind handoff');
   const blind = plan.checks.filter((check) => check.source === 'blind-review');
-  if (blind.length !== 1 || blind[0].role !== 'scored'
-      || blind[0].items.length !== 1 || blind[0].items[0] !== '01-011')
+  if (legacy ? (blind.length !== 1 || blind[0].role !== 'scored'
+      || blind[0].items.length !== 1 || blind[0].items[0] !== '01-011') : blind.length !== 0)
     throw new Error('panel needs one scored blind review for 01-011');
   const specialists = specialistWorkers(plan);
   if (plan.checks.some((check) => check.source === 'specialist'

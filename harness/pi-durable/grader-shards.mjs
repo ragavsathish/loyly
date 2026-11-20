@@ -35,7 +35,7 @@ export function partitionByRule(items, count) {
 }
 
 export function prepareShards({ gradingRoom, sourceRoom, scratch, schemaFile, candidateSha256,
-  schemaSha256, count }) {
+  schemaSha256, count, project = 'loyly', blindReview = project === 'loyly' }) {
   const full = JSON.parse(readFileSync(join(gradingRoom, "checklist.json"), "utf8"));
   const partitions = partitionByRule(full.items, count);
   return partitions.map(({ id, items }) => {
@@ -49,7 +49,7 @@ export function prepareShards({ gradingRoom, sourceRoom, scratch, schemaFile, ca
     writeFileSync(checklistFile, bytes);
     const checklistSha256 = hash(bytes);
     const args = { sourceRoom, candidateRoom: gradingRoom, checklistFile, schemaFile, out,
-      candidateSha256, checklistSha256, schemaSha256 };
+      candidateSha256, checklistSha256, schemaSha256, project, blindReview };
     if (existsSync(out)) verifyGradingRoom(args);
     else prepareGradingRoom(args);
     return { id, items: items.map((item) => item.id), out, checklistSha256, args };
@@ -73,7 +73,9 @@ export function combineShards({ gradingRoom, shards, candidateSha256, schemaSha2
   const surprises = [];
   for (const shard of shards) {
     verifyGradingRoom({ out: shard.out, candidateSha256,
-      checklistSha256: shard.checklistSha256, schemaSha256 });
+      checklistSha256: shard.checklistSha256, schemaSha256,
+      project: JSON.parse(readFileSync(join(gradingRoom, '.grading-room.json'))).project ?? 'loyly',
+      blindReview: JSON.parse(readFileSync(join(gradingRoom, '.grading-room.json'))).blindReview ?? true });
     const judged = readAllureResults(shard.out);
     if (judged.verdicts.length !== shard.items.length) throw new Error(`incomplete ${shard.id}`);
     const source = join(shard.out, "work", "allure-results");

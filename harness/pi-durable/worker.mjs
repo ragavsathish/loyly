@@ -19,6 +19,7 @@ import { runBlindAgent } from "./blind-agent-adapter.mjs";
 import { bindScoreInput, verifyScoredCycle } from "./score-receipt.mjs";
 import { MAX_CONTINUATIONS, continuationPrompt, selectedUncarried } from "./continuation.mjs";
 import { runDurablePanel, runDurablePanelReport } from "./panel-adapter.mjs";
+import { createLifecycle } from "./lifecycle.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../..");
@@ -75,6 +76,7 @@ const builder = live ? {
   commandSha256: process.env.LOYLY_BUILDER_COMMAND_SHA256,
   imageSha256: process.env.LOYLY_BUILDER_IMAGE_SHA256,
   instructionSha256: process.env.LOYLY_BUILDER_INSTRUCTION_SHA256,
+  instructionFile: process.env.LOYLY_BUILDER_INSTRUCTION_FILE ?? "builder-instruction.md",
 } : null;
 if (live && (!approvedCommit || !process.env.LOYLY_BUILDER_IMAGE || !builder.model
     || [builder.commandSha256, builder.imageSha256, builder.instructionSha256]
@@ -110,7 +112,11 @@ const blindAgent = live && process.env.LOYLY_BLIND_AGENT_MODEL ? {
   imageSha256: process.env.LOYLY_BLIND_AGENT_IMAGE_SHA256,
   settingsSha256: process.env.LOYLY_BLIND_AGENT_SETTINGS_SHA256,
   instructionSha256: process.env.LOYLY_BLIND_AGENT_INSTRUCTION_SHA256,
+  instructionFile: process.env.LOYLY_BLIND_AGENT_INSTRUCTION_FILE ?? "blind-agent-instruction.md",
 } : null;
+const blindRequired = live && process.env.LOYLY_BLIND_REQUIRED !== "0";
+const project = process.env.HARNESS_PROJECT_ID ?? 'loyly';
+if (!/^[a-z][a-z0-9-]*$/.test(project)) throw new Error('invalid harness project');
 if (blindAgent && [blindAgent.commandSha256, blindAgent.imageSha256,
   blindAgent.settingsSha256, blindAgent.instructionSha256]
   .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? "")))
@@ -128,6 +134,8 @@ if (panel && [panel.planSha256, panel.imageSha256]
   throw new Error("grading panel needs approved plan and image manifest digests");
 if (panel && !/^[a-z][a-z0-9-]*\.panel\.json$/.test(panel.planFile))
   throw new Error("grading panel plan file must be a local named plan");
+const lifecycle = createLifecycle({ assessments: live
+  ? [...(blindRequired ? ["blind-review"] : []), ...(panel ? ["panel"] : [])] : [] });
 mkdirSync(scratch, { recursive: true });
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -444,10 +452,11 @@ const Grade = defineTask({
               || attachedSchemaSha256 !== grader.schemaSha256)
             throw new Error("grader instruction, command, image, settings or schema differs from approved digest");
           verifyGradingRoom({ out: gradingRoom, candidateSha256: task.input.candidateSha256,
-            checklistSha256: approvedChecklistSha256, schemaSha256: grader.schemaSha256 });
+            checklistSha256: approvedChecklistSha256, schemaSha256: grader.schemaSha256,
+            project, blindReview: blindRequired });
           const shards = prepareShards({ gradingRoom, sourceRoom: room, scratch, schemaFile,
             candidateSha256: task.input.candidateSha256, schemaSha256: grader.schemaSha256,
-            count: graderShardCount });
+            count: graderShardCount, project, blindReview: blindRequired });
           const launches = await Promise.allSettled(shards.map((shard) => runBuilder({
             command: grader.command, room: shard.out, instruction,
             image: grader.image, evidenceDir: join(scratch, "grader-evidence", shard.id),
@@ -463,7 +472,8 @@ const Grade = defineTask({
             : launch.value.exit !== 0 ? [`${shards[i].id}: exit ${launch.value.exit}`] : []);
           if (failures.length) throw new Error(`grader shards failed: ${failures.join("; ")}`);
           verifyGradingRoom({ out: gradingRoom, candidateSha256: task.input.candidateSha256,
-            checklistSha256: approvedChecklistSha256, schemaSha256: grader.schemaSha256 });
+            checklistSha256: approvedChecklistSha256, schemaSha256: grader.schemaSha256,
+            project, blindReview: blindRequired });
           judged = combineShards({ gradingRoom, shards, candidateSha256: task.input.candidateSha256,
             schemaSha256: grader.schemaSha256 });
           shardReceipts = shards.map((shard, i) => ({ id: shard.id, items: shard.items,
@@ -610,8 +620,8 @@ const Cycle = defineTask({
     render: async (task, runtime) => {
       // The original harness has no prompt renderer. Record the exact legacy
       // README and plan the fixture builder would receive, without inventing a v2 tool.
-      const plan = readFileSync(join(sourceRoot, "docs", "plan", "01-booking-core", "spec.feature"), "utf8");
-      const instruction = live ? readFileSync(join(HERE, "builder-instruction.md"), "utf8")
+      const plan = live ? null : readFileSync(join(sourceRoot, "docs", "plan", "01-booking-core", "spec.feature"), "utf8");
+      const instruction = live ? readFileSync(join(HERE, builder.instructionFile), "utf8")
         : `${readFileSync(join(sourceRoot, "harness", "README.md"), "utf8")}\n\n${plan}`;
       const commandSha256 = live && existsSync(builder.command) ? hash(readFileSync(builder.command)) : null;
       const manifest = live ? join(builder.image, "manifest.json") : null;
@@ -641,25 +651,24 @@ const Cycle = defineTask({
       const { attempt, builder } = task.state.checkpoint;
       const [outcome] = await runtime.outcomes([builder], ctx);
       await runtime.commit(async (tx) => {
-        if (outcome?.status !== "completed") {
-          if (outcome?.result?.retryable && attempt < 3) {
-            await audit(tx, task, "retry", "scheduled", { attempt: attempt + 1,
-              previous_builder_log: outcome.result.failureLog,
-              previous_builder_log_sha256: outcome.result.failureSha256,
+        const decision = lifecycle.afterBuild(attempt, outcome);
+        if (decision.retry === "builder") {
+            await audit(tx, task, "retry", "scheduled", { attempt: decision.attempt,
+              previous_builder_log: decision.failureLog,
+              previous_builder_log_sha256: decision.failureSha256,
               fork_from: builderReceipt(attempt) });
-            return { status: "running", checkpoint: { phase: "build", attempt: attempt + 1,
-              previousFailureLog: outcome.result.failureLog,
-              previousFailureSha256: outcome.result.failureSha256,
+            return { status: "running", checkpoint: { phase: "build", attempt: decision.attempt,
+              previousFailureLog: decision.failureLog,
+              previousFailureSha256: decision.failureSha256,
               previousFailureKind: "builder" } };
-          }
-          if (outcome?.result?.retryable && attempt === 3) {
-            await audit(tx, task, "cycle", "failed", { reason: "builder-attempts-exhausted", attempt });
+        }
+        if (decision.terminal) {
+          await audit(tx, task, "cycle", "failed", { reason: decision.reason, attempt });
+          if (decision.exhausted)
             return { status: "terminal", outcome: { status: "completed", result: { passed: false, attempts: attempt } } };
-          }
-          await audit(tx, task, "cycle", "failed", { reason: "builder-attempt-failed", attempt });
           return { status: "terminal", outcome: { status: "failed", error: "build" } };
         }
-        return { status: "running", checkpoint: { phase: "gate", attempt } };
+        return { status: "running", checkpoint: { phase: decision.phase, attempt } };
       }, ctx);
     },
     gate: async (task, runtime) => runtime.commit(async (tx) => {
@@ -671,22 +680,23 @@ const Cycle = defineTask({
       const { attempt, gate } = task.state.checkpoint;
       const [outcome] = await runtime.outcomes([gate], ctx);
       await runtime.commit(async (tx) => {
-        if (outcome?.status !== "completed") {
-          await audit(tx, task, "cycle", "failed", { reason: "gate-effect-failed", attempt });
+        const decision = lifecycle.afterGate(attempt, outcome);
+        if (decision.reason === "gate-effect-failed") {
+          await audit(tx, task, "cycle", "failed", { reason: decision.reason, attempt });
           return { status: "terminal", outcome: { status: "failed", error: "gate" } };
         }
-        const result = outcome.result;
-        if (result.passed) {
-          return { status: "running", checkpoint: { phase: "grading-room", attempt,
-            candidateSha256: result.candidateSha256 } };
+        if (decision.phase === "grading-room") {
+          return { status: "running", checkpoint: { phase: decision.phase, attempt,
+            candidateSha256: decision.candidateSha256 } };
         }
-        if (attempt < 3) {
-          await audit(tx, task, "retry", "scheduled", { attempt: attempt + 1, previous_gate_log: result.log });
-          return { status: "running", checkpoint: { phase: "build", attempt: attempt + 1,
-            previousFailureLog: result.log, previousFailureSha256: result.logSha256,
+        if (decision.retry === "gate") {
+          await audit(tx, task, "retry", "scheduled", { attempt: decision.attempt,
+            previous_gate_log: decision.failureLog });
+          return { status: "running", checkpoint: { phase: "build", attempt: decision.attempt,
+            previousFailureLog: decision.failureLog, previousFailureSha256: decision.failureSha256,
             previousFailureKind: "gate" } };
         }
-        await audit(tx, task, "cycle", "failed", { reason: "gate-attempts-exhausted", attempt });
+        await audit(tx, task, "cycle", "failed", { reason: decision.reason, attempt });
         return { status: "terminal", outcome: { status: "completed", result: { passed: false, attempts: attempt } } };
       }, ctx);
     },
@@ -696,7 +706,8 @@ const Cycle = defineTask({
         const checklistFile = join(scratch, "checklist.json");
         const args = { sourceRoom: room, candidateRoom: room, checklistFile, schemaFile,
           out: gradingRoom, candidateSha256, checklistSha256: approvedChecklistSha256,
-          schemaSha256: grader?.schemaSha256 ?? attachedSchemaSha256 };
+          schemaSha256: grader?.schemaSha256 ?? attachedSchemaSha256,
+          project, blindReview: blindRequired };
         let reason;
         try {
           if (existsSync(gradingRoom)) verifyGradingRoom(args);
@@ -747,11 +758,12 @@ const Cycle = defineTask({
     "after-grade": async (task, runtime) => {
       const [outcome] = await runtime.outcomes([task.state.checkpoint.grader], ctx);
       await runtime.commit(async (tx) => {
-        if (outcome?.status !== "completed") {
-          await audit(tx, task, "cycle", "failed", { reason: "grader-effect-or-verdict" });
+        const decision = lifecycle.afterGrade(outcome);
+        if (decision.terminal) {
+          await audit(tx, task, "cycle", "failed", { reason: decision.reason });
           return { status: "terminal", outcome: { status: "failed", error: "grade" } };
         }
-        return { status: "running", checkpoint: { phase: live ? "blind-review" : "score",
+        return { status: "running", checkpoint: { phase: decision.phase,
           attempt: task.state.checkpoint.attempt } };
       }, ctx);
     },
@@ -768,7 +780,7 @@ const Cycle = defineTask({
         if (blindAgent) {
           agentLaunch = await runBlindAgent({ packetDir, gradingRoom,
             room: join(scratch, "blind-agent-room"),
-            instruction: join(HERE, "blind-agent-instruction.md"),
+            instruction: join(HERE, blindAgent.instructionFile),
             command: blindAgent.command, image: blindAgent.image,
             settings: blindAgent.settings, model: blindAgent.model,
             evidenceDir: join(scratch, "blind-agent-evidence"),
@@ -837,7 +849,7 @@ const Cycle = defineTask({
           agent_reconciled: agentLaunch?.reconciled ?? false,
           final_verdicts_sha256: projected ? hash(readFileSync(join(scratch, "final-verdicts.json"))) : null,
           reason_code: reason ? "blind-agent-evidence" : null });
-        return projected ? { status: "running", checkpoint: { phase: panel ? "panel" : "score",
+        return projected ? { status: "running", checkpoint: { phase: lifecycle.afterAssessment("blind-review", true).phase,
           attempt: task.state.checkpoint.attempt } }
           : { status: "terminal", outcome: { status: "failed", error: "blind-review" } };
       }, ctx);
@@ -856,18 +868,19 @@ const Cycle = defineTask({
           await audit(tx, task, "cycle", "failed", { reason: "panel-vm-effect" });
           return { status: "terminal", outcome: { status: "failed", error: "panel" } };
         }
-        return { status: "running", checkpoint: { phase: "score",
+        return { status: "running", checkpoint: { phase: lifecycle.afterAssessment("panel", true).phase,
           attempt: task.state.checkpoint.attempt } };
       }, ctx);
     },
     score: async (task, runtime) => {
-      const verdictsFile = join(scratch, live ? "final-verdicts.json" : "verdicts.json");
+      const verdictsFile = join(scratch, blindRequired ? "final-verdicts.json" : "verdicts.json");
       let r, board, scoreReceipt, scoreInput, reason, reconciled = false;
       try {
         const candidateSha256 = candidateDigest(room);
-        if (live) {
+        if (live && blindRequired) {
           verifyGradingRoom({ out: gradingRoom, candidateSha256,
-            checklistSha256: approvedChecklistSha256, schemaSha256: grader.schemaSha256 });
+            checklistSha256: approvedChecklistSha256, schemaSha256: grader.schemaSha256,
+            project, blindReview: blindRequired });
           const reviewFile = join(scratch, "blind-agent-review.json");
           const review = JSON.parse(readFileSync(reviewFile, "utf8"));
           const projected = finalVerdictsFromBlindReview({ packetDir: join(scratch, "blind-agent-packet"),
@@ -909,7 +922,7 @@ const Cycle = defineTask({
       }
       const scored = scoreReceipt?.items ?? [];
       const score = scoreReceipt?.score ?? null;
-      const blindAgentReviewFailed = live && scored.some((item) => item.id === "01-011" && item.verdict === "fail");
+      const blindAgentReviewFailed = blindRequired && scored.some((item) => item.id === "01-011" && item.verdict === "fail");
       const attempt = task.state.checkpoint.attempt ?? 2;
       await runtime.commit(async (tx) => {
         await audit(tx, task, "score", reason ? "failed" : "filed", {
@@ -977,7 +990,9 @@ try {
   const cycleInput = { runId, approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder,
     ...(process.env.LOYLY_SOURCE_REPO ? { approvedSourceRepo } : {}),
     ...(scoreCycle !== "02" ? { scoreCycle } : {}),
-    grader, blindAgent, panel, graderShardCount: live ? graderShardCount : null };
+    grader, blindAgent, ...(process.env.HARNESS_PROJECT_ID ? { project } : {}),
+    ...(live && !blindRequired ? { blindRequired: false } : {}),
+    panel, graderShardCount: live ? graderShardCount : null };
   if (id && JSON.stringify(existing.items[0].input) !== JSON.stringify(cycleInput))
     throw new Error("this Pi store belongs to a different approved cut, checklist or mode");
   if (!id) id = await harness.commit((tx) => tx.createTask(Cycle, cycleInput,

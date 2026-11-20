@@ -7,6 +7,7 @@ import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { validatePanelSelection } from './panel-selection.mjs';
+import { specialistWorkers } from './panel-vm-run.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
@@ -59,10 +60,12 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
   const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(join(HERE, 'live-run.schema.json'))));
   if (!validate(config)) throw Error(`live run schema: ${JSON.stringify(validate.errors)}`);
   const javaHome = process.env.JAVA_HOME;
-  if (!javaHome) throw Error('JAVA_HOME must point to Java 21');
-  const java = spawnSync(join(javaHome, 'bin', 'java'), ['-version'], { encoding: 'utf8' });
-  if (java.status !== 0 || !/version "21(?:\.|\")/.test(`${java.stdout}${java.stderr}`))
-    throw Error('live run requires Java 21');
+  if (config.schema === 'loyly.pi-live-run.v1' || config.runtime?.java21) {
+    if (!javaHome) throw Error('JAVA_HOME must point to Java 21');
+    const java = spawnSync(join(javaHome, 'bin', 'java'), ['-version'], { encoding: 'utf8' });
+    if (java.status !== 0 || !/version "21(?:\.|\")/.test(`${java.stdout}${java.stderr}`))
+      throw Error('live run requires Java 21');
+  }
   const source = resolve(config.source.repo), scratch = resolve(config.scratch);
   if (source === ROOT || scratch === source || scratch.startsWith(`${source}/`))
     throw Error('source, controller and output must be separate');
@@ -74,12 +77,13 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
       || git(ROOT, 'status', '--porcelain') || git(source, 'status', '--porcelain'))
     throw Error('controller or source is dirty or differs from the approved commit');
   verifySelectedSpecs(source, config.source);
-  if (config.builder.instruction_file || config.blind.instruction_file)
-    throw Error('only the grader selects a separate instruction file');
+  if (config.schema === 'loyly.pi-live-run.v1'
+      && (config.builder.instruction_file || config.blind?.instruction_file))
+    throw Error('only the grader selects a separate instruction file in v1');
   const agents = [
-    [config.builder, 'builder-instruction.md'],
+    [config.builder, config.builder.instruction_file ?? 'builder-instruction.md'],
     [config.grader, config.grader.instruction_file ?? 'grader-instruction-01.md'],
-    [config.blind, 'blind-agent-instruction.md'],
+    ...(config.blind ? [[config.blind, config.blind.instruction_file ?? 'blind-agent-instruction.md']] : []),
   ];
   const checkedImages = new Set();
   for (const [agent, instruction] of agents) {
@@ -95,8 +99,10 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
   if (config.builder.model === config.grader.model)
     throw Error('builder and black-box grader must use different models');
   requireHash(join(HERE, 'allure-lifecycle-result.schema.json'), config.grader.schema_sha256);
-  requireHash(join(HERE, config.panel.plan_file ?? 'booking-core.panel.json'), config.panel.plan_sha256);
-  verifyImage(config.panel.image, config.panel.image_sha256);
+  if (config.panel) {
+    requireHash(join(HERE, config.panel.plan_file ?? 'booking-core.panel.json'), config.panel.plan_sha256);
+    verifyImage(config.panel.image, config.panel.image_sha256);
+  }
   if (!makeChecklist) return { source, scratch };
   mkdirSync(scratch, { recursive: true });
   const checklist = join(scratch, 'approved-checklist.json');
@@ -107,9 +113,20 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
   }
   requireHash(checklist, config.source.checklist_sha256);
   const selectedChecklist = JSON.parse(readFileSync(checklist, 'utf8'));
+  if (config.schema === 'harness.pi-live-run.v2' && config.project === 'loyly'
+      && selectedChecklist.items.some((item) => item.id === '01-011'))
+    throw Error('selected Löyly refusal item requires the v1 blind-review contract');
   verifySelectedSpecs(source, config.source, selectedChecklist);
-  validatePanelSelection(JSON.parse(readFileSync(join(HERE,
-    config.panel.plan_file ?? 'booking-core.panel.json'), 'utf8')), selectedChecklist);
+  if (config.panel) {
+    const panelPlan = JSON.parse(readFileSync(join(HERE,
+      config.panel.plan_file ?? 'booking-core.panel.json'), 'utf8'));
+    if (config.schema === 'harness.pi-live-run.v2'
+        && (panelPlan.schema !== 'harness.grading-panel-plan.v2'
+          || panelPlan.project !== config.project))
+      throw Error('panel plan project differs from the live contract');
+    validatePanelSelection(panelPlan, selectedChecklist);
+    specialistWorkers(panelPlan); // Verify the approved project's worker bundle before building.
+  }
   return { source, scratch };
 }
 
@@ -120,8 +137,12 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const { source, scratch } = checkLiveRun(config);
   console.log('pinned cycle contract verified');
   if (process.argv[2] === '--run') {
-    const env = { ...process.env, PATH: `${process.env.JAVA_HOME}/bin:${process.env.PATH}`,
+    const inherited = Object.fromEntries(Object.entries(process.env)
+      .filter(([name]) => !name.startsWith('LOYLY_') && name !== 'HARNESS_PROJECT_ID'));
+    const env = { ...inherited, PATH: process.env.JAVA_HOME
+      ? `${process.env.JAVA_HOME}/bin:${process.env.PATH}` : process.env.PATH,
       LOYLY_RUN_ID: config.run_id,
+      ...(config.project ? { HARNESS_PROJECT_ID: config.project } : {}),
       LOYLY_SCORE_CYCLE: config.score_cycle ?? '02',
       LOYLY_SOURCE_REPO: source,
       LOYLY_APPROVED_COMMIT: config.source.commit,
@@ -132,6 +153,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       LOYLY_BUILDER_IMAGE_SHA256: config.builder.image_sha256,
       LOYLY_BUILDER_MODEL: config.builder.model,
       LOYLY_BUILDER_INSTRUCTION_SHA256: config.builder.instruction_sha256,
+      LOYLY_BUILDER_INSTRUCTION_FILE: config.builder.instruction_file ?? 'builder-instruction.md',
       LOYLY_GRADER_COMMAND: config.grader.command,
       LOYLY_GRADER_COMMAND_SHA256: config.grader.command_sha256,
       LOYLY_GRADER_IMAGE: config.grader.image,
@@ -143,18 +165,25 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       LOYLY_GRADER_INSTRUCTION_FILE: config.grader.instruction_file ?? 'grader-instruction-01.md',
       LOYLY_GRADER_SCHEMA_SHA256: config.grader.schema_sha256,
       LOYLY_GRADER_SHARDS: String(config.grader.shards),
-      LOYLY_BLIND_AGENT_COMMAND: config.blind.command,
-      LOYLY_BLIND_AGENT_COMMAND_SHA256: config.blind.command_sha256,
-      LOYLY_BLIND_AGENT_IMAGE: config.blind.image,
-      LOYLY_BLIND_AGENT_IMAGE_SHA256: config.blind.image_sha256,
-      LOYLY_BLIND_AGENT_MODEL: config.blind.model,
-      LOYLY_BLIND_AGENT_SETTINGS: config.blind.settings,
-      LOYLY_BLIND_AGENT_SETTINGS_SHA256: config.blind.settings_sha256,
-      LOYLY_BLIND_AGENT_INSTRUCTION_SHA256: config.blind.instruction_sha256,
-      LOYLY_PANEL_REQUIRED: '1', LOYLY_PANEL_IMAGE: config.panel.image,
-      LOYLY_PANEL_IMAGE_SHA256: config.panel.image_sha256,
-      LOYLY_PANEL_PLAN_SHA256: config.panel.plan_sha256,
-      LOYLY_PANEL_PLAN_FILE: config.panel.plan_file ?? 'booking-core.panel.json',
+      LOYLY_BLIND_REQUIRED: config.schema === 'loyly.pi-live-run.v1' || config.blind ? '1' : '0',
+      ...(config.blind ? {
+        LOYLY_BLIND_AGENT_COMMAND: config.blind.command,
+        LOYLY_BLIND_AGENT_COMMAND_SHA256: config.blind.command_sha256,
+        LOYLY_BLIND_AGENT_IMAGE: config.blind.image,
+        LOYLY_BLIND_AGENT_IMAGE_SHA256: config.blind.image_sha256,
+        LOYLY_BLIND_AGENT_MODEL: config.blind.model,
+        LOYLY_BLIND_AGENT_SETTINGS: config.blind.settings,
+        LOYLY_BLIND_AGENT_SETTINGS_SHA256: config.blind.settings_sha256,
+        LOYLY_BLIND_AGENT_INSTRUCTION_SHA256: config.blind.instruction_sha256,
+        LOYLY_BLIND_AGENT_INSTRUCTION_FILE: config.blind.instruction_file ?? 'blind-agent-instruction.md',
+      } : {}),
+      LOYLY_PANEL_REQUIRED: config.schema === 'loyly.pi-live-run.v1' ? '1' : '0',
+      ...(config.panel ? {
+        LOYLY_PANEL_IMAGE: config.panel.image,
+        LOYLY_PANEL_IMAGE_SHA256: config.panel.image_sha256,
+        LOYLY_PANEL_PLAN_SHA256: config.panel.plan_sha256,
+        LOYLY_PANEL_PLAN_FILE: config.panel.plan_file ?? 'booking-core.panel.json',
+      } : {}),
     };
     const result = spawnSync(process.execPath, [join(HERE, 'worker.mjs'), scratch, 'live'],
       { cwd: HERE, env, stdio: 'inherit' });

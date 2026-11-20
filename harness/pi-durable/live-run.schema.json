@@ -1,10 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Pinned Löyly Pi live cycle",
+  "title": "Pinned Pi live cycle",
   "type": "object", "additionalProperties": false,
-  "required": ["schema", "run_id", "controller_commit", "source", "scratch", "builder", "grader", "blind", "panel"],
+  "required": ["schema", "run_id", "controller_commit", "source", "scratch", "builder", "grader"],
   "properties": {
-    "schema": { "const": "loyly.pi-live-run.v1" },
+    "schema": { "enum": ["loyly.pi-live-run.v1", "harness.pi-live-run.v2"] },
+    "project": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "runtime": { "type": "object", "additionalProperties": false,
+      "properties": { "java21": { "type": "boolean" } } },
     "run_id": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
     "score_cycle": { "type": "string", "pattern": "^[0-9]{2}$" },
     "controller_commit": { "$ref": "#/$defs/commit" },
@@ -36,6 +39,9 @@
         "plan_file": { "type": "string", "pattern": "^[a-z][a-z0-9-]*\\.panel\\.json$" },
         "image_sha256": { "$ref": "#/$defs/sha" }, "plan_sha256": { "$ref": "#/$defs/sha" } } }
   },
+  "allOf": [{ "if": { "properties": { "schema": { "const": "loyly.pi-live-run.v1" } } },
+    "then": { "required": ["blind", "panel"], "not": { "required": ["project"] } },
+    "else": { "required": ["project"], "not": { "required": ["blind"] } } }],
   "$defs": {
     "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
     "sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" },

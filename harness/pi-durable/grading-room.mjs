@@ -37,7 +37,9 @@ function selectedPlans(checklistFile) {
   return [...plans];
 }
 export function prepareGradingRoom({ sourceRoom, candidateRoom, checklistFile, schemaFile, out,
-  candidateSha256, checklistSha256, schemaSha256 }) {
+  candidateSha256, checklistSha256, schemaSha256, project = 'loyly',
+  blindReview = project === 'loyly' }) {
+  if (!/^[a-z][a-z0-9-]*$/.test(project)) throw new Error('invalid grading project');
   for (const path of [sourceRoom, candidateRoom, checklistFile, schemaFile, out])
     if (!isAbsolute(path)) throw new Error(`grading path must be absolute: ${path}`);
   if ([candidateSha256, checklistSha256, schemaSha256]
@@ -67,15 +69,19 @@ export function prepareGradingRoom({ sourceRoom, candidateRoom, checklistFile, s
   const receipt = { schema: "loyly.grading-room.v1", candidateSha256, checklistSha256,
     schemaSha256, planSha256: planDigest(out),
     sourcePlan: plans.length === 1 ? `plan/${plans[0]}` : null,
-    sourcePlans: plans.map((plan) => `plan/${plan}`) };
+    sourcePlans: plans.map((plan) => `plan/${plan}`),
+    ...(project === 'loyly' && blindReview ? {} : { project, blindReview }) };
   writeFileSync(join(out, ".grading-room.json"), JSON.stringify(receipt));
   return receipt;
 }
-export function verifyGradingRoom({ out, candidateSha256, checklistSha256, schemaSha256 }) {
+export function verifyGradingRoom({ out, candidateSha256, checklistSha256, schemaSha256,
+  project = 'loyly', blindReview = project === 'loyly' }) {
   const receipt = JSON.parse(readFileSync(join(out, ".grading-room.json"), "utf8"));
   const expectedPlans = selectedPlans(join(out, "checklist.json")).map((plan) => `plan/${plan}`);
   const recordedPlans = receipt.sourcePlans ?? (receipt.sourcePlan ? [receipt.sourcePlan] : []);
-  if (receipt.schema !== "loyly.grading-room.v1" || receipt.candidateSha256 !== candidateSha256
+  if (receipt.schema !== "loyly.grading-room.v1" || (receipt.project ?? 'loyly') !== project
+      || (receipt.blindReview ?? true) !== blindReview
+      || receipt.candidateSha256 !== candidateSha256
       || receipt.checklistSha256 !== checklistSha256
       || receipt.schemaSha256 !== schemaSha256
       || JSON.stringify(recordedPlans) !== JSON.stringify(expectedPlans)

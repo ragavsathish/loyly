@@ -61,3 +61,22 @@ test('live contract accepts the old single-spec cut and a pinned multi-slice cut
   config.source.spec_file = 'docs/plan/01-booking-core/spec.feature';
   assert.equal(validate(config), false);
 });
+
+test('general live contract can grade without a blind handoff, panel or JVM requirement', () => {
+  const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(
+    new URL('../live-run.schema.json', import.meta.url))));
+  const digest = 'a'.repeat(64), commit = 'b'.repeat(40);
+  const agent = { command: '/agent', command_sha256: digest, image: '/image',
+    image_sha256: digest, model: 'test/builder', instruction_sha256: digest,
+    instruction_file: 'hello-builder.md' };
+  const config = { schema: 'harness.pi-live-run.v2', project: 'hello', run_id: 'hello-cycle-1',
+    controller_commit: commit, runtime: { java21: false },
+    source: { repo: '/source', commit, checklist_sha256: digest,
+      spec_file: 'docs/plan/01-health/spec.feature', spec_sha256: digest },
+    scratch: '/scratch', builder: agent,
+    grader: { ...agent, model: 'test/grader', settings: '/settings',
+      settings_sha256: digest, schema_sha256: digest, shards: 2 } };
+  assert.equal(validate(config), true, JSON.stringify(validate.errors));
+  config.schema = 'loyly.pi-live-run.v1';
+  assert.equal(validate(config), false);
+});

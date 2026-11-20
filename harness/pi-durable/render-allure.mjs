@@ -1,5 +1,5 @@
-// Render a scored cycle with the official Allure CLI. The raw grader result for
-// 01-011 stays pending; the blind subagent's result is a separate test case.
+// Render a scored cycle with the official Allure CLI. Historical Löyly runs
+// add a separate blind-review case; direct-grade projects use raw results.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -19,35 +19,41 @@ export async function renderScoredAllure(scratch) {
   scratch = resolve(scratch);
   const instrument = join(scratch, "instrument");
   const gradingRoom = join(scratch, "grading-room");
-  const verdictsFile = join(scratch, "final-verdicts.json");
-  const reviewFile = join(scratch, "blind-agent-review.json");
+  const receipt = JSON.parse(readFileSync(join(gradingRoom, '.grading-room.json'), 'utf8'));
+  const blindRequired = receipt.blindReview ?? true;
+  const verdictsFile = join(scratch, blindRequired ? "final-verdicts.json" : "verdicts.json");
   const scoreInput = JSON.parse(readFileSync(join(scratch, "score-input.json"), "utf8"));
   if (candidateDigest(join(scratch, "fenced-room")) !== scoreInput.candidate_sha256)
     throw new Error("current candidate differs from the scored candidate");
   const score = verifyScoredCycle({ scratch, instrument, verdictsFile,
     cycle: scoreCycleFor(scratch) });
-  const review = JSON.parse(readFileSync(reviewFile, "utf8"));
-  const projected = finalVerdictsFromBlindReview({ packetDir: join(scratch, "blind-agent-packet"),
-    reviewFile, gradingRoom,
-    verificationDir: review.verdict === "pass" ? join(scratch, "blind-agent-verification") : undefined,
-    out: join(scratch, "blind-agent-allure") });
+  const raw = readAllureResults(gradingRoom);
+  let projected = { verdicts: raw.verdicts, rawAllureSha256: raw.allureSha256 };
+  let supplemental;
+  if (blindRequired) {
+    const reviewFile = join(scratch, "blind-agent-review.json");
+    const review = JSON.parse(readFileSync(reviewFile, "utf8"));
+    projected = finalVerdictsFromBlindReview({ packetDir: join(scratch, "blind-agent-packet"),
+      reviewFile, gradingRoom,
+      verificationDir: review.verdict === "pass" ? join(scratch, "blind-agent-verification") : undefined,
+      out: join(scratch, "blind-agent-allure") });
+    supplemental = readBlindAgentAllure({ packetDir: join(scratch, "blind-agent-packet"),
+      reviewFile, gradingRoom,
+      verificationDir: review.verdict === "pass" ? join(scratch, "blind-agent-verification") : undefined,
+      out: join(scratch, "blind-agent-allure") });
+    if (raw.allureSha256 !== projected.rawAllureSha256)
+      throw new Error("raw grader Allure changed after blind review");
+  }
   if (readFileSync(verdictsFile, "utf8") !== JSON.stringify(projected.verdicts))
     throw new Error("scored verdicts differ from the bound Allure projection");
-  const raw = readAllureResults(gradingRoom);
-  if (raw.allureSha256 !== projected.rawAllureSha256)
-    throw new Error("raw grader Allure changed after blind review");
-  const supplemental = readBlindAgentAllure({ packetDir: join(scratch, "blind-agent-packet"),
-    reviewFile, gradingRoom,
-    verificationDir: review.verdict === "pass" ? join(scratch, "blind-agent-verification") : undefined,
-    out: join(scratch, "blind-agent-allure") });
   const rows = await readAuditRows(scratch);
   const stage = (name, outcome) => rows.findLast((row) => row.stage === name && row.outcome === outcome);
   const cut = stage("cut", "pinned"), grade = stage("grade", "completed");
   const blind = stage("blind-review", "completed"), filed = stage("score", "filed");
   if (cut?.approved_commit !== scoreInput.source_commit
       || grade?.allure_results_sha256 !== projected.rawAllureSha256
-      || blind?.raw_allure_sha256 !== projected.rawAllureSha256
-      || blind?.review_sha256 !== projected.reviewSha256
+      || (blindRequired && blind?.raw_allure_sha256 !== projected.rawAllureSha256)
+      || (blindRequired && blind?.review_sha256 !== projected.reviewSha256)
       || filed?.score_file_sha256 !== score.scoreSha256
       || filed?.score_input_sha256 !== fileHash(join(scratch, "score-input.json"))
       || !stage("cycle", "measured"))
@@ -58,13 +64,13 @@ export async function renderScoredAllure(scratch) {
   const cli = join(HERE, "node_modules", ".bin", "allure");
   if (!existsSync(cli)) throw new Error("Allure CLI missing; run npm ci in the prototype");
   const rendered = spawnSync(cli, ["generate", join(gradingRoom, "work", "allure-results"),
-    join(scratch, "blind-agent-allure"), "--config", join(HERE, "allurerc.mjs"),
+    ...(blindRequired ? [join(scratch, "blind-agent-allure")] : []), "--config", join(HERE, "allurerc.mjs"),
     "--output", out, "--clean"], { cwd: HERE, encoding: "utf8" });
   if (rendered.error || rendered.status !== 0)
     throw new Error(`Allure render failed: ${rendered.error ?? rendered.stderr}`);
   const summary = JSON.parse(readFileSync(join(out, "summary.json"), "utf8"));
-  const expected = { total: score.items.length + 1 };
-  for (const result of [...raw.results, supplemental.result])
+  const expected = { total: score.items.length + (blindRequired ? 1 : 0) };
+  for (const result of [...raw.results, ...(supplemental ? [supplemental.result] : [])])
     expected[result.status] = (expected[result.status] ?? 0) + 1;
   for (const key of new Set([...Object.keys(expected), ...Object.keys(summary.stats)])) {
     if ((summary.stats[key] ?? 0) !== (expected[key] ?? 0))
@@ -77,9 +83,12 @@ export async function renderScoredAllure(scratch) {
     source_commit: scoreInput.source_commit,
     candidate_sha256: scoreInput.candidate_sha256, checklist_sha256: scoreInput.checklist_sha256,
     score_sha256: score.scoreSha256, score: score.score,
-    raw_allure_sha256: projected.rawAllureSha256, blind_review_sha256: projected.reviewSha256,
+    raw_allure_sha256: projected.rawAllureSha256,
+    ...(blindRequired ? { blind_review_sha256: projected.reviewSha256 } : {}),
     report_html_sha256: fileHash(report), result_count: expected.total,
-    note: "One raw pending 01-011 result plus one separate blind subagent result; the score has one final verdict per checklist item." };
+    note: blindRequired
+      ? "One raw pending 01-011 result plus one separate blind subagent result; the score has one final verdict per checklist item."
+      : "One direct grader result and one filed verdict per selected checklist item." };
   writeFileSync(join(out, "loyly-report-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
   return { out, report, manifest, stats: summary.stats };
 }

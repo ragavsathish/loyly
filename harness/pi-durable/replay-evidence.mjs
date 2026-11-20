@@ -1,5 +1,5 @@
 // Read-only Allure projection for the Pi audit page. These are evidence records,
-// not Pi events; only committed grade/blind-review entries can reveal them.
+// not Pi events; only committed grade, review and panel entries can reveal them.
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -42,7 +42,8 @@ export function projectReplayEvidence(dir, rows) {
   if (!prepared || !existsSync(gradingRoom)) throw new Error("committed grade has no bound grading room");
   const roomReceipt = JSON.parse(readFileSync(join(gradingRoom, ".grading-room.json"), "utf8"));
   verifyGradingRoom({ out: gradingRoom, candidateSha256: prepared.candidate_sha256,
-    checklistSha256: prepared.checklist_sha256, schemaSha256: roomReceipt.schemaSha256 });
+    checklistSha256: prepared.checklist_sha256, schemaSha256: roomReceipt.schemaSha256,
+    project: roomReceipt.project ?? 'loyly', blindReview: roomReceipt.blindReview ?? true });
   const judged = readAllureResults(gradingRoom);
   if (judged.allureSha256 !== grade.allure_results_sha256)
     throw new Error("Allure evidence differs from the committed grade digest");
@@ -54,19 +55,23 @@ export function projectReplayEvidence(dir, rows) {
     return summary(result, item.id, grade.seq, "grader-item", judged.allureSha256,
       join(gradingRoom, "work", "allure-results"));
   });
-  if (!blind) return raw;
-  if (blind.raw_allure_sha256 !== judged.allureSha256)
-    throw new Error("blind review audit differs from committed grade evidence");
-  const reviewFile = join(dir, "blind-agent-review.json");
-  const review = JSON.parse(readFileSync(reviewFile, "utf8"));
-  const supplemental = readBlindAgentAllure({ packetDir: join(dir, "blind-agent-packet"),
-    reviewFile, gradingRoom,
-    verificationDir: review.verdict === "pass" ? join(dir, "blind-agent-verification") : undefined,
-    out: join(dir, "blind-agent-allure") });
-  if (supplemental.reviewSha256 !== blind.review_sha256)
-    throw new Error("blind Allure evidence differs from the committed review digest");
-  const projected = [...raw, summary(supplemental.result, "01-011", blind.seq, "blind-review",
-    supplemental.reviewSha256, join(dir, "blind-agent-allure"))];
+  const projected = [...raw];
+  if (blind) {
+    if (blind.raw_allure_sha256 !== judged.allureSha256)
+      throw new Error("blind review audit differs from committed grade evidence");
+    const reviewFile = join(dir, "blind-agent-review.json");
+    const review = JSON.parse(readFileSync(reviewFile, "utf8"));
+    const supplemental = readBlindAgentAllure({ packetDir: join(dir, "blind-agent-packet"),
+      reviewFile, gradingRoom,
+      verificationDir: review.verdict === "pass" ? join(dir, "blind-agent-verification") : undefined,
+      out: join(dir, "blind-agent-allure") });
+    if (supplemental.reviewSha256 !== blind.review_sha256)
+      throw new Error("blind Allure evidence differs from the committed review digest");
+    projected.push(summary(supplemental.result, "01-011", blind.seq, "blind-review",
+      supplemental.reviewSha256, join(dir, "blind-agent-allure")));
+  } else if (roomReceipt.blindReview ?? true) {
+    return projected;
+  }
   const panel = rows.findLast((row) => row.stage === "panel" && row.outcome === "completed");
   if (!panel) return projected;
   const selected = JSON.parse(readFileSync(join(dir, "panel-vm", "selected.json"), "utf8"));

@@ -6,8 +6,14 @@
   "additionalProperties": false,
   "required": ["schema", "project", "feature", "checks"],
   "properties": {
-    "schema": { "const": "loyly.grading-panel-plan.v1" },
+    "schema": { "enum": ["loyly.grading-panel-plan.v1", "harness.grading-panel-plan.v2"] },
     "project": { "type": "string", "minLength": 1 },
+    "bundle": { "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^[a-z][a-z0-9/-]*$" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      } },
     "feature": { "type": "string", "minLength": 1 },
     "checks": {
       "type": "array", "minItems": 1,
@@ -19,7 +25,7 @@
           "source": { "enum": ["raw-grader", "blind-review", "specialist"] },
           "role": { "enum": ["scored", "handoff", "corroborating", "diagnostic"] },
           "tool": { "type": "string", "minLength": 1 },
-          "script": { "type": "string", "pattern": "^panel-[a-z][a-z0-9-]*\\.mjs$" },
+          "script": { "type": "string", "pattern": "^[a-z][a-z0-9-]*\\.mjs$" },
           "feature": { "type": "string", "minLength": 1 },
           "probe": { "type": "object", "additionalProperties": false,
             "required": ["method", "path", "expected_status"],
@@ -38,5 +44,10 @@
         }
       }
     }
-  }
+  },
+  "allOf": [{ "if": { "properties": { "schema": { "const": "harness.grading-panel-plan.v2" } } },
+    "then": { "required": ["bundle"], "properties": { "checks": { "items": {
+      "if": { "properties": { "source": { "const": "specialist" } } },
+      "then": { "required": ["script"] }
+    } } } } }]
 }

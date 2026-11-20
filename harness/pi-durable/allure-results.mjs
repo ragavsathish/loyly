@@ -8,14 +8,14 @@ const RESULT = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-
 // Preserve the old calibration room, while requiring the revised handoff in every new cut.
 const PERSON_SPEC_SHA256 = "b28ee83dfaada8df0ed99b90121a50f3c55885ade4db323b68e03c4d5f15005e";
 const labelValues = (result, name) => result.labels.filter((label) => label.name === name).map((label) => label.value);
-function identity(room, item) {
+function identity(room, item, project) {
   const source = /^docs\/plan\/(\d\d-([a-z][a-z0-9-]*))\/spec\.feature:\d+$/.exec(item.source ?? "");
   if (!source || source[1].slice(0, 2) !== item.id?.slice(0, 2))
     throw new Error(`Allure item has no matching numbered plan source: ${item.id ?? "unknown"}`);
   const spec = readFileSync(join(room, "plan", source[1], "spec.feature"), "utf8");
   const feature = /^Feature:\s*(.+?)\s*$/m.exec(spec)?.[1];
   if (!feature) throw new Error(`selected plan has no Feature title: ${source[1]}`);
-  return { fullName: `loyly.${source[2]}.${item.id}`, feature };
+  return { fullName: `${project}.${source[2]}.${item.id}`, feature };
 }
 
 export function readAllureResults(room) {
@@ -23,10 +23,14 @@ export function readAllureResults(room) {
   const validate = new Ajv2020({ strict: false }).compile(schema);
   const checklist = JSON.parse(readFileSync(join(room, "checklist.json"), "utf8"));
   const items = checklist.items;
+  const receipt = JSON.parse(readFileSync(join(room, '.grading-room.json'), 'utf8'));
+  const project = receipt.project ?? 'loyly';
+  const blindReview = receipt.blindReview ?? true;
+  if (!/^[a-z][a-z0-9-]*$/.test(project)) throw new Error('invalid grading project');
   if (!Array.isArray(items) || !items.length || new Set(items.map((item) => item.id)).size !== items.length)
     throw new Error("invalid grading checklist");
-  const identities = new Map(items.map((item) => [item.id, identity(room, item)]));
-  const specSha256 = items.some((item) => item.id === "01-011")
+  const identities = new Map(items.map((item) => [item.id, identity(room, item, project)]));
+  const specSha256 = blindReview && project === 'loyly' && items.some((item) => item.id === "01-011")
     ? createHash("sha256").update(readFileSync(join(room, "plan", "01-booking-core", "spec.feature"))).digest("hex")
     : null;
   const pendingPrefix = specSha256 === PERSON_SPEC_SHA256
@@ -66,7 +70,7 @@ export function readAllureResults(room) {
         throw new Error(`Allure attachment bytes missing for ${id}: ${attachment.source}`);
       expectedFiles.add(attachment.source);
     }
-    if (id === "01-011" && (result.status !== "skipped" || result.stage !== "pending"
+    if (blindReview && project === 'loyly' && id === "01-011" && (result.status !== "skipped" || result.stage !== "pending"
         || !result.statusDetails.message.startsWith(pendingPrefix)))
       throw new Error("01-011 needs a separate blind subagent review");
     byId.set(id, result);

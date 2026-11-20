@@ -36,6 +36,7 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   chmodSync(join(room, "impl", "start.sh"), 0o755);
   writeFileSync(join(room, "impl", "server.js"), 'require("http").createServer((req,res)=>{let body="";req.on("data",x=>body+=x);req.on("end",()=>{if(req.url==="/"){res.statusCode=200;res.end(`<form method="post" action="/request"><input name="household"><select name="resource"><option value="ph9">pukuhuone 9</option></select><select name="weekday"></select><select name="start"></select></form>`);return}res.statusCode=req.url==="/request"?(body.includes("Thursday")?201:409):404;res.end(String(res.statusCode))})}).listen(Number(process.argv[2]),"127.0.0.1")\n');
   cpSync(schema, join(room, "allure-lifecycle-result.schema.json"));
+  writeFileSync(join(room, '.grading-room.json'), JSON.stringify({ schema: 'loyly.grading-room.v1' }));
   writeFileSync(join(room, "checklist.json"), JSON.stringify({ items: [
     { id: "01-011", name: "The refusal for a closed day is judged usable",
       rule: "A refusal is judged by whether a resident can act on it without asking again",
