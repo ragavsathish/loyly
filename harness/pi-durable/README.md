@@ -35,9 +35,12 @@ directory, and the panel compiler checks the result against the pinned plan.
 The approved first-cut product selection has 47 stamped items across slices
 01 through 05. `whole-product.panel.json` assigns every selected item to one
 raw grader check and keeps the independent `01-011` blind handoff. It adds
-four parallel specialist VMs for browser, protocol, candidate-emitted Node
-OpenTelemetry and cross-runtime process profiling. The latter four still
+three parallel specialist VMs for browser, protocol and cross-runtime process
+profiling. These specialists still
 probe booking core; the raw grader shards cover every whole-product rule.
+The candidate-emitted Node OpenTelemetry worker remains in the historical
+booking-core calibration plan and is excluded here because the product spec
+permits a non-Node implementation.
 This expanded selection has not entered a scored cycle. The historical
 cycle-06 score remains an eleven-item booking-core result.
 

@@ -21,5 +21,5 @@ test('the approved whole-product panel covers the real five-slice checklist', ()
   assert.deepEqual(new Set(selected.selected.map((id) => id.slice(0, 2))),
     new Set(['01', '02', '03', '04', '05']));
   assert.deepEqual(selected.specialists,
-    ['browser', 'protocol', 'telemetry', 'runtime-profile']);
+    ['browser', 'protocol', 'runtime-profile']);
 });

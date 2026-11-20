@@ -1,14 +1,25 @@
 // Read-only Allure projection for the Pi audit page. These are evidence records,
 // not Pi events; only committed grade/blind-review entries can reveal them.
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { readAllureResults } from "./allure-results.mjs";
 import { readBlindAgentAllure } from "./blind-review.mjs";
 import { verifyGradingRoom } from "./grading-room.mjs";
 import { verifyPanelVmRun } from "./panel-vm-run.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+const here = fileURLToPath(new URL('.', import.meta.url));
+export function panelPlanForManifest(manifest) {
+  if (!/^[0-9a-f]{64}$/.test(manifest.plan_sha256 ?? ''))
+    throw new Error('panel manifest has no plan digest');
+  const matches = readdirSync(here).filter((name) => name.endsWith('.panel.json')
+    && hash(readFileSync(join(here, name))) === manifest.plan_sha256);
+  if (matches.length !== 1)
+    throw new Error('panel replay needs exactly one local plan matching the committed digest');
+  return join(here, matches[0]);
+}
 function summary(result, item, afterSeq, kind, sourceDigest, dir) {
   return { schema: "loyly.replay-evidence.v1", source: "Allure evidence projection",
     kind, after_seq: afterSeq, item, name: result.name, status: result.status,
@@ -60,7 +71,9 @@ export function projectReplayEvidence(dir, rows) {
   if (!panel) return projected;
   const selected = JSON.parse(readFileSync(join(dir, "panel-vm", "selected.json"), "utf8"));
   const out = join(dir, "panel-vm", `attempt-${String(selected.attempt).padStart(2, "0")}`);
-  const verified = verifyPanelVmRun({ original: dir, out });
+  const manifest = JSON.parse(readFileSync(join(out, "manifest.json"), "utf8"));
+  const verified = verifyPanelVmRun({ original: dir, out,
+    planFile: panelPlanForManifest(manifest) });
   if (selected.manifest_sha256 !== panel.manifest_sha256
       || hash(readFileSync(join(out, "manifest.json"))) !== panel.manifest_sha256)
     throw new Error("panel Allure evidence differs from committed Pi audit");

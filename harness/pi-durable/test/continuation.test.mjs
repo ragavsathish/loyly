@@ -30,6 +30,24 @@ test("uncarried selection names only approved item lines", () => {
   } finally { rmSync(scratch, { recursive: true, force: true }); }
 });
 
+test("whole-product continuation carries selected items beyond booking core", () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-whole-uncarried-"));
+  try {
+    const room = join(scratch, "room");
+    assert.equal(spawnSync("mkdir", ["-p", join(room, "impl")]).status, 0);
+    const checklist = join(scratch, "checklist.json");
+    writeFileSync(checklist, JSON.stringify({ items: [
+      { id: "01-011" }, { id: "02-005" }, { id: "03-014" },
+    ] }));
+    writeFileSync(join(room, "impl", "UNCARRIED.md"),
+      "- @item-02-005: resale\n* `@item-03-014`: notice\n- @item-04-001: unselected\n- @item-01-0110: malformed\n");
+    const ids = selectedUncarried(room, checklist);
+    assert.deepEqual(ids, ["02-005", "03-014"]);
+    assert.match(continuationPrompt(ids), /@item-02-005, @item-03-014/);
+    assert.throws(() => continuationPrompt(["06-1"]), /selected product item IDs/);
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
+});
+
 function fixtureEnv(scratch, mode = "carry", builderCommand) {
     const checklist = join(scratch, "approved-checklist.json");
     const generated = spawnSync("bb", ["harness/gen_checklist.clj", "--out", checklist],

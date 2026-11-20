@@ -80,20 +80,6 @@
       "feature": "Booking core"
     },
     {
-      "id": "telemetry",
-      "source": "specialist",
-      "role": "diagnostic",
-      "tool": "OpenTelemetry",
-      "technique": "tracing",
-      "items": [
-        "01-003"
-      ],
-      "criterion": "A bounded real booking emits candidate-bound spans and metrics tied to the confirmed record.",
-      "failure": "The probe cannot associate the observed telemetry with the candidate and booking request.",
-      "target_runtime": "gondolin-qemu-vm",
-      "feature": "Booking core"
-    },
-    {
       "id": "runtime-profile",
       "source": "specialist",
       "role": "diagnostic",

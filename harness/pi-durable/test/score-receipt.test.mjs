@@ -33,7 +33,8 @@ test("an existing legacy score is reconciled only against its original cut and v
     bindScoreInput({ scratch, sourceRoot: root, instrument,
       candidateSha256: "a".repeat(64), verdictsFile });
     run("bb", ["harness/score.clj", "02", "--verdicts", verdictsFile], instrument);
-    assert.equal(verifyScoredCycle({ scratch, instrument, verdictsFile }).score, "11/11");
+    assert.equal(verifyScoredCycle({ scratch, instrument, verdictsFile }).score,
+      `${checklist.items.length}/${checklist.items.length}`);
     const scoresFile = join(cycle, "scores.json");
     const originalScores = readFileSync(scoresFile);
     const tampered = JSON.parse(originalScores);
@@ -79,7 +80,8 @@ test("a filed score binds the selected pre-score panel manifest", () => {
       candidateSha256: "a".repeat(64), verdictsFile });
     assert.equal(bound.panel_manifest_sha256, digest);
     run("bb", ["harness/score.clj", "02", "--verdicts", verdictsFile], instrument);
-    assert.equal(verifyScoredCycle({ scratch, instrument, verdictsFile }).score, "11/11");
+    assert.equal(verifyScoredCycle({ scratch, instrument, verdictsFile }).score,
+      `${verdicts.length}/${verdicts.length}`);
     writeFileSync(manifest, '{"candidate":"changed"}');
     assert.throws(() => verifyScoredCycle({ scratch, instrument, verdictsFile }),
       /selected panel manifest changed/);
@@ -104,7 +106,8 @@ test("a later product cycle binds its own score directory", () => {
     assert.equal(input.score_cycle, "03");
     assert.equal(scoreCycleFor(scratch), "03");
     run("bb", ["harness/score.clj", "03", "--verdicts", verdictsFile], instrument);
-    assert.equal(verifyScoredCycle({ scratch, instrument, verdictsFile, cycle: "03" }).score, "11/11");
+    assert.equal(verifyScoredCycle({ scratch, instrument, verdictsFile, cycle: "03" }).score,
+      "47/47");
     assert.throws(() => verifyScoredCycle({ scratch, instrument, verdictsFile }),
       /scored cycle inputs differ/);
   } finally { rmSync(scratch, { recursive: true, force: true }); }

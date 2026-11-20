@@ -7,10 +7,17 @@ import { join } from "node:path";
 import { candidateDigest, prepareGradingRoom } from "../grading-room.mjs";
 import { readAllureResults } from "../allure-results.mjs";
 import { prepareBlindReview, writeBlindAgentAllure } from "../blind-review.mjs";
-import { projectReplayEvidence } from "../replay-evidence.mjs";
+import { panelPlanForManifest, projectReplayEvidence } from "../replay-evidence.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const schemaFile = new URL("../allure-lifecycle-result.schema.json", import.meta.url).pathname;
+
+test("replay selects the whole-product panel by its committed digest", () => {
+  const plan = new URL("../whole-product.panel.json", import.meta.url).pathname;
+  assert.equal(panelPlanForManifest({ plan_sha256: hash(readFileSync(plan)) }), plan);
+  assert.throws(() => panelPlanForManifest({ plan_sha256: "0".repeat(64) }),
+    /exactly one local plan/);
+});
 
 test("playback projects bound grader and blind Allure evidence without inventing Pi entries", () => {
   const scratch = mkdtempSync(join(tmpdir(), "loyly-replay-evidence-"));
