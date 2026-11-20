@@ -53,7 +53,11 @@ test('live contract accepts the old single-spec cut and a pinned multi-slice cut
   config.source.specs = [{ file: 'docs/plan/01-booking-core/spec.feature', sha256: digest },
     { file: 'docs/plan/02-occurrence-release/spec.feature', sha256: digest }];
   config.grader.instruction_file = 'grader-instruction-product.md';
+  config.panel.plan_file = 'whole-product.panel.json';
   assert.equal(validate(config), true, JSON.stringify(validate.errors));
+  config.panel.plan_file = '../outside.panel.json';
+  assert.equal(validate(config), false);
+  config.panel.plan_file = 'whole-product.panel.json';
   config.source.spec_file = 'docs/plan/01-booking-core/spec.feature';
   assert.equal(validate(config), false);
 });

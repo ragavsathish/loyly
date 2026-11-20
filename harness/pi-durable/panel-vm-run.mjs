@@ -94,7 +94,8 @@ async function runWorker(worker, image, candidate, out, candidateSha256, sourceF
     execution_receipt_sha256: hashes[receiptName], files: hashes };
 }
 
-export async function runPanelVms({ original, image, out }) {
+export async function runPanelVms({ original, image, out,
+  planFile = join(HERE, 'booking-core.panel.json') }) {
   original = resolve(original); image = resolve(image); out = resolve(out);
   if (existsSync(out)) throw new Error('panel VM output already exists');
   const scoreInput = runBinding(original);
@@ -109,7 +110,6 @@ export async function runPanelVms({ original, image, out }) {
   const imageDigest = `sha256:${fileSha(join(image, 'manifest.json'))}`;
   const schemaFile = join(HERE, 'allure-lifecycle-result.schema.json');
   const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, 'utf8')));
-  const planFile = join(HERE, 'booking-core.panel.json');
   const plan = JSON.parse(readFileSync(planFile, 'utf8'));
   const validatePlan = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(join(HERE, 'panel-plan.schema.json'), 'utf8')));
   if (!validatePlan(plan) || WORKERS.some((worker) => !plan.checks.some((check) =>
@@ -133,18 +133,19 @@ export async function runPanelVms({ original, image, out }) {
     parallel_overlap_ms: overlap, original_score_unchanged: true,
     score_state: scoreSha256 ? 'filed' : 'pre-score', producers };
   writeFileSync(join(out, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-  return verifyPanelVmRun({ original, out, imageDigest });
+  return verifyPanelVmRun({ original, out, imageDigest, planFile });
 }
 
 // Reopen a completed panel after a controller restart without launching VMs
 // again. A partial output is not a receipt and must be kept as failed evidence.
-export function verifyPanelVmRun({ original, out, imageDigest }) {
+export function verifyPanelVmRun({ original, out, imageDigest,
+  planFile = join(HERE, 'booking-core.panel.json') }) {
   original = resolve(original); out = resolve(out);
   const manifest = JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8'));
   const scoreInput = runBinding(original);
   const candidateSha256 = candidateDigest(join(original, 'fenced-room'));
   const scoreSha256 = scoreDigest(original);
-  const planSha256 = fileSha(join(HERE, 'booking-core.panel.json'));
+  const planSha256 = fileSha(planFile);
   const schemaFile = join(HERE, 'allure-lifecycle-result.schema.json');
   const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, 'utf8')));
   if (manifest.schema !== 'loyly.panel-vm-run.v1'

@@ -29,7 +29,7 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   mkdirSync(join(room, "impl"), { recursive: true });
   mkdirSync(join(room, "plan", "01-booking-core"), { recursive: true });
   const specFile = join(room, "plan", "01-booking-core", "spec.feature");
-  writeFileSync(specFile, "Scenario: The refusal for a closed day is judged usable\n");
+  writeFileSync(specFile, "Feature: Booking core\nScenario: The refusal for a closed day is judged usable\n");
   mkdirSync(join(room, "work", "shards", "shard-01"), { recursive: true });
   mkdirSync(results, { recursive: true });
   writeFileSync(join(room, "impl", "start.sh"), '#!/bin/sh\ncd "$(dirname "$0")"\nexec node server.js "$1"\n');
@@ -38,7 +38,8 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   cpSync(schema, join(room, "allure-lifecycle-result.schema.json"));
   writeFileSync(join(room, "checklist.json"), JSON.stringify({ items: [
     { id: "01-011", name: "The refusal for a closed day is judged usable",
-      rule: "A refusal is judged by whether a resident can act on it without asking again" }] }));
+      rule: "A refusal is judged by whether a resident can act on it without asking again",
+      source: "docs/plan/01-booking-core/spec.feature:1" }] }));
   writeFileSync(join(room, "work", "surprises.json"), "[]");
   writeFileSync(join(room, "work", "shards", "shard-01", "blind-review-011.txt"),
     "Try Thursday at 17:00 in pukuhuone 9.\n");
@@ -121,7 +122,7 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   assert.throws(() => validateBlindReview({ packetDir, reviewFile, gradingRoom: room }), /unbound/);
   review.packet_sha256 = JSON.parse(readFileSync(join(packetDir, "response-template.json"))).packet_sha256;
   writeFileSync(reviewFile, JSON.stringify(review));
-  writeFileSync(specFile, "Scenario: The refusal for a closed day is judged usable\n# changed wording\n");
+  writeFileSync(specFile, "Feature: Booking core\nScenario: The refusal for a closed day is judged usable\n# changed wording\n");
   assert.throws(() => validateBlindReview({ packetDir, reviewFile, gradingRoom: room }),
     /packet no longer matches/);
   writeFileSync(join(room, "work", "shards", "shard-01", "blind-review-011.txt"), "Different refusal\n");

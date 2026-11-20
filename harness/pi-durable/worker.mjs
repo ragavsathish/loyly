@@ -117,6 +117,7 @@ if (blindAgent && [blindAgent.commandSha256, blindAgent.imageSha256,
   throw new Error("blind agent needs approved command, image, settings and instruction digests");
 const panel = live && process.env.LOYLY_PANEL_IMAGE ? {
   image: resolve(process.env.LOYLY_PANEL_IMAGE),
+  planFile: process.env.LOYLY_PANEL_PLAN_FILE ?? "booking-core.panel.json",
   planSha256: process.env.LOYLY_PANEL_PLAN_SHA256,
   imageSha256: process.env.LOYLY_PANEL_IMAGE_SHA256,
 } : null;
@@ -125,6 +126,8 @@ if (live && process.env.LOYLY_PANEL_REQUIRED === "1" && !panel)
 if (panel && [panel.planSha256, panel.imageSha256]
   .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? "")))
   throw new Error("grading panel needs approved plan and image manifest digests");
+if (panel && !/^[a-z][a-z0-9-]*\.panel\.json$/.test(panel.planFile))
+  throw new Error("grading panel plan file must be a local named plan");
 mkdirSync(scratch, { recursive: true });
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -520,6 +523,7 @@ const Panel = defineTask({
       try {
         if (!panel) throw new Error("grading panel not configured");
         result = await runDurablePanel({ scratch, image: panel.image,
+          planFile: join(HERE, panel.planFile),
           approvedPlanSha256: panel.planSha256,
           approvedImageSha256: panel.imageSha256 });
         if (result.manifest.candidate_sha256 !== task.input.candidateSha256)
@@ -932,7 +936,8 @@ const Cycle = defineTask({
       try {
         const selected = JSON.parse(readFileSync(join(scratch, "panel-vm", "selected.json"), "utf8"));
         const specialists = join(scratch, "panel-vm", `attempt-${String(selected.attempt).padStart(2, "0")}`);
-        report = await runDurablePanelReport({ scratch, specialists });
+        report = await runDurablePanelReport({ scratch, specialists,
+          planFile: join(HERE, panel.planFile) });
       } catch (error) {
         reason = String(error.stack ?? error);
         writeFileSync(join(scratch, "panel-report-error.log"), `${reason}\n`);

@@ -1,4 +1,4 @@
-// Supported entrypoint for a pinned booking-core live cycle. The JSON file is
+// Supported entrypoint for a pinned product live cycle. The JSON file is
 // the exact operator-selected contract; no digest is computed into approval.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -94,7 +94,7 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
   if (config.builder.model === config.grader.model)
     throw Error('builder and black-box grader must use different models');
   requireHash(join(HERE, 'allure-lifecycle-result.schema.json'), config.grader.schema_sha256);
-  requireHash(join(HERE, 'booking-core.panel.json'), config.panel.plan_sha256);
+  requireHash(join(HERE, config.panel.plan_file ?? 'booking-core.panel.json'), config.panel.plan_sha256);
   verifyImage(config.panel.image, config.panel.image_sha256);
   if (!makeChecklist) return { source, scratch };
   mkdirSync(scratch, { recursive: true });
@@ -150,6 +150,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       LOYLY_PANEL_REQUIRED: '1', LOYLY_PANEL_IMAGE: config.panel.image,
       LOYLY_PANEL_IMAGE_SHA256: config.panel.image_sha256,
       LOYLY_PANEL_PLAN_SHA256: config.panel.plan_sha256,
+      LOYLY_PANEL_PLAN_FILE: config.panel.plan_file ?? 'booking-core.panel.json',
     };
     const result = spawnSync(process.execPath, [join(HERE, 'worker.mjs'), scratch, 'live'],
       { cwd: HERE, env, stdio: 'inherit' });

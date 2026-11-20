@@ -33,6 +33,7 @@
     "panel": { "type": "object", "additionalProperties": false,
       "required": ["image", "image_sha256", "plan_sha256"],
       "properties": { "image": { "type": "string", "minLength": 1 },
+        "plan_file": { "type": "string", "pattern": "^[a-z][a-z0-9-]*\\.panel\\.json$" },
         "image_sha256": { "$ref": "#/$defs/sha" }, "plan_sha256": { "$ref": "#/$defs/sha" } } }
   },
   "$defs": {

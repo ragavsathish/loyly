@@ -22,11 +22,13 @@ The contract pins the clean controller and source commits, selected spec and
 checklist, agent wrappers and instructions, model names, Allure schema, panel
 plan and both VM images. The builder and grader use different models. The
 multi-slice form uses `source.specs` (every selected `spec.feature` with its
-SHA-256) and may name `grader.instruction_file`; the checker requires that
-list to match the derived checklist exactly. The current product selection is
-still the eleven stamped booking-core items. The release slice in
-`docs/plan/02-occurrence-release/` is a draft and has not entered a scored
-cycle.
+SHA-256), may name `grader.instruction_file`, and may select a local panel
+plan through `panel.plan_file` and its pinned `panel.plan_sha256`. The checker
+requires the spec list to match the derived checklist exactly. The specialist
+worker set is still the three booking-core workers; choosing a new panel file
+does not add a specialist probe. The current product selection is still the
+eleven stamped booking-core items. Slices 02 through 05 under `docs/plan/`
+are drafts and have not entered a scored cycle.
 
 The controller clones the source cut into private scratch, sends the builder at
 most three same-session continuations on selected uncarried items, and runs

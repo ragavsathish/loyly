@@ -200,7 +200,8 @@ export async function compilePanel({ original, specialists, out,
   return { out, summary, manifest, stats };
 }
 
-export function verifyCompiledPanel({ original, out }) {
+export function verifyCompiledPanel({ original, out,
+  planFile = join(HERE, "booking-core.panel.json") }) {
   original = resolve(original); out = resolve(out);
   const summary = json(join(out, "panel-summary.json"));
   checked(schemaValidator(join(HERE, "panel-summary.schema.json")), summary, "panel summary");
@@ -214,7 +215,7 @@ export function verifyCompiledPanel({ original, out }) {
       || manifest.original_score_unchanged !== true
       || summary.original_score_sha256 !== score.scoreSha256
       || summary.candidate_sha256 !== candidateDigest(join(original, "fenced-room"))
-      || summary.plan_sha256 !== fileSha(join(HERE, "booking-core.panel.json")))
+      || summary.plan_sha256 !== fileSha(planFile))
     throw new Error("compiled panel report changed after filing");
   return { out, summary, manifest, stats: json(join(out, "allure-report", "summary.json")).stats };
 }
