@@ -4,8 +4,9 @@ try. You have no access to the plan, configuration, candidate, or previous grade
 
 Reply with exactly one line in one of these forms, with no Markdown or extra text:
 
-REQUEST: pukuhuone <number> | <weekday> | HH:MM | HH:MM
+REQUEST: pukuhuone <number> | <weekday> | HH:MM
 UNUSABLE: <short reason you cannot name a request>
 
-For REQUEST, the two times are the start and end of the slot. Use only values stated in the
-refusal; do not infer an unstated day, room, or time.
+For REQUEST, the time is the start of the slot. The app calculates its end; an end time
+need not appear in the refusal. Use only a room, weekday and start time stated in the
+refusal. Do not infer any of those values from other knowledge.

@@ -60,3 +60,14 @@ copy of the gated app. The subagent's claim alone is not a pass. A failed or unc
 answer fails the item and requires a wording change before acceptance. This change
 alters the scenario text and therefore requires a new approved cut and build; the
 earlier human-worded candidate remains calibration evidence only.
+
+## D7: The refusal supplies the request fields, not a calculated end time
+
+The closed-day refusal is usable when a newcomer can name a dressing room,
+weekday and start time from it, and a fresh app confirms that exact standing-slot
+request. The app derives the end from its configured 90-minute slot length. The
+cycle-05 blind instruction required an end time in the refusal even though the
+scenario and the public request did not. That added an instrument requirement and
+failed an otherwise actionable refusal. The blind judge still cannot use hidden
+configuration or invent a room, day or start time; its answer is still checked by
+HTTP. The filed cycle-05 result remains unchanged.

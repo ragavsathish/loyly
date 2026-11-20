@@ -41,6 +41,15 @@ with the image manifest digest, candidate digest, mount policy, exit code and
 timing. It validates each result with the Allure schema before writing the run
 manifest. No API key or model call is needed for these deterministic probes.
 
+The candidate launch contract for every specialist is `impl/start.sh PORT` on a
+writable copy of the frozen candidate. The public behavior is the measurement;
+`server.mjs`, `server.js`, and a particular source language are not part of the
+booking specification. A probe that cannot launch the candidate through this
+contract reports an instrument failure and leaves that specialist behavior
+unobserved. Cycle 05 exposed that the current specialist workers still hardcode
+`server.mjs`; those workers must be corrected before their results can support
+acceptance.
+
 From `harness/pi-durable` after `npm ci`:
 
 ```sh

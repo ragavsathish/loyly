@@ -156,10 +156,12 @@ Feature: Booking core
     Scenario: The refusal for a closed day is judged usable
       Given the household in apartment 12 has been refused a standing slot on Tuesday at 17:00 in pukuhuone 9
       When a fresh independent subagent with no prior context or configuration reads only the refusal
-      Then it can name a request that the app confirms from fresh state, using nothing but the refusal
+      Then it can name a dressing room, weekday and start time for a standing-slot request that the app confirms from fresh state, using nothing but the refusal
       And a refusal it cannot act on fails this budget, and its wording is changed before the slice is called done
       # WHO JUDGES: a fresh subagent whose room holds only the exact refusal and question,
       # with no plan, configuration, candidate, prior transcript or tools to inspect them.
       # Its suggested request is checked over HTTP against a fresh candidate copy.
+      # The app derives the end of this configured 90-minute slot from its start;
+      # the refusal need not state an end time for the resident to make the request.
       # An agent that already knows the schedule can act on a bare "no", so context
       # isolation and the independent replay are both part of this check.

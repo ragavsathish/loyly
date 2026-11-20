@@ -37,6 +37,8 @@ suite, a fixed answer, or another item's result.
   configuration** to judge whether the refusal is actionable. You have read the spec, so you
   cannot be that subagent. Collect
   the exact refusal text in `work/blind-review-011.txt`, without the configuration or your answer.
+  The refusal must let the blind subagent identify a room, weekday and start time;
+  the app derives the end of the slot.
   File this item's Allure result as `skipped`, `stage: "pending"`, with a `statusDetails.message`
   beginning `not reached: blind subagent review required`.
   The controller gives only this refusal to a fresh subagent, then probes its suggested request

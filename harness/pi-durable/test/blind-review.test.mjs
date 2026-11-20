@@ -10,6 +10,18 @@ import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer, val
 import { parseBlindAgentAnswer } from "../blind-agent-adapter.mjs";
 
 const schema = new URL("../allure-lifecycle-result.schema.json", import.meta.url).pathname;
+test("blind request needs only the room, weekday and start given by the refusal", () => {
+  const refusal = "pukuhuone 9 is closed Tuesday. Request apartment 12, pukuhuone 8, Tuesday at 17:00 instead.";
+  const accepted = parseBlindAgentAnswer("REQUEST: pukuhuone 8 | Tuesday | 17:00", refusal);
+  assert.equal(accepted.verdict, "pass");
+  assert.equal(new URLSearchParams(accepted.request.body).get("start"), "17:00");
+  assert.throws(() => parseBlindAgentAnswer("REQUEST: pukuhuone 8 | Tuesday | 18:30", refusal),
+    /absent from the refusal/);
+  assert.throws(() => parseBlindAgentAnswer("REQUEST: pukuhuone 8 | Friday | 17:00", refusal),
+    /absent from the refusal/);
+  assert.throws(() => parseBlindAgentAnswer("REQUEST: pukuhuone 7 | Tuesday | 17:00", refusal),
+    /absent from the refusal/);
+});
 test("a blind subagent's Allure result is separate, bound and confirmed over HTTP", async () => {
   const root = mkdtempSync(join(tmpdir(), "loyly-blind-review-"));
   const room = join(root, "room"), packetDir = join(root, "packet"), agentDir = join(root, "agent");
@@ -67,8 +79,8 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   assert.throws(() => writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom: room, out: agentDir }),
     /independent HTTP probe/);
   const verificationDir = join(root, "probe");
-  const parsed = parseBlindAgentAnswer("REQUEST: pukuhuone 9 | Thursday | 17:00 | 18:30",
-    "Try Thursday at 17:00 to 18:30 in pukuhuone 9.\n");
+  const parsed = parseBlindAgentAnswer("REQUEST: pukuhuone 9 | Thursday | 17:00",
+    "Try Thursday at 17:00 in pukuhuone 9.\n");
   assert.equal(parsed.request.path, "@booking-form");
   const verification = await probeBlindAnswer({ packetDir, reviewFile, gradingRoom: room,
     request: { ...parsed.request, body: "weekday=Thursday" }, out: verificationDir });
@@ -76,7 +88,7 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   assert.equal(verification.request.resolved_path, "/request");
   const mappedReviewFile = join(root, "mapped-review.json");
   writeFileSync(mappedReviewFile, JSON.stringify({ ...review,
-    answer: "REQUEST: pukuhuone 9 | Thursday | 17:00 | 18:30" }));
+    answer: "REQUEST: pukuhuone 9 | Thursday | 17:00" }));
   const mapped = await probeBlindAnswer({ packetDir, reviewFile: mappedReviewFile,
     gradingRoom: room, request: parsed.request, out: join(root, "mapped-probe") });
   assert.equal(mapped.http_status, 201);
