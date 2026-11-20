@@ -55,7 +55,7 @@ Feature: Booking core
       Given the household in apartment 12 holds one standing slot
       And no free standing slots remain in the weekly schedule
       When the household in apartment 12 requests a second standing slot
-      Then the request is refused because there is no room
+      Then the refusal says the weekly schedule has no free standing slot and does not suggest choosing one
       And the household in apartment 12 still holds exactly one standing slot
 
   Rule: One booking is the single source of truth for the list, the timer and the billing
