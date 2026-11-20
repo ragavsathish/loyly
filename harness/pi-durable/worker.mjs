@@ -63,6 +63,7 @@ if (approvedCommit && !/^[0-9a-f]{64}$/.test(approvedChecklistSha256 ?? ""))
   throw new Error("a pinned cut needs LOYLY_APPROVED_CHECKLIST_SHA256");
 const cut = join(scratch, "cut");
 const sourceRoot = approvedCommit ? join(cut, "project") : ROOT;
+const approvedSourceRepo = process.env.LOYLY_SOURCE_REPO ? resolve(process.env.LOYLY_SOURCE_REPO) : ROOT;
 const mode = process.argv[3] ?? "repair"; // repair: red first gate, green second; three-red: all red
 const live = mode === "live";
 const builder = live ? {
@@ -161,6 +162,7 @@ function proveCut() {
   if (!existsSync(receipt) || !existsSync(sourceRoot)) return false;
   const recorded = JSON.parse(readFileSync(receipt, "utf8"));
   return recorded.commit === approvedCommit && recorded.project === sourceRoot
+    && (recorded.source_repo ?? ROOT) === approvedSourceRepo
     && gitAt(sourceRoot, "rev-parse", "HEAD") === approvedCommit
     && gitAt(sourceRoot, "status", "--porcelain") === "";
 }
@@ -551,11 +553,12 @@ const Cycle = defineTask({
       if (approvedCommit && !proveCut()) {
         if (existsSync(cut)) throw new Error("incomplete or changed original-source cut");
         mkdirSync(cut, { recursive: true });
-        r = command("cut-clone", "git", ["clone", "-q", "--no-local", "--no-checkout", ROOT, sourceRoot], { cwd: ROOT });
+        r = command("cut-clone", "git", ["clone", "-q", "--no-local", "--no-checkout", approvedSourceRepo, sourceRoot], { cwd: ROOT });
         if (r.code === 0) r = command("cut-checkout", "git", ["checkout", "-q", "--detach", approvedCommit], { cwd: sourceRoot });
         if (r.code === 0 && gitAt(sourceRoot, "rev-parse", "HEAD") === approvedCommit
             && gitAt(sourceRoot, "status", "--porcelain") === "")
-          writeFileSync(join(cut, "cut.json"), JSON.stringify({ commit: approvedCommit, project: sourceRoot }));
+          writeFileSync(join(cut, "cut.json"), JSON.stringify({ commit: approvedCommit,
+            project: sourceRoot, source_repo: approvedSourceRepo }));
         if (!proveCut()) r = { ...r, code: 1 };
       }
       await runtime.commit(async (tx) => {
@@ -963,6 +966,7 @@ try {
   const existing = await harness.commit((tx) => tx.scanTasks({ kind: "loyly.proto.cycle" }, 10), ctx);
   let id = existing.items[0]?.id;
   const cycleInput = { runId, approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder,
+    ...(process.env.LOYLY_SOURCE_REPO ? { approvedSourceRepo } : {}),
     grader, blindAgent, panel, graderShardCount: live ? graderShardCount : null };
   if (id && JSON.stringify(existing.items[0].input) !== JSON.stringify(cycleInput))
     throw new Error("this Pi store belongs to a different approved cut, checklist or mode");

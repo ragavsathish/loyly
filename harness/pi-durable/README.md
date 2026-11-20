@@ -7,6 +7,16 @@ gate, score and scoreboard. Gondolin runs the Pi builder, independent grader
 shards, blind reviewer and project-specific specialist probes. The former
 ORC runner remains historical comparison evidence.
 
+## Whole-app migration
+
+The current live controller is still the booking-core adapter. Run
+`node full-app-preflight.mjs <spec-v2-checkout>` to inventory the complete
+six-context cut through that checkout's legacy checklist parser. It reports
+the source commit, checklist and ordered-item digests, and each context's spec
+digest and item count. This command is read-only and does not launch or score a
+cycle. The migration boundaries and current evidence are in
+[`FULL-APP-MIGRATION.md`](FULL-APP-MIGRATION.md).
+
 ## Run a pinned live cycle
 
 Install this directory's npm dependencies and the `.pi/harness/builder-host`

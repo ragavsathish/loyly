@@ -44,6 +44,7 @@ function liveEnv(scratch) {
   const graderCommand = join(here, "test/stub-grader.sh");
   const settings = join(root, ".pi/harness/config/pi.grader.settings.json");
   return { ...process.env,
+    LOYLY_SOURCE_REPO: root,
     LOYLY_APPROVED_COMMIT: commit.stdout.trim(),
     LOYLY_APPROVED_CHECKLIST_SHA256: sha(checklist),
     LOYLY_BUILDER_COMMAND: builderCommand, LOYLY_BUILDER_IMAGE: image,

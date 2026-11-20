@@ -40,6 +40,7 @@ function fixtureEnv(scratch, mode = "carry", builderCommand) {
     const image = join(root, ".pi/harness/.state/assets/builder-clojure");
     const command = builderCommand ?? join(here, "test/stub-continuation-builder.sh");
     return { ...process.env,
+      LOYLY_SOURCE_REPO: root,
       LOYLY_APPROVED_COMMIT: head.stdout.trim(), LOYLY_APPROVED_CHECKLIST_SHA256: sha(checklist),
       LOYLY_BUILDER_COMMAND: command, LOYLY_BUILDER_IMAGE: image,
       LOYLY_BUILDER_MODEL: "test/continuing-builder",
@@ -95,6 +96,23 @@ test("live cycle continues one Pi session on its own uncarried list before gate"
   assert.ok(turns.every((row) => row.session_id === "prototype-cycle-1-attempt-1" && row.changed));
   assert.deepEqual(rows.findLast((row) => row.stage === "builder-continuation").remaining_uncarried, []);
   assert.ok(rows.find((row) => row.stage === "gate" && row.outcome === "passed").seq > turns[1].seq);
+});
+
+test("pinned cut clones the approved source checkout instead of the controller checkout", async () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-external-source-"));
+  try {
+    const sourceRepo = join(scratch, "source");
+    const cloned = spawnSync("git", ["clone", "-q", "--shared", root, sourceRepo], { encoding: "utf8" });
+    assert.equal(cloned.status, 0, cloned.stderr);
+    const env = { ...fixtureEnv(scratch, "unchanged"), LOYLY_SOURCE_REPO: sourceRepo };
+    await finish(startWorker(scratch, env));
+    const receipt = JSON.parse(readFileSync(join(scratch, "cut", "cut.json"), "utf8"));
+    assert.equal(receipt.source_repo, sourceRepo);
+    assert.equal(receipt.commit, env.LOYLY_APPROVED_COMMIT);
+    const cutHead = spawnSync("git", ["rev-parse", "HEAD"],
+      { cwd: join(scratch, "cut", "project"), encoding: "utf8" });
+    assert.equal(cutHead.stdout.trim(), env.LOYLY_APPROVED_COMMIT);
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
 });
 
 test("unchanged continuation stops before a second turn", async () => {
