@@ -8,17 +8,29 @@ const RESULT = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-
 // Preserve the old calibration room, while requiring the revised handoff in every new cut.
 const PERSON_SPEC_SHA256 = "b28ee83dfaada8df0ed99b90121a50f3c55885ade4db323b68e03c4d5f15005e";
 const labelValues = (result, name) => result.labels.filter((label) => label.name === name).map((label) => label.value);
+function identity(room, item) {
+  const source = /^docs\/plan\/(\d\d-([a-z][a-z0-9-]*))\/spec\.feature:\d+$/.exec(item.source ?? "");
+  if (!source || source[1].slice(0, 2) !== item.id?.slice(0, 2))
+    throw new Error(`Allure item has no matching numbered plan source: ${item.id ?? "unknown"}`);
+  const spec = readFileSync(join(room, "plan", source[1], "spec.feature"), "utf8");
+  const feature = /^Feature:\s*(.+?)\s*$/m.exec(spec)?.[1];
+  if (!feature) throw new Error(`selected plan has no Feature title: ${source[1]}`);
+  return { fullName: `loyly.${source[2]}.${item.id}`, feature };
+}
 
 export function readAllureResults(room) {
   const schema = JSON.parse(readFileSync(join(room, "allure-lifecycle-result.schema.json"), "utf8"));
   const validate = new Ajv2020({ strict: false }).compile(schema);
   const checklist = JSON.parse(readFileSync(join(room, "checklist.json"), "utf8"));
-  const specSha256 = createHash("sha256").update(readFileSync(join(room, "plan", "01-booking-core", "spec.feature"))).digest("hex");
-  const pendingPrefix = specSha256 === PERSON_SPEC_SHA256
-    ? "not reached: blind human review required" : "not reached: blind subagent review required";
   const items = checklist.items;
   if (!Array.isArray(items) || !items.length || new Set(items.map((item) => item.id)).size !== items.length)
     throw new Error("invalid grading checklist");
+  const identities = new Map(items.map((item) => [item.id, identity(room, item)]));
+  const specSha256 = items.some((item) => item.id === "01-011")
+    ? createHash("sha256").update(readFileSync(join(room, "plan", "01-booking-core", "spec.feature"))).digest("hex")
+    : null;
+  const pendingPrefix = specSha256 === PERSON_SPEC_SHA256
+    ? "not reached: blind human review required" : "not reached: blind subagent review required";
   const dir = join(room, "work", "allure-results");
   const files = readdirSync(dir).filter((name) => RESULT.test(name));
   if (files.length !== items.length) throw new Error("grader did not return one Allure result per selected item");
@@ -33,9 +45,10 @@ export function readAllureResults(room) {
     const id = tags[0].slice(6);
     const item = items.find((x) => x.id === id);
     if (!item || byId.has(id)) throw new Error(`unknown or duplicate Allure item ${id}`);
-    if (result.name !== item.name || result.fullName !== `loyly.booking-core.${id}`
+    const expected = identities.get(id);
+    if (result.name !== item.name || result.fullName !== expected.fullName
         || result.testCaseId !== result.fullName || result.historyId !== result.fullName
-        || labelValues(result, "feature").join() !== "Booking core"
+        || labelValues(result, "feature").join() !== expected.feature
         || labelValues(result, "story").join() !== item.rule
         || labelValues(result, "lifecycle").join() !== "pre-production"
         || !labelValues(result, "tool").length || !labelValues(result, "technique").length)

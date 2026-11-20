@@ -36,6 +36,24 @@ function pathInSource(repo, relative) {
     throw Error('spec_file must stay inside the pinned source cut');
   return join(repo, relative);
 }
+export function verifySelectedSpecs(repo, source, checklist) {
+  const selected = source.specs ?? [{ file: source.spec_file, sha256: source.spec_sha256 }];
+  const paths = selected.map(({ file }) => file);
+  if (new Set(paths).size !== paths.length
+      || paths.some((file) => !/^docs\/plan\/\d\d-[a-z][a-z0-9-]*\/spec\.feature$/.test(file)))
+    throw Error('approved specs must uniquely name numbered product plans');
+  for (const spec of selected) requireHash(pathInSource(repo, spec.file), spec.sha256);
+  if (checklist) {
+    const actual = [...new Set(checklist.items.map((item) => {
+      const match = /^(docs\/plan\/\d\d-[a-z][a-z0-9-]*\/spec\.feature):\d+$/.exec(item.source ?? '');
+      if (!match) throw Error(`checklist item has no numbered product spec source: ${item.id}`);
+      return match[1];
+    }))].sort();
+    if (JSON.stringify([...paths].sort()) !== JSON.stringify(actual))
+      throw Error('approved spec files do not exactly cover the derived checklist');
+  }
+  return selected;
+}
 export function checkLiveRun(config, { makeChecklist = true } = {}) {
   const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(join(HERE, 'live-run.schema.json'))));
   if (!validate(config)) throw Error(`live run schema: ${JSON.stringify(validate.errors)}`);
@@ -54,7 +72,7 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
       || git(source, 'rev-parse', 'HEAD') !== config.source.commit
       || git(ROOT, 'status', '--porcelain') || git(source, 'status', '--porcelain'))
     throw Error('controller or source is dirty or differs from the approved commit');
-  requireHash(pathInSource(source, config.source.spec_file), config.source.spec_sha256);
+  verifySelectedSpecs(source, config.source);
   const agents = [
     [config.builder, 'builder-instruction.md'],
     [config.grader, 'grader-instruction-01.md'],
@@ -85,6 +103,7 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
     if (result.status !== 0) throw Error(`checklist derivation failed: ${result.stderr}`);
   }
   requireHash(checklist, config.source.checklist_sha256);
+  verifySelectedSpecs(source, config.source, JSON.parse(readFileSync(checklist, 'utf8')));
   return { source, scratch };
 }
 
@@ -97,6 +116,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (process.argv[2] === '--run') {
     const env = { ...process.env, PATH: `${process.env.JAVA_HOME}/bin:${process.env.PATH}`,
       LOYLY_RUN_ID: config.run_id,
+      LOYLY_SOURCE_REPO: source,
       LOYLY_APPROVED_COMMIT: config.source.commit,
       LOYLY_APPROVED_CHECKLIST_SHA256: config.source.checklist_sha256,
       LOYLY_BUILDER_COMMAND: config.builder.command,

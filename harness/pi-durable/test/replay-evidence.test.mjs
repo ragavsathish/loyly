@@ -23,8 +23,10 @@ test("playback projects bound grader and blind Allure evidence without inventing
     writeFileSync(join(sourceRoom, "docs", "plan", "01-booking-core", "spec.feature"),
       "Feature: Booking core\nScenario: Fresh blind subagent judges refusal\n");
     writeFileSync(join(candidateRoom, "impl", "app.txt"), "candidate");
-    const items = [{ id: "01-001", name: "The schedule", rule: "Availability" },
-      { id: "01-011", name: "The refusal", rule: "Actionable refusal" }];
+    const items = [{ id: "01-001", name: "The schedule", rule: "Availability",
+      source: "docs/plan/01-booking-core/spec.feature:2" },
+    { id: "01-011", name: "The refusal", rule: "Actionable refusal",
+      source: "docs/plan/01-booking-core/spec.feature:3" }];
     writeFileSync(checklistFile, JSON.stringify({ items }));
     const candidateSha256 = candidateDigest(candidateRoom);
     const checklistSha256 = hash(readFileSync(checklistFile));

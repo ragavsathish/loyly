@@ -22,10 +22,10 @@ test("rule scopes merge exactly once into the attached Allure contract", () => {
   writeFileSync(join(source, "docs", "plan", "01-booking-core", "spec.feature"), "Feature: Booking core\n");
   writeFileSync(join(candidate, "impl", "start.sh"), "#!/bin/sh\n");
   const items = [
-    { id: "01-001", name: "Schedule", rule: "Availability" },
-    { id: "01-002", name: "Closed day", rule: "Availability" },
-    { id: "01-003", name: "Holder", rule: "Booking" },
-    { id: "01-011", name: "Usable refusal", rule: "Blind review" },
+    { id: "01-001", name: "Schedule", rule: "Availability", source: "docs/plan/01-booking-core/spec.feature:2" },
+    { id: "01-002", name: "Closed day", rule: "Availability", source: "docs/plan/01-booking-core/spec.feature:3" },
+    { id: "01-003", name: "Holder", rule: "Booking", source: "docs/plan/01-booking-core/spec.feature:4" },
+    { id: "01-011", name: "Usable refusal", rule: "Blind review", source: "docs/plan/01-booking-core/spec.feature:5" },
   ];
   writeFileSync(checklistFile, JSON.stringify({ items }));
   const candidateSha256 = candidateDigest(candidate), checklistSha256 = sha(readFileSync(checklistFile));
@@ -58,4 +58,13 @@ test("rule scopes merge exactly once into the attached Allure contract", () => {
   rmSync(join(shards[0].out, "work", "allure-results", resultFile));
   assert.throws(() => combineShards({ gradingRoom: full, shards, candidateSha256, schemaSha256 }),
     /one Allure result/);
+});
+
+test("identical rule names in different product slices stay separate scopes", () => {
+  const groups = partitionByRule([
+    { id: "01-001", rule: "Availability", source: "docs/plan/01-booking-core/spec.feature:2" },
+    { id: "02-001", rule: "Availability", source: "docs/plan/02-release/spec.feature:2" },
+  ], 2);
+  assert.equal(groups.length, 2);
+  assert.ok(groups.every((group) => group.items.length === 1));
 });

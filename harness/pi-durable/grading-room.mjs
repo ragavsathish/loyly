@@ -22,6 +22,20 @@ export function treeDigest(root, prefix) {
 }
 export const candidateDigest = (room) => treeDigest(join(room, "impl"), "impl");
 const planDigest = (room) => treeDigest(join(room, "plan"), "plan");
+function selectedPlans(checklistFile) {
+  const checklist = JSON.parse(readFileSync(checklistFile, "utf8"));
+  if (!Array.isArray(checklist.items) || !checklist.items.length)
+    throw new Error("grading checklist has no selected items");
+  const plans = new Set();
+  for (const item of checklist.items) {
+    const match = /^docs\/plan\/(\d\d-[a-z][a-z0-9-]*)\/spec\.feature:\d+$/.exec(item.source ?? "");
+    if (!match || !/^\d\d-\d\d\d$/.test(item.id ?? "")
+        || match[1].slice(0, 2) !== item.id.slice(0, 2))
+      throw new Error(`grading item has no safe matching plan source: ${item.id ?? "unknown"}`);
+    plans.add(match[1]);
+  }
+  return [...plans];
+}
 export function prepareGradingRoom({ sourceRoom, candidateRoom, checklistFile, schemaFile, out,
   candidateSha256, checklistSha256, schemaSha256 }) {
   for (const path of [sourceRoom, candidateRoom, checklistFile, schemaFile, out])
@@ -35,9 +49,13 @@ export function prepareGradingRoom({ sourceRoom, candidateRoom, checklistFile, s
       || candidateDigest(candidateRoom) !== candidateSha256)
     throw new Error("grading inputs differ from the gated candidate, checklist or schema");
   if (existsSync(out)) throw new Error("grading room already exists; reconcile its receipt or inspect it");
+  const plans = selectedPlans(checklistFile);
   mkdirSync(join(out, "plan"), { recursive: true });
-  cpSync(join(sourceRoom, "docs", "plan", "01-booking-core"), join(out, "plan", "01-booking-core"),
-    { recursive: true });
+  for (const plan of plans) {
+    const from = join(sourceRoom, "docs", "plan", plan);
+    if (!existsSync(join(from, "spec.feature"))) throw new Error(`selected plan missing: ${plan}`);
+    cpSync(from, join(out, "plan", plan), { recursive: true });
+  }
   cpSync(join(candidateRoom, "impl"), join(out, "impl"), { recursive: true });
   cpSync(checklistFile, join(out, "checklist.json"));
   cpSync(schemaFile, join(out, "allure-lifecycle-result.schema.json"));
@@ -48,15 +66,19 @@ export function prepareGradingRoom({ sourceRoom, candidateRoom, checklistFile, s
     throw new Error("grading copy differs from the gated candidate, checklist or schema");
   const receipt = { schema: "loyly.grading-room.v1", candidateSha256, checklistSha256,
     schemaSha256, planSha256: planDigest(out),
-    sourcePlan: "plan/01-booking-core" };
+    sourcePlan: plans.length === 1 ? `plan/${plans[0]}` : null,
+    sourcePlans: plans.map((plan) => `plan/${plan}`) };
   writeFileSync(join(out, ".grading-room.json"), JSON.stringify(receipt));
   return receipt;
 }
 export function verifyGradingRoom({ out, candidateSha256, checklistSha256, schemaSha256 }) {
   const receipt = JSON.parse(readFileSync(join(out, ".grading-room.json"), "utf8"));
+  const expectedPlans = selectedPlans(join(out, "checklist.json")).map((plan) => `plan/${plan}`);
+  const recordedPlans = receipt.sourcePlans ?? (receipt.sourcePlan ? [receipt.sourcePlan] : []);
   if (receipt.schema !== "loyly.grading-room.v1" || receipt.candidateSha256 !== candidateSha256
       || receipt.checklistSha256 !== checklistSha256
       || receipt.schemaSha256 !== schemaSha256
+      || JSON.stringify(recordedPlans) !== JSON.stringify(expectedPlans)
       || receipt.planSha256 !== planDigest(out)
       || candidateDigest(out) !== candidateSha256
       || hash(readFileSync(join(out, "checklist.json"))) !== checklistSha256

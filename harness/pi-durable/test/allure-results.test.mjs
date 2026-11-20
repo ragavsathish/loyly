@@ -13,10 +13,12 @@ function fixture() {
   mkdirSync(dir, { recursive: true });
   mkdirSync(join(room, "plan", "01-booking-core"), { recursive: true });
   writeFileSync(join(room, "plan", "01-booking-core", "spec.feature"),
-    "Scenario: A fresh subagent judges the refusal\n");
+    "Feature: Booking core\nScenario: A fresh subagent judges the refusal\n");
   cpSync(schema, join(room, "allure-lifecycle-result.schema.json"));
-  const items = [{ id: "01-001", name: "The schedule", rule: "Availability" },
-    { id: "01-011", name: "Usable refusal", rule: "Actionable refusal" }];
+  const items = [{ id: "01-001", name: "The schedule", rule: "Availability",
+    source: "docs/plan/01-booking-core/spec.feature:2" },
+  { id: "01-011", name: "Usable refusal", rule: "Actionable refusal",
+    source: "docs/plan/01-booking-core/spec.feature:3" }];
   writeFileSync(join(room, "checklist.json"), JSON.stringify({ items }));
   writeFileSync(join(room, "work", "surprises.json"), "[]");
   const make = (item, status) => {
@@ -57,6 +59,40 @@ test("attached lifecycle schema is the grader contract and projects honest legac
   first.result.labels = first.result.labels.filter((label) => label.name !== "lifecycle");
   writeFileSync(first.path, JSON.stringify(first.result));
   assert.throws(() => readAllureResults(room), /Allure schema rejected/);
+});
+
+test("Allure identity follows the selected product slice without a booking-core dependency", () => {
+  const room = mkdtempSync(join(tmpdir(), "loyly-allure-second-slice-"));
+  const dir = join(room, "work", "allure-results");
+  mkdirSync(dir, { recursive: true });
+  mkdirSync(join(room, "plan", "02-occurrence-release"), { recursive: true });
+  writeFileSync(join(room, "plan", "02-occurrence-release", "spec.feature"),
+    "Feature: Occurrence release\n");
+  cpSync(schema, join(room, "allure-lifecycle-result.schema.json"));
+  writeFileSync(join(room, "checklist.json"), JSON.stringify({ items: [{ id: "02-001",
+    name: "Release one week", rule: "Standing holding survives",
+    source: "docs/plan/02-occurrence-release/spec.feature:2" }] }));
+  writeFileSync(join(room, "work", "surprises.json"), "[]");
+  const uuid = randomUUID(), attachment = `${randomUUID()}-attachment.txt`;
+  writeFileSync(join(dir, attachment), "Observed release over HTTP\n");
+  const fullName = "loyly.occurrence-release.02-001";
+  const result = { uuid, name: "Release one week", fullName, testCaseId: fullName,
+    historyId: fullName, status: "passed", stage: "finished",
+    statusDetails: { message: "A one-week release left the standing holding intact" },
+    start: 1, stop: 2,
+    labels: [{ name: "lifecycle", value: "pre-production" },
+      { name: "technique", value: "acceptance" }, { name: "tool", value: "Pi grader" },
+      { name: "feature", value: "Occurrence release" },
+      { name: "story", value: "Standing holding survives" },
+      { name: "tag", value: "@item-02-001" }],
+    steps: [{ name: "Observe release", status: "passed", stage: "finished" }],
+    attachments: [{ name: "HTTP observation", source: attachment, type: "text/plain" }] };
+  const resultPath = join(dir, `${uuid}-result.json`);
+  writeFileSync(resultPath, JSON.stringify(result));
+  assert.deepEqual(readAllureResults(room).verdicts.map((item) => item.verdict), ["pass"]);
+  result.labels.find((label) => label.name === "feature").value = "Booking core";
+  writeFileSync(resultPath, JSON.stringify(result));
+  assert.throws(() => readAllureResults(room), /Allure identity/);
 });
 test("surprise projection accepts only local evidence and selected item IDs", () => {
   const { room } = fixture();

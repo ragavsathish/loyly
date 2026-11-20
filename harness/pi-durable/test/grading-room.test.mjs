@@ -20,7 +20,7 @@ test("grading room carries only the selected plan, candidate and checklist", () 
   writeFileSync(join(sourceRoom, "docs", "plan", "02-private", "secret"), "unselected\n");
   writeFileSync(join(candidateRoom, "impl", "start.sh"), "#!/bin/sh\nexit 0\n");
   writeFileSync(join(candidateRoom, ".builder", "transcript"), "builder-only\n");
-  writeFileSync(checklistFile, '{"items":[{"id":"01-001"}]}\n');
+  writeFileSync(checklistFile, '{"items":[{"id":"01-001","source":"docs/plan/01-booking-core/spec.feature:1"}]}\n');
   writeFileSync(schemaFile, '{"type":"object"}\n');
   const args = { sourceRoom, candidateRoom, checklistFile, schemaFile, out,
     candidateSha256: candidateDigest(candidateRoom), checklistSha256: sha(readFileSync(checklistFile)),
@@ -39,4 +39,52 @@ test("grading room carries only the selected plan, candidate and checklist", () 
   writeFileSync(join(out, "plan", "01-booking-core", "spec.feature"), "@item-01-001\n");
   writeFileSync(join(out, "impl", "start.sh"), "changed\n");
   assert.throws(() => verifyGradingRoom(args), /changed/);
+});
+
+test("grading room carries every selected product slice and excludes other plans", () => {
+  const root = mkdtempSync(join(tmpdir(), "loyly-multi-plan-room-"));
+  const sourceRoom = join(root, "source"), candidateRoom = join(root, "candidate");
+  const out = join(root, "grade"), checklistFile = join(root, "checklist.json");
+  const schemaFile = join(root, "allure-lifecycle-result.schema.json");
+  for (const name of ["01-booking-core", "02-occurrence-release", "03-private"]) {
+    const dir = join(sourceRoom, "docs", "plan", name);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "spec.feature"), `Feature: ${name}\n`);
+  }
+  mkdirSync(join(candidateRoom, "impl"), { recursive: true });
+  writeFileSync(join(candidateRoom, "impl", "start.sh"), "#!/bin/sh\n");
+  writeFileSync(checklistFile, JSON.stringify({ items: [
+    { id: "01-001", source: "docs/plan/01-booking-core/spec.feature:2" },
+    { id: "02-001", source: "docs/plan/02-occurrence-release/spec.feature:2" },
+  ] }));
+  writeFileSync(schemaFile, '{"type":"object"}\n');
+  const args = { sourceRoom, candidateRoom, checklistFile, schemaFile, out,
+    candidateSha256: candidateDigest(candidateRoom), checklistSha256: sha(readFileSync(checklistFile)),
+    schemaSha256: sha(readFileSync(schemaFile)) };
+  const receipt = prepareGradingRoom(args);
+  assert.deepEqual(receipt.sourcePlans,
+    ["plan/01-booking-core", "plan/02-occurrence-release"]);
+  verifyGradingRoom(args);
+  assert.ok(existsSync(join(out, "plan", "01-booking-core", "spec.feature")));
+  assert.ok(existsSync(join(out, "plan", "02-occurrence-release", "spec.feature")));
+  assert.ok(!existsSync(join(out, "plan", "03-private")));
+  writeFileSync(join(out, "plan", "02-occurrence-release", "spec.feature"), "changed\n");
+  assert.throws(() => verifyGradingRoom(args), /changed/);
+});
+
+test("grading room refuses a checklist source outside the numbered product plans", () => {
+  const root = mkdtempSync(join(tmpdir(), "loyly-bad-plan-room-"));
+  const sourceRoom = join(root, "source"), candidateRoom = join(root, "candidate");
+  const out = join(root, "grade"), checklistFile = join(root, "checklist.json");
+  const schemaFile = join(root, "allure-lifecycle-result.schema.json");
+  mkdirSync(join(candidateRoom, "impl"), { recursive: true });
+  writeFileSync(join(candidateRoom, "impl", "start.sh"), "#!/bin/sh\n");
+  writeFileSync(checklistFile, JSON.stringify({ items: [
+    { id: "02-001", source: "docs/plan/../../private/spec.feature:2" },
+  ] }));
+  writeFileSync(schemaFile, '{"type":"object"}\n');
+  assert.throws(() => prepareGradingRoom({ sourceRoom, candidateRoom, checklistFile,
+    schemaFile, out, candidateSha256: candidateDigest(candidateRoom),
+    checklistSha256: sha(readFileSync(checklistFile)),
+    schemaSha256: sha(readFileSync(schemaFile)) }), /safe matching plan source/);
 });
