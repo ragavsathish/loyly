@@ -140,6 +140,29 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
     gradingRoom: apiRoom, request: parsed.request, out: join(root, "api-probe") });
   assert.equal(apiProbe.http_status, 200);
   assert.equal(apiProbe.request.resolved_path, "/api/houses/house1/bookings");
+  const workbenchRoom = join(root, "workbench-room"), workbenchPacket = join(root, "workbench-packet");
+  cpSync(room, workbenchRoom, { recursive: true });
+  writeFileSync(join(workbenchRoom, "impl", "server.js"), `require("http").createServer((req,res)=>{
+    const send=(status,body)=>{res.statusCode=status;res.setHeader("content-type","application/json");res.end(JSON.stringify(body))};
+    if(req.url==="/"){res.statusCode=200;res.end('<form id="booking-form"></form>');return}
+    if(req.url==="/api/houses")return send(200,{houses:[{id:"house2",policy:{route:"self-service",
+      resources:[{id:"ph9",name:"pukuhuone 9"}],bookerRoles:["tenant"]}}]});
+    let body="";req.on("data",x=>body+=x);req.on("end",()=>{
+      const p=JSON.parse(body);send(req.url==="/api/bookings"&&p.house==="house2"
+        &&p.resource==="ph9"&&p.weekday==="Thursday"&&p.start==="17:00"
+        &&p.role==="tenant"?200:409,{status:"confirmed"})
+    });
+  }).listen(Number(process.argv[2]),"127.0.0.1")\n`);
+  prepareBlindReview({ gradingRoom: workbenchRoom, out: workbenchPacket });
+  const workbenchReviewFile = join(root, "workbench-review.json");
+  writeFileSync(workbenchReviewFile, JSON.stringify({ ...apiReview,
+    packet_sha256: JSON.parse(readFileSync(join(workbenchPacket,
+      "response-template.json"))).packet_sha256 }));
+  const workbenchProbe = await probeBlindAnswer({ packetDir: workbenchPacket,
+    reviewFile: workbenchReviewFile, gradingRoom: workbenchRoom,
+    request: parsed.request, out: join(root, "workbench-probe") });
+  assert.equal(workbenchProbe.http_status, 200);
+  assert.equal(workbenchProbe.request.resolved_path, "/api/bookings");
   review.packet_sha256 = "0".repeat(64);
   writeFileSync(reviewFile, JSON.stringify(review));
   assert.throws(() => validateBlindReview({ packetDir, reviewFile, gradingRoom: room }), /unbound/);

@@ -120,24 +120,31 @@ async function publicJsonBooking(base, body, answer) {
   const matches = [];
   for (const house of houses) {
     if (typeof house.id !== "string" || !/^[A-Za-z0-9_-]+$/.test(house.id)) continue;
-    const stateResponse = await fetch(`${base}/api/houses/${house.id}/state`,
-      { signal: AbortSignal.timeout(1000) });
-    if (!stateResponse.ok) continue;
-    const state = await stateResponse.json();
-    const resources = state.resources?.filter((resource) =>
+    let policy = house.policy, resources = policy?.resources, route = policy?.route;
+    let path = "/api/bookings";
+    if (!Array.isArray(resources)) {
+      const stateResponse = await fetch(`${base}/api/houses/${house.id}/state`,
+        { signal: AbortSignal.timeout(1000) });
+      if (!stateResponse.ok) continue;
+      const state = await stateResponse.json();
+      policy = state.policy;
+      resources = state.resources;
+      route = state.route?.kind;
+      path = `/api/houses/${house.id}/bookings`;
+    }
+    const named = resources?.filter((resource) =>
       resource.name?.trim().toLowerCase() === `pukuhuone ${room}`) ?? [];
-    if (state.route?.kind === "self-service" && resources.length === 1)
-      matches.push({ house: house.id, resource: resources[0].id,
-        role: state.policy?.eligibleRoles?.[0] });
+    if (route === "self-service" && named.length === 1)
+      matches.push({ house: house.id, resource: named[0].id,
+        role: policy?.eligibleRoles?.[0] ?? policy?.bookerRoles?.[0], path });
   }
   if (matches.length !== 1) throw new Error("blind room is not unique in the public self-service API");
   const match = matches[0];
-  const path = `/api/houses/${match.house}/bookings`;
-  const payload = { household: params.get("household"), resource: match.resource,
+  const payload = { house: match.house, household: params.get("household"), resource: match.resource,
     weekday: params.get("weekday"), start: params.get("start"), kind: "standing", role: match.role };
   if (!Object.values(payload).every((value) => typeof value === "string" && value.trim()))
     throw new Error("public booking request is incomplete");
-  return { path, body: JSON.stringify(payload), contentType: "application/json" };
+  return { path: match.path, body: JSON.stringify(payload), contentType: "application/json" };
 }
 function resolveRoomInPublicForm(html, body, answer) {
   const params = new URLSearchParams(body);
