@@ -68,6 +68,12 @@ receipt. It never changes the original cycle's audit, score or outcome. See
   candidate because it hardcoded `server.mjs`. The corrected workers later
   passed all three Gondolin probes in a separate, pinned reassessment. The
   original score remains **10/11**, and that reassessment is still `not-ready`.
+- Cycle 06 passed the independent gate, all ten direct behavior items, and the
+  fresh blind review. The original scorer filed **11/11**. Its original panel
+  failed on new UI and view shapes; a separately pinned reassessment of the
+  same frozen candidate passed all three Gondolin specialists and produced
+  **15 Allure cases, ready-for-review**, with no gaps. The original cycle
+  audit and score remain unchanged.
 
 Pi is the active driver by operator direction. The original cycle failure
 remains visible; the reassessment is separately labelled. The generated app

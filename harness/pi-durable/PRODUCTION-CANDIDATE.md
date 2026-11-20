@@ -132,15 +132,13 @@ requires explicit server cleanup. The controller records that bound in the
 launch receipt and rejects a different value on resume. Cycle 05 exercised
 this correction in a fresh live run: all three Terra shards completed.
 
-The specialist panel remains specific to one Node candidate shape: its workers
-launch `server.mjs`, assume particular JSON routes and record files, and its image
-does not contain Babashka. Cycle 03's successful reassessment proves that
-panel on one Node candidate only. Cycle 05 generated `server.js` and the panel
-failed all three probes before observing the app. The booking spec deliberately leaves the
-implementation stack open, so this is an instrument limitation, not a failed
-booking behavior. Before production cutover, the panel must launch the public
-`start.sh` seam in a suitable pinned runtime image and report project-specific
-observations honestly across both generated shapes.
+At the time of cycle 05, the specialist panel launched `server.mjs` and
+assumed particular JSON routes and record files. The revised launcher now
+uses `start.sh`; cycle 05's `server.js` app passed its separate reassessment.
+The panel image still lacks Babashka and its telemetry adapter is Node-specific.
+The booking spec leaves the implementation stack open, so a Clojure candidate
+still needs suitable runtime and diagnostic adapters before those specialist
+results can support acceptance.
 
 The pre-reset `ragavsathish/main` ran the ORC harness over the wider spec-v2
 system. Its exact tip `a733b7e` is preserved at
@@ -189,3 +187,35 @@ at `scratch-production-cycle-05/panel-reassessment-8b3e5ea/reassessment.json`;
 its specialist manifest SHA-256 is
 `4dc415526477a1dff08d69dae95f432b51f0af9461e632edfdbc764f340c6d88`.
 The next scored cycle requires new pinned instruments and operator approval.
+
+## Cycle 06, 2026-11-20
+
+The operator approved the exact eleven-item contract at controller and source
+commit `40101bb`. The fresh Sol builder produced a Node candidate, followed by
+three same-session continuations on `01-011`, which requires an independent
+blind judge outside the builder room. The independent legacy gate passed on
+attempt 1 with 16 tests and a fresh HTTP boot within its ten-second budget.
+Three Terra grader shards filed ten behavioral passes and the planned pending
+blind handoff. The fresh Sol blind reviewer saw only the refusal and question,
+answered `REQUEST: pukuhuone 8 | Tuesday | 17:00`, and its exact request was
+confirmed by the fresh app. The filed legacy score is **11/11**; relative to
+cycle 05, `01-011` newly passes and no item newly fails. `surprises.json` is
+empty. Pi committed 23 audit facts.
+
+The original cycle-06 specialist panel failed on new public UI and JSON view
+shapes and its 15-case report ended `not-ready`. Its filed score and original
+panel manifest remain unchanged. Controller `4bc2655` revised the probes to
+recognize the public linked schedule and `billingSignals` view. A separately
+pinned reassessment of the frozen candidate passed Playwright, 100/100
+overlapping protocol races, and candidate-bound OpenTelemetry in parallel
+Gondolin VMs. The combined Allure report has 15 cases: 14 passed, one planned
+raw-grader handoff skipped, zero failed. Its panel outcome is
+`ready-for-review` with no gaps. The local receipt is
+`scratch-production-cycle-06/panel-reassessment-4bc2655/reassessment.json`;
+the specialist manifest SHA-256 is
+`c6ce4063830d152f516b3d0e55da1839d1fb33fe1ecacd286de5b0c5b0e620e5`.
+
+This is an acceptance candidate for booking core, not an accepted build. The
+operator still needs to decide acceptance after reviewing the bound evidence.
+The full cross-stack runtime profile and live controller restart matrix remain
+open for a production claim; the Pi driver currently covers booking core only.
