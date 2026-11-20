@@ -129,13 +129,14 @@ and launch receipts remain intact.
 
 The grader now has a five-minute shell-call recovery bound, and its instruction
 requires explicit server cleanup. The controller records that bound in the
-launch receipt and rejects a different value on resume. This correction has
-adapter regression coverage; it has **not** been exercised in a new live cycle.
+launch receipt and rejects a different value on resume. Cycle 05 exercised
+this correction in a fresh live run: all three Terra shards completed.
 
-The specialist panel remains specific to Node candidates: its workers launch
-`server.mjs`, assume particular JSON routes and record files, and its image
+The specialist panel remains specific to one Node candidate shape: its workers
+launch `server.mjs`, assume particular JSON routes and record files, and its image
 does not contain Babashka. Cycle 03's successful reassessment proves that
-panel on one Node candidate only. The booking spec deliberately leaves the
+panel on one Node candidate only. Cycle 05 generated `server.js` and the panel
+failed all three probes before observing the app. The booking spec deliberately leaves the
 implementation stack open, so this is an instrument limitation, not a failed
 booking behavior. Before production cutover, the panel must launch the public
 `start.sh` seam in a suitable pinned runtime image and report project-specific
@@ -147,3 +148,33 @@ system. Its exact tip `a733b7e` is preserved at
 not the other contexts. Those contexts still need to migrate and be compared
 with the archived instrument. The next booking-core acceptance review needs a
 complete integrated live cycle, product profile and restart checks.
+
+## Cycle 05, 2026-11-20
+
+The approved Pi controller `4e9695f` built the unchanged eleven-item source cut
+`b97e4ed`. Its first build and two same-session continuations produced a Node
+candidate. The independent legacy gate passed on attempt 1: 19 tests, a fresh
+boot within the ten-second budget, and the HTTP identity probe. Three Terra
+grader shards finished with ten behavioral passes and the one planned
+`01-011` blind handoff. The raw grader surprise list was empty.
+
+The blind Sol reviewer saw only the refusal and question and answered
+`UNUSABLE: The refusal does not state an end time.` The filed legacy score is
+**10/11**, with `01-011` failed; compared with cycle 03's 11/11, that is one
+newly failing item. The refusal explicitly names a complete request for
+pukuhuone 8 on Tuesday at 17:00, and the Terra grader observed that request
+accepted with a derived end time of 18:30. The pinned blind instruction,
+however, requires the refusal to state both start and end times. That extra
+instruction caused the blind reviewer to reject the refusal before the
+controller could confirm it over fresh HTTP. The failed review and 10/11
+score are preserved; this diagnosis does not revise either.
+
+All three specialist VMs launched `/candidate/server.mjs`, which is absent
+from the generated `server.js` candidate. The panel outcome is `not-ready`;
+its browser and protocol corroboration and telemetry diagnostic failed before
+measuring behavior. The unified Allure report has 15 cases: ten passed, four
+failed, one skipped handoff. Pi committed 21 cycle facts; the local replay
+projects them without adding ORC or Grain events. The candidate is not ready
+for acceptance. Correct the blind instruction to ask for a request the app can
+accept, and make the panel launch through `start.sh` before another scored
+cycle. Both changes require newly pinned instruments and approval.
