@@ -64,6 +64,7 @@ async function runWorker(worker, image, candidate, out, candidateSha256, sourceF
     worker: worker.id, candidate_sha256: candidateSha256,
     imageDigest, image_manifest_sha256: imageDigest.slice(7),
     worker_script_sha256: fileSha(join(HERE, worker.script)),
+    worker_support_sha256: fileSha(join(HERE, 'panel-candidate.mjs')),
     package_lock_sha256: fileSha(join(HERE, 'package-lock.json')),
     ...(worker.id === 'telemetry' ? {
       instrumentation_sha256: fileSha(join(HERE, 'panel-otel-instrumentation.mjs')),
@@ -125,6 +126,7 @@ export async function runPanelVms({ original, image, out }) {
   const manifest = { schema: 'loyly.panel-vm-run.v1', source_commit: scoreInput.source_commit,
     candidate_sha256: candidateSha256, original_score_sha256: scoreSha256,
     allure_schema_sha256: fileSha(schemaFile), plan_sha256: fileSha(planFile), image_digest: imageDigest,
+    worker_support_sha256: fileSha(join(HERE, 'panel-candidate.mjs')),
     parallel_overlap_ms: overlap, original_score_unchanged: true,
     score_state: scoreSha256 ? 'filed' : 'pre-score', producers };
   writeFileSync(join(out, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
@@ -181,6 +183,8 @@ export function verifyPanelVmRun({ original, out, imageDigest }) {
     const receipt = JSON.parse(readFileSync(join(dir, receiptFile), 'utf8'));
     if (receipt.worker !== worker.id || receipt.candidate_sha256 !== candidateSha256
         || receipt.imageDigest !== manifest.image_digest
+        || (manifest.worker_support_sha256
+          && receipt.worker_support_sha256 !== manifest.worker_support_sha256)
         || receipt.isolation !== 'gondolin-qemu-vm'
         || receipt.mounts?.candidate !== 'read-only'
         || receipt.mounts?.worker !== 'read-only'

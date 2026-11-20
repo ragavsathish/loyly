@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { treeDigest } from './grading-room.mjs';
+import { launchCandidate, readDerivedViews } from './panel-candidate.mjs';
 
 const out = '/out';
 const config = JSON.parse(await readFile(join(out, 'config.json'), 'utf8'));
@@ -46,7 +46,7 @@ async function oneRace(index) {
   const overlapped = !firstAnswered;
   const [a, b] = await Promise.all([first, second]);
   const booking = await request('/api/bookings');
-  const views = await request('/api/views');
+  const views = await readDerivedViews(base);
   const schedule = await request('/api/schedule');
   const selected = schedule.slots.find((value) => value.resource === slot.resource
     && value.weekday === 'Tuesday' && value.start === '17:00');
@@ -81,18 +81,15 @@ async function oneRace(index) {
 try {
   if (treeDigest('/candidate', 'impl') !== config.candidate_sha256)
     throw Error('Mounted candidate differs from the bound source digest');
-  server = spawn(process.execPath, ['/candidate/server.mjs', '8901'], {
-    cwd: '/candidate', env: { ...process.env, LOYLY_DATA: record,
-      LOYLY_DATA_FILE: record }, stdio: ['ignore', 'pipe', 'pipe'],
-  });
+  server = launchCandidate({ candidate: '/candidate', out, port: 8901,
+    env: { LOYLY_DATA: record, LOYLY_DATA_FILE: record } });
   let stderr = '';
   server.stderr.on('data', (chunk) => { stderr += chunk; });
   await step('Start fresh candidate in the Gondolin VM', async () => {
     for (let i = 0; i < 100; i++) {
       if (server.exitCode !== null) throw Error(`candidate exited: ${stderr}`);
       try {
-        if (serverRendered ? (await fetch(base + '/')).ok
-          : (await request(modern ? '/api/state' : '/health')).status === 200) return;
+        if ((await fetch(base + '/')).ok) return;
       } catch { /* wait */ }
       await delay(100);
     }
@@ -104,7 +101,7 @@ try {
   await step('Check the durable record and derived views after release', async () => {
     const stored = JSON.parse(await readFile(record, 'utf8'));
     assert.equal(stored.bookings.length, 0);
-    const views = await request('/api/views');
+    const views = await readDerivedViews(base);
     for (const name of ['postedList', 'heaterSchedule', 'invoicingSignals'])
       assert.equal(views[name].length, 0);
   });

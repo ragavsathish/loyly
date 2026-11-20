@@ -46,9 +46,11 @@ writable copy of the frozen candidate. The public behavior is the measurement;
 `server.mjs`, `server.js`, and a particular source language are not part of the
 booking specification. A probe that cannot launch the candidate through this
 contract reports an instrument failure and leaves that specialist behavior
-unobserved. Cycle 05 exposed that the current specialist workers still hardcode
-`server.mjs`; those workers must be corrected before their results can support
-acceptance.
+unobserved. Cycle 05 exposed an older worker revision that hardcoded
+`server.mjs`; the revised workers use `start.sh` and support both combined and
+separate public derived-view endpoints. The telemetry worker still uses Node's
+OpenTelemetry loader, so a non-Node candidate needs a runtime-specific
+instrumentation adapter before that diagnostic can be assessed.
 
 From `harness/pi-durable` after `npm ci`:
 

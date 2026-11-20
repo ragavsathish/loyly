@@ -1,11 +1,11 @@
 import http from 'node:http';
-import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { treeDigest } from './grading-room.mjs';
+import { launchCandidate, readDerivedViews } from './panel-candidate.mjs';
 
 const out = '/out';
 const config = JSON.parse(await readFile(join(out, 'config.json'), 'utf8'));
@@ -44,22 +44,19 @@ const attributes = (resource) => Object.fromEntries((resource?.attributes ?? [])
 try {
   if (treeDigest('/candidate', 'impl') !== config.candidate_sha256)
     throw Error('Mounted candidate differs from the bound source digest');
-  server = spawn(process.execPath, [
-    '--experimental-loader=/worker/node_modules/@opentelemetry/instrumentation/hook.mjs',
-    '--import=/worker/panel-otel-instrumentation.mjs', '/candidate/server.mjs', '8902',
-  ], { cwd: '/candidate', env: { ...process.env,
+  server = launchCandidate({ candidate: '/candidate', out, port: 8902,
+    nodeOptions: '--experimental-loader=/worker/node_modules/@opentelemetry/instrumentation/hook.mjs --import=/worker/panel-otel-instrumentation.mjs',
+    env: {
     LOYLY_DATA: join(out, 'record.json'), LOYLY_DATA_FILE: join(out, 'record.json'),
     CANDIDATE_SHA256: config.candidate_sha256,
-    PROBE_RUN_ID: uuid, OTLP_RECEIVER: `http://127.0.0.1:${receiverPort}` },
-    stdio: ['ignore', 'pipe', 'pipe'] });
+    PROBE_RUN_ID: uuid, OTLP_RECEIVER: `http://127.0.0.1:${receiverPort}` } });
   let stderr = '';
   server.stderr.on('data', (chunk) => { stderr += chunk; });
   await step('Start instrumented candidate and local OTLP receiver in Gondolin VM', async () => {
     for (let i = 0; i < 100; i++) {
       if (server.exitCode !== null) throw Error(`candidate exited: ${stderr}`);
       try {
-        if (serverRendered ? (await fetch(base + '/')).ok
-          : (await request(modern ? '/api/state' : '/health')).status === 200) return;
+        if ((await fetch(base + '/')).ok) return;
       } catch { /* wait */ }
       await delay(100);
     }
@@ -70,12 +67,12 @@ try {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ household: 'Probe-17', resource: serverRendered && !uiVariant ? 'pukuhuone 8' : 'ph8',
         weekday: 'Tuesday', start: '17:00' }) });
-    const views = await request('/api/views');
+    const views = await readDerivedViews(base);
     const stored = JSON.parse(await readFile(join(out, 'record.json'), 'utf8'));
     observed = { status: booked.status, recurrence: booked.body.booking?.recurrence,
       bookingId: booked.body.booking?.id, storedCount: stored.bookings.length,
       viewCounts: Object.fromEntries(['postedList', 'heaterSchedule', 'invoicingSignals']
-        .map((name) => [name, views.body[name]?.length])), processPid: server.pid };
+        .map((name) => [name, views[name]?.length])), processPid: server.pid };
     if (booked.status !== 201 || observed.recurrence !== 'weekly'
         || observed.storedCount !== 1
         || Object.values(observed.viewCounts).some((count) => count !== 1))

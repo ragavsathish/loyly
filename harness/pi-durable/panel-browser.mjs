@@ -1,4 +1,3 @@
-import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -6,6 +5,7 @@ import { join, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium } from 'playwright-core';
 import { treeDigest } from './grading-room.mjs';
+import { launchCandidate, readDerivedViews } from './panel-candidate.mjs';
 
 const root = '/out';
 const candidate = '/candidate';
@@ -69,7 +69,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-let server, browser, context, page, traceStarted = false;
+let server, browser, context, page, traceStarted = false, currentUi = false;
 const observations = { candidateSha256, sourceFilesSha256, browser: 'Chromium via Playwright core', isolation: 'Gondolin QEMU VM; candidate and worker mounted read-only; isolated record under /out', checks: {} };
 try {
   await step('Verify read-only mounted candidate source files', async () => {
@@ -78,12 +78,9 @@ try {
   });
   const port = 33000 + Math.floor(Math.random() * 20000);
   const base = `http://127.0.0.1:${port}`;
-  server = spawn(process.execPath, ['server.mjs', String(port)], {
-    cwd: candidate,
-    env: { ...process.env, LOYLY_DATA: join(artifacts, 'record.json'),
-      LOYLY_DATA_FILE: join(artifacts, 'record.json') },
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
+  server = launchCandidate({ candidate, out: root, port,
+    env: { LOYLY_DATA: join(artifacts, 'record.json'),
+      LOYLY_DATA_FILE: join(artifacts, 'record.json') } });
   let serverOutput = '';
   server.stdout.on('data', x => { serverOutput += x; });
   server.stderr.on('data', x => { serverOutput += x; });
@@ -91,7 +88,7 @@ try {
     for (let i = 0; i < 100; i++) {
       if (server.exitCode !== null) throw new Error(`Server exited: ${serverOutput}`);
       try {
-        const response = await fetch(`${base}${serverRendered ? '/' : modern ? '/api/state' : '/health'}`);
+        const response = await fetch(`${base}/`);
         if (response.ok) return;
       } catch { /* waiting for listener */ }
       await delay(100);
@@ -109,7 +106,9 @@ try {
   await step('Open the schedule and inspect free Tuesday room 8 slot', async () => {
     await page.goto(base, { waitUntil: 'networkidle' });
     assert((await page.title()).includes('Löyly'), 'Unexpected page title');
-    const free = serverRendered
+    currentUi = await page.locator('#request-dialog').count() === 1;
+    const free = currentUi ? page.locator('button.slot[data-day="Tuesday"][data-start="17:00"]')
+      : serverRendered
       ? page.getByRole('link', { name: uiVariant
         ? /Choose pukuhuone 8, Tuesday at 17:00/ : /Request pukuhuone 8, Tuesday, 17:00/ })
       : modern ? page.locator('button.slot[data-slot="ph8|Tuesday|17:00"]')
@@ -119,15 +118,23 @@ try {
     await page.screenshot({ path: join(artifacts, 'before.png'), fullPage: true });
   });
   await step('Submit the native booking form as apartment 12', async () => {
-    if (serverRendered) await page.getByRole('link', { name: uiVariant
+    if (currentUi) await page.locator('button.slot[data-day="Tuesday"][data-start="17:00"]').click();
+    else if (serverRendered) await page.getByRole('link', { name: uiVariant
       ? /Choose pukuhuone 8, Tuesday at 17:00/ : /Request pukuhuone 8, Tuesday, 17:00/ }).click();
     else if (modern) await page.locator('button.slot[data-slot="ph8|Tuesday|17:00"]').click();
     else await page.getByRole('link', { name: 'Request Tuesday 17:00 in Pukuhuone 8' }).click();
-    const selector = serverRendered ? (name) => page.locator(`[name="${name}"]`) : (name) => page.locator(`#${name}`);
+    const selector = currentUi ? (name) => page.locator(`#request-form [name="${name}"]`)
+      : serverRendered ? (name) => page.locator(`[name="${name}"]`) : (name) => page.locator(`#${name}`);
     assert(await selector('resource').inputValue() === (serverRendered && !uiVariant ? 'pukuhuone 8' : 'ph8'), 'Room selection failed');
     assert(await selector('weekday').inputValue() === 'Tuesday', 'Weekday selection failed');
     assert(await selector('start').inputValue() === '17:00', 'Start selection failed');
-    if (serverRendered) {
+    if (currentUi) {
+      const response = page.waitForResponse(r => r.url().endsWith('/api/bookings') && r.request().method() === 'POST');
+      await page.locator('#submit-request').click();
+      assert((await response).status() === 201, 'Booking form did not confirm over HTTP');
+      await page.locator('#notice:not([hidden])').waitFor();
+      assert((await page.locator('#notice').innerText()).includes('Confirmed'), 'Confirmation notice missing');
+    } else if (serverRendered) {
       if (uiVariant) await page.locator('[name="household"]').first().fill('12');
       const navigation = page.waitForNavigation();
       await page.getByRole('button', { name: /Request standing slot/ }).click();
@@ -149,10 +156,12 @@ try {
     observations.checks.formConfirmation = true;
   });
   await step('Inspect holding, schedule, posted list, heater and billing views', async () => {
-    if (serverRendered) await page.goto(uiVariant
+    if (currentUi) await page.locator('[data-page="holdings"]').click();
+    else if (serverRendered) await page.goto(uiVariant
       ? `${base}/?household=12` : `${base}/my-slots?household=12`);
     else if (modern) await page.locator('[data-tab="mine"]').click();
-    const holdings = serverRendered ? page.locator(uiVariant ? '.holdings table tbody tr' : '.booking-card')
+    const holdings = currentUi ? page.locator('#all-holdings .holding-item')
+      : serverRendered ? page.locator(uiVariant ? '.holdings table tbody tr' : '.booking-card')
       : modern ? page.locator('#my-bookings .booking-card') : page.locator('#holdings .holding-card');
     assert(await holdings.count() === 1, 'Expected one standing holding card');
     assert((await holdings.innerText()).includes('Tuesday'), 'Holding weekday missing');
@@ -161,11 +170,24 @@ try {
     const slot = schedule.slots.find(s => s.resource === (serverRendered && !uiVariant ? 'pukuhuone 8' : 'ph8')
       && s.weekday === 'Tuesday' && s.start === '17:00');
     assert((slot?.status ?? slot?.state) === 'held' && slot.household === '12', `Schedule mismatch: ${JSON.stringify(slot)}`);
-    const views = await page.request.get(`${base}/api/views`).then(r => r.json());
+    const views = await readDerivedViews(base, async (url) => {
+      const response = await page.request.get(url);
+      return { ok: response.ok(), status: response.status(), json: () => response.json() };
+    });
     assert(views.postedList.length === 1 && views.heaterSchedule.length === 1 && views.invoicingSignals.length === 1, `Derived view counts: ${JSON.stringify(views)}`);
     assert(views.postedList[0].household === '12', 'Posted list household mismatch');
     assert(views.invoicingSignals[0].payer === '12', 'Billing payer mismatch');
-    if (serverRendered) {
+    if (currentUi) {
+      await page.locator('[data-page="views"]').click();
+      const cards = page.locator('#derived-views .view-card');
+      await cards.first().waitFor();
+      assert(await cards.count() === 3, 'Three derived view cards missing');
+      for (const card of await cards.all()) {
+        const text = await card.innerText();
+        assert(text.includes('Apartment 12') || text.includes('Scheduled'), 'Derived view does not show the holding');
+        assert(text.includes('17:00'), 'Derived view omits the time');
+      }
+    } else if (serverRendered) {
       if (uiVariant) {
         for (const name of ['posted-list', 'heater-schedule', 'invoicing-signals']) {
           await page.goto(`${base}/?view=${name}&household=12`);
