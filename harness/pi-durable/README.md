@@ -24,11 +24,14 @@ plan and both VM images. The builder and grader use different models. The
 multi-slice form uses `source.specs` (every selected `spec.feature` with its
 SHA-256), may name `grader.instruction_file`, and may select a local panel
 plan through `panel.plan_file` and its pinned `panel.plan_sha256`. The checker
-requires the spec list to match the derived checklist exactly. The specialist
-worker set is still the three booking-core workers; choosing a new panel file
-does not add a specialist probe. The current product selection is still the
-eleven stamped booking-core items. Slices 02 through 05 under `docs/plan/`
-are drafts and have not entered a scored cycle.
+requires the spec list to match the derived checklist exactly. The plan's
+specialist checks launch in parallel Gondolin VMs. Existing booking-core
+checks retain their named scripts; each additional check must name a local
+`panel-*.mjs` script and one selected item. Each script writes its own Allure
+directory, and the panel compiler checks the result against the pinned plan.
+The current product selection is still the eleven stamped booking-core items.
+Slices 02 through 05 under `docs/plan/` are drafts and have not entered a
+scored cycle.
 
 The controller clones the source cut into private scratch, sends the builder at
 most three same-session continuations on selected uncarried items, and runs

@@ -55,7 +55,7 @@ function specialistResults({ specialists, plan, planSha256, manifest, candidateS
     if (producer.result !== `${result.uuid}-result.json` || result.status !== producer.status
         || result.stage !== "finished" || label(result, "tag") !== producer.item
         || label(result, "tool") !== spec.tool || label(result, "technique") !== spec.technique
-        || label(result, "feature") !== plan.feature
+        || label(result, "feature") !== (spec.feature ?? plan.feature)
         || result.parameters?.find((entry) => entry.name === "candidate_sha256")?.value !== candidateSha256
         || !result.statusDetails?.message || !result.steps?.length)
       throw new Error(`${spec.id}: specialist identity or observation differs from the plan`);
