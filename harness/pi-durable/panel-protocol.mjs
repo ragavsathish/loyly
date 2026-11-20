@@ -100,7 +100,7 @@ try {
   });
   await step('Check the durable record and derived views after release', async () => {
     const stored = JSON.parse(await readFile(record, 'utf8'));
-    assert.equal(stored.bookings.length, 0);
+    assert.equal(stored.bookings.filter((booking) => !booking.endedAt).length, 0);
     const views = await readDerivedViews(base);
     for (const name of ['postedList', 'heaterSchedule', 'invoicingSignals'])
       assert.equal(views[name].length, 0);

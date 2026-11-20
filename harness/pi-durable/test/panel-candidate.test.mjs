@@ -45,4 +45,12 @@ test('specialist reads either combined or split public derived views', async () 
   const views = await readDerivedViews('http://example.invalid', split);
   assert.deepEqual(Object.keys(views), ['postedList', 'heaterSchedule', 'invoicingSignals']);
   assert.equal(views.postedList[0].route, 'http://example.invalid/api/posted-list');
+  assert.deepEqual(await readDerivedViews('http://example.invalid', async () => ({
+    ok: true, json: async () => ({ postedList: [], heaterSchedule: [], billingSignals: [] }),
+  })), combined);
+  const splitBilling = async (url) => url.endsWith('/api/views') || url.endsWith('/api/invoicing-signals')
+    ? { ok: false, status: 404 }
+    : { ok: true, json: async () => ({ billingSignals: [],
+      postedList: [], heaterSchedule: [] }) };
+  assert.deepEqual(await readDerivedViews('http://example.invalid', splitBilling), combined);
 });

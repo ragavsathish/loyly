@@ -18,12 +18,17 @@ export function launchCandidate({ candidate, out, port, env = {}, nodeOptions })
 }
 
 export async function readDerivedViews(base, fetcher = fetch) {
+  const normalize = (body) => {
+    const invoicingSignals = body.invoicingSignals ?? body.billingSignals;
+    if (!Array.isArray(body.postedList) || !Array.isArray(body.heaterSchedule)
+        || !Array.isArray(invoicingSignals))
+      throw new Error('derived views have an unexpected shape');
+    return { postedList: body.postedList, heaterSchedule: body.heaterSchedule,
+      invoicingSignals };
+  };
   const combined = await fetcher(`${base}/api/views`);
   if (combined.ok) {
-    const body = await combined.json();
-    if (['postedList', 'heaterSchedule', 'invoicingSignals']
-      .every((key) => Array.isArray(body[key]))) return body;
-    throw new Error('combined derived views have an unexpected shape');
+    return normalize(await combined.json());
   }
   if (combined.status !== 404) throw new Error(`derived views HTTP ${combined.status}`);
   const routes = [
@@ -32,11 +37,14 @@ export async function readDerivedViews(base, fetcher = fetch) {
     ['invoicingSignals', '/api/invoicing-signals'],
   ];
   const pairs = await Promise.all(routes.map(async ([key, path]) => {
-    const response = await fetcher(`${base}${path}`);
+    let response = await fetcher(`${base}${path}`);
+    if (key === 'invoicingSignals' && response.status === 404)
+      response = await fetcher(`${base}/api/billing-signals`);
     if (!response.ok) throw new Error(`${path} HTTP ${response.status}`);
     const body = await response.json();
-    if (!Array.isArray(body.entries)) throw new Error(`${path} has no entries`);
-    return [key, body.entries];
+    const entries = body.entries ?? body[key] ?? (key === 'invoicingSignals' ? body.billingSignals : undefined);
+    if (!Array.isArray(entries)) throw new Error(`${path} has no entries`);
+    return [key, entries];
   }));
   return Object.fromEntries(pairs);
 }

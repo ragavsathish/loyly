@@ -69,7 +69,8 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-let server, browser, context, page, traceStarted = false, currentUi = false;
+let server, browser, context, page, traceStarted = false, currentUi = false,
+  linkedSchedule = false;
 const observations = { candidateSha256, sourceFilesSha256, browser: 'Chromium via Playwright core', isolation: 'Gondolin QEMU VM; candidate and worker mounted read-only; isolated record under /out', checks: {} };
 try {
   await step('Verify read-only mounted candidate source files', async () => {
@@ -107,7 +108,11 @@ try {
     await page.goto(base, { waitUntil: 'networkidle' });
     assert((await page.title()).includes('Löyly'), 'Unexpected page title');
     currentUi = await page.locator('#request-dialog').count() === 1;
+    linkedSchedule = await page.getByRole('link', {
+      name: 'Book pukuhuone 8 Tuesday 17:00',
+    }).count() === 1;
     const free = currentUi ? page.locator('button.slot[data-day="Tuesday"][data-start="17:00"]')
+      : linkedSchedule ? page.getByRole('link', { name: 'Book pukuhuone 8 Tuesday 17:00' })
       : serverRendered
       ? page.getByRole('link', { name: uiVariant
         ? /Choose pukuhuone 8, Tuesday at 17:00/ : /Request pukuhuone 8, Tuesday, 17:00/ })
@@ -119,16 +124,25 @@ try {
   });
   await step('Submit the native booking form as apartment 12', async () => {
     if (currentUi) await page.locator('button.slot[data-day="Tuesday"][data-start="17:00"]').click();
+    else if (linkedSchedule) await page.getByRole('link', { name: 'Book pukuhuone 8 Tuesday 17:00' }).click();
     else if (serverRendered) await page.getByRole('link', { name: uiVariant
       ? /Choose pukuhuone 8, Tuesday at 17:00/ : /Request pukuhuone 8, Tuesday, 17:00/ }).click();
     else if (modern) await page.locator('button.slot[data-slot="ph8|Tuesday|17:00"]').click();
     else await page.getByRole('link', { name: 'Request Tuesday 17:00 in Pukuhuone 8' }).click();
     const selector = currentUi ? (name) => page.locator(`#request-form [name="${name}"]`)
+      : linkedSchedule ? (name) => page.locator(`form[action="/bookings"] [name="${name}"]`)
       : serverRendered ? (name) => page.locator(`[name="${name}"]`) : (name) => page.locator(`#${name}`);
     assert(await selector('resource').inputValue() === (serverRendered && !uiVariant ? 'pukuhuone 8' : 'ph8'), 'Room selection failed');
     assert(await selector('weekday').inputValue() === 'Tuesday', 'Weekday selection failed');
     assert(await selector('start').inputValue() === '17:00', 'Start selection failed');
-    if (currentUi) {
+    if (linkedSchedule) {
+      await selector('household').fill('12');
+      const navigation = page.waitForNavigation();
+      await page.getByRole('button', { name: /Confirm standing slot/ }).click();
+      const response = await navigation;
+      assert(response?.status() === 200, `Booking form status ${response?.status()}`);
+      assert(await page.getByRole('status').count() === 1, 'Confirmation notice missing');
+    } else if (currentUi) {
       const response = page.waitForResponse(r => r.url().endsWith('/api/bookings') && r.request().method() === 'POST');
       await page.locator('#submit-request').click();
       assert((await response).status() === 201, 'Booking form did not confirm over HTTP');
@@ -156,11 +170,13 @@ try {
     observations.checks.formConfirmation = true;
   });
   await step('Inspect holding, schedule, posted list, heater and billing views', async () => {
-    if (currentUi) await page.locator('[data-page="holdings"]').click();
+    if (linkedSchedule) await page.goto(`${base}/holdings?household=12`);
+    else if (currentUi) await page.locator('[data-page="holdings"]').click();
     else if (serverRendered) await page.goto(uiVariant
       ? `${base}/?household=12` : `${base}/my-slots?household=12`);
     else if (modern) await page.locator('[data-tab="mine"]').click();
-    const holdings = currentUi ? page.locator('#all-holdings .holding-item')
+    const holdings = linkedSchedule ? page.locator('.holdings .holding')
+      : currentUi ? page.locator('#all-holdings .holding-item')
       : serverRendered ? page.locator(uiVariant ? '.holdings table tbody tr' : '.booking-card')
       : modern ? page.locator('#my-bookings .booking-card') : page.locator('#holdings .holding-card');
     assert(await holdings.count() === 1, 'Expected one standing holding card');
@@ -177,7 +193,16 @@ try {
     assert(views.postedList.length === 1 && views.heaterSchedule.length === 1 && views.invoicingSignals.length === 1, `Derived view counts: ${JSON.stringify(views)}`);
     assert(views.postedList[0].household === '12', 'Posted list household mismatch');
     assert(views.invoicingSignals[0].payer === '12', 'Billing payer mismatch');
-    if (currentUi) {
+    if (linkedSchedule) {
+      for (const [route, needsHousehold] of [
+        ['posted-list', true], ['heater-schedule', false], ['billing-signals', true],
+      ]) {
+        await page.goto(`${base}/${route}`);
+        const text = await page.locator('main').innerText();
+        assert(text.includes('17:00') && (!needsHousehold || text.includes('Apartment 12')),
+          `${route} does not show the holding`);
+      }
+    } else if (currentUi) {
       await page.locator('[data-page="views"]').click();
       const cards = page.locator('#derived-views .view-card');
       await cards.first().waitFor();
