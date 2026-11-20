@@ -175,6 +175,17 @@ its browser and protocol corroboration and telemetry diagnostic failed before
 measuring behavior. The unified Allure report has 15 cases: ten passed, four
 failed, one skipped handoff. Pi committed 21 cycle facts; the local replay
 projects them without adding ORC or Grain events. The candidate is not ready
-for acceptance. Correct the blind instruction to ask for a request the app can
-accept, and make the panel launch through `start.sh` before another scored
-cycle. Both changes require newly pinned instruments and approval.
+for acceptance. The original panel result and score remain immutable.
+
+The corrected blind instruction now asks for a room, weekday and start time
+that the app confirms, with no extra end-time requirement. Panel controller
+`8b3e5ea` starts each specialist from a writable copy through `start.sh` and
+reads either combined or separate public derived-view endpoints. A separately
+pinned cycle-05 panel reassessment produced three passing Gondolin results:
+Playwright, 100 overlapping protocol races, and candidate-bound OpenTelemetry.
+Its 15-case Allure report still says `not-ready` because the original blind
+review and filed 10/11 score are unchanged. The reassessment receipt is local
+at `scratch-production-cycle-05/panel-reassessment-8b3e5ea/reassessment.json`;
+its specialist manifest SHA-256 is
+`4dc415526477a1dff08d69dae95f432b51f0af9461e632edfdbc764f340c6d88`.
+The next scored cycle requires new pinned instruments and operator approval.

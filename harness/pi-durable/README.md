@@ -64,8 +64,10 @@ receipt. It never changes the original cycle's audit, score or outcome. See
 - Cycle 05 passed the independent gate on attempt 1 and completed all three
   grader shards. Its blind reviewer rejected `01-011` under an end-time
   requirement added by the blind instruction, so the filed score is **10/11**.
-  The specialist panel failed to launch the generated `server.js` candidate
-  because it hardcodes `server.mjs`; its outcome is `not-ready`.
+  The original specialist panel failed to launch the generated `server.js`
+  candidate because it hardcoded `server.mjs`. The corrected workers later
+  passed all three Gondolin probes in a separate, pinned reassessment. The
+  original score remains **10/11**, and that reassessment is still `not-ready`.
 
 Pi is the active driver by operator direction. The original cycle failure
 remains visible; the reassessment is separately labelled. The generated app
