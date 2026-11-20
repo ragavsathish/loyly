@@ -40,6 +40,14 @@ replacement for the archived runner.
 The original booking flow remains supported while the spec-v2 adapter is built.
 Do not treat a green booking cycle as proof that the whole-app cut works.
 
+The Pi gate process adapter now has a `spec-v2` mode that runs the pinned
+source's `harness/v2/gate.sh` against a separate candidate room. It checks the
+instrument commit before launch and again in the gate host, binds the mode,
+slice and instrument identity into its durable receipt, and retains restart
+reconciliation. A fixture proves that mode and the original booking mode.
+The live cycle has not yet selected this mode; it still needs the spec-v2
+fence, candidate path and builder instruction wiring.
+
 ## Execution order
 
 1. Add a versioned `spec-v2` run profile to the Pi controller. Bind a separate

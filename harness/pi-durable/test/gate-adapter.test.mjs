@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -35,4 +35,28 @@ test("a killed controller reads the surviving gate receipt", async () => {
   const result = await runGate(args);
   assert.deepEqual([result.exit, result.reconciled], [1, true]);
   assert.equal(readdirSync(args.out).filter((name) => name === "receipt.txt").length, 1);
+});
+
+test("spec-v2 gate runs the pinned external instrument against the candidate room", async () => {
+  const root = mkdtempSync(join(tmpdir(), "loyly-v2-gate-adapter-"));
+  const instrumentRoot = join(root, "instrument"), room = join(root, "candidate");
+  const out = join(root, "evidence");
+  mkdirSync(join(instrumentRoot, "harness", "v2"), { recursive: true });
+  mkdirSync(join(room, "harness-impl", "06-cycle-runner"), { recursive: true });
+  writeFileSync(join(instrumentRoot, "harness", "v2", "gate.sh"),
+    '#!/bin/sh\nprintf "slice=%s room=%s\\n" "$1" "$2"\nexit 0\n');
+  for (const args of [["init", "-q"], ["add", "."],
+    ["-c", "user.name=test", "-c", "user.email=test@example.invalid", "commit", "-q", "-m", "instrument"]]) {
+    const git = spawnSync("git", args, { cwd: instrumentRoot, encoding: "utf8" });
+    assert.equal(git.status, 0, git.stderr);
+  }
+  const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: instrumentRoot, encoding: "utf8" });
+  const args = { room, out, candidateSha256: "b".repeat(64), profile: "spec-v2",
+    instrumentRoot, instrumentCommit: head.stdout.trim(), slice: "06" };
+  const first = await runGate(args);
+  assert.equal(first.exit, 0);
+  assert.match(readFileSync(join(out, "gate.log"), "utf8"), /slice=06 room=.*candidate/);
+  assert.equal((await runGate(args)).reconciled, true);
+  writeFileSync(join(instrumentRoot, "changed.txt"), "dirty\n");
+  await assert.rejects(runGate(args), /instrument is dirty/);
 });
