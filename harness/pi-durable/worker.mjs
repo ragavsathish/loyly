@@ -29,6 +29,8 @@ const Audit = defineEntry("loyly.proto.audit.v1");
 const scratch = resolve(process.argv[2] ?? join(HERE, "scratch"));
 const runId = process.env.LOYLY_RUN_ID ?? "prototype-cycle-1";
 if (!/^[A-Za-z0-9._-]+$/.test(runId)) throw new Error("LOYLY_RUN_ID contains unsafe characters");
+const scoreCycle = process.env.LOYLY_SCORE_CYCLE ?? "02";
+if (!/^\d\d$/.test(scoreCycle)) throw new Error("LOYLY_SCORE_CYCLE must be two digits");
 const storePath = join(scratch, "cycle.PROTOTYPE.sqlite");
 const room = join(scratch, "fenced-room");
 const gradingRoom = join(scratch, "grading-room");
@@ -877,8 +879,8 @@ const Cycle = defineTask({
           if (cloned.code !== 0) throw new Error("instrument clone failed");
         }
         scoreInput = bindScoreInput({ scratch, sourceRoot, instrument,
-          candidateSha256, verdictsFile });
-        const cycleDir = join(instrument, "harness", "cycles", "02");
+          candidateSha256, verdictsFile, scoreCycle });
+        const cycleDir = join(instrument, "harness", "cycles", scoreCycle);
         mkdirSync(cycleDir, { recursive: true });
         if (!existsSync(join(cycleDir, "checklist.json"))) {
           const checklist = command("score-checklist", "bb", ["harness/gen_checklist.clj",
@@ -886,16 +888,16 @@ const Cycle = defineTask({
           if (checklist.code !== 0) throw new Error("score checklist derivation failed");
         }
         if (existsSync(join(cycleDir, "scores.json"))) {
-          scoreReceipt = verifyScoredCycle({ scratch, instrument, verdictsFile });
+          scoreReceipt = verifyScoredCycle({ scratch, instrument, verdictsFile, cycle: scoreCycle });
           r = { code: 0, sha256: scoreReceipt.scoreSha256 };
           reconciled = true;
         } else {
-          r = command("score", "bb", ["harness/score.clj", "02", "--verdicts", verdictsFile],
+          r = command("score", "bb", ["harness/score.clj", scoreCycle, "--verdicts", verdictsFile],
             { cwd: instrument });
           if (r.code !== 0) throw new Error("legacy scorer failed");
-          scoreReceipt = verifyScoredCycle({ scratch, instrument, verdictsFile });
+          scoreReceipt = verifyScoredCycle({ scratch, instrument, verdictsFile, cycle: scoreCycle });
         }
-        board = command("scoreboard", "bb", ["harness/scoreboard.clj", "02"], { cwd: instrument });
+        board = command("scoreboard", "bb", ["harness/scoreboard.clj", scoreCycle], { cwd: instrument });
         if (board.code !== 0) throw new Error("legacy scoreboard failed");
       } catch (error) {
         reason = String(error.stack ?? error);
@@ -912,7 +914,7 @@ const Cycle = defineTask({
           score_file_sha256: scoreReceipt?.scoreSha256 ?? null, reconciled,
           fixture_grader: !live || grader?.model.startsWith("test/") });
         if (!reason) await audit(tx, task, "scoreboard", "reported", {
-          cycle: "02", log_sha256: board.sha256 });
+          cycle: scoreCycle, log_sha256: board.sha256 });
         if (reason) {
           await audit(tx, task, "cycle", "failed", { reason: "score" });
           return { status: "terminal", outcome: { status: "failed", error: "score" } };
@@ -969,6 +971,7 @@ try {
   let id = existing.items[0]?.id;
   const cycleInput = { runId, approvedCommit: approvedCommit ?? null, approvedChecklistSha256, mode, builder,
     ...(process.env.LOYLY_SOURCE_REPO ? { approvedSourceRepo } : {}),
+    ...(scoreCycle !== "02" ? { scoreCycle } : {}),
     grader, blindAgent, panel, graderShardCount: live ? graderShardCount : null };
   if (id && JSON.stringify(existing.items[0].input) !== JSON.stringify(cycleInput))
     throw new Error("this Pi store belongs to a different approved cut, checklist or mode");

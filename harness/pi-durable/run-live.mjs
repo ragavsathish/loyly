@@ -118,6 +118,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (process.argv[2] === '--run') {
     const env = { ...process.env, PATH: `${process.env.JAVA_HOME}/bin:${process.env.PATH}`,
       LOYLY_RUN_ID: config.run_id,
+      LOYLY_SCORE_CYCLE: config.score_cycle ?? '02',
       LOYLY_SOURCE_REPO: source,
       LOYLY_APPROVED_COMMIT: config.source.commit,
       LOYLY_APPROVED_CHECKLIST_SHA256: config.source.checklist_sha256,
