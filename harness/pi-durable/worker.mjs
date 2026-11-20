@@ -87,12 +87,14 @@ const grader = live && process.env.LOYLY_GRADER_MODEL ? {
   imageSha256: process.env.LOYLY_GRADER_IMAGE_SHA256,
   settingsSha256: process.env.LOYLY_GRADER_SETTINGS_SHA256,
   instructionSha256: process.env.LOYLY_GRADER_INSTRUCTION_SHA256,
+  instructionFile: process.env.LOYLY_GRADER_INSTRUCTION_FILE ?? "grader-instruction-01.md",
   schemaSha256: process.env.LOYLY_GRADER_SCHEMA_SHA256,
 } : null;
 const graderShardCount = Number(process.env.LOYLY_GRADER_SHARDS ?? 3);
 if (live && (!Number.isInteger(graderShardCount) || graderShardCount < 1 || graderShardCount > 16))
   throw new Error("LOYLY_GRADER_SHARDS must be an integer from 1 to 16");
 if (grader && (grader.model === builder.model
+    || !/^[A-Za-z0-9._-]+\.md$/.test(grader.instructionFile)
     || [grader.commandSha256, grader.imageSha256, grader.settingsSha256,
       grader.instructionSha256, grader.schemaSha256]
       .some((digest) => !/^[0-9a-f]{64}$/.test(digest ?? ""))))
@@ -426,7 +428,7 @@ const Grade = defineTask({
   phases: {
     file: async (task, runtime) => {
       if (live) {
-        const instruction = join(HERE, "grader-instruction-01.md");
+        const instruction = join(HERE, grader.instructionFile);
         let r, judged, reason, shardReceipts;
         try {
           if (!grader) throw new Error("independent grader not configured");

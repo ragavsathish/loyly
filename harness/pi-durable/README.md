@@ -21,7 +21,14 @@ node run-live.mjs --run scratch-production-cycle-XX/live-run.json
 The contract pins the clean controller and source commits, selected spec and
 checklist, agent wrappers and instructions, model names, Allure schema, panel
 plan and both VM images. The builder and grader use different models. The
-controller clones the source cut into private scratch, sends the builder at
+multi-slice form uses `source.specs` (every selected `spec.feature` with its
+SHA-256) and may name `grader.instruction_file`; the checker requires that
+list to match the derived checklist exactly. The current product selection is
+still the eleven stamped booking-core items. The release slice in
+`docs/plan/02-occurrence-release/` is a draft and has not entered a scored
+cycle.
+
+The controller clones the source cut into private scratch, sends the builder at
 most three same-session continuations on selected uncarried items, and runs
 the legacy gate independently after each completed build. A red gate or a
 failed builder process with a completed Pi session receipt starts a repair

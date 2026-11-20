@@ -45,6 +45,7 @@
         "image_sha256": { "$ref": "#/$defs/sha" },
         "model": { "type": "string", "minLength": 1 },
         "instruction_sha256": { "$ref": "#/$defs/sha" },
+        "instruction_file": { "type": "string", "pattern": "^[A-Za-z0-9._-]+\\.md$" },
         "settings": { "type": "string", "minLength": 1 },
         "settings_sha256": { "$ref": "#/$defs/sha" },
         "schema_sha256": { "$ref": "#/$defs/sha" },

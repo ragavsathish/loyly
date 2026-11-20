@@ -73,9 +73,11 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
       || git(ROOT, 'status', '--porcelain') || git(source, 'status', '--porcelain'))
     throw Error('controller or source is dirty or differs from the approved commit');
   verifySelectedSpecs(source, config.source);
+  if (config.builder.instruction_file || config.blind.instruction_file)
+    throw Error('only the grader selects a separate instruction file');
   const agents = [
     [config.builder, 'builder-instruction.md'],
-    [config.grader, 'grader-instruction-01.md'],
+    [config.grader, config.grader.instruction_file ?? 'grader-instruction-01.md'],
     [config.blind, 'blind-agent-instruction.md'],
   ];
   const checkedImages = new Set();
@@ -133,6 +135,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       LOYLY_GRADER_SETTINGS: config.grader.settings,
       LOYLY_GRADER_SETTINGS_SHA256: config.grader.settings_sha256,
       LOYLY_GRADER_INSTRUCTION_SHA256: config.grader.instruction_sha256,
+      LOYLY_GRADER_INSTRUCTION_FILE: config.grader.instruction_file ?? 'grader-instruction-01.md',
       LOYLY_GRADER_SCHEMA_SHA256: config.grader.schema_sha256,
       LOYLY_GRADER_SHARDS: String(config.grader.shards),
       LOYLY_BLIND_AGENT_COMMAND: config.blind.command,
