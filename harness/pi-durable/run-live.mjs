@@ -6,6 +6,7 @@ import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
+import { validatePanelSelection } from './panel-selection.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
@@ -105,7 +106,10 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
     if (result.status !== 0) throw Error(`checklist derivation failed: ${result.stderr}`);
   }
   requireHash(checklist, config.source.checklist_sha256);
-  verifySelectedSpecs(source, config.source, JSON.parse(readFileSync(checklist, 'utf8')));
+  const selectedChecklist = JSON.parse(readFileSync(checklist, 'utf8'));
+  verifySelectedSpecs(source, config.source, selectedChecklist);
+  validatePanelSelection(JSON.parse(readFileSync(join(HERE,
+    config.panel.plan_file ?? 'booking-core.panel.json'), 'utf8')), selectedChecklist);
   return { source, scratch };
 }
 

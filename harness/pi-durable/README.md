@@ -25,7 +25,10 @@ multi-slice form uses `source.specs` (every selected `spec.feature` with its
 SHA-256), may name `grader.instruction_file`, and may select a local panel
 plan through `panel.plan_file` and its pinned `panel.plan_sha256`. The checker
 requires the spec list to match the derived checklist exactly. The plan's
-specialist checks launch in parallel Gondolin VMs. Existing booking-core
+raw checks must cover that checklist exactly; its separate blind check must
+cover `01-011`, and specialist checks must name selected items. This is
+validated before the build starts. The plan's specialist checks launch in
+parallel Gondolin VMs. Existing booking-core
 checks retain their named scripts; each additional check must name a local
 `panel-*.mjs` script and one selected item. Each script writes its own Allure
 directory, and the panel compiler checks the result against the pinned plan.
