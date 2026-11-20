@@ -51,6 +51,11 @@ unobserved. Cycle 05 exposed an older worker revision that hardcoded
 separate public derived-view endpoints. The telemetry worker still uses Node's
 OpenTelemetry loader, so a non-Node candidate needs a runtime-specific
 instrumentation adapter before that diagnostic can be assessed.
+`Dockerfile.panel-multistack` and `panel-vm-multistack-build.json` provide a
+separate image with Node, Chromium, Babashka, Clojure, Java 21, `jcmd` and
+`jfr`. Its smoke run passed the three existing probes against the frozen
+cycle-06 Node candidate, and it launched the preserved cycle-04 Babashka app
+over HTTP. No JVM or Babashka telemetry claim follows from those smoke runs.
 
 From `harness/pi-durable` after `npm ci`:
 

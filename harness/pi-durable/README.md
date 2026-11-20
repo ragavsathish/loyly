@@ -36,6 +36,29 @@ The current product selection is still the eleven stamped booking-core items.
 Slices 02 through 05 under `docs/plan/` are drafts and have not entered a
 scored cycle.
 
+For a candidate that may use Node, Babashka or the JVM, build the optional
+combined specialist image from the Clojure builder OCI image at the digest
+named in `Dockerfile.panel-multistack`:
+
+```sh
+docker build --platform linux/arm64 \
+  -f Dockerfile.panel-multistack -t loyly/panel-multistack:oci .
+gondolin build --config panel-vm-multistack-build.json \
+  --output ../../.pi/harness/.state/assets/panel-multistack \
+  --tag loyly-panel:multistack-v1
+```
+
+The base OCI image is a local prerequisite from the existing Clojure builder
+toolchain; the build refuses a different digest. The Gondolin asset remains
+gitignored and its manifest digest must be pinned in a live run contract.
+This image adds Node and Chromium to the existing Java 21, Clojure CLI and
+Babashka toolchain. In an exploratory run, the frozen cycle-06 Node candidate
+passed the browser, protocol and Node OpenTelemetry workers in three
+overlapping VMs, and the preserved cycle-04 Babashka candidate started and
+served HTTP from the same image. The current OpenTelemetry worker still uses
+Node's loader. A JVM or Babashka diagnostic needs its own panel script and
+approved plan entry; the combined image alone does not provide that evidence.
+
 The controller clones the source cut into private scratch, sends the builder at
 most three same-session continuations on selected uncarried items, and runs
 the legacy gate independently after each completed build. A red gate or a
