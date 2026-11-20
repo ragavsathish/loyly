@@ -4,12 +4,19 @@ import { test } from 'node:test';
 import { validatePanelSelection } from '../panel-selection.mjs';
 
 const booking = JSON.parse(readFileSync(new URL('../booking-core.panel.json', import.meta.url)));
+const runtime = JSON.parse(readFileSync(new URL('../booking-core-runtime.panel.json', import.meta.url)));
 const ids = Array.from({ length: 11 }, (_, n) => `01-${String(n + 1).padStart(3, '0')}`);
 const checklist = { items: ids.map((id) => ({ id })) };
 
 test('the existing panel covers its whole scored booking cut', () => {
   assert.deepEqual(validatePanelSelection(booking, checklist), {
     selected: ids, specialists: ['browser', 'protocol', 'telemetry'],
+  });
+});
+
+test('the four-worker calibration panel retains the same scored denominator', () => {
+  assert.deepEqual(validatePanelSelection(runtime, checklist), {
+    selected: ids, specialists: ['browser', 'protocol', 'telemetry', 'runtime-profile'],
   });
 });
 

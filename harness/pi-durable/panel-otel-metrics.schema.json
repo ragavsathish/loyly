@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Löyly panel OTLP JSON process-metrics subset",
+  "description": "Validates the required structure of the OpenTelemetry SDK's OTLP JSON export; it is not a replacement for the complete OTLP protobuf schema.",
+  "type": "object",
+  "required": ["resourceMetrics"],
+  "properties": {
+    "resourceMetrics": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["resource", "scopeMetrics"],
+        "properties": {
+          "resource": { "type": "object", "required": ["attributes"],
+            "properties": { "attributes": { "$ref": "#/$defs/attributes" } } },
+          "scopeMetrics": { "type": "array", "minItems": 1,
+            "items": { "type": "object", "required": ["scope", "metrics"],
+              "properties": {
+                "scope": { "type": "object", "required": ["name"],
+                  "properties": { "name": { "const": "loyly.panel.runtime" } } },
+                "metrics": { "type": "array", "minItems": 3,
+                  "items": { "type": "object", "required": ["name", "gauge"],
+                    "properties": {
+                      "name": { "type": "string", "minLength": 1 },
+                      "gauge": { "type": "object", "required": ["dataPoints"],
+                        "properties": { "dataPoints": { "type": "array", "minItems": 1,
+                          "items": { "type": "object", "required": ["attributes", "timeUnixNano", "asDouble"],
+                            "properties": {
+                              "attributes": { "$ref": "#/$defs/attributes" },
+                              "timeUnixNano": { "type": "string", "pattern": "^[0-9]+$" },
+                              "asDouble": { "type": "number", "minimum": 0 }
+                            } } } } }
+                    } } }
+              } } }
+        } }
+    }
+  },
+  "$defs": {
+    "attributes": { "type": "array", "items": { "type": "object",
+      "required": ["key", "value"],
+      "properties": {
+        "key": { "type": "string", "minLength": 1 },
+        "value": { "type": "object", "properties": {
+          "stringValue": { "type": "string" }, "intValue": { "type": "number" }
+        } }
+      } } }
+  }
+}

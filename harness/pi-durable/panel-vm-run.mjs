@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { candidateDigest } from './grading-room.mjs';
 import { scoreCycleFor } from './score-receipt.mjs';
+import { verifyRuntimeProfileEvidence } from './runtime-profile-evidence.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -31,7 +32,8 @@ export function specialistWorkers(plan) {
           || legacy.item !== check.items[0])))
       throw new Error(`${check.id}: specialist script or item differs from the panel plan`);
     return { id: check.id, script, tool: check.tool, item: check.items[0],
-      technique: check.technique, feature: check.feature ?? plan.feature };
+      technique: check.technique, feature: check.feature ?? plan.feature,
+      probe: check.probe };
   });
 }
 const label = (result, name) => result.labels?.find((entry) => entry.name === name)?.value;
@@ -57,7 +59,8 @@ async function runWorker(worker, image, candidate, out, candidateSha256, sourceF
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'config.json'), JSON.stringify({ candidate_sha256: candidateSha256,
     source_files_sha256: sourceFilesSha256, item: worker.item,
-    feature: worker.feature, tool: worker.tool, technique: worker.technique }));
+    feature: worker.feature, tool: worker.tool, technique: worker.technique,
+    ...(worker.probe ? { probe: worker.probe } : {}) }));
   const args = ['exec', '--image', image,
     '--mount-hostfs', `${candidate}:/candidate:ro`,
     '--mount-hostfs', `${HERE}:/worker:ro`,
@@ -90,6 +93,10 @@ async function runWorker(worker, image, candidate, out, candidateSha256, sourceF
     ...(worker.id === 'telemetry' ? {
       instrumentation_sha256: fileSha(join(HERE, 'panel-otel-instrumentation.mjs')),
     } : {}),
+    ...(worker.script === 'panel-runtime.mjs' ? {
+      profile_validator_sha256: fileSha(join(HERE, 'runtime-profile-evidence.mjs')),
+      profile_otel_schema_sha256: fileSha(join(HERE, 'panel-otel-metrics.schema.json')),
+    } : {}),
     vm_exit_code: exitCode, isolation: 'gondolin-qemu-vm',
     mounts: { candidate: 'read-only', worker: 'read-only', output: 'read-write' },
     egress: ['egress-blocked.invalid'], started, stopped,
@@ -106,6 +113,8 @@ async function runWorker(worker, image, candidate, out, candidateSha256, sourceF
       || result.parameters?.find((entry) => entry.name === 'candidate_sha256')?.value !== candidateSha256
       || result.stage !== 'finished' || (exitCode === 0) !== (result.status === 'passed'))
     throw new Error(`${worker.id}: VM result is invalid: ${JSON.stringify(validate.errors)}`);
+  if (worker.script === 'panel-runtime.mjs')
+    verifyRuntimeProfileEvidence({ dir, result, candidateSha256, probe: worker.probe });
   const files = [resultFile, ...result.attachments.map((attachment) => attachment.source)];
   const hashes = Object.fromEntries(files.map((name) => [name, fileSha(join(dir, name))]));
   return { id: worker.id, tool: worker.tool, item: `@item-${worker.item}`,
@@ -191,6 +200,8 @@ export function verifyPanelVmRun({ original, out, imageDigest,
     if (results.length !== 1 || results[0] !== producer.result)
       throw new Error(`${worker.id}: expected one result`);
     const result = JSON.parse(readFileSync(join(dir, producer.result), 'utf8'));
+    if (worker.script === 'panel-runtime.mjs')
+      verifyRuntimeProfileEvidence({ dir, result, candidateSha256, probe: worker.probe });
     const receiptFile = result.attachments?.find((attachment) =>
       attachment.name === 'Gondolin VM execution receipt')?.source;
     const files = [producer.result, ...(result.attachments ?? []).map((attachment) => attachment.source)];
@@ -210,6 +221,9 @@ export function verifyPanelVmRun({ original, out, imageDigest,
     if (receipt.worker !== worker.id || receipt.candidate_sha256 !== candidateSha256
         || receipt.imageDigest !== manifest.image_digest
         || receipt.worker_script_sha256 !== fileSha(join(HERE, worker.script))
+        || (worker.script === 'panel-runtime.mjs'
+          && (receipt.profile_validator_sha256 !== fileSha(join(HERE, 'runtime-profile-evidence.mjs'))
+            || receipt.profile_otel_schema_sha256 !== fileSha(join(HERE, 'panel-otel-metrics.schema.json'))))
         || (manifest.worker_support_sha256
           && receipt.worker_support_sha256 !== manifest.worker_support_sha256)
         || receipt.isolation !== 'gondolin-qemu-vm'

@@ -56,8 +56,9 @@ Babashka toolchain. In an exploratory run, the frozen cycle-06 Node candidate
 passed the browser, protocol and Node OpenTelemetry workers in three
 overlapping VMs, and the preserved cycle-04 Babashka candidate started and
 served HTTP from the same image. The current OpenTelemetry worker still uses
-Node's loader. A JVM or Babashka diagnostic needs its own panel script and
-approved plan entry; the combined image alone does not provide that evidence.
+Node's loader. The separate `panel-runtime.mjs` script collects panel-observed
+process metrics and JFR, when applicable, under an approved plan entry. It
+does not turn those observations into candidate-emitted OpenTelemetry.
 
 The controller clones the source cut into private scratch, sends the builder at
 most three same-session continuations on selected uncarried items, and runs
@@ -67,9 +68,10 @@ attempt: Pi forks the prior conversation at its last committed entry, keeps
 the existing `impl/`, and gives the fork the failure log. The cycle stops
 after three attempts; a changed approved input or invalid receipt stops it
 immediately. It then grades rule scopes in separate VMs, launches a
-fresh blind Pi reviewer for `01-011`, and runs three specialist VMs in
+fresh blind Pi reviewer for `01-011`, and runs the selected specialist VMs in
 parallel. The selected panel manifest is bound into the filed score input.
-Five Allure result directories then generate one 15-case report.
+The current booking plan has three specialists and produces a 15-case Allure
+report; another pinned plan may add result directories without merging them.
 
 ## Panel-only reassessment
 

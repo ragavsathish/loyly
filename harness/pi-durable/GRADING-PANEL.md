@@ -57,6 +57,42 @@ separate image with Node, Chromium, Babashka, Clojure, Java 21, `jcmd` and
 cycle-06 Node candidate, and it launched the preserved cycle-04 Babashka app
 over HTTP. No JVM or Babashka telemetry claim follows from those smoke runs.
 
+## Cross-runtime process profile
+
+`panel-runtime.mjs` is an optional **diagnostic** specialist for a selected
+item. Its panel check pins one public HTTP method, path, expected status and
+optional JSON body under `probe`. In a private Gondolin VM it starts a writable
+candidate copy, takes `/proc` process snapshots before and after that request,
+and writes a standard Allure result. The panel's OpenTelemetry SDK exports
+RSS, thread count and request duration as OTLP JSON. Its resource attributes
+name the candidate SHA-256, probe run ID and `measurement.source=panel-vm-procfs`:
+these are observations by the grading VM, **not** spans or metrics emitted by
+the candidate. If the live process is Java, the worker starts JFR with JVM
+startup options and attaches the nonempty recording after process exit.
+`jcmd` is present in the multistack image but its attach operation did not work
+in the exploratory Gondolin JVM; the worker does not depend on it.
+
+The host checks the Allure result against the supplied lifecycle schema, the
+OTLP JSON against `panel-otel-metrics.schema.json`, the OTLP values against the
+raw `/proc` evidence, and a JVM's JFR file length against both. The worker
+script, validator and metric schema digests are in the VM execution receipt.
+No latency or memory budget is inferred from a single sample. A product
+acceptance item still needs its independent black-box grade.
+`booking-core-runtime.panel.json` is the versioned calibration plan for the
+existing 11-item cut; it adds this profile to the original three specialists.
+It is not the approved plan for a new whole-product scored cycle.
+
+Exploratory evidence on 2026-11-20: the frozen cycle-06 Node app and preserved
+cycle-04 Babashka app both returned HTTP 201 for a real standing-slot booking
+under this probe. A local Java server produced a nonempty JFR recording. A
+four-worker panel against the frozen cycle-06 app had 4,076 ms of VM overlap;
+browser, protocol, Node telemetry and process profile passed. The compiler
+verified a 16-case Allure report (15 passed, one raw blind handoff skipped) as
+`ready-for-review` against the unchanged historical **11/11** score. Its
+manifests and report are in ignored local
+`scratch-runtime-calibration-20261120/`. This is instrument calibration,
+not a new scored whole-product cycle or acceptance decision.
+
 From `harness/pi-durable` after `npm ci`:
 
 ```sh
