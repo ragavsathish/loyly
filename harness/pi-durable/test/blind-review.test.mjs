@@ -117,6 +117,29 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
   assert.deepEqual(finalVerdictsFromBlindReview({ packetDir, reviewFile: badFile,
     gradingRoom: room, verificationDir: badProbe, out: join(root, "bad-agent") })
     .verdicts.map((v) => v.verdict), ["fail"]);
+  const apiRoom = join(root, "api-room"), apiPacket = join(root, "api-packet");
+  cpSync(room, apiRoom, { recursive: true });
+  writeFileSync(join(apiRoom, "impl", "server.js"), `require("http").createServer((req,res)=>{
+    const send=(status,body)=>{res.statusCode=status;res.setHeader("content-type","application/json");res.end(JSON.stringify(body))};
+    if(req.url==="/"){res.statusCode=200;res.end('<form id="booking-form"></form>');return}
+    if(req.url==="/api/houses")return send(200,{houses:[{id:"house1"}]});
+    if(req.url==="/api/houses/house1/state")return send(200,{route:{kind:"self-service"},
+      resources:[{id:"ph9",name:"pukuhuone 9"}],policy:{eligibleRoles:["tenant"]}});
+    let body="";req.on("data",x=>body+=x);req.on("end",()=>{
+      const p=JSON.parse(body);send(req.url==="/api/houses/house1/bookings"&&p.resource==="ph9"
+        &&p.weekday==="Thursday"&&p.start==="17:00"&&p.role==="tenant"?200:409,{status:"confirmed"})
+    });
+  }).listen(Number(process.argv[2]),"127.0.0.1")\n`);
+  prepareBlindReview({ gradingRoom: apiRoom, out: apiPacket });
+  const apiReview = { ...review, answer: "REQUEST: pukuhuone 9 | Thursday | 17:00",
+    packet_sha256: JSON.parse(readFileSync(join(apiPacket,
+    "response-template.json"))).packet_sha256 };
+  const apiReviewFile = join(root, "api-review.json");
+  writeFileSync(apiReviewFile, JSON.stringify(apiReview));
+  const apiProbe = await probeBlindAnswer({ packetDir: apiPacket, reviewFile: apiReviewFile,
+    gradingRoom: apiRoom, request: parsed.request, out: join(root, "api-probe") });
+  assert.equal(apiProbe.http_status, 200);
+  assert.equal(apiProbe.request.resolved_path, "/api/houses/house1/bookings");
   review.packet_sha256 = "0".repeat(64);
   writeFileSync(reviewFile, JSON.stringify(review));
   assert.throws(() => validateBlindReview({ packetDir, reviewFile, gradingRoom: room }), /unbound/);
