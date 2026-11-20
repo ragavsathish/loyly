@@ -1,9 +1,9 @@
 {
   "schema": "loyly.grading-panel-report.v1",
-  "panel_summary_sha256": "2678eca33edf151f93d8ecee8c55fbdfbb01d9d5dd25e7004ef0bf746e58472c",
-  "report_html_sha256": "9afae989ba3e303904e6bb90a5493189a74b81288845b4d1e65242a60406ed71",
-  "audit_entries_sha256": "7f1fd726b91cf3e0605d5e33a86d453b725998186a45f33c3db3c48217ea0c7f",
-  "specialist_manifest_sha256": "fd5eea2ad1be84ebb9f42cd5a9558b7424292f58ff3c77c7da7d56f3a1985c35",
+  "panel_summary_sha256": "e752f07f929d6d9e5ff9cdfda851e1383a8b5b3f9424db1f1b6b49a4f505b6a5",
+  "report_html_sha256": "1f68b22c53be4ae008e54028115c1a3d8273a7b56a8eb015b779d0bae2e3591b",
+  "audit_entries_sha256": "4f52cad5c9528e44d2434f97c2a453f546cb8ecf67cf3275c71abd0098027916",
+  "specialist_manifest_sha256": "c6ce4063830d152f516b3d0e55da1839d1fb33fe1ecacd286de5b0c5b0e620e5",
   "result_count": 15,
   "original_score_unchanged": true
 }
