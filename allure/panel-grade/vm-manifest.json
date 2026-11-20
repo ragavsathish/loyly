@@ -1,69 +1,66 @@
 {
   "schema": "loyly.panel-vm-run.v1",
   "source_commit": "b97e4eda015167c571eb3296fa03fe4fea366130",
-  "candidate_sha256": "c885b22fdaf8fdf931570269d9516c111fe361841fa1d39c7bfdda7be44ada41",
-  "original_score_sha256": "8bf9bc936116dcf2dd73dceafd4b8df5a98fd7b4135306d95013f7e969e02ae2",
+  "candidate_sha256": "aa6f55265ecd4f3d73969ddd758583ac2c4f0f90441ce66b78b2c2e30e25a43a",
+  "original_score_sha256": null,
   "allure_schema_sha256": "0eef607c5d9eef4a190ea0deb7c7a61228267d8ec556b722b37dd83ef253fee1",
   "plan_sha256": "e4fca29d12716cc096ca5c8aea581b7cfa4be23fa7bb5b03b2b2f029628d6b32",
   "image_digest": "sha256:ea5ee4377b274691fa3dfac999f1b9e567013b94c7f9c2a2298b4e322abc8f23",
-  "parallel_overlap_ms": 4059,
+  "parallel_overlap_ms": 1100,
   "original_score_unchanged": true,
-  "score_state": "filed",
+  "score_state": "pre-score",
   "producers": [
     {
       "id": "browser",
       "tool": "Playwright",
       "item": "@item-01-003",
-      "status": "passed",
-      "result": "42a716dc-38c4-493d-8134-5a80c626aec4-result.json",
-      "start": 1795125054530,
-      "stop": 1795125057499,
-      "started": 1795125053106,
-      "stopped": 1795125059519,
+      "status": "failed",
+      "result": "b961ed4d-785f-4885-bcc8-4897d558d64a-result.json",
+      "start": 1795157907485,
+      "stop": 1795157907600,
+      "started": 1795157906620,
+      "stopped": 1795157908044,
       "image_digest": "sha256:ea5ee4377b274691fa3dfac999f1b9e567013b94c7f9c2a2298b4e322abc8f23",
-      "execution_receipt_sha256": "009f3a72fdc72e10dbe3e61499528dde3aaf74fb15a769d41db95172ba2589d4",
+      "execution_receipt_sha256": "58a6e83bea01aeef053335818c05af8927de05a6a1d78bbf6bbfaf464c651da6",
       "files": {
-        "42a716dc-38c4-493d-8134-5a80c626aec4-result.json": "f73cf42c9309db0a2e870d051e1334d586f5081f2aed7ac22598a0501a89aba0",
-        "aefe8450-a214-46fd-b2af-94e8af24d30e-attachment.png": "b887ba238f16e249a55e16ce6c4c34fb4229f0bca33397d7d3b249d95a8d7b7e",
-        "fa37da39-539e-4512-ac44-0b25e1694175-attachment.png": "d3a4f2fcdd0c562bccafc01934704f0ff477bc582be69d1951af588c6a4196ea",
-        "d2bb8fb8-4dfb-4e53-b77f-ff25f78d4c48-attachment.zip": "c1be003c8ffdcf80e4512b63c6cfd9616f50ea3f47804213e3616d61c5a27f33",
-        "c8629d30-bc6b-4197-ba49-409e551d84ce-attachment.receipt.json": "009f3a72fdc72e10dbe3e61499528dde3aaf74fb15a769d41db95172ba2589d4"
+        "b961ed4d-785f-4885-bcc8-4897d558d64a-result.json": "36924deb490c35a37f8d3e115f4aa44a615a79ef4e7fd912640ead90f2b83056",
+        "8a83d4fb-1c1a-482f-8c00-728e58969499-attachment.receipt.json": "58a6e83bea01aeef053335818c05af8927de05a6a1d78bbf6bbfaf464c651da6"
       }
     },
     {
       "id": "protocol",
       "tool": "Node.js",
       "item": "@item-01-010",
-      "status": "passed",
-      "result": "ebb5675d-4623-4acc-b6ce-0d268925e15d-result.json",
-      "start": 1795125053923,
-      "stop": 1795125055145,
-      "started": 1795125053108,
-      "stopped": 1795125057168,
+      "status": "failed",
+      "result": "e58f2c62-66cc-400f-96eb-c499aae4ef8e-result.json",
+      "start": 1795157907049,
+      "stop": 1795157907282,
+      "started": 1795157906622,
+      "stopped": 1795157907724,
       "image_digest": "sha256:ea5ee4377b274691fa3dfac999f1b9e567013b94c7f9c2a2298b4e322abc8f23",
-      "execution_receipt_sha256": "a0ec9efdc2eaddc737361320cb09ccbd6627a8a46624b1a6db2cd6ab64835800",
+      "execution_receipt_sha256": "3090c0a463873acf1d7b777e6f73ffeba7db1eda47e2d7c47c31251ad5c09416",
       "files": {
-        "ebb5675d-4623-4acc-b6ce-0d268925e15d-result.json": "4904477aac47a0ce280cc611bca86c4de003900e6ba05a6a4ba0b1fa2c8c0412",
-        "897fcdd7-404d-49c9-a400-a5b8984997bc-attachment.json": "19bd37d047aebe1d9b1806dd16582c20a5f581089b527337a8bfcfa317dee0aa",
-        "668838ff-d66d-44e3-b1ba-17af558516de-attachment.receipt.json": "a0ec9efdc2eaddc737361320cb09ccbd6627a8a46624b1a6db2cd6ab64835800"
+        "e58f2c62-66cc-400f-96eb-c499aae4ef8e-result.json": "215c7ebd73cbff373626eb3fce2c1846c9e38ff7e0684dc27558e242f8abb2e8",
+        "cc67c2a8-75b4-4180-a6b8-8822c1d4fa2c-attachment.json": "d57363edf2abeeaa12e840bba4cf5dd92280a1e0e7a817ef8a3029126d8787a6",
+        "33f2d457-9f02-4635-9bd5-3c218e275c27-attachment.receipt.json": "3090c0a463873acf1d7b777e6f73ffeba7db1eda47e2d7c47c31251ad5c09416"
       }
     },
     {
       "id": "telemetry",
       "tool": "OpenTelemetry",
       "item": "@item-01-003",
-      "status": "passed",
-      "result": "60a44518-6598-429d-9b61-120390fa44cc-result.json",
-      "start": 1795125054000,
-      "stop": 1795125061762,
-      "started": 1795125053109,
-      "stopped": 1795125063696,
+      "status": "failed",
+      "result": "a483fe8a-6243-4980-b63a-560d777a8e07-result.json",
+      "start": 1795157907092,
+      "stop": 1795157908712,
+      "started": 1795157906624,
+      "stopped": 1795157909157,
       "image_digest": "sha256:ea5ee4377b274691fa3dfac999f1b9e567013b94c7f9c2a2298b4e322abc8f23",
-      "execution_receipt_sha256": "e8beb03b01157cc1db0a0d316c5a65a4dfa6aedae1ff84e2629bced9fcf39a69",
+      "execution_receipt_sha256": "09f47db6a47fe7c95b1f4dc4d85e737b52e122e9d3ad4106720deb56bb7ab37f",
       "files": {
-        "60a44518-6598-429d-9b61-120390fa44cc-result.json": "3c8778d032196d8dad82f2a431af4fd9892038161dffa11ba866f45fcf4b0ac2",
-        "48e9ef71-911a-46f8-9d43-2bb064039a6d-attachment.json": "10aa91aea53f11d138eba4626fab632692fb3ead162d92747ff47e1e014b5e91",
-        "6460ff7d-fcce-4f06-9253-954d806498c2-attachment.receipt.json": "e8beb03b01157cc1db0a0d316c5a65a4dfa6aedae1ff84e2629bced9fcf39a69"
+        "a483fe8a-6243-4980-b63a-560d777a8e07-result.json": "7437925589f09c4c2badea6e6fa85ab383f7cc7177a6d11d171dfc653b97e3e8",
+        "25eadd11-d145-42ef-9614-7da6521ddb7c-attachment.json": "ad45d3b583910c4b4eb0e32a467e784997fbcda1b01dce5ed0158c0f132d6e5a",
+        "79768996-1a3a-4c3c-9705-55a1adba9b25-attachment.receipt.json": "09f47db6a47fe7c95b1f4dc4d85e737b52e122e9d3ad4106720deb56bb7ab37f"
       }
     }
   ]

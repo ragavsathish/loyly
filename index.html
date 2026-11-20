@@ -21,9 +21,9 @@
       <p class="lede">Pi durable now drives the clean-room build, independent grading and committed audit on <code>ragavsathish/main</code>. The original legacy tools still ratify the gate and file the score. The former ORC main is preserved as an archive.</p>
       <div class="actions"><a class="button primary" href="replay/latest.html">Play the latest cycle <span aria-hidden="true">↗</span></a><a class="button" href="allure/panel-grade/index.html">Open latest Allure report <span aria-hidden="true">↗</span></a></div>
       <div class="score-row" aria-label="Current evidence">
-        <div><strong>11<span>/11</span></strong><small>Cycle 03 · last filed booking-core score</small></div>
-        <div><strong>15</strong><small>Cycle 03 panel reassessment · 14 passed, 1 pending</small></div>
-        <div><strong>0</strong><small>Cycle 04 score · grading stopped before filing</small></div>
+        <div><strong>10<span>/11</span></strong><small>Cycle 05 · latest filed booking-core score</small></div>
+        <div><strong>19<span>/19</span></strong><small>Cycle 05 · independent verify suite passed</small></div>
+        <div><strong>15</strong><small>Allure cases · 10 passed, 4 failed, 1 skipped</small></div>
       </div>
     </section>
 
@@ -35,7 +35,7 @@
         <li><span class="step-number">03</span><div><h3>Grade independently</h3><p>Three Terra shards get private read-only rooms and write schema-valid Allure results. A fresh blind reviewer sees only the refusal and question.</p></div><span class="tag">Gondolin VMs</span></li>
         <li><span class="step-number">04</span><div><h3>Probe and score</h3><p>Specialist VMs add browser, protocol and telemetry observations. The original scorer files the item verdicts; Pi commits the lifecycle audit.</p></div><span class="tag">Allure + Pi</span></li>
       </ol>
-      <div class="callout"><strong>Latest cycle: Clojure build, gate passed, grading stopped</strong><p>Cycle 04 built a Babashka/Clojure app and passed the independent legacy gate on attempt 1. One grader shard waited on its own long-lived servers, so the cycle recorded a grade failure and filed no score. The Pi host now imposes a hard five-minute shell-call limit. The specialist panel still needs a stack-neutral launcher and runtime image.</p></div>
+      <div class="callout"><strong>Cycle 05: verified app, failed measurement</strong><p>The independent gate passed on attempt 1. Three grader shards passed ten behavior items. The blind reviewer failed item 01-011 because its instruction required an end time absent from the refusal, although the refusal named a complete request. Three specialist probes could not launch the generated server.js because the panel assumes server.mjs. The 10/11 score and not-ready panel remain on record.</p></div>
     </div></section>
 
     <section class="wrap section" id="architecture">
@@ -51,15 +51,15 @@
     </section>
 
     <section class="band" id="graders"><div class="wrap section">
-      <div class="section-heading"><span class="kicker">03 / Grading</span><h2>One score, separate panel evidence.</h2><p>Cycle 03 filed 11/11. Its original specialist panel failed, and that original cycle outcome remains failed. A pinned reassessment on the frozen candidate ran three parallel Gondolin VMs and compiled the existing grader, blind reviewer and specialist directories into one Allure report.</p></div>
-      <div class="shard-grid"><article><small>Filed Pi score</small><strong>11/11</strong><span>Original scorer; unchanged by reassessment</span></article><article><small>Specialist VMs</small><strong>3/3 passed</strong><span>Playwright, 100 protocol races, OpenTelemetry</span></article><article><small>Unified Allure</small><strong>15 cases</strong><span>14 passed · 1 raw handoff pending</span></article></div>
-      <p class="report-footnote">The separate panel summary says <strong>ready for review</strong>, with no gaps. It is not an acceptance decision and does not rewrite the original failed audit. Cycle 04 has no filed score or Allure report because grading stopped.</p>
+      <div class="section-heading"><span class="kicker">03 / Grading</span><h2>Verify passed; measure exposed two gaps.</h2><p>Cycle 05 filed 10/11. Three Terra shards completed ten independent HTTP behavior checks. The blind reviewer failed 01-011 under an end-time requirement in its instruction, and three specialist VMs failed before probing because they hardcode a different server filename.</p></div>
+      <div class="shard-grid"><article><small>Filed Pi score</small><strong>10/11</strong><span>One failed blind review; original scorer</span></article><article><small>Specialist VMs</small><strong>0/3 passed</strong><span>Launcher assumed server.mjs; candidate has server.js</span></article><article><small>Unified Allure</small><strong>15 cases</strong><span>10 passed · 4 failed · 1 skipped</span></article></div>
+      <p class="report-footnote">The panel says <strong>not ready</strong>. Cycle 03's separate 11/11 reassessment remains available as <a href="allure/cycle-03/index.html">historical evidence</a>; it does not change cycle 05's result. The replay shows 21 committed Pi facts.</p>
       <div class="schema-actions"><a class="button primary" href="allure/panel-grade/index.html">Open Allure report ↗</a><a class="text-link" href="allure/panel-grade/panel-summary.json">Read item-level summary ↗</a></div>
     </div></section>
 
     <section class="band" id="evidence"><div class="wrap section">
       <div class="section-heading"><span class="kicker">04 / Evidence</span><h2>Follow the current audit</h2></div>
-      <div class="cards"><article class="card"><span class="card-num">A</span><h3>Latest replay</h3><p>Cycle 04's 13 committed Pi facts show the successful gate and the grade failure. No score is implied.</p><a href="replay/latest.html">Play cycle 04 ↗</a></article><article class="card"><span class="card-num">B</span><h3>Last scored report</h3><p>Cycle 03's frozen 11/11 score and separate 15-case panel reassessment are bound by digests.</p><a href="allure/panel-grade/index.html">Open Allure ↗</a></article><article class="card"><span class="card-num">C</span><h3>Source and limits</h3><p>The active Pi driver and its known cross-stack limits are in the repository. The old ORC main is archived.</p><a href="https://github.com/ragavsathish/loyly/tree/main">Browse active main ↗</a></article></div>
+      <div class="cards"><article class="card"><span class="card-num">A</span><h3>Latest replay</h3><p>Cycle 05's 21 committed Pi facts show the green gate, independent grading, blind failure, panel failure and filed score.</p><a href="replay/latest.html">Play cycle 05 ↗</a></article><article class="card"><span class="card-num">B</span><h3>Latest Allure report</h3><p>Fifteen candidate-bound cases show ten passes, four failures and one skipped handoff without hiding the panel gaps.</p><a href="allure/panel-grade/index.html">Open Allure ↗</a></article><article class="card"><span class="card-num">C</span><h3>Source and limits</h3><p>The active Pi driver and its known grading limits are in the repository. The old ORC main is archived.</p><a href="https://github.com/ragavsathish/loyly/tree/main">Browse active main ↗</a></article></div>
       <div class="actions"><a class="button" href="https://github.com/ragavsathish/loyly/blob/main/harness/pi-durable/PRODUCTION-CANDIDATE.md">Read promotion review ↗</a><a class="button" href="https://github.com/ragavsathish/loyly/tree/archive/orc-main-a733b7e">Browse archived ORC main ↗</a></div>
     </div></section>
   </main>

@@ -2,12 +2,12 @@
   "schema": "loyly.grading-panel-summary.v1",
   "project": "01-booking-core",
   "source_commit": "b97e4eda015167c571eb3296fa03fe4fea366130",
-  "candidate_sha256": "c885b22fdaf8fdf931570269d9516c111fe361841fa1d39c7bfdda7be44ada41",
+  "candidate_sha256": "aa6f55265ecd4f3d73969ddd758583ac2c4f0f90441ce66b78b2c2e30e25a43a",
   "plan_sha256": "e4fca29d12716cc096ca5c8aea581b7cfa4be23fa7bb5b03b2b2f029628d6b32",
   "allure_schema_sha256": "0eef607c5d9eef4a190ea0deb7c7a61228267d8ec556b722b37dd83ef253fee1",
-  "original_score_sha256": "8bf9bc936116dcf2dd73dceafd4b8df5a98fd7b4135306d95013f7e969e02ae2",
-  "filed_score": "11/11",
-  "panel_outcome": "ready-for-review",
+  "original_score_sha256": "03e95c2a3955c7c21efa9740061f8658ae55f105251794f3a3b341ab2bbf3154",
+  "filed_score": "10/11",
+  "panel_outcome": "not-ready",
   "checks": [
     {
       "id": "black-box",
@@ -18,10 +18,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "952abca03b354caf5b40fccfa0a6cd4a3930ad7eadc610b5fb446da3860733ff",
+      "result_sha256": "c60189f2b364c149a59904b96c6023003ed391d366c05cb1fea3a655ebc2c038",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "GET / returned the weekly schedule: ph8 Tuesday 17:00 and 18:30 are free, while both ph9 Tuesday cells are closed; ph8 opens Tuesday and ph9 Thursday, Friday, Saturday."
+      "message": "GET /api/config and /api/schedule: HTTP 200; ph8 has free Tuesday slots at 17:00, 18:30 and 20:00; ph9 has none Tuesday and opens Thursday, Friday, Saturday."
     },
     {
       "id": "black-box",
@@ -32,10 +32,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "0c8e3f37fdc145ea3186e4a2bab1c180e07b031b674ba7df6a3cc72bbc0c21bd",
+      "result_sha256": "b4b43ccd5f571d79024b2bbd7923eafedbd8898d3e9d40574de4e52677b1a5e5",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "POST /bookings household=12, ph9, Tuesday 17:00 returned HTTP 409. Exact refusal: pukuhuone 9 has no sauna day on Tuesday. It opens on Thursday, Friday, Saturday. This alternative is currently free. You can instead book pukuhuone 8 on Tuesday, 17:00–18:30, repeating every week. Request apartment 12, resource ph8, weekday Tuesday, start 17:00. On the weekly schedule choose that room, day and time and press Request standing slot. API: POST /api/bookings with JSON {\"household\":\"12\",\"resource\":\"ph8\",\"weekday\":\"Tuesday\",\"start\":\"17:00\"}. Open days Thursday, Friday, Saturday; schedule and holdings show no booking."
+      "message": "POST /api/bookings apartment 12, ph9 Tuesday 17:00: HTTP 409 closed_day. Exact refusal: pukuhuone 9 has no sauna day on Tuesday. It opens on Thursday, Friday, Saturday. Request apartment 12, pukuhuone 8, Tuesday at 17:00 for a standing weekly slot. Complete alternative request: {\"household\":\"12\",\"resourceName\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"start\":\"17:00\"}. This alternative is free now; availability is checked when you request."
     },
     {
       "id": "black-box",
@@ -46,10 +46,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "8172cac831a2183f799dd8d5f649fc29a910cedaf5b83a43ecef00a5e17b1dfe",
+      "result_sha256": "5154d4a40d4238db5903376a0f58337545c2ba3b778d658a0ee8d4226a593f0e",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "POST /bookings apartment 12, ph8 Tuesday 17:00 returned 303 confirmed; confirmation and GET household=12 show a weekly Tuesday 17:00–18:30 standing slot held by apartment 12."
+      "message": "POST apartment 12: 201 {'outcome': 'confirmed', 'booking': {'id': '87b379db-f669-4641-b348-933426c37cca', 'household': '12', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly'}}; GET bookings: [{'id': '87b379db-f669-4641-b348-933426c37cca', 'household': '12', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly'}]"
     },
     {
       "id": "black-box",
@@ -60,10 +60,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "cbd2bad2c05d3ccb045b9f27589a06bd0e115c5622f70ab3583d511674570110",
+      "result_sha256": "877828830c995be10b17fcf5a4afcb1165882ada78ad1b5fe81932140476dc89",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "POST /bookings apartment 12 confirmed; same POST for apartment 3 returned 409: “This standing slot is already held. Choose a free slot from the weekly schedule.” GET household=12 still shows its one Tuesday 17:00–18:30 slot; household=3 has zero."
+      "message": "POST apartment 3: 409 {'code': 'held', 'message': 'This weekly slot is already held. Choose a free slot in the weekly schedule.'}; GET bookings: [{'id': '89d498ad-23a6-4c03-b5be-c3f0bea41009', 'household': '12', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly'}]"
     },
     {
       "id": "black-box",
@@ -74,10 +74,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "433ff1d137b28f9484ca13a82571a53d2d6352f7c25c135f02a8444841cb6c31",
+      "result_sha256": "a64c2c1008b1fd86e745899bc3b4295b4adfc4c7935b7613420da9e8de98e7e8",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "POST /bookings apartment 12, ph8 Tuesday 18:30 returned 303 confirmed; GET household 12 re-read both Tuesday 17:00–18:30 and 18:30–20:00 holdings, with 6 of 8 free."
+      "message": "POST apartment 12 ph8 Tuesday 18:30 returned 201 confirmed; GET /api/bookings re-read two distinct weekly bookings for apartment 12, including the original Tuesday 17:00."
     },
     {
       "id": "black-box",
@@ -88,10 +88,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "95ba6ab7a0b8f0a3b5888af64c9147dd057da140eefcc2a7f78b8b31a1c14a95",
+      "result_sha256": "2dfa0f3bf85b9978befe7e4a555b5c28b6b35997f8e7283eb2699a0182ed1c35",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "POST /bookings apartment 12, ph8 Tuesday 18:30 returned 409: There is no room for another standing slot: the weekly schedule is full. Your existing holding is unchanged. GET shows zero free and the original sole 17:00 holding."
+      "message": "After filling all 12 slots, POST apartment 12 ph9 Saturday 20:00 returned 409 no_room: the weekly schedule is full; GET /api/bookings still shows exactly the original apartment 12 Tuesday 17:00 holding."
     },
     {
       "id": "black-box",
@@ -102,10 +102,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "4407b4a3125bd3dabe8bb03d100252fa05aac4a87b2f1cf9138f6c2dfeeaf6c7",
+      "result_sha256": "80fdeac76ccff460c971ddb6c5bba21de9ef35a49191cf2d9a966db3607bdf4c",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "GET schedule showed ph8 Tuesday 17:00 free. POST /bookings apartment 12 ph8 Tuesday 17:00 returned 303; confirmation and holdings show recurring 17:00–18:30. GET posted list shows apartment 12; heater schedule shows ph8 Tuesday 17:00–18:30; invoicing shows apartment 12 weekly standing-slot charge basis. After release all three views are empty."
+      "message": "POST /api/bookings apartment 12 ph8 Tuesday 17:00: HTTP 201, weekly 17:00–18:30; re-read booking and posted-list, heater-schedule, invoicing-signals share its ID, payer 12 and heat=true. DELETE and re-read all three: empty."
     },
     {
       "id": "black-box",
@@ -116,10 +116,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "86319568c54faac5391c337dde518b2e2eba26efb1dc36f073e6148776a4dce3",
+      "result_sha256": "04b7aaed9eccf318a095e2ad41bd7639dfb170cbf62875904d9236acae1e1852",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "POST /bookings apartment 12 ph8 Tuesday 17:00 confirmed and re-read in holdings and all three derived views. POST /give-up using that booking id returned 303; re-read holdings and all three views show no standing slots, heating intervals, or current charge bases. The views agree."
+      "message": "POST /api/bookings apartment 12 ph8 Tuesday 17:00: HTTP 201; re-read booking and all three views share its ID. DELETE that ID as apartment 12: HTTP 200 given_up; re-read booking and all three views empty, slot free."
     },
     {
       "id": "black-box",
@@ -130,10 +130,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "27ad57e387ba9f65ae58bf1ab0f418604cd18b94cf75370e6d6bb4e58fa61221",
+      "result_sha256": "acc010acf2927f13c8165feae384b1381e6bb200d0687f46d80374d19ab34ec1",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "Both POST /bookings requests for apartments 12 and 3 were sent before either response was read; 12 got 303 confirmed, 3 got 409 already held. Re-read holdings show only 12. Posted list has one holder, heater schedule one interval, and invoicing one payer, all for the same slot."
+      "message": "Sent both POST requests before reading either response; counts={'one-confirmed': 1, 'both-confirmed': 0, 'neither-confirmed': 0}; last responses and views=([(201, {'outcome': 'confirmed', 'booking': {'id': '6752eab7-d56f-4d25-a30a-0aa5cfa0f2c2', 'household': '12', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly'}}), (409, {'code': 'held', 'message': 'This weekly slot is already held. Choose a free slot in the weekly schedule.'})], {'bookings': [{'id': '6752eab7-d56f-4d25-a30a-0aa5cfa0f2c2', 'household': '12', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly'}], 'posted-list': [{'bookingId': '6752eab7-d56f-4d25-a30a-0aa5cfa0f2c2', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly', 'household': '12'}], 'heater-schedule': [{'bookingId': '6752eab7-d56f-4d25-a30a-0aa5cfa0f2c2', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly', 'heat': True}], 'invoicing-signals': [{'bookingId': '6752eab7-d56f-4d25-a30a-0aa5cfa0f2c2', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly', 'payer': '12', 'chargeBasis': 'normal-standing-slot-fee', 'kind': 'standing-slot-fee'}]})"
     },
     {
       "id": "black-box",
@@ -144,10 +144,10 @@
       "status": "passed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "15e85dfda4f11235aedd86fe724ee7dfad29a3cbcaf59b1b4cf0208e7a85466d",
+      "result_sha256": "0222f55d179e3aa8e8558e2e672d0bc0d5d377046955843abe39c3eb9b164ed6",
       "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
       "failure": "A scenario is contradicted, missing, or cannot be observed.",
-      "message": "100 pairs of POST /bookings sent before reading either response; every run began with the slot free and released the confirmed booking before the next run. Counts: one confirmed 100, both confirmed 0, neither confirmed 0."
+      "message": "Sent both POST requests before reading either response; counts={'one-confirmed': 100, 'both-confirmed': 0, 'neither-confirmed': 0}; last responses and views=([(201, {'outcome': 'confirmed', 'booking': {'id': 'c0a61e87-7c26-40cd-90e8-9ee03efec8b2', 'household': '12', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly'}}), (409, {'code': 'held', 'message': 'This weekly slot is already held. Choose a free slot in the weekly schedule.'})], {'bookings': [{'id': 'c0a61e87-7c26-40cd-90e8-9ee03efec8b2', 'household': '12', 'resource': 'ph8', 'weekday': 'Tuesday', 'start': '17:00', 'end': '18:30', 'recurrence': 'weekly'}]})"
     },
     {
       "id": "blind-handoff",
@@ -158,10 +158,10 @@
       "status": "skipped",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "df57604f884de3df097d14a08daf4f339b7badf90f3bc9f249763417a7edb2e2",
+      "result_sha256": "47bf7c3db5460929c254ea81f35121137eefb636548fcefce55e307c2a81b912",
       "criterion": "The grader records the refusal and leaves the blind judgment pending.",
       "failure": "The grader judges the refusal from its own context or omits the handoff.",
-      "message": "not reached: blind subagent review required; POST /bookings apartment 12, ph9 Tuesday 17:00 returned 409 with refusal captured verbatim; independent review and replay remain pending."
+      "message": "not reached: blind subagent review required; POST apartment 12 ph9 Tuesday 17:00 returned 409 closed_day. Exact refusal was saved for independent review; no usability verdict or replay was performed."
     },
     {
       "id": "blind-review",
@@ -169,13 +169,13 @@
       "role": "scored",
       "tool": "fresh blind subagent",
       "technique": "usability",
-      "status": "passed",
+      "status": "failed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "2be16a28385b355685037995535827c0308f225592656d8732c928fa5c23ff74",
+      "result_sha256": "8e0d3c28a44f2e22a6080998301247641f866e5babe321431e5e26ae73da382e",
       "criterion": "A fresh judge names an actionable request from only the refusal; a fresh app confirms that exact request.",
       "failure": "The answer needs hidden context or its exact request is not confirmed over HTTP.",
-      "message": "The fresh agent named a request from the refusal; HTTP confirmation follows. Answer: REQUEST: pukuhuone 8 | Tuesday | 17:00 | 18:30"
+      "message": "The refusal does not state an end time. Answer: UNUSABLE: The refusal does not state an end time."
     },
     {
       "id": "browser",
@@ -183,13 +183,13 @@
       "role": "corroborating",
       "tool": "Playwright",
       "technique": "ui-ux",
-      "status": "passed",
+      "status": "failed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "f73cf42c9309db0a2e870d051e1334d586f5081f2aed7ac22598a0501a89aba0",
+      "result_sha256": "36924deb490c35a37f8d3e115f4aa44a615a79ef4e7fd912640ead90f2b83056",
       "criterion": "The public form confirms a free slot and displays the persistent holding and all three derived views; trace and screenshots are attached.",
       "failure": "The UI cannot complete the journey or disagrees with the persisted booking.",
-      "message": "Fresh copied candidate passed the browser booking journey: free slot, native form confirmation, persisted holding, and all three derived views."
+      "message": "Error: Server exited: node:internal/modules/cjs/loader:1568\n  throw err;\n  ^\n\nError: Cannot find module '/candidate/server.mjs'\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)\n    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)\n    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)\n    at Module._load (node:internal/modules/cjs/loader:1341:5)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v24.22.3\n\n    at file:///worker/panel-browser.mjs:92:43\n    at async step (file:///worker/panel-browser.mjs:56:19)\n    at async file:///worker/panel-browser.mjs:90:3"
     },
     {
       "id": "protocol",
@@ -197,13 +197,13 @@
       "role": "corroborating",
       "tool": "Node.js",
       "technique": "acceptance",
-      "status": "passed",
+      "status": "failed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "4904477aac47a0ce280cc611bca86c4de003900e6ba05a6a4ba0b1fa2c8c0412",
+      "result_sha256": "215c7ebd73cbff373626eb3fce2c1846c9e38ff7e0684dc27558e242f8abb2e8",
       "criterion": "One hundred fresh overlapping two-household races each produce exactly one confirmation and one held refusal; derived views name one holder.",
       "failure": "Any race confirms twice, refuses twice, or leaves inconsistent views.",
-      "message": "100/100 overlapping races confirmed one household, refused the other, and preserved all derived views."
+      "message": "Error: candidate exited: node:internal/modules/cjs/loader:1568\n  throw err;\n  ^\n\nError: Cannot find module '/candidate/server.mjs'\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)\n    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)\n    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)\n    at Module._load (node:internal/modules/cjs/loader:1341:5)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v24.22.3\n\n    at file:///worker/panel-protocol.mjs:92:43\n    at async step (file:///worker/panel-protocol.mjs:37:16)\n    at async file:///worker/panel-protocol.mjs:90:3"
     },
     {
       "id": "telemetry",
@@ -211,13 +211,13 @@
       "role": "diagnostic",
       "tool": "OpenTelemetry",
       "technique": "tracing",
-      "status": "passed",
+      "status": "failed",
       "runtime": "gondolin-qemu-vm",
       "target_runtime": "gondolin-qemu-vm",
-      "result_sha256": "3c8778d032196d8dad82f2a431af4fd9892038161dffa11ba866f45fcf4b0ac2",
+      "result_sha256": "7437925589f09c4c2badea6e6fa85ab383f7cc7177a6d11d171dfc653b97e3e8",
       "criterion": "A bounded real booking emits candidate-bound spans and metrics tied to the confirmed record.",
       "failure": "The probe cannot associate the observed telemetry with the candidate and booking request.",
-      "message": "HTTP 201, durable holding, three views, 3 candidate-bound spans and 17 metric rows."
+      "message": "Error: candidate exited: (node:637) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:\n--import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"/worker/node_modules/%40opentelemetry/instrumentation/hook.mjs\", pathToFileURL(\"./\"));'\n(Use `node --trace-warnings ...` to show where the warning was created)\n\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\nError [ERR_MODULE_NOT_FOUND]: Cannot find module '/candidate/server.mjs' imported from /candidate/\n    at finalizeResolution (node:internal/modules/esm/resolve:272:11)\n    at moduleResolve (node:internal/modules/esm/resolve:879:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1006:11)\n    at nextResolve (node:internal/modules/esm/hooks:785:28)\n    at resolve (file:///worker/node_modules/import-in-the-middle/create-hook.mjs:727:26)\n    at nextResolve (node:internal/modules/esm/hooks:785:28)\n    at AsyncLoaderHooksOnLoaderHookWorker.resolve (node:internal/modules/esm/hooks:269:30)\n    at MessagePort.handleMessage (node:internal/modules/esm/worker:251:24)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:869:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {\n  code: 'ERR_MODULE_NOT_FOUND',\n  url: 'file:///candidate/server.mjs'\n}\n\nNode.js v24.22.3\n\n    at file:///worker/panel-telemetry.mjs:59:43\n    at async step (file:///worker/panel-telemetry.mjs:33:16)\n    at async file:///worker/panel-telemetry.mjs:57:3"
     }
   ],
   "items": [
@@ -248,7 +248,7 @@
         "browser",
         "telemetry"
       ],
-      "panel_status": "supported"
+      "panel_status": "conflicted"
     },
     {
       "id": "01-004",
@@ -312,18 +312,23 @@
         "black-box",
         "protocol"
       ],
-      "panel_status": "supported"
+      "panel_status": "conflicted"
     },
     {
       "id": "01-011",
       "rule": "A refusal is judged by whether a resident can act on it without asking again",
-      "filed_verdict": "pass",
+      "filed_verdict": "fail",
       "check_ids": [
         "blind-handoff",
         "blind-review"
       ],
-      "panel_status": "supported"
+      "panel_status": "failed"
     }
   ],
-  "gaps": []
+  "gaps": [
+    "telemetry/01-003: diagnostic failed",
+    "01-003: filed pass; panel conflicted",
+    "01-010: filed pass; panel conflicted",
+    "01-011: filed fail; panel failed"
+  ]
 }
