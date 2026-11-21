@@ -144,7 +144,7 @@ export async function compilePanel({ original, specialists, out,
       || stage("score", "filed")?.score_file_sha256 !== scored.scoreSha256
       || stage("score", "filed")?.score_input_sha256 !== fileSha(join(original, "score-input.json")))
     throw new Error("scored evidence differs from committed Pi audit entries");
-  const schemaFile = join(HERE, "allure-lifecycle-result.schema.json");
+  const schemaFile = join(HERE, "../evidence-core/allure-lifecycle-result.schema.json");
   const schemaSha256 = fileSha(schemaFile);
   if (fileSha(join(room, "allure-lifecycle-result.schema.json")) !== schemaSha256)
     throw new Error("original room uses a different Allure schema");

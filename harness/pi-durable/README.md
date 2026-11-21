@@ -83,10 +83,15 @@ report; another pinned plan may add result directories without merging them.
 
 ## Use the lifecycle with another project
 
-The reusable control policy lives in [`lifecycle.ts`](lifecycle.ts): build,
-independent gate, bounded repair, isolated grader shards, optional assessments,
-then score. Its inputs and results, the panel policy, continuation selection,
-and verdict validation use the shared types in [`contracts.ts`](contracts.ts).
+The reusable control policy lives in
+[`../cycle-core/lifecycle.ts`](../cycle-core/lifecycle.ts): build, independent
+gate, bounded repair, optional assessments, then score. Its inputs and
+decisions live in the same Pi-independent folder. Generic Allure result,
+verdict coverage and panel evaluation rules live in
+[`../evidence-core/`](../evidence-core/); the approved Allure schema is
+canonical there. The current path in this directory is a byte-checked
+compatibility copy for existing graders and instructions. The Pi driver owns
+the rooms, task checkpoints, audit, legacy scoring and replay projection.
 `harness.pi-live-run.v2` names a `project` and pins the same source,
 agent, schema, and image inputs. Its builder and grader instructions can have
 project-specific file names. The blind handoff is absent in v2; a direct grader
@@ -120,9 +125,10 @@ live cycle still needs the exact approval described in `AGENTS.md`.
 
 ## Code quality checks
 
-Run `npm run quality` to type-check the migrated modules with strict indexed
-and optional-property checks, lint the harness and its tests, and check
-formatting of the TypeScript and tool configuration. TypeScript source runs
+Run `npm run quality` to type-check the Pi modules and both independent core
+folders with strict indexed and optional-property checks, lint the harness
+and its tests, and check formatting of the TypeScript and tool configuration.
+TypeScript source runs
 directly on the host's Node 26 and in the panel VM's Node 24; `tsc` does not
 emit JavaScript.
 The runtime entrypoints and pinned VM worker filenames remain `.mjs` while

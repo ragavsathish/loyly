@@ -26,7 +26,7 @@ export function collectSupplementalGrade(original, probes) {
   const scoreInput = JSON.parse(readFileSync(join(original, "score-input.json"), "utf8"));
   if (candidateSha256 !== scoreInput.candidate_sha256)
     throw new Error("frozen candidate differs from the original scored candidate");
-  const schemaFile = join(HERE, "allure-lifecycle-result.schema.json");
+  const schemaFile = join(HERE, "../evidence-core/allure-lifecycle-result.schema.json");
   const schemaSha256 = fileSha(schemaFile);
   const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, "utf8")));
   const out = join(probes, "combined");

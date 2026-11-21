@@ -3,6 +3,7 @@ import { existsSync, lstatSync, readFileSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import Ajv2020 from "ajv/dist/2020.js";
+import { validateResultEvidence } from '../evidence-core/validate-result.ts';
 
 const RESULT = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-result\.json$/;
 // Preserve the old calibration room, while requiring the revised handoff in every new cut.
@@ -57,13 +58,7 @@ export function readAllureResults(room) {
         || labelValues(result, "lifecycle").join() !== "pre-production"
         || !labelValues(result, "tool").length || !labelValues(result, "technique").length)
       throw new Error(`Allure identity or Gherkin labels differ for ${id}`);
-    if (typeof result.statusDetails?.message !== "string" || !result.statusDetails.message.trim()
-        || !Number.isInteger(result.start) || !Number.isInteger(result.stop)
-        || result.stop < result.start || !Array.isArray(result.steps) || !result.steps.length
-        || result.steps.some((step) => !step.status || !step.stage))
-      throw new Error(`Allure observation, timing or steps missing for ${id}`);
-    if (!Array.isArray(result.attachments) || !result.attachments.length)
-      throw new Error(`Allure evidence attachment missing for ${id}`);
+    validateResultEvidence(result, id);
     for (const attachment of result.attachments) {
       const path = join(dir, attachment.source);
       if (!existsSync(path) || !lstatSync(path).isFile())

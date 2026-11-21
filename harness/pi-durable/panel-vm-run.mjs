@@ -152,7 +152,7 @@ export async function runPanelVms({ original, image, out,
   const verify = spawnSync('gondolin', ['build', '--verify', image], { encoding: 'utf8' });
   if (verify.status !== 0) throw new Error(`Gondolin image verification failed: ${verify.stderr}`);
   const imageDigest = `sha256:${fileSha(join(image, 'manifest.json'))}`;
-  const schemaFile = join(HERE, 'allure-lifecycle-result.schema.json');
+  const schemaFile = join(HERE, '../evidence-core/allure-lifecycle-result.schema.json');
   const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, 'utf8')));
   const plan = JSON.parse(readFileSync(planFile, 'utf8'));
   const validatePlan = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(join(HERE, 'panel-plan.schema.json'), 'utf8')));
@@ -193,7 +193,7 @@ export function verifyPanelVmRun({ original, out, imageDigest,
   const plan = JSON.parse(readFileSync(planFile, 'utf8'));
   const bundle = workerBundle(plan);
   const workers = specialistWorkers(plan);
-  const schemaFile = join(HERE, 'allure-lifecycle-result.schema.json');
+  const schemaFile = join(HERE, '../evidence-core/allure-lifecycle-result.schema.json');
   const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, 'utf8')));
   if (manifest.schema !== 'loyly.panel-vm-run.v1'
       || manifest.source_commit !== scoreInput.source_commit
