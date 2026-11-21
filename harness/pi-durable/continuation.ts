@@ -14,8 +14,10 @@ export const MAX_CONTINUATIONS = 3;
 export function extractUncarried(checklist: SelectedChecklist, text: string): string[] {
   const selected = new Set(checklist.items.map((item) => item.id));
   const ids = new Set<string>();
-  for (const match of text.matchAll(/^\s*[-*]\s*`?@item-(\d{2}-\d{3})\b/gm))
-    if (selected.has(match[1])) ids.add(match[1]);
+  for (const match of text.matchAll(/^\s*[-*]\s*`?@item-(\d{2}-\d{3})\b/gm)) {
+    const id = match[1];
+    if (id && selected.has(id)) ids.add(id);
+  }
   return [...ids].sort();
 }
 

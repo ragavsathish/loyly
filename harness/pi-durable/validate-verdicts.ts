@@ -50,7 +50,8 @@ export function validateVerdicts(room: string): {
   for (let i = 0; i < ids.length; i++) {
     const v = verdicts[i];
     if (
-      v?.id !== ids[i] ||
+      !v ||
+      v.id !== ids[i] ||
       !['pass', 'fail'].includes(v.verdict) ||
       typeof v.evidence !== 'string' ||
       !v.evidence.trim()

@@ -37,8 +37,12 @@ export function createLifecycle({ maxBuildAttempts = 3, assessments = [] }: Life
         phase: 'build',
         attempt: attempt + 1,
         retry: 'builder',
-        failureLog: outcome.result.failureLog,
-        failureSha256: outcome.result.failureSha256,
+        ...(outcome.result.failureLog === undefined
+          ? {}
+          : { failureLog: outcome.result.failureLog }),
+        ...(outcome.result.failureSha256 === undefined
+          ? {}
+          : { failureSha256: outcome.result.failureSha256 }),
       };
     return {
       terminal: true,
@@ -52,15 +56,23 @@ export function createLifecycle({ maxBuildAttempts = 3, assessments = [] }: Life
       throw Error('invalid gate attempt');
     if (outcome?.status !== 'completed' || !outcome.result)
       return { terminal: true, reason: 'gate-effect-failed', attempt };
-    if (outcome.result?.passed)
-      return { phase: 'grading-room', attempt, candidateSha256: outcome.result.candidateSha256 };
+    if (outcome.result.passed)
+      return {
+        phase: 'grading-room',
+        attempt,
+        ...(outcome.result.candidateSha256 === undefined
+          ? {}
+          : { candidateSha256: outcome.result.candidateSha256 }),
+      };
     if (attempt < maxBuildAttempts)
       return {
         phase: 'build',
         attempt: attempt + 1,
         retry: 'gate',
-        failureLog: outcome.result.log,
-        failureSha256: outcome.result.logSha256,
+        ...(outcome.result.log === undefined ? {} : { failureLog: outcome.result.log }),
+        ...(outcome.result.logSha256 === undefined
+          ? {}
+          : { failureSha256: outcome.result.logSha256 }),
       };
     return { terminal: true, reason: 'gate-attempts-exhausted', exhausted: true, attempt };
   }

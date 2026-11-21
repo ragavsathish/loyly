@@ -118,11 +118,13 @@ The older `loyly.pi-live-run.v1` contract and its panel retain their blind
 `01-011` handoff, Java preflight, and historical report identity. A new scored
 live cycle still needs the exact approval described in `AGENTS.md`.
 
-## JavaScript checks
+## Code quality checks
 
-Run `npm run check` to type-check the migrated modules and `npm run lint` to
-lint the harness and its tests. TypeScript source runs directly on the host's
-Node 26 and in the panel VM's Node 24; `tsc` does not emit JavaScript.
+Run `npm run quality` to type-check the migrated modules with strict indexed
+and optional-property checks, lint the harness and its tests, and check
+formatting of the TypeScript and tool configuration. TypeScript source runs
+directly on the host's Node 26 and in the panel VM's Node 24; `tsc` does not
+emit JavaScript.
 The runtime entrypoints and pinned VM worker filenames remain `.mjs` while
 their imports cross into the typed modules. Changing those filenames would
 invalidate existing panel plans and execution receipts.

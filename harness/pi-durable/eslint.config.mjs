@@ -13,11 +13,16 @@ export default [
   },
   {
     files: ['**/*.ts'],
-    languageOptions: { parser: tseslint.parser, globals: globals.node },
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: { projectService: true },
+      globals: globals.node,
+    },
     plugins: { '@typescript-eslint': tseslint.plugin },
     rules: {
       ...js.configs.recommended.rules,
-      ...tseslint.plugin.configs.recommended.rules,
+      ...tseslint.configs.recommendedTypeChecked[1].rules,
+      ...tseslint.configs.recommendedTypeChecked[2].rules,
       'no-unused-vars': 'off',
     },
   },
