@@ -1,13 +1,13 @@
 // The pi-env daemon inside a Gondolin VM, with this process's stdin and stdout passed through.
 // pi-env's Connection starts it as `node vm-daemon.ts <room> serve --token <hex>`: the VM boots from
-// GONDOLIN_GUEST_DIR (Gondolin reads it), mounts <room> at /workspace and nothing else of the host,
+// GONDOLIN_GUEST_DIR (Gondolin reads it), mounts <room> at /workspace and session-scoped package caches,
 // gets pi-env's packaged static Linux daemon copied in, and runs it. Same shape as p2's sandbox
 // launcher (earendil-works/pi apps/p2/plugins/envs/sandbox/p2-sandbox.mjs), without SSH or a supervisor:
 // one VM per connection, closed when the connection closes (SIGTERM, or stdin's end).
 // Network, mount and user follow policy.ts: HTTP(S) only to ALLOWED_HOSTS (none: no egress at all),
-// the room alone at GUEST_WORKSPACE, and the daemon refuses to serve unless it runs as GUEST_USER.
-import { readFileSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+// the room at GUEST_WORKSPACE, and the daemon refuses to serve unless it runs as GUEST_USER.
+import { mkdirSync, readFileSync } from "node:fs";
+import { basename, isAbsolute, join, resolve } from "node:path";
 import { createHttpHooks, type HttpHooks, RealFSProvider, ReadonlyProvider, VM } from "@earendil-works/gondolin";
 import { packagedDaemon } from "@earendil-works/pi-env";
 import { ALLOWED_HOSTS, GUEST_USER, GUEST_WORKSPACE } from "./policy.ts";
@@ -20,6 +20,23 @@ if (!roomArg || daemonArgs[0] !== "serve") {
 }
 const room = resolve(roomArg);
 const readonlyInputs = process.env.LOYLY_ROOM_READONLY_INPUTS === "1";
+const stateRoot = process.env.PI_HARNESS_STATE_ROOT;
+const sessionId = process.env.LOYLY_BUILDER_SESSION_ID;
+if (stateRoot && !isAbsolute(stateRoot)) throw new Error("PI_HARNESS_STATE_ROOT must be absolute");
+if (sessionId && !/^[A-Za-z0-9._-]+$/.test(sessionId)) throw new Error("invalid cache session ID");
+const cacheRoot = stateRoot && sessionId ? join(stateRoot, "package-cache", sessionId) : null;
+const cacheMounts: Record<string, RealFSProvider> = {};
+if (cacheRoot) {
+	for (const [name, guest] of [
+		["npm", "/root/.npm"],
+		["maven", "/root/.m2"],
+		["uv", "/root/.cache/uv"],
+	] as const) {
+		const host = join(cacheRoot, name);
+		mkdirSync(host, { recursive: true });
+		cacheMounts[guest] = new RealFSProvider(host);
+	}
+}
 
 // HTTP(S) only to ALLOWED_HOSTS, by exact name. The request check runs before the host resolves the
 // name (Gondolin checks `allowedHosts` itself only after resolving, which would leak other names to
@@ -54,6 +71,7 @@ const vm = await VM.create({
 	sessionLabel: `loyly-builder ${basename(room)}`,
 	vfs: { mounts: {
 		[GUEST_WORKSPACE]: new RealFSProvider(room),
+		...cacheMounts,
 		...(readonlyInputs ? {
 			[`${GUEST_WORKSPACE}/impl`]: new ReadonlyProvider(new RealFSProvider(join(room, "impl"))),
 			[`${GUEST_WORKSPACE}/plan`]: new ReadonlyProvider(new RealFSProvider(join(room, "plan"))),

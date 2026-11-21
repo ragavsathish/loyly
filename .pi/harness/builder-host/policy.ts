@@ -3,7 +3,7 @@
 // they are Gondolin API options kept here, one place that both vm-daemon.ts enforces and host.ts
 // states in the builder's prompt.
 
-/** The builder room's mount point in the VM, read-write; no other host directory is mounted. */
+/** The builder room's mount point in the VM. Session-scoped package caches are separate mounts. */
 export const GUEST_WORKSPACE = "/workspace";
 
 /**

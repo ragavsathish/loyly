@@ -8,6 +8,15 @@ tmp="$OUT/running.tmp.$$"
 mv "$tmp" "$OUT/running.txt"
 bash "$ROOM/harness/verify.sh" > "$OUT/gate.log.tmp" 2>&1
 rc=$?
+if (( rc == 0 )); then
+  for cache in .npm-cache .npm .m2 .cache .uv-cache .gradle; do
+    if [[ -e "$ROOM/impl/$cache" ]]; then
+      echo "FATAL: package cache impl/$cache was recreated by the suite; use the VM's external package cache" >> "$OUT/gate.log.tmp"
+      rc=1
+      break
+    fi
+  done
+fi
 mv "$OUT/gate.log.tmp" "$OUT/gate.log"
 sha="$(shasum -a 256 "$OUT/gate.log" | cut -d' ' -f1)"
 tmp="$OUT/receipt.tmp.$$"

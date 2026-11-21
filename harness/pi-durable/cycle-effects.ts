@@ -89,7 +89,18 @@ export function createCycleEffects(
     return digestCandidate(candidateRoom);
   }
   function clearBuilderTestArtifacts() {
-    for (const name of ['node_modules', '.tmp'])
+    // These are download/build caches, not part of the candidate. In the paired
+    // run a 390 MB .npm-cache was copied into every grader item runtime.
+    for (const name of [
+      'node_modules',
+      '.tmp',
+      '.npm-cache',
+      '.npm',
+      '.m2',
+      '.cache',
+      '.uv-cache',
+      '.gradle',
+    ])
       rmSync(join(room, 'impl', name), { recursive: true, force: true });
   }
   function verifyBuilderScope(requireEntrypoints = true) {

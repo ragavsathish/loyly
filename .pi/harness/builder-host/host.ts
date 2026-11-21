@@ -144,7 +144,10 @@ export function environmentText(tools: readonly string[], roomLabel = "the build
 	return [
 		`You run as ${GUEST_USER} (superuser) in ${imageLine()}.`,
 		network,
-		`Your working directory is ${GUEST_WORKSPACE}: ${roomLabel}, and the only host directory the VM can see.`,
+		`Your working directory is ${GUEST_WORKSPACE}: ${roomLabel}.`,
+		...(process.env.PI_HARNESS_STATE_ROOT && process.env.LOYLY_BUILDER_SESSION_ID
+			? ["Package caches for npm, Maven and uv are mounted separately per session at their normal root-user paths."]
+			: []),
 		readonlyInputs ? "The plan and impl directories are mounted read-only; put every writable runtime copy and observation under /workspace/work." : "The room is read-write.",
 		"The image already carries the toolchain; use it first.",
 		...(installCommand()

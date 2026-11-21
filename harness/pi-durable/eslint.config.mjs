@@ -4,7 +4,7 @@ import tseslint from 'typescript-eslint';
 
 export default [
   {
-    ignores: ['node_modules/**', 'scratch*/**', 'fixture/**', 'example-replay.html'],
+    ignores: ['node_modules/**', 'scratch*/**', 'reviews/**', 'fixture/**', 'example-replay.html'],
   },
   {
     files: ['**/*.mjs'],
