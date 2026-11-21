@@ -1,0 +1,30 @@
+{
+  "schema": "loyly.grading-panel-plan.v1",
+  "project": "loyly-whole-product-reassessment",
+  "feature": "Cycle 04 targeted black-box reassessment",
+  "checks": [
+    {
+      "id": "clock-aware-black-box",
+      "source": "raw-grader",
+      "role": "scored",
+      "tool": "Codex black-box grader",
+      "technique": "acceptance",
+      "items": [
+        "02-003",
+        "02-008",
+        "03-007",
+        "03-008",
+        "03-009",
+        "03-012",
+        "03-013",
+        "04-004",
+        "04-007",
+        "05-004",
+        "05-005"
+      ],
+      "criterion": "Each selected Given, When and Then is independently observed in a fresh Gondolin VM; deadline items advance the guest clock past the actual returned boundary.",
+      "failure": "A stated consequence is contradicted or remains unobserved after the documented VM setup.",
+      "target_runtime": "gondolin-qemu-vm"
+    }
+  ]
+}

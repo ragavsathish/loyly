@@ -33,3 +33,14 @@ review. The old specialist scripts assumed a particular HTTP response and
 request shape, so specialist reassessment is separate and acceptance remains
 open. A new scored
 run must use fresh subagents; no historical Pi receipt becomes a Codex score.
+
+For a grader-only reassessment of a frozen candidate, use a separate
+`loyly.codex-grader-reassessment.v1` contract. `node reassessment-cli.ts
+<contract.json>` checks the original candidate, score and full checklist,
+requires exactly its failed items, pins the new grader instruction, panel,
+schema and VM image, and refuses a reused output path. The original score is
+never rewritten. A fresh independent grader writes new Allure evidence under
+the reassessment output; the operator validates it with `evidence-core` and
+files a separate receipt. `grader-reassessment-instruction.md` and
+`whole-product-reassessment.panel.json` define the first clock-aware
+reassessment of cycle 04.

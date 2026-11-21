@@ -8,6 +8,7 @@
   "scripts": {
     "check": "tsc -p tsconfig.json",
     "preflight": "node cli.ts preflight",
+    "reassess-preflight": "node reassessment-cli.ts",
     "decide": "node cli.ts decide",
     "evidence": "node cli.ts evidence",
     "test": "node --test test/*.test.mjs"
