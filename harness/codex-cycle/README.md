@@ -1,0 +1,35 @@
+# Codex subagent cycle adapter
+
+This adapter lets a Codex orchestrator use `cycle-core` and `evidence-core` for
+a selected Löyly slice or the whole-product cut. It does not start agents or
+act as a durable driver.
+The orchestrator prepares a pinned contract, obtains the operator's exact
+approval under `AGENTS.md`, fences the selected source, launches fresh builder
+and independent grader subagents, runs the legacy gate, and uses this adapter
+to decide the next phase and validate Allure before filing the legacy score.
+The grader's app observations run in private Gondolin VMs. The blind reviewer
+sees only the refusal and question.
+
+`node cli.ts preflight contract.json` checks the clean controller checkout at
+its approved commit, checks the source commit, derives the
+checklist afresh with the legacy generator and compares its bytes to the pin,
+then checks the run ID, score cycle, output path, ordered item list, spec files,
+model separation, instruction and concrete subagent preamble digests, exact
+panel coverage, the Allure schema, panel plan, grader image manifest, and
+the Codex/Gondolin runtime declarations. `node cli.ts decide attempt.json` applies the three-attempt
+`cycle-core` policy to recorded builder and gate outcomes. `node cli.ts evidence
+evidence.json` checks grader and blind Allure schema, attachments, exact item
+coverage, tool labels, surprises and final verdicts through `evidence-core`.
+These commands only read evidence and print reports. They do not fence, build,
+grade or score. The evidence checker does not prove the candidate digest or
+Gondolin VM launch receipt; the orchestrator must bind and verify those raw
+receipts before scoring.
+
+The Codex-specific builder, booking/product grader and blind instructions,
+subagent preambles, and
+booking/product panel plans are drafts until the operator approves their exact
+hashes. The first product panel contains only raw grader shards and blind
+review. The old specialist scripts assumed a particular HTTP response and
+request shape, so specialist reassessment is separate and acceptance remains
+open. A new scored
+run must use fresh subagents; no historical Pi receipt becomes a Codex score.
