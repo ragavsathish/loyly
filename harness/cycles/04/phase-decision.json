@@ -1,0 +1,10 @@
+{
+  "afterGrade": {
+    "phase": "blind-review"
+  },
+  "afterBlind": {
+    "phase": "score"
+  },
+  "blindResult": "passed",
+  "evidenceValidation": "harness/cycles/04/evidence-validation.json"
+}

@@ -32,7 +32,9 @@ handoff, one blind Allure result, and `work/surprises.json`. Every item has a
 VM command and exit receipt. The blind subagent saw only the refusal and
 question, suggested `pukuhuone 8 | Tuesday | 17:00`, and a fresh VM confirmed
 that exact standing request with HTTP 201. `evidence-validation.json` records
-the schema and coverage check. Recheck from the repo root with:
+the schema and coverage check. `phase-decision.json` records the `cycle-core`
+transition from grading through the completed blind review to scoring.
+Recheck from the repo root with:
 
 ```sh
 node harness/codex-cycle/cli.ts evidence harness/cycles/04/evidence.json
