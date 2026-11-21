@@ -10,7 +10,7 @@ import { readAllureResults } from "./allure-results.mjs";
 import { readAuditRows } from "./audit-rows.mjs";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
 import { candidateDigest } from "./grading-room.mjs";
-import { evaluatePanel } from "./panel-policy.mjs";
+import { evaluatePanel } from "./panel-policy.ts";
 import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));

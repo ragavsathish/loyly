@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { evaluatePanel } from '../panel-policy.mjs';
+import { evaluatePanel } from '../panel-policy.ts';
 
 const hash = 'a'.repeat(64);
 const plan = { checks: [

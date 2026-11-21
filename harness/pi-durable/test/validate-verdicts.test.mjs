@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { validateVerdicts } from "../validate-verdicts.mjs";
+import { validateVerdicts } from "../validate-verdicts.ts";
 
 test("verdicts preserve the approved denominator and reserve blind review", () => {
   const room = mkdtempSync(join(tmpdir(), "loyly-verdicts-"));

@@ -83,9 +83,11 @@ report; another pinned plan may add result directories without merging them.
 
 ## Use the lifecycle with another project
 
-The reusable control policy lives in [`lifecycle.mjs`](lifecycle.mjs): build,
+The reusable control policy lives in [`lifecycle.ts`](lifecycle.ts): build,
 independent gate, bounded repair, isolated grader shards, optional assessments,
-then score. `harness.pi-live-run.v2` names a `project` and pins the same source,
+then score. Its inputs and results, the panel policy, continuation selection,
+and verdict validation use the shared types in [`contracts.ts`](contracts.ts).
+`harness.pi-live-run.v2` names a `project` and pins the same source,
 agent, schema, and image inputs. Its builder and grader instructions can have
 project-specific file names. The blind handoff is absent in v2; a direct grader
 result decides every selected item. A panel is optional. Java 21 is required
@@ -115,6 +117,19 @@ passed a non-Löyly HTTP candidate in a real Gondolin VM.
 The older `loyly.pi-live-run.v1` contract and its panel retain their blind
 `01-011` handoff, Java preflight, and historical report identity. A new scored
 live cycle still needs the exact approval described in `AGENTS.md`.
+
+## JavaScript checks
+
+Run `npm run check` to type-check the migrated modules and `npm run lint` to
+lint the harness and its tests. TypeScript source runs directly on the host's
+Node 26 and in the panel VM's Node 24; `tsc` does not emit JavaScript.
+The runtime entrypoints and pinned VM worker filenames remain `.mjs` while
+their imports cross into the typed modules. Changing those filenames would
+invalidate existing panel plans and execution receipts.
+Prettier is available for explicit files: `npm run format:check -- lifecycle.ts`
+checks one file, and `npm run format -- lifecycle.ts` formats it. Keep the
+file list explicit when editing a pinned grader instruction, panel worker, or
+schema; formatting those files changes their approved digest.
 
 ## Panel-only reassessment
 

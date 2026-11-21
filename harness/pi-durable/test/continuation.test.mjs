@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readAuditRows } from "../audit-rows.mjs";
-import { continuationPrompt, selectedUncarried } from "../continuation.mjs";
+import { continuationPrompt, selectedUncarried } from "../continuation.ts";
 
 const here = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const root = resolve(here, "../..");

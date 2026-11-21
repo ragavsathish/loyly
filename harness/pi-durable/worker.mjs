@@ -17,9 +17,9 @@ import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer,
   verifyBlindReviewPacket, writeBlindAgentAllure } from "./blind-review.mjs";
 import { runBlindAgent } from "./blind-agent-adapter.mjs";
 import { bindScoreInput, verifyScoredCycle } from "./score-receipt.mjs";
-import { MAX_CONTINUATIONS, continuationPrompt, selectedUncarried } from "./continuation.mjs";
+import { MAX_CONTINUATIONS, continuationPrompt, selectedUncarried } from "./continuation.ts";
 import { runDurablePanel, runDurablePanelReport } from "./panel-adapter.mjs";
-import { createLifecycle } from "./lifecycle.mjs";
+import { createLifecycle } from "./lifecycle.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../..");

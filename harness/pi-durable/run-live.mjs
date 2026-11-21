@@ -63,7 +63,7 @@ export function checkLiveRun(config, { makeChecklist = true } = {}) {
   if (config.schema === 'loyly.pi-live-run.v1' || config.runtime?.java21) {
     if (!javaHome) throw Error('JAVA_HOME must point to Java 21');
     const java = spawnSync(join(javaHome, 'bin', 'java'), ['-version'], { encoding: 'utf8' });
-    if (java.status !== 0 || !/version "21(?:\.|\")/.test(`${java.stdout}${java.stderr}`))
+    if (java.status !== 0 || !/version "21(?:[.]|")/.test(`${java.stdout}${java.stderr}`))
       throw Error('live run requires Java 21');
   }
   const source = resolve(config.source.repo), scratch = resolve(config.scratch);
