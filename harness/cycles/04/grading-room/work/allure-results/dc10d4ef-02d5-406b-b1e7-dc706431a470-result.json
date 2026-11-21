@@ -1,0 +1,81 @@
+{
+  "uuid": "dc10d4ef-02d5-406b-b1e7-dc706431a470",
+  "name": "Releasing one week does not offer a different week",
+  "fullName": "loyly.occurrence-release.02-002",
+  "testCaseId": "loyly.occurrence-release.02-002",
+  "historyId": "loyly.occurrence-release.02-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET soukanvuori/views?date=2026-12-01 \u2192 200; GET soukanvuori/views?date=2026-12-08 \u2192 200; POST soukanvuori/take \u2192 200; GET soukanvuori/views?date=2026-12-01 \u2192 200; GET soukanvuori/views?date=2026-12-08 \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256736016,
+  "stop": 1795256739620,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Releasing one week preserves the standing holding"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12 holds a Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: apartment 12 releases the occurrence on one named Tuesday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: another household can take that named Tuesday occurrence",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the occurrence on the following Tuesday remains assigned to apartment 12",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "6fbc3aa0-574d-4203-a581-4508747c8be8-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

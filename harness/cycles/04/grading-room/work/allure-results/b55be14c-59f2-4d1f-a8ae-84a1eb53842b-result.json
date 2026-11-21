@@ -1,0 +1,81 @@
+{
+  "uuid": "b55be14c-59f2-4d1f-a8ae-84a1eb53842b",
+  "name": "An unrelated class does not consume the family-time allowance",
+  "fullName": "loyly.time-classes.05-002",
+  "testCaseId": "loyly.time-classes.05-002",
+  "historyId": "loyly.time-classes.05-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET masthugget/policies \u2192 200; POST masthugget/occurrences \u2192 201; POST masthugget/occurrences \u2192 201; GET masthugget/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256662688,
+  "stop": 1795256665402,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a house caps family time at one active or upcoming booking per household",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Given: apartment 12 has an upcoming booking in a different time class",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: apartment 12 requests a free family-time window",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the unrelated booking does not trigger the family-time cap",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "6106ad45-17f3-49df-be29-268279af297b-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

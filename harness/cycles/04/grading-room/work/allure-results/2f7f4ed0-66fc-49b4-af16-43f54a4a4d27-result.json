@@ -1,0 +1,89 @@
+{
+  "uuid": "2f7f4ed0-66fc-49b4-af16-43f54a4a4d27",
+  "name": "A household with one family-time booking cannot take another",
+  "fullName": "loyly.time-classes.05-001",
+  "testCaseId": "loyly.time-classes.05-001",
+  "historyId": "loyly.time-classes.05-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET masthugget/policies \u2192 200; POST masthugget/occurrences \u2192 201; POST masthugget/occurrences \u2192 409; GET masthugget/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256661753,
+  "stop": 1795256664465,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a house caps family time at one active or upcoming booking per household",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Given: apartment 12 already has an upcoming family-time booking",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: apartment 12 requests another family-time window",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the request is refused with the family-time cap as its reason",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the existing family-time booking is identified",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "31dc7971-ce09-4981-b2ad-944547333e7b-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

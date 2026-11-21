@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Löyly · Sauna bookings</title>
+<link rel="stylesheet" href="/style.css">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<header>
+  <div><h1>Löyly</h1><p>Sauna bookings</p></div>
+  <label>House <select id="house"></select></label>
+</header>
+<main>
+  <section aria-labelledby="schedule-title">
+    <h2 id="schedule-title">Weekly schedule</h2>
+    <p id="route"></p>
+    <div id="schedule"></div>
+  </section>
+  <section aria-labelledby="book-title">
+    <h2 id="book-title">Request a sauna slot</h2>
+    <form id="book">
+      <label>Apartment <input name="household" required maxlength="40"></label>
+      <label>Booker role <select name="role"></select></label>
+      <label>Booking <select name="kind"><option value="standing">Standing weekly slot</option><option value="occurrences">Single occurrence</option></select></label>
+      <label>Dressing room <select name="resource"></select></label>
+      <label id="weekday-field">Weekday <select name="weekday"></select></label>
+      <label id="date-field" hidden>Date <input name="date" type="date"></label>
+      <label>Start time <input name="start" type="time" value="17:00" required></label>
+      <button>Request slot</button>
+    </form>
+  </section>
+  <section aria-labelledby="record-title">
+    <h2 id="record-title">Booking record</h2>
+    <p id="status" role="status" aria-live="polite"></p>
+    <form id="date-view">
+      <label>Occurrence date <input type="date" name="date" required></label>
+      <button>View date</button>
+      <button type="button" id="weekly">View weekly holdings</button>
+    </form>
+    <div id="views"></div>
+  </section>
+  <section aria-labelledby="management-title">
+    <h2 id="management-title">Manage a booking</h2>
+    <form id="manage">
+      <label>Action <select name="action"></select></label>
+      <div class="fields" id="manage-fields"></div>
+      <button>Submit</button>
+    </form>
+    <div id="outcome"></div>
+  </section>
+  <section aria-labelledby="operations-title">
+    <h2 id="operations-title">House rules and operations</h2>
+    <div id="operations"></div>
+  </section>
+</main>
+</body>
+</html>
+Löyly sauna listening on port 8080
+curl: (7) Failed to connect to 127.0.0.1:8080 after 0 ms: Could not connect to server
+
+exit=0

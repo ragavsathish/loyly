@@ -1,0 +1,81 @@
+{
+  "uuid": "36316bd6-ddc7-40aa-829c-4f7c1787a927",
+  "name": "The queue is ordered by accepted request within its eligible group",
+  "fullName": "loyly.scarcity-forfeit.03-005",
+  "testCaseId": "loyly.scarcity-forfeit.03-005",
+  "historyId": "loyly.scarcity-forfeit.03-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET masthugget/queue \u2192 200; POST masthugget/evaluate-scarcity \u2192 200; GET masthugget/notices \u2192 200; GET masthugget/notices \u2192 200; GET masthugget/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256727873,
+  "stop": 1795256731877,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: group A is full and two eligible households request a standing slot in that group",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the first request is accepted into the queue before the second",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the first household is queue-head for group A",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: neither request joins a queue for an unrelated resource group",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "05656f4a-d283-47c6-a3cf-d628ca902b79-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

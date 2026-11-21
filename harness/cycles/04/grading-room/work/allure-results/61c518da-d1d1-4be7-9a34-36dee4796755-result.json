@@ -1,0 +1,89 @@
+{
+  "uuid": "61c518da-d1d1-4be7-9a34-36dee4796755",
+  "name": "The weekly schedule shows each dressing room's own sauna days",
+  "fullName": "loyly.booking-core.01-001",
+  "testCaseId": "loyly.booking-core.01-001",
+  "historyId": "loyly.booking-core.01-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET soukanvuori/schedule \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256628640,
+  "stop": 1795256632574,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Availability is per dressing room, per weekday"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: pukuhuone 9's sauna days are Thursday, Friday and Saturday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Given: pukuhuone 8's sauna days include Tuesday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: a resident views the weekly schedule for sauna F",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: Tuesday shows bookable slots for pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: Tuesday shows no slots for pukuhuone 9",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "29199bbc-47a3-42c0-9d94-bfb889fd9096-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

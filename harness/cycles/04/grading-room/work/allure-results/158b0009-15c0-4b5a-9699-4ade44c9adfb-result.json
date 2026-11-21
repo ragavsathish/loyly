@@ -1,0 +1,81 @@
+{
+  "uuid": "158b0009-15c0-4b5a-9699-4ade44c9adfb",
+  "name": "A held slot cannot be confirmed for another household",
+  "fullName": "loyly.booking-core.01-004",
+  "testCaseId": "loyly.booking-core.01-004",
+  "historyId": "loyly.booking-core.01-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST soukanvuori/standing \u2192 201; POST soukanvuori/standing \u2192 409; GET soukanvuori/schedule \u2192 200; GET soukanvuori/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256628643,
+  "stop": 1795256632376,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: the household in apartment 12 holds the Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the household in apartment 3 requests a standing slot on Tuesday at 17:00 in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the request is refused because the slot is held",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the household in apartment 12 still holds the slot",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "41a2ad1d-3b90-4a4e-be30-62825b01d564-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

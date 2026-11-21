@@ -1,0 +1,81 @@
+{
+  "uuid": "a5db5f06-d374-4ba0-b035-a14396bf36ba",
+  "name": "A queue-head decline offers the holding to the next eligible entry",
+  "fullName": "loyly.scarcity-forfeit.03-011",
+  "testCaseId": "loyly.scarcity-forfeit.03-011",
+  "historyId": "loyly.scarcity-forfeit.03-011",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET masthugget/notices \u2192 200; POST masthugget/choose \u2192 200; POST masthugget/claim \u2192 200; GET masthugget/notices \u2192 200; GET masthugget/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256731901,
+  "stop": 1795256735785,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-011"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a selected holding is under notice and two eligible households wait in order",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the queue-head declines that holding",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the next eligible household is offered the pending claim",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the original holder keeps using the holding until its recorded notice deadline",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "73b62c74-65d3-4116-8e49-7cfc2f514176-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

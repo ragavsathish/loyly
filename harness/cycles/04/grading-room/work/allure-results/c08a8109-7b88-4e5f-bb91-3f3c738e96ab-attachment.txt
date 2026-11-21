@@ -1,0 +1,14 @@
+COMMAND ['gondolin', 'exec', '--image', '/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/.state/assets/builder-clojure', '--mount-hostfs', '/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-product-01/grading-room/impl:/candidate:ro', '--mount-hostfs', '/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-product-01/grading-room/work/01-002:/out', '--', 'sh', '-c', 'apk add --no-cache nodejs icu-data-full; node --version; cp -R /candidate /tmp/app; cd /tmp/app; ./start.sh 8080 >/out/server.log 2>&1 & p=$!; trap "kill $p 2>/dev/null; wait $p 2>/dev/null" EXIT; for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8080/api >/dev/null && break; kill -0 $p 2>/dev/null || exit 1; sleep 1; done; node /out/probe.js 01-002']
+(1/6) Installing icu-data-full (78.1-r0)
+(2/6) Installing ada-libs (4.0.0-r0)
+(3/6) Installing icu-libs (78.1-r0)
+(4/6) Installing simdjson (4.2.4-r0)
+(5/6) Installing simdutf (9.0.0-r0)
+(6/6) Installing nodejs (24.22.3-r0)
+Executing busybox-1.37.0-r31.trigger
+OK: 159.2 MiB in 100 packages
+v24.22.3
+{"method":"POST","path":"soukanvuori/standing","body":{"resource":"pukuhuone-9","weekday":"Tuesday","start":"17:00","role":"shareholder","household":"12"},"status":409,"response":{"reason":"closed_day","message":"pukuhuone 9 has no sauna day on Tuesday. Open days: Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 for a free standing slot.","policyVersion":"v1","decisionId":"f3a20834-c2a3-466a-a34b-297bfac6660d","openDays":["Thursday","Friday","Saturday"]}}
+curl: (7) Failed to connect to 127.0.0.1:8080 after 0 ms: Could not connect to server
+
+EXIT 0

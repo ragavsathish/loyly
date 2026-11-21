@@ -1,0 +1,81 @@
+{
+  "uuid": "96d02573-ca96-4fa8-bf28-38bb56444b73",
+  "name": "The choice right passes after the shorter clock",
+  "fullName": "loyly.scarcity-forfeit.03-007",
+  "testCaseId": "loyly.scarcity-forfeit.03-007",
+  "historyId": "loyly.scarcity-forfeit.03-007",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "not reached: the notice was created, but passage of the 14-day choose deadline was not observable through the served controls"
+  },
+  "start": 1795256728133,
+  "stop": 1795256731863,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a scarcity notice has started a 14-day choose clock and 30-day notice clock",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the choose deadline passes without the holder choosing",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the notice was created, but passage of the 14-day choose deadline was not observable through the served controls"
+      }
+    },
+    {
+      "name": "Then: the queue-head gains the right to choose which holding will lapse",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the notice was created, but passage of the 14-day choose deadline was not observable through the served controls"
+      }
+    },
+    {
+      "name": "Then: the original holder has not yet lost a holding",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the notice was created, but passage of the 14-day choose deadline was not observable through the served controls"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "3a7a1a5b-7d99-4ce7-b7ae-64c806e4c887-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

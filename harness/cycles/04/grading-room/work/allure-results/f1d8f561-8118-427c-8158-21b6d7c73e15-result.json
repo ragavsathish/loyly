@@ -1,0 +1,81 @@
+{
+  "uuid": "f1d8f561-8118-427c-8158-21b6d7c73e15",
+  "name": "A confirmed queue claim takes effect only at lapse",
+  "fullName": "loyly.scarcity-forfeit.03-010",
+  "testCaseId": "loyly.scarcity-forfeit.03-010",
+  "historyId": "loyly.scarcity-forfeit.03-010",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET masthugget/notices \u2192 200; POST masthugget/choose \u2192 200; POST masthugget/claim \u2192 200; GET masthugget/notices \u2192 200; GET masthugget/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256731878,
+  "stop": 1795256735650,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-010"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a queue-head has confirmed the selected holding under notice",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the notice deadline has not yet passed",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the original household still holds and may use that standing slot",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the queue-head is identified as the pending successor, not its current holder",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "8f72fb84-e469-45e8-802d-79ea69ea81c7-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

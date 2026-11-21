@@ -1,0 +1,81 @@
+{
+  "uuid": "85f6387c-5062-4d0f-aaaa-80cf7481ef42",
+  "name": "A standing slot cannot be requested on a closed day",
+  "fullName": "loyly.booking-core.01-002",
+  "testCaseId": "loyly.booking-core.01-002",
+  "historyId": "loyly.booking-core.01-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST soukanvuori/standing \u2192 409; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256628644,
+  "stop": 1795256632357,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Availability is per dressing room, per weekday"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: pukuhuone 9's sauna days are Thursday, Friday and Saturday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the household in apartment 12 requests a standing slot on Tuesday at 17:00 in pukuhuone 9",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the request is refused because pukuhuone 9 has no sauna day on Tuesday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the refusal names the days pukuhuone 9 does open",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "c08a8109-7b88-4e5f-bb91-3f3c738e96ab-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}
