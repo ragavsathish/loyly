@@ -1,0 +1,22 @@
+./start.sh: line 4: exec: node: not found
+not reached: HTTP readiness
++ cp -R /candidate /tmp/app
++ cd /tmp/app
++ command -v node
++ true
++ p=629
++ seq 1 30
++ curl -sS -D /result/headers.txt http://127.0.0.1:18080/ -o /result/root.txt
++ ./start.sh 18080
+curl: (7) Failed to connect to 127.0.0.1:18080 after 0 ms: Could not connect to server
++ kill -0 629
++ break
++ cat /result/server.log
++ test -s /result/root.txt
++ echo 'not reached: HTTP readiness'
++ kill 629
++ true
++ wait 629
++ true
+
+VM exit=0

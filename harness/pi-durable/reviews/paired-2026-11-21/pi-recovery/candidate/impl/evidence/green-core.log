@@ -1,0 +1,19 @@
+✔ @item-01-001 per-dressing-room weekly days (133.286166ms)
+✔ @item-01-002 closed day names opening days (100.857875ms)
+✔ @item-01-003 confirmation recurs with configured duration (99.995125ms)
+✔ @item-01-004 held slot is refused without revealing holder (94.361959ms)
+✔ @item-01-005 second slot while room remains (88.786583ms)
+✔ @item-01-006 full schedule refusal does not suggest unavailable choices (109.368708ms)
+✔ @item-01-007 three views derive confirmation (87.8565ms)
+✔ @item-01-008 give up removes every current derived claim (87.922ms)
+✔ @item-01-009 overlapping requests have one winner (92.178291ms)
+✔ @item-01-010 one hundred two-household races (1068.680126ms)
+✔ @item-01-011 actionable refusal HTTP replay (independent judging outstanding) (182.202209ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2211.183126

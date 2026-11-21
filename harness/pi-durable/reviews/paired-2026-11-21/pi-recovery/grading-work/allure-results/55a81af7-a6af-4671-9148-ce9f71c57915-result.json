@@ -1,0 +1,74 @@
+{
+  "uuid": "55a81af7-a6af-4671-9148-ce9f71c57915",
+  "name": "A household with one family-time booking cannot take another",
+  "fullName": "loyly.time-classes.05-001",
+  "testCaseId": "loyly.time-classes.05-001",
+  "historyId": "loyly.time-classes.05-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Second dated request returned HTTP 409: {\"code\": \"class-cap\", \"reason\": \"family time cap is 1 active or upcoming booking(s) per household; existing booking booking-1 uses the allowance.\", \"existingBooking\": \"booking-1\", \"decision\": {\"id\": \"decision-3\", \"house\": \"house-a\", \"household\": \"12\", \"request\": {\"house\": \"house-a\", \"household\": \"12\", \"resource\": \"room\", \"date\": \"2026-11-28\", \"start\": \"18:30\", \"operator\": \"manager\"}, \"outcome\": \"refused\", \"reason\": \"family time cap is 1 active or upcoming booking(s) per household; existing booking booking-1 uses the allowance.\", \"code\": \"class-cap\", \"policyVersion\": \"v1\", \"at\": \"2026-11-21T17:35:22.137Z\"}}; booking and views reread."
+  },
+  "start": 1795282519340,
+  "stop": 1795282523111,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given a house caps family time at one active or upcoming booking per household",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12 already has an upcoming family-time booking",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 12 requests another family-time window",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the request is refused with the family-time cap as its reason",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And the existing family-time booking is identified",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "50978d1b-0eff-46db-9c9f-74595f74892c-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

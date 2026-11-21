@@ -1,0 +1,13 @@
+# Löyly regenerated application
+
+Run `./test.sh`, then `./start.sh 8901`. Node 20.11+ is sufficient; no packages or build are needed. Both scripts resolve their own location. Open http://127.0.0.1:8901/.
+
+The house selector includes the documented Soukanvuori manager route, an explicitly configurable self-service example, and a family-time policy example. The resource calendars and example hours are visible configuration; they do not assert undocumented hours as corpus facts. House setup adds independent calendars, eligible groups, booker roles, time classes, caps, and effective-dated rules. The operator console's household and booker-role fields let the operator process real household decisions. Manager-mediated houses show the manager route and offer no resident queue.
+
+Use weekly schedule to request a standing holding or one dated occurrence. Holdings & releases offers a selected week FREE or SALE, withdraws an untaken offer, takes an offer as another household, or gives up a standing holding. Queue & notices handles scoped FIFO requests, scarcity evaluation, selection, confirmation and decline. House setup can advance the house clock to exercise exact expiry and lapse boundaries. List, heater & billing accepts a named date to inspect occurrence transfers independently of the weekly standing right. Policy & disputes reconstructs booking decision evidence for the configured first-stop role.
+
+The public HTTP contract is served at `/api/contract` and stored in `contract.json`. All product tests exercise these HTTP endpoints, including 100 overlapping pairs of booking requests. The frontend uses the same endpoints. Persistent state and immutable decision history live in `data.json`. Tests use a separate `test-data.json` and remove it afterwards. Atomic synchronous mutations in one server process make a contested slot or occurrence indivisible. Derived lists, heating windows, and charge signals are computed from the booking history; they have no separate mutable storage.
+
+This is a local operator console. Acting roles are explicit inputs, not authenticated identity. Time is UTC to keep the named occurrence model deterministic; a deployed cooperative would need an agreed timezone and identity integration. No network heater control, monetary charge calculation, payment collection or resale payout distribution is implemented.
+
+`red.log` records the initial failing suite; `green.log` records the builder's passing acceptance suite. The independent gate and blind reviewer decide acceptance, including the judged refusal budget. See `UNCARRIED.md` for any known gaps.

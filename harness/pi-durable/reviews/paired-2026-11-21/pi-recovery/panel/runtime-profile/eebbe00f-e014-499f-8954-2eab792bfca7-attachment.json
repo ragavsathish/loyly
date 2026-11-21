@@ -1,0 +1,21 @@
+{
+  "candidate_sha256": "8ffe62eb046ae03e5b1907b06f7341cb1c8301e9ccc9f5eb7a94f62330e89dfc",
+  "probe_run_id": "3304bd91-5081-4859-a3fb-e4da47fab92c",
+  "source": "panel-vm-procfs",
+  "before": {
+    "at": 1795283263032,
+    "processes": [
+      {
+        "pid": 644,
+        "executable": "/usr/bin/node",
+        "rss_bytes": 62345216,
+        "threads": 7,
+        "voluntary_context_switches": 74
+      }
+    ],
+    "rss_bytes": 62345216,
+    "threads": 7
+  },
+  "output": "LISTEN 8903\n",
+  "failure": "Error: HTTP 404, expected 201: {\"code\":\"not-found\",\"reason\":\"House not found\"}\n    at file:///worker/panel-runtime.mjs:143:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async step (file:///worker/panel-runtime.mjs:27:16)\n    at async file:///worker/panel-runtime.mjs:134:25"
+}

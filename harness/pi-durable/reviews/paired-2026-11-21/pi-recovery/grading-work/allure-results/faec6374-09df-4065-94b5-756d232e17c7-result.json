@@ -1,0 +1,69 @@
+{
+  "uuid": "faec6374-09df-4065-94b5-756d232e17c7",
+  "name": "Family-time allowance does not block a different class",
+  "fullName": "loyly.time-classes.05-003",
+  "testCaseId": "loyly.time-classes.05-003",
+  "historyId": "loyly.time-classes.05-003",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Second dated request returned HTTP 201: {\"booking\": {\"id\": \"booking-3\", \"house\": \"house-a\", \"household\": \"12\", \"kind\": \"occurrence\", \"resource\": \"room\", \"resourceName\": \"Room\", \"sauna\": \"Sauna A\", \"group\": \"A\", \"weekday\": \"Saturday\", \"start\": \"20:00\", \"end\": \"21:30\", \"class\": \"other\", \"date\": \"2026-11-28\", \"confirmedAt\": \"2026-11-21T17:35:30.941Z\", \"policyVersion\": \"v1\", \"priceReference\": \"standing-price\", \"history\": [{\"id\": \"event-4\", \"booking\": \"booking-3\", \"type\": \"confirmed\", \"at\": \"2026-11-21T17:35:30.941Z\", \"policyVersion\": \"v1\"}]}}; booking and views reread."
+  },
+  "start": 1795282527363,
+  "stop": 1795282532044,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-003"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given a house caps family time at one active or upcoming booking per household",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12 has an upcoming family-time booking",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 12 requests a free window in another time class",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the family-time cap does not refuse that request",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "3798ea8c-4341-4e11-a0ec-73e7a25e6cf2-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+
+added 40 packages in 3s
+✔ @item-01-001 per-dressing-room weekly days (139.892334ms)
+✔ @item-01-002 closed day names opening days (95.948375ms)
+✔ @item-01-003 confirmation recurs with configured duration (94.71425ms)
+✔ @item-01-004 held slot is refused without revealing holder (94.299625ms)
+✔ @item-01-005 second slot while room remains (94.346667ms)
+✔ @item-01-006 full schedule refusal does not suggest unavailable choices (111.160375ms)
+✔ @item-01-007 three views derive confirmation (92.294292ms)
+✔ @item-01-008 give up removes every current derived claim (93.488834ms)
+✔ @item-01-009 overlapping requests have one winner (101.605542ms)
+✔ @item-01-010 one hundred two-household races (1036.263751ms)
+✔ @item-01-011 actionable refusal HTTP replay (independent judging outstanding) (184.437209ms)
+✔ @item-02-001 FREE offers only one occurrence (144.481125ms)
+✔ @item-02-002 next Tuesday remains assigned (96.147958ms)
+✔ @item-02-003 unused offer preserves normal fee and holding (98.966792ms)
+✔ @item-02-004 free taker owes no charge, holder owes normal fee (105.662583ms)
+✔ @item-02-005 sale emits distinct priced policy-bound charge (99.893958ms)
+✔ @item-02-006 untaken withdrawal restores holder and prevents taking (97.949126ms)
+✔ @item-02-007 taken transfer cannot be withdrawn (99.896625ms)
+✔ @item-02-008 offer expires precisely at occurrence start (103.762917ms)
+✔ @item-02-009 one taker across all views (99.566375ms)
+✔ @item-02-010 concurrent takers have one winner (97.156416ms)
+✔ @item-03-001 free eligible capacity prevents notice (180.787875ms)
+✔ @item-03-002 full capacity alone is not scarcity (118.166417ms)
+✔ @item-03-003 release is not free standing capacity (121.954916ms)
+✔ @item-03-004 other resource group queue does not trigger notice (118.053625ms)
+✔ @item-03-005 accepted sequence gives scoped FIFO head (121.86175ms)
+✔ @item-03-014 repeated evaluation issues one active notice for three holdings (123.134583ms)
+✔ @item-03-006 holder chooses before shorter deadline but keeps using both (153.393792ms)
+✔ @item-03-007 choice right passes to queue-head at deadline (135.73125ms)
+✔ @item-03-008 choose deadline leaves loss deadline and holdings unchanged (124.251791ms)
+✔ @item-03-009 lapse removes only selected holding with consistent history (152.571917ms)
+✔ @item-03-010 confirmed claim is pending until lapse (133.557333ms)
+✔ @item-03-011 decline offers next eligible entry without early loss (131.1395ms)
+✔ @item-03-012 all declines return selected slot to pool at lapse (142.071001ms)
+✔ @item-03-013 queue withdrawal does not erase notice deadlines or rule (130.709083ms)
+✔ @item-04-001 calendars belong to their own house (180.066875ms)
+✔ @item-04-002 booker roles are checked per house (130.1815ms)
+✔ @item-04-003 manager route does not expose or accept self-service queue (105.765042ms)
+✔ @item-04-004 effective-dated rules record authorized governance (119.284083ms)
+✔ @item-04-005 configured dispute role reconstructs booking history (118.064042ms)
+✔ @item-04-006 later revision cannot rewrite refusal evidence (116.63375ms)
+✔ @item-04-007 revisions affect new notice clocks only (143.806459ms)
+✔ @item-05-001 family cap identifies the existing household booking (158.945209ms)
+✔ @item-05-002 unrelated booking does not use family allowance (118.88775ms)
+✔ @item-05-003 family allowance does not block other classes (116.576916ms)
+✔ @item-05-004 caps do not leak between houses (121.52ms)
+✔ @item-05-005 completed occurrence releases the class allowance (123.22175ms)
+✔ browser surface exposes the booking product, scripts and styles (166.579458ms)
+✔ scenario clock can return to real time (155.9735ms)
+✔ invalid calendar coordinates fail without an internal error (103.40825ms)
+✔ invalid house configuration cannot enter the record (102.836917ms)
+✔ overlapping configured windows are rejected (99.220792ms)
+✔ choice-right transition is recorded at its original instant (125.256792ms)
+✔ booking and derived views survive a process restart (172.687708ms)
+✖ an accepted transfer cannot be undone via giving up the standing holding (98.263708ms)
+✖ initial policy is effective at its exact ISO instant (88.396625ms)
+✔ browser workflow: standing confirmation, sale, taking and dated derived views (341.955209ms)
+✔ browser workflow: reasoned refusal and giving up clear current views (173.515917ms)
+✔ browser workflow: create a family-policy house, register and enforce its class cap (199.6105ms)
+✔ browser workflow: scoped queue, holder choice, pending claim and later lapse (255.229209ms)
+ℹ tests 60
+ℹ suites 0
+ℹ pass 58
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9938.734589
+
+✖ failing tests:
+
+test at tests/07-integrity.test.mjs:10:1
+✖ an accepted transfer cannot be undone via giving up the standing holding (98.263708ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'household')
+      at TestContext.<anonymous> (file:///workspace/impl/tests/07-integrity.test.mjs:10:438)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests/07-integrity.test.mjs:11:1
+✖ initial policy is effective at its exact ISO instant (88.396625ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  409 !== 201
+  
+      at TestContext.<anonymous> (file:///workspace/impl/tests/07-integrity.test.mjs:11:159)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 409,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

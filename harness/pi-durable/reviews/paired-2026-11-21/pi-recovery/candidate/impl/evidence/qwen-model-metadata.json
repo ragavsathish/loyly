@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0-alpha.1",
+  "dist.unpackedSize": 15470,
+  "dependencies": {
+    "tripilot-runtime": "0.1.0-alpha.1",
+    "tripilot-model-qwen-part-1": "0.1.0-alpha.1",
+    "tripilot-model-qwen-part-2": "0.1.0-alpha.1",
+    "tripilot-model-qwen-part-3": "0.1.0-alpha.1",
+    "tripilot-model-qwen-part-4": "0.1.0-alpha.1",
+    "tripilot-model-qwen-part-5": "0.1.0-alpha.1"
+  },
+  "readme": "# tripilot-model-qwen\n\nQwen3-0.6B Q4_K_M local opcional para TriPilot. Este pequeno pacote depende de cinco pacotes de dados e tripilot-runtime. O npm instala todos os arquivos; não há scripts de instalação nem downloads externos de artefatos. O TriPilot verifica cada parte, recompõe o GGUF original de 397 MB e verifica seu SHA-256 completo antes do uso. O modelo transfere cerca de 386 MB no total, além do runtime.\n\nInstale `pnpm add -D tripilot-e2e@alpha tripilot-model-qwen@alpha`, depois `pnpm exec tripilot ai-prepare --offline`. Não importe as ferramentas no app mobile. Consulte provenance.json, LICENSE e NOTICE.\n"
+}

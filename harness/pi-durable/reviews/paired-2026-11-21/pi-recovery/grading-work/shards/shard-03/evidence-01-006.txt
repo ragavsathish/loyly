@@ -1,0 +1,322 @@
+GET / 
+HTTP 200 <!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Löyly · sauna slots</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div class="brand">Löyly<span>SAUNA · SHARED, SIMPLY</span></div>
+      <div class="identity">
+        <label>House<select id="house"></select></label
+        ><label>Acting household<select id="household"></select></label>
+      </div>
+    </header>
+    <nav aria-label="Sections">
+      <a href="#schedule">Weekly schedule</a
+      ><a href="#bookings">Your bookings</a
+      ><a href="#releases">One-week offers</a><a href="#views">Derived views</a
+      ><a href="#notices">Queue & notices</a
+      ><a href="#policies">House & history</a>
+    </nav>
+    <main>
+      <div class="intro">
+        <div>
+          <p class="eyebrow">A LITTLE HEAT. A SHARED ROUTINE.</p>
+          <h1>Your next löyly.</h1>
+          <p>
+            One booking record. The slot list, heater schedule and billing
+            signal always read from it.
+          </p>
+        </div>
+        <div class="clock">
+          <span id="clock-label"></span
+          ><small>All dates and notice instants use UTC.</small>
+        </div>
+      </div>
+      <div id="message" role="status" aria-live="polite" hidden></div>
+      <section id="schedule">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">01 / MAKE IT A ROUTINE</p>
+            <h2>Weekly sauna schedule</h2>
+          </div>
+          <button id="refresh" class="secondary">Refresh record</button>
+        </div>
+        <div id="route" class="callout"></div>
+        <p class="muted">
+          Availability belongs to each dressing room, not the whole sauna.
+          Select a window to request it.
+        </p>
+        <div id="schedule-grid" class="resources"></div>
+        <details id="request-details" open>
+          <summary>Request a standing slot or one dated occurrence</summary>
+          <form id="request-form" class="form-grid">
+            <label
+              >Bookable resource<select
+                name="resource"
+                id="request-resource"
+                required
+              ></select></label
+            ><label
+              >Weekday<select name="weekday" id="request-weekday">
+                <option>Monday</option>
+                <option selected>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+                <option>Saturday</option>
+                <option>Sunday</option>
+              </select></label
+            ><label
+              >Start time<input
+                name="start"
+                id="request-start"
+                type="time"
+                value="17:00"
+                required /></label
+            ><label
+              >Occurrence date (leave blank for weekly)<input
+                name="date"
+                type="date"
+                id="request-date" /></label
+            ><label id="operator-label"
+              >Booking operator role<input
+                name="operator"
+                id="request-operator"
+                value="manager"
+                required /></label
+            ><button type="submit">Request slot</button>
+          </form>
+          <p class="muted">
+            A confirmed standing slot repeats every week until given up or
+            lapsed. Dated bookings reserve only that occurrence. The configured
+            slot length determines the end time.
+          </p>
+        </details>
+      </section>
+      <section id="bookings">
+        <p class="eyebrow">02 / YOUR RECURRING RIGHTS</p>
+        <h2>Your bookings</h2>
+        <div id="booking-list" class="cards"></div>
+      </section>
+      <section id="releases">
+        <p class="eyebrow">03 / AWAY THIS WEEK?</p>
+        <h2>One-week offers</h2>
+        <p>
+          FREE: the holder pays their usual standing fee, the taker pays
+          nothing. SALE: the buyer receives a separate resale billing signal.
+          Neither ends the standing holding.
+        </p>
+        <div id="release-list" class="cards"></div>
+      </section>
+      <section id="views">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">04 / THREE READINGS, ONE RECORD</p>
+            <h2>List, heater & billing</h2>
+          </div>
+          <label>Occurrence date<input type="date" id="view-date" /></label>
+        </div>
+        <p class="muted">
+          Leave the date blank for the standing schedule. Choose a date to see
+          occurrence transfers. Heater and billing are signals only: this app
+          does not control equipment or collect money.
+        </p>
+        <div class="view-grid">
+          <article>
+            <h3>Posted slot list</h3>
+            <div id="posted-view"></div>
+          </article>
+          <article>
+            <h3>Heater schedule</h3>
+            <div id="heater-view"></div>
+          </article>
+          <article>
+            <h3>Invoicing signal</h3>
+            <div id="billing-view"></div>
+          </article>
+        </div>
+      </section>
+      <section id="notices">
+        <p class="eyebrow">05 / ROOM FOR EVERYONE</p>
+        <h2>Waiting queue & scarcity notices</h2>
+        <div id="queue-route"></div>
+        <div id="queue-tools" hidden>
+          <form id="queue-form" class="inline">
+            <label
+              >Eligible resource group<select
+                id="queue-group"
+                name="group"
+              ></select></label
+            ><button type="submit">Join waiting queue</button
+            ><button type="button" id="evaluate" class="secondary">
+              Evaluate scarcity
+            </button>
+          </form>
+          <p class="muted">
+            FIFO within the eligible group. Only full standing capacity and a
+            waiting household can start notice. A one-week offer does not free a
+            standing slot.
+          </p>
+          <div id="queue-list"></div>
+          <h3>Recorded notices</h3>
+          <div id="notice-list" class="cards"></div>
+        </div>
+      </section>
+      <section id="policies">
+        <p class="eyebrow">06 / EVERY HOUSE IS DIFFERENT</p>
+        <h2>House policy & decision history</h2>
+        <div id="roles" class="callout"></div>
+        <div class="admin-grid">
+          <details>
+            <summary>Current policy and revisions</summary>
+            <div id="policy-list"></div>
+            <form id="policy-form">
+              <label
+                >Authorized recording role<input
+                  id="policy-actor"
+                  required /></label
+              ><label
+                >Revised policy (JSON)<textarea
+                  id="policy-json"
+                  rows="19"
+                  spellcheck="false"
+                  required
+                ></textarea></label
+              ><button type="submit">Record future revision</button>
+            </form>
+          </details>
+          <details>
+            <summary>Open a dispute with the first-stop role</summary>
+            <form id="dispute-form">
+              <label
+                >Booking<select id="dispute-booking" required></select></label
+              ><label>Opening role<input id="dispute-role" required /></label
+              ><label
+                >What happened?<textarea
+                  id="dispute-reason"
+                  rows="3"
+                  required
+                ></textarea></label
+              ><button type="submit">Open dispute & show evidence</button>
+            </form>
+            <pre id="dispute-result"></pre>
+          </details>
+          <details>
+            <summary>Register a household in this house</summary>
+            <form id="household-form">
+              <label
+                >Apartment / household identifier<input
+                  name="id"
+                  required /></label
+              ><label
+                >Tenure role<input
+                  name="role"
+                  placeholder="shareholder or tenant"
+                  required /></label
+              ><button type="submit">Register household</button>
+            </form>
+          </details>
+          <details>
+            <summary>Add a house and its calendars</summary>
+            <p>
+              Use a separate house configuration rather than borrowing another
+              house’s rules. Demo calendars below are editable examples, not
+              additional Soukanvuori rules.
+            </p>
+            <div class="inline">
+              <button type="button" id="self-example" class="secondary">
+                Self-service example</button
+              ><button type="button" id="family-example" class="secondary">
+                Family-time example
+              </button>
+            </div>
+            <form id="house-form">
+              <label
+                >House configuration (JSON)<textarea
+                  id="house-json"
+                  rows="22"
+                  spellcheck="false"
+                  required
+                ></textarea></label
+              ><button type="submit">Create house</button>
+            </form>
+          </details>
+          <details>
+            <summary>Decision and booking history</summary>
+            <div id="history-list"></div>
+          </details>
+          <details>
+            <summary>Operator tools: scenario clock</summary>
+            <p>
+              For exercising deadline-based rules without waiting weeks. This
+              changes the shared clock, not any recorded policy or deadline.
+              Leave blank to use the real clock. This demonstration does not
+              provide production authentication; role fields represent the
+              acting party.
+            </p>
+            <form id="clock-form">
+              <label
+                >UTC instant<input
+                  id="scenario-now"
+                  placeholder="2030-01-01T00:00:00Z" /></label
+              ><button type="submit">Set clock</button>
+            </form>
+          </details>
+        </div>
+      </section>
+      <footer>
+        Löyly · one record, derived views ·
+        <a href="/api-docs">HTTP API & configuration guide</a>
+      </footer>
+    </main>
+  </body>
+</html>
+
+
+GET /api/schedule?house=soukanvuori 
+HTTP 200 {"house":"soukanvuori","slots":[{"resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","state":"free"},{"resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"18:30","end":"20:00","class":"ordinary","state":"free"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"17:00","end":"18:30","class":"ordinary","state":"free"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"18:30","end":"20:00","class":"ordinary","state":"free"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"17:00","end":"18:30","class":"ordinary","state":"free"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"18:30","end":"20:00","class":"ordinary","state":"free"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"17:00","end":"18:30","class":"ordinary","state":"free"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"18:30","end":"20:00","class":"ordinary","state":"free"}]}
+
+GET /api/households?house=soukanvuori 
+HTTP 200 {"households":[{"id":"12","house":"soukanvuori","role":"shareholder"},{"id":"3","house":"soukanvuori","role":"shareholder"},{"id":"4","house":"soukanvuori","role":"shareholder"}]}
+
+POST /api/bookings {"house":"soukanvuori","household":"12","resource":"ph8","weekday":"Tuesday","start":"17:00","operator":"manager"}
+HTTP 201 {"booking":{"id":"booking-1","house":"soukanvuori","household":"12","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.557Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-2","booking":"booking-1","type":"confirmed","at":"2026-11-21T17:33:30.557Z","policyVersion":"v1"}]}}
+
+POST /api/bookings {"house":"soukanvuori","household":"3","resource":"ph8","weekday":"Tuesday","start":"18:30","operator":"manager"}
+HTTP 201 {"booking":{"id":"booking-3","house":"soukanvuori","household":"3","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"18:30","end":"20:00","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.562Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-4","booking":"booking-3","type":"confirmed","at":"2026-11-21T17:33:30.562Z","policyVersion":"v1"}]}}
+
+POST /api/bookings {"house":"soukanvuori","household":"3","resource":"ph9","weekday":"Thursday","start":"17:00","operator":"manager"}
+HTTP 201 {"booking":{"id":"booking-5","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.567Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-6","booking":"booking-5","type":"confirmed","at":"2026-11-21T17:33:30.567Z","policyVersion":"v1"}]}}
+
+POST /api/bookings {"house":"soukanvuori","household":"3","resource":"ph9","weekday":"Thursday","start":"18:30","operator":"manager"}
+HTTP 201 {"booking":{"id":"booking-7","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"18:30","end":"20:00","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.572Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-8","booking":"booking-7","type":"confirmed","at":"2026-11-21T17:33:30.572Z","policyVersion":"v1"}]}}
+
+POST /api/bookings {"house":"soukanvuori","household":"3","resource":"ph9","weekday":"Friday","start":"17:00","operator":"manager"}
+HTTP 201 {"booking":{"id":"booking-9","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.577Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-10","booking":"booking-9","type":"confirmed","at":"2026-11-21T17:33:30.577Z","policyVersion":"v1"}]}}
+
+POST /api/bookings {"house":"soukanvuori","household":"3","resource":"ph9","weekday":"Friday","start":"18:30","operator":"manager"}
+HTTP 201 {"booking":{"id":"booking-11","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"18:30","end":"20:00","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.583Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-12","booking":"booking-11","type":"confirmed","at":"2026-11-21T17:33:30.583Z","policyVersion":"v1"}]}}
+
+POST /api/bookings {"house":"soukanvuori","household":"3","resource":"ph9","weekday":"Saturday","start":"17:00","operator":"manager"}
+HTTP 201 {"booking":{"id":"booking-13","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.587Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-14","booking":"booking-13","type":"confirmed","at":"2026-11-21T17:33:30.587Z","policyVersion":"v1"}]}}
+
+POST /api/bookings {"house":"soukanvuori","household":"3","resource":"ph9","weekday":"Saturday","start":"18:30","operator":"manager"}
+HTTP 201 {"booking":{"id":"booking-15","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"18:30","end":"20:00","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.594Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-16","booking":"booking-15","type":"confirmed","at":"2026-11-21T17:33:30.594Z","policyVersion":"v1"}]}}
+
+GET /api/schedule?house=soukanvuori 
+HTTP 200 {"house":"soukanvuori","slots":[{"resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","state":"held","booking":"booking-1","household":"12"},{"resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"18:30","end":"20:00","class":"ordinary","state":"held","booking":"booking-3","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"17:00","end":"18:30","class":"ordinary","state":"held","booking":"booking-5","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"18:30","end":"20:00","class":"ordinary","state":"held","booking":"booking-7","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"17:00","end":"18:30","class":"ordinary","state":"held","booking":"booking-9","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"18:30","end":"20:00","class":"ordinary","state":"held","booking":"booking-11","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"17:00","end":"18:30","class":"ordinary","state":"held","booking":"booking-13","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"18:30","end":"20:00","class":"ordinary","state":"held","booking":"booking-15","household":"3"}]}
+
+POST /api/bookings {"house":"soukanvuori","household":"12","resource":"ph8","weekday":"Tuesday","start":"18:30","operator":"manager"}
+HTTP 409 {"code":"full","reason":"The weekly schedule has no free standing slot.","decision":{"id":"decision-17","house":"soukanvuori","household":"12","request":{"house":"soukanvuori","household":"12","resource":"ph8","weekday":"Tuesday","start":"18:30","operator":"manager"},"outcome":"refused","reason":"The weekly schedule has no free standing slot.","code":"full","policyVersion":"v1","at":"2026-11-21T17:33:30.599Z"}}
+
+GET /api/bookings?house=soukanvuori 
+HTTP 200 {"bookings":[{"id":"booking-1","house":"soukanvuori","household":"12","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.557Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-2","booking":"booking-1","type":"confirmed","at":"2026-11-21T17:33:30.557Z","policyVersion":"v1"}]},{"id":"booking-3","house":"soukanvuori","household":"3","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"18:30","end":"20:00","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.562Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-4","booking":"booking-3","type":"confirmed","at":"2026-11-21T17:33:30.562Z","policyVersion":"v1"}]},{"id":"booking-5","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.567Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-6","booking":"booking-5","type":"confirmed","at":"2026-11-21T17:33:30.567Z","policyVersion":"v1"}]},{"id":"booking-7","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"18:30","end":"20:00","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.572Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-8","booking":"booking-7","type":"confirmed","at":"2026-11-21T17:33:30.572Z","policyVersion":"v1"}]},{"id":"booking-9","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.577Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-10","booking":"booking-9","type":"confirmed","at":"2026-11-21T17:33:30.577Z","policyVersion":"v1"}]},{"id":"booking-11","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"18:30","end":"20:00","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.583Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-12","booking":"booking-11","type":"confirmed","at":"2026-11-21T17:33:30.583Z","policyVersion":"v1"}]},{"id":"booking-13","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.587Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-14","booking":"booking-13","type":"confirmed","at":"2026-11-21T17:33:30.587Z","policyVersion":"v1"}]},{"id":"booking-15","house":"soukanvuori","household":"3","kind":"standing","resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"18:30","end":"20:00","class":"ordinary","confirmedAt":"2026-11-21T17:33:30.594Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-16","booking":"booking-15","type":"confirmed","at":"2026-11-21T17:33:30.594Z","policyVersion":"v1"}]}]}
+
+GET /api/schedule?house=soukanvuori 
+HTTP 200 {"house":"soukanvuori","slots":[{"resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","state":"held","booking":"booking-1","household":"12"},{"resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"18:30","end":"20:00","class":"ordinary","state":"held","booking":"booking-3","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"17:00","end":"18:30","class":"ordinary","state":"held","booking":"booking-5","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Thursday","start":"18:30","end":"20:00","class":"ordinary","state":"held","booking":"booking-7","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"17:00","end":"18:30","class":"ordinary","state":"held","booking":"booking-9","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Friday","start":"18:30","end":"20:00","class":"ordinary","state":"held","booking":"booking-11","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"17:00","end":"18:30","class":"ordinary","state":"held","booking":"booking-13","household":"3"},{"resource":"ph9","resourceName":"pukuhuone 9","sauna":"sauna F","group":"ph9","weekday":"Saturday","start":"18:30","end":"20:00","class":"ordinary","state":"held","booking":"booking-15","household":"3"}]}

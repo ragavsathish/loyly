@@ -1,0 +1,73 @@
+{
+  "uuid": "b8b9f16a-ef30-4415-9f96-d3f7f57a216f",
+  "name": "A pending notice retains its original deadlines after the queue empties",
+  "fullName": "loyly.scarcity-forfeit.03-013",
+  "testCaseId": "loyly.scarcity-forfeit.03-013",
+  "historyId": "loyly.scarcity-forfeit.03-013",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST /api/queue/queue-5/withdraw returned 200; GET /api/notices retained original chooseAt, lapseAt and policy v1. After advancing the guest clock past lapseAt, GET /api/schedule showed the selected slot free and GET /api/views retained only booking-3."
+  },
+  "start": 1795282801353,
+  "stop": 1795282801353,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-013"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a selected holding is under notice with recorded choose and notice deadlines",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP and clock transcript."
+      }
+    },
+    {
+      "name": "When: When the last waiting household withdraws before the notice deadline",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP and clock transcript."
+      }
+    },
+    {
+      "name": "Then: Then the notice remains in force with the same deadlines and policy version / And the selected holding lapses into the available pool at its notice deadline",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST /api/queue/queue-5/withdraw returned 200; GET /api/notices retained original chooseAt, lapseAt and policy v1. After advancing the guest clock past lapseAt, GET /api/schedule showed the selected slot free and GET /api/views retained only booking-3."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock transcript",
+      "source": "18eba308-bed1-4457-8fac-69620127ad94-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

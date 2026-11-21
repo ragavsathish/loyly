@@ -1,0 +1,64 @@
+{
+  "uuid": "63df8316-336f-47aa-93d4-4b62875ae1af",
+  "name": "An empty queue does not put a multi-slot household under notice",
+  "fullName": "loyly.scarcity-forfeit.03-002",
+  "testCaseId": "loyly.scarcity-forfeit.03-002",
+  "historyId": "loyly.scarcity-forfeit.03-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST scarcity evaluate group A: 200 notices empty; GET notices empty."
+  },
+  "start": 1795282410887,
+  "stop": 1795282411155,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Group A all three held, two by 12; queue A empty",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST scarcity evaluate group A",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then 200 notices empty; GET notices empty",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "1a4f7c99-bcde-4d58-99bf-726c545fff00-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

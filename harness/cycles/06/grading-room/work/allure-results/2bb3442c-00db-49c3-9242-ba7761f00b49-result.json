@@ -1,0 +1,88 @@
+{
+  "uuid": "2bb3442c-00db-49c3-9242-ba7761f00b49",
+  "name": "A rule change records its authority and effective date",
+  "fullName": "loyly.house-policy.04-004",
+  "testCaseId": "loyly.house-policy.04-004",
+  "historyId": "loyly.house-policy.04-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST future revision v2 with board authority; before effective instant booking identifies v1, after guest clock advance app confirms v2 and booking identifies v2."
+  },
+  "start": 1795281258681,
+  "stop": 1795281258681,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a house has a current booking rule",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST future revision v2 with board authority; before effective instant booking identifies v1, after guest clock advance app confirms v2 and booking identifies v2."
+      }
+    },
+    {
+      "name": "When: the authorized party records a revised rule with a future effective date",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST future revision v2 with board authority; before effective instant booking identifies v1, after guest clock advance app confirms v2 and booking identifies v2."
+      }
+    },
+    {
+      "name": "Then: decisions before that date identify the earlier rule; decisions after that date identify the revised rule",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST future revision v2 with board authority; before effective instant booking identifies v1, after guest clock advance app confirms v2 and booking identifies v2."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "observations.json",
+      "source": "ca697c48-707d-4a4f-856a-36fb4b6fd0aa-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "vm-final.log",
+      "source": "faf133f0-7256-4498-aaca-7765c20cb3de-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "command.txt",
+      "source": "b956a1a7-34bc-47f1-a2eb-13309687171e-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "exit-final.txt",
+      "source": "c96ebfc3-8739-4abe-9929-e1d41e4e7991-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

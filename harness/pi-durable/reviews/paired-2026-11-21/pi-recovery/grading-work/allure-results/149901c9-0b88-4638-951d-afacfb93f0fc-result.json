@@ -1,0 +1,64 @@
+{
+  "uuid": "149901c9-0b88-4638-951d-afacfb93f0fc",
+  "name": "One multi-holding household receives only one active notice",
+  "fullName": "loyly.scarcity-forfeit.03-014",
+  "testCaseId": "loyly.scarcity-forfeit.03-014",
+  "historyId": "loyly.scarcity-forfeit.03-014",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST scarcity evaluate twice: First response creates one notice for 12, second creates none; GET notices shows exactly one active with selected null."
+  },
+  "start": 1795282411994,
+  "stop": 1795282412272,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-014"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Group A full, 12 holds all three; 3 waits in A",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST scarcity evaluate twice",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then First response creates one notice for 12, second creates none; GET notices shows exactly one active with selected null",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "29361e1f-dfc8-4cc0-9200-db80134e54f6-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

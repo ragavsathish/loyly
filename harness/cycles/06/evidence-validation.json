@@ -1,0 +1,9 @@
+{
+  "items": 47,
+  "passed": 46,
+  "rawAllureResults": 47,
+  "blindAllureResults": 1,
+  "nextPhase": {
+    "phase": "blind-review"
+  }
+}

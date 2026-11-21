@@ -1,0 +1,88 @@
+{
+  "uuid": "6e9e88b2-7f1e-41de-8ee4-476fe7fc3d3c",
+  "name": "Confirming a booking updates all three derived views together",
+  "fullName": "loyly.booking-core.01-007",
+  "testCaseId": "loyly.booking-core.01-007",
+  "historyId": "loyly.booking-core.01-007",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST book confirmed holding-1; re-read posted list, heater and billing identify apartment 12 and Tuesday 17:00\u201318:30."
+  },
+  "start": 1795281258578,
+  "stop": 1795281258578,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "One booking is the single source of truth for the list, the timer and the billing"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Tuesday at 17:00 in pukuhuone 8 is free",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST book confirmed holding-1; re-read posted list, heater and billing identify apartment 12 and Tuesday 17:00\u201318:30."
+      }
+    },
+    {
+      "name": "When: the household in apartment 12's standing slot request for Tuesday at 17:00 in pukuhuone 8 is confirmed",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST book confirmed holding-1; re-read posted list, heater and billing identify apartment 12 and Tuesday 17:00\u201318:30."
+      }
+    },
+    {
+      "name": "Then: the posted slot list shows the slot for apartment 12; the heater schedule heats pukuhuone 8's sauna for Tuesday 17:00 to 18:30; an invoicing signal is raised naming apartment 12 as payer for the standing slot",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST book confirmed holding-1; re-read posted list, heater and billing identify apartment 12 and Tuesday 17:00\u201318:30."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "observations.json",
+      "source": "b03f5460-1ec1-4dfe-88a7-312a6718b097-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "vm-final.log",
+      "source": "275db972-741f-4765-abd7-703349010cdf-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "command.txt",
+      "source": "f07d6476-fb2f-4e92-99a3-48d2aab68347-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "exit-final.txt",
+      "source": "df399f77-8273-4bd8-9bed-f14c431d9b52-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

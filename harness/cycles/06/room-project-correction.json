@@ -1,0 +1,28 @@
+{
+  "changes": [
+    {
+      "room": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-compare-codex-01/grading-room",
+      "beforeSha256": "d773e2f4c2019a84e58eea35dbd30db864561398b92ac606892414dab5ad5e6a",
+      "afterSha256": "6d6021ff7bd1062c7d9ef0cc8ffbffad95cd02105357b889812b52fd6aeccc84",
+      "reason": "collector identity prefix from approved grader instruction is loyly; candidate, checklist, plan, schema, and raw Allure unchanged"
+    },
+    {
+      "room": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-compare-codex-01/grader-shards/shard-01/grading-shard-01",
+      "beforeSha256": "28576939da0f6b7e3ae79ef03286efbeb99987fd7033368c7fd72e67410b8a42",
+      "afterSha256": "a8e4640436259d30c117f341f5c8f65b77fc42e9308de082375df57d9663dcee",
+      "reason": "collector identity prefix from approved grader instruction is loyly; candidate, checklist, plan, schema, and raw Allure unchanged"
+    },
+    {
+      "room": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-compare-codex-01/grader-shards/shard-02/grading-shard-02",
+      "beforeSha256": "8d239ee1287b31d7f9b9bd2b19bbc7d63b19d7160ffe674473434e23cc6ed69f",
+      "afterSha256": "5e04da98d2c13dee5d01e492075f7f59b40a8a49ff40788c9bc4d655d451feee",
+      "reason": "collector identity prefix from approved grader instruction is loyly; candidate, checklist, plan, schema, and raw Allure unchanged"
+    },
+    {
+      "room": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-compare-codex-01/grader-shards/shard-03/grading-shard-03",
+      "beforeSha256": "79987c260427f797c89c15e7c0bd4436bd646bc68fda0fc42ece185c4a7c59bc",
+      "afterSha256": "2fdfb0259717a911d8e32fdf72ea53376df3b05032607aaed064bc3acd6844a7",
+      "reason": "collector identity prefix from approved grader instruction is loyly; candidate, checklist, plan, schema, and raw Allure unchanged"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+✖ @item-01-011 fresh blind language-model subagent names a request confirmed by fresh HTTP replay (15273.250924ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15336.120965
+
+✖ failing tests:
+
+test at impl/tests/10-blind-refusal.test.mjs:10:1
+✖ @item-01-011 fresh blind language-model subagent names a request confirmed by fresh HTTP replay (15273.250924ms)
+  AssertionError [ERR_ASSERTION]: The blind agent found the refusal insufficient: ```json
+  {
+    "insufficient": true
+  }
+  ```
+      at TestContext.<anonymous> (file:///workspace/impl/tests/10-blind-refusal.test.mjs:39:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -1,0 +1,31 @@
+$ date -u -s 2026-11-21 17:39:13
+Sat Nov 21 17:39:13 UTC 2026
+exit=0
+
+GET /api/houses 
+HTTP 200
+{"houses":[{"id":"soukanvuori","name":"As Oy Soukanvuori","resources":[{"id":"ph8","name":"pukuhuone 8","sauna":"sauna F","group":"ph8","duration":90,"days":{"Tuesday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}},{"id":"ph9","name":"pukuhuone 9","sauna":"sauna F","group":"ph9","duration":90,"days":{"Thursday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Friday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Saturday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}}],"policies":[{"version":"v1","authority":"board","effective":"2020-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"route":"manager","bookingRole":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitaja","disputeRole":"manager","chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"standing-fee","salePriceReference":"resale-fee"}],"currentPolicy":{"version":"v1","authority":"board","effective":"2020-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"route":"manager","bookingRole":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitaja","disputeRole":"manager","chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"standing-fee","salePriceReference":"resale-fee"}}]}
+
+POST /api/bookings {"house": "soukanvuori", "household": "12", "resource": "ph8", "weekday": "Tuesday", "start": "17:00", "operator": "manager"}
+HTTP 201
+{"booking":{"id":"booking-1","house":"soukanvuori","household":"12","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:39:13.275Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-2","booking":"booking-1","type":"confirmed","at":"2026-11-21T17:39:13.275Z","policyVersion":"v1"}]}}
+
+GET /api/bookings?house=soukanvuori 
+HTTP 200
+{"bookings":[{"id":"booking-1","house":"soukanvuori","household":"12","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2026-11-21T17:39:13.275Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-2","booking":"booking-1","type":"confirmed","at":"2026-11-21T17:39:13.275Z","policyVersion":"v1"}]}]}
+
+POST /api/releases {"booking": "booking-1", "household": "12", "date": "2026-11-24", "mode": "FREE"}
+HTTP 201
+{"release":{"id":"release-3","house":"soukanvuori","booking":"booking-1","date":"2026-11-24","mode":"FREE","holder":"12","offeredAt":"2026-11-21T17:39:13.285Z","policyVersion":"v1"}}
+
+GET /api/releases?house=soukanvuori 
+HTTP 200
+{"releases":[{"id":"release-3","house":"soukanvuori","booking":"booking-1","date":"2026-11-24","mode":"FREE","holder":"12","offeredAt":"2026-11-21T17:39:13.285Z","policyVersion":"v1","state":"released"}]}
+
+GET /api/views?house=soukanvuori&date=2026-11-24 
+HTTP 200
+{"house":"soukanvuori","date":"2026-11-24","asOf":"2026-11-21T17:39:13.292Z","posted":[{"booking":"booking-1","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","weekday":"Tuesday","start":"17:00","end":"18:30","household":null,"kind":"standing","policyVersion":"v1","state":"released","date":"2026-11-24","occurrence":"release-3","mode":"FREE"}],"heater":[],"billing":[{"booking":"booking-1","payer":"12","kind":"standing","policyVersion":"v1","priceReference":"standing-fee"}]}
+
+Required boundary 2026-11-24 18:30 UTC; attempted 2030 baseline earlier caused harness connection loss and VM reset; cannot advance across multiple days safely in this harness.
+
+EXCEPTION Exception('clock advance past occurrence not reached: previous baseline jump disconnected harness and reset VM')

@@ -1,0 +1,93 @@
+{
+  "uuid": "59501a95-2568-45ef-b778-504e3bd54d90",
+  "name": "Browser booking journey: standing slot appears in all three views",
+  "fullName": "Löyly Pi supplemental browser probe / item-01-003",
+  "status": "failed",
+  "statusDetails": {
+    "message": "Error: Expected one free room 8 Tuesday 17:00 slot\n    at assert (file:///worker/panel-browser.mjs:69:25)\n    at file:///worker/panel-browser.mjs:121:5\n    at async step (file:///worker/panel-browser.mjs:56:19)\n    at async file:///worker/panel-browser.mjs:107:3"
+  },
+  "stage": "finished",
+  "start": 1795283242295,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "ui-ux"
+    },
+    {
+      "name": "tool",
+      "value": "Playwright"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Browser booking journey"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-003"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "candidate_sha256",
+      "value": "8ffe62eb046ae03e5b1907b06f7341cb1c8301e9ccc9f5eb7a94f62330e89dfc"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Verify read-only mounted candidate source files",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795283242295,
+      "steps": [],
+      "attachments": [],
+      "stop": 1795283242295
+    },
+    {
+      "name": "Launch fresh candidate server with isolated record",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795283261973,
+      "steps": [],
+      "attachments": [],
+      "stop": 1795283262200
+    },
+    {
+      "name": "Open the schedule and inspect free Tuesday room 8 slot",
+      "status": "failed",
+      "stage": "finished",
+      "start": 1795283263085,
+      "steps": [],
+      "attachments": [],
+      "statusDetails": {
+        "message": "Expected one free room 8 Tuesday 17:00 slot"
+      },
+      "stop": 1795283263924
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Failure screenshot",
+      "source": "62831334-1853-4707-ac51-427735db0f65-attachment.png",
+      "type": "image/png"
+    },
+    {
+      "name": "Playwright trace",
+      "source": "513d1e0b-9546-4dfb-b089-0171a5ab7eb9-attachment.zip",
+      "type": "application/vnd.allure.playwright-trace"
+    },
+    {
+      "name": "Gondolin VM execution receipt",
+      "source": "dd20f143-6a71-4e7f-ba36-0f0be43caf2d-attachment.receipt.json",
+      "type": "application/json"
+    }
+  ],
+  "stop": 1795283264456
+}

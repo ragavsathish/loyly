@@ -1,0 +1,73 @@
+{
+  "uuid": "9d75b69c-bf71-4d07-91eb-a53693bf5fae",
+  "name": "A requested slot on an open day is confirmed",
+  "fullName": "loyly.booking-core.01-003",
+  "historyId": "loyly.booking-core.01-003",
+  "testCaseId": "loyly.booking-core.01-003",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST standing request returned 201; GET bookings re-read apartment 12 Tuesday 17:00\u201318:30 weekly holding."
+  },
+  "start": 1790812880356,
+  "stop": 1790812880506,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-003"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: establish scenario prerequisites on fresh state",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See HTTP transcript"
+      }
+    },
+    {
+      "name": "When: perform scenario action",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See HTTP transcript"
+      }
+    },
+    {
+      "name": "Then: observe all stated consequences",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST standing request returned 201; GET bookings re-read apartment 12 Tuesday 17:00\u201318:30 weekly holding."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response evidence",
+      "source": "ec29879e-374c-4f8c-99f6-8a6ee79d2b18-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

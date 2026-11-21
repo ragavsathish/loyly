@@ -1,0 +1,1 @@
+gondolin exec --image PINNED --mount-hostfs impl:/candidate:ro --mount-hostfs work/ITEM:/result -- sh -c guest command; apk add nodejs; date -u -s baseline; copy candidate; start; probe; terminate

@@ -1,0 +1,22 @@
+{
+  "name": "loyly",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@hpcc-js/wasm-llama": "1.7.0",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.5.3",
+    "tripilot-model-qwen-part-1": "0.1.0-alpha.1",
+    "tripilot-model-qwen-part-2": "0.1.0-alpha.1",
+    "tripilot-model-qwen-part-3": "0.1.0-alpha.1",
+    "tripilot-model-qwen-part-4": "0.1.0-alpha.1",
+    "tripilot-model-qwen-part-5": "0.1.0-alpha.1"
+  }
+}

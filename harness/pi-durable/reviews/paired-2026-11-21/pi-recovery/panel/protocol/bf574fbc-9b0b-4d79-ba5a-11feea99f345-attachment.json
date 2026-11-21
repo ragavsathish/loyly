@@ -1,0 +1,6 @@
+{
+  "candidate_sha256": "8ffe62eb046ae03e5b1907b06f7341cb1c8301e9ccc9f5eb7a94f62330e89dfc",
+  "runs": [],
+  "total": 0,
+  "failure": "Error: derived views have an unexpected shape\n    at normalize (file:///worker/panel-candidate.mjs:25:13)\n    at readDerivedViews (file:///worker/panel-candidate.mjs:31:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async oneRace (file:///worker/panel-protocol.mjs:49:17)\n    at async file:///worker/panel-protocol.mjs:99:35\n    at async step (file:///worker/panel-protocol.mjs:37:16)\n    at async file:///worker/panel-protocol.mjs:98:3"
+}

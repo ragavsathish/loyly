@@ -1,0 +1,30 @@
+(1/6) Installing ada-libs (4.0.0-r0)
+(2/6) Installing icu-data-en (78.1-r0)
+  Executing icu-data-en-78.1-r0.post-install
+(3/6) Installing icu-libs (78.1-r0)
+(4/6) Installing simdjson (4.2.4-r0)
+(5/6) Installing simdutf (9.0.0-r0)
+(6/6) Installing nodejs (24.22.3-r0)
+Executing busybox-1.37.0-r31.trigger
+OK: 130.5 MiB in 100 packages
+Fri Nov 20 12:00:00 UTC 2026
++ apk add nodejs
+  * If you need ICU with non-English locales and legacy charset support, install
+  * package icu-data-full.
++ date -u -s 2026-11-20T12:00:00Z
++ cp -R /candidate /tmp/app
++ cd /tmp/app
++ p=634
++ trap 'kill "$p" 2>/dev/null; wait "$p" 2>/dev/null' EXIT
++ seq 1 30
++ curl -fsS http://127.0.0.1:18080/ -o /result/root.html
++ ./start.sh 18080
+curl: (7) Failed to connect to 127.0.0.1:18080 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:18080/ -o /result/root.html
++ break
++ node /result/probe.js 03-001
++ kill 634
++ wait 634
+
+VM exit=0

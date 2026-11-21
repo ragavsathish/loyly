@@ -1,0 +1,88 @@
+{
+  "uuid": "f3d8d880-265c-486c-a462-125c8faf8da1",
+  "name": "An untaken offer expires when its occurrence begins",
+  "fullName": "loyly.occurrence-release.02-008",
+  "testCaseId": "loyly.occurrence-release.02-008",
+  "historyId": "loyly.occurrence-release.02-008",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Guest clock advanced past served 2026-11-24 17:00 boundary; app clock confirmed 17:01, offer expired, take refused, occurrence unclaimed and standing fee and later holding retained."
+  },
+  "start": 1795281258641,
+  "stop": 1795281258641,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-008"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12 has released one Tuesday occurrence and nobody has taken it",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Guest clock advanced past served 2026-11-24 17:00 boundary; app clock confirmed 17:01, offer expired, take refused, occurrence unclaimed and standing fee and later holding retained."
+      }
+    },
+    {
+      "name": "When: that occurrence begins",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Guest clock advanced past served 2026-11-24 17:00 boundary; app clock confirmed 17:01, offer expired, take refused, occurrence unclaimed and standing fee and later holding retained."
+      }
+    },
+    {
+      "name": "Then: the offer is unclaimed and cannot be taken afterward; apartment 12 keeps its standing holding and still owes the normal fee",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Guest clock advanced past served 2026-11-24 17:00 boundary; app clock confirmed 17:01, offer expired, take refused, occurrence unclaimed and standing fee and later holding retained."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "observations.json",
+      "source": "793d4706-7dc5-48c6-9046-9803691fa7a5-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "vm-final.log",
+      "source": "89c81cb3-562f-46f9-aa60-054784a03995-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "command.txt",
+      "source": "60d5a3c8-5f64-4631-9730-8e4ee7fd2682-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "exit-final.txt",
+      "source": "e7fae496-5863-4f91-b30c-fc51069d5c63-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

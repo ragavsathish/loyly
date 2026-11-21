@@ -1,0 +1,25 @@
+# Paired whole-product Pi durable and Codex-only run
+
+The operator approved one paired run at controller `5c3440c7943d0a47caa05cbb7712065f93c18f16` and source `7e2fb1c0ba88c6b941a296a1298b89dd0bd5db5a`. Both arms used the same 47 item checklist (SHA-256 `06f0dba7ba9aa07152950cd0bc6c38560f6c6b95a3fa88354909a4561434dda2`), the same spec cut, Sol builder, independent Terra grader, Sol blind reviewer, and Gondolin grader image. The Pi arm also selected three specialist VM probes. Agent execution and control differed: Pi durable owned its checkpoint and audit; Codex subagents were orchestrated directly through `cycle-core` and `evidence-core`.
+
+| Stage | Pi durable cycle 05 | Codex-only cycle 06 |
+| --- | --- | --- |
+| Fresh build | Three same-session continuations; no uncarried items | One builder turn; no uncarried items |
+| Independent gate | Passed attempt 1 | Passed attempt 1 |
+| Raw grader | 46 passed, `01-011` pending | 45 passed, `02-001` failed, `01-011` pending |
+| Blind review | Fresh Pi Sol named room 8, Tuesday 17:00; fresh VM confirmed HTTP 201 | Fresh Codex Sol named room 8, Tuesday 17:00; fresh VM confirmed HTTP 200 |
+| Filed cycle outcome | **Failed before scoring**: shard 05 hit `database or disk is full` | **46/47** official score |
+| Separate recovery | **47/47 supplemental projection** from the resumed same shard session and legacy scorer | Separate diagnostic exercised `02-001` successfully; filed score unchanged |
+| Pi specialist panel | Browser, protocol and runtime profile all failed at public interface assumptions | No specialist panel in this approved arm |
+
+On the 47 shared item IDs, comparing the **supplemental** Pi projection to the official Codex score gives zero newly passing items and one newly failing item, `02-001`, in the Codex arm. The Codex diagnostic shows `02-001` behavior passes when its missing taker step is exercised, so this difference is a grader omission. It is not an official score-to-score comparison because the Pi task was terminal before its scorer.
+
+## Pi failure and recovery
+
+`pi-recovery/original-audit.v1.jsonl` preserves the terminal `grade failed` Pi audit; `pi-recovery/original-grade-error.log` names shard 05's exit 1. Its Pi session reported `database or disk is full`. The candidate contained a 390 MB `.npm-cache`, and each fresh item runtime copied that cache, expanding grader shards to about 10 GB. Only 21 disposable `work/runtime-*` copies were removed after the failed run; `runtime-cleanup.json` names them. The candidate, receipts, raw Allure, and SQLite audit stayed intact in the ignored local scratch. With space recovered, the **same** shard 05 Pi session ID and request ID, approved instruction, settings, model and image completed its five results. The collector validated all 47 raw results, with one surprise: `02-004`'s FREE take response exposed a resale price reference while billing correctly charged the taker nothing.
+
+A fresh Pi Sol blind agent read only the generated refusal and question. The existing host blind HTTP adapter could not resolve this manager routed app (`blind room is not unique in the public self-service API`). A fresh Gondolin VM resolved the original house and named room from the public `/api/houses` response and confirmed the agent's exact request through `/api/bookings` with HTTP 201. `blind-vm-verification.json`, its raw response and VM receipt bind this confirmation. The standard blind Allure writer and verdict projector then validated 47 passes, and the legacy scorer produced `pi-recovery/scores.projection.json`. This recovery did **not** add a `grade completed`, `score`, or `cycle passed` entry to the original Pi audit.
+
+The approved Pi specialist panel ran separately on the frozen candidate with 30,465 ms of VM overlap. The browser probe expected one particular free-slot shape, the protocol probe expected a different derived-view shape, and the runtime probe posted to a house route this app did not expose. All three filed failed Allure results. These instrument assumptions need revision before the panel can support acceptance. The panel manifest and result directories are in `pi-recovery/panel/`; the local runtime copies are omitted from this Git archive. The Pi candidate's generated npm cache is likewise omitted from `pi-recovery/candidate/impl`, while the exact candidate and its SHA-256 bound grading room remain in the ignored local scratch at `harness/pi-durable/scratch-compare-pi-01/`.
+
+Neither generated app is accepted. The Pi durable controller demonstrated same-session continuation and a recoverable shard session, but its terminal cycle did not resume to scoring. The Codex adapter completed a scored run without Pi durability. The next harness work is to exclude disposable caches from candidate copies, make panel and blind adapters follow the candidate's public interface, and prevent an unobserved Then from becoming a product comparison claim. A changed graded instrument requires a fresh pinned approval under `AGENTS.md`.

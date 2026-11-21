@@ -1,0 +1,64 @@
+{
+  "uuid": "1b68583d-c216-44a8-9693-9bc4298fd88d",
+  "name": "Lapse changes only the selected standing holding",
+  "fullName": "loyly.scarcity-forfeit.03-009",
+  "historyId": "loyly.scarcity-forfeit.03-009",
+  "testCaseId": "loyly.scarcity-forfeit.03-009",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After recorded lapse deadline, holding-1 lapsed; holding-3 remains, and list and standing billing reflect that holding."
+  },
+  "start": 1795281232588,
+  "stop": 1795281233588,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given one of a household's two standing holdings was selected under notice",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When the notice deadline passes",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the household loses the selected standing holding And its other standing holding remains held And the posted list and billing signal reflect the same holding history",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "ed5892ce-9b24-468a-875e-2eaadf47f8dc-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

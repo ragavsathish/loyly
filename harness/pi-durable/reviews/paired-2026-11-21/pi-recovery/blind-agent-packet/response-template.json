@@ -1,0 +1,12 @@
+{
+  "schema": "loyly.blind-review-response.v1",
+  "packet_sha256": "08bcc741aba7991653119e0572358ec4a5c8b95bcabdc13d8cdde00b104f2e38",
+  "reviewer_kind": "agent",
+  "reviewer": "",
+  "had_not_read_configuration": false,
+  "saw_only_refusal": false,
+  "answer": "",
+  "verdict": "",
+  "reason": "",
+  "reviewed_at": 0
+}

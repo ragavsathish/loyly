@@ -1,0 +1,74 @@
+{
+  "uuid": "90f0222e-060f-46c8-90c7-4dbba5a5df0c",
+  "name": "An untaken release does not cancel the holding or its normal fee",
+  "fullName": "loyly.occurrence-release.02-003",
+  "testCaseId": "loyly.occurrence-release.02-003",
+  "historyId": "loyly.occurrence-release.02-003",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST FREE release for 2026-11-24; end 18:30 UTC; after date -u -s 18:31, app asOf 18:31 shows unclaimed, no heater, fee for 12; following week remains held by 12."
+  },
+  "start": 1795539540000,
+  "stop": 1795539540000,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Releasing one week preserves the standing holding"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-003"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given apartment 12 has released one Tuesday occurrence for free",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When nobody takes it before that occurrence ends",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the occurrence is unclaimed and unused",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12 still holds its standing slot",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12's normal standing-slot fee remains due",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "f6dc0647-183b-4550-9047-9219831e06f3-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

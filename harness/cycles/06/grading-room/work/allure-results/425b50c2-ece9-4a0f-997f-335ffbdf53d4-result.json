@@ -1,0 +1,88 @@
+{
+  "uuid": "425b50c2-ece9-4a0f-997f-335ffbdf53d4",
+  "name": "A standing slot cannot be requested on a closed day",
+  "fullName": "loyly.booking-core.01-002",
+  "testCaseId": "loyly.booking-core.01-002",
+  "historyId": "loyly.booking-core.01-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST book room 9 Tuesday 17:00 refused: pukuhuone 9 has no sauna day on Tuesday. It opens Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 instead."
+  },
+  "start": 1795281258566,
+  "stop": 1795281258566,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Availability is per dressing room, per weekday"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: pukuhuone 9's sauna days are Thursday, Friday and Saturday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST book room 9 Tuesday 17:00 refused: pukuhuone 9 has no sauna day on Tuesday. It opens Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 instead."
+      }
+    },
+    {
+      "name": "When: the household in apartment 12 requests a standing slot on Tuesday at 17:00 in pukuhuone 9",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST book room 9 Tuesday 17:00 refused: pukuhuone 9 has no sauna day on Tuesday. It opens Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 instead."
+      }
+    },
+    {
+      "name": "Then: the request is refused because pukuhuone 9 has no sauna day on Tuesday; the refusal names the days pukuhuone 9 does open",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST book room 9 Tuesday 17:00 refused: pukuhuone 9 has no sauna day on Tuesday. It opens Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 instead."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "observations.json",
+      "source": "c63db0a3-d5eb-45ab-be1c-6032a5d9094b-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "vm-final.log",
+      "source": "1bf0062f-7ebf-4cff-af17-742c4f9fab50-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "command.txt",
+      "source": "b7bd68f7-55f1-4964-8650-d2c56a91cfe6-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "exit-final.txt",
+      "source": "79304125-58fc-4735-a549-e97a15121411-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

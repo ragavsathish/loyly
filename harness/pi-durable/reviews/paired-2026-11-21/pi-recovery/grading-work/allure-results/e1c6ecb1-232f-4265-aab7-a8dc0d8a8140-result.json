@@ -1,0 +1,64 @@
+{
+  "uuid": "e1c6ecb1-232f-4265-aab7-a8dc0d8a8140",
+  "name": "A second standing slot is granted while there is room",
+  "fullName": "loyly.booking-core.01-005",
+  "testCaseId": "loyly.booking-core.01-005",
+  "historyId": "loyly.booking-core.01-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST apartment 12 ph8 Tuesday 18:30: 201 booking-3 confirmed; GET bookings and schedule persist both booking-1 and booking-3 for 12."
+  },
+  "start": 1795282410032,
+  "stop": 1795282410339,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A household may hold a second standing slot when there is room"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Two free Tuesday ph8 slots; apartment 12 confirmed at 17:00",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST apartment 12 ph8 Tuesday 18:30",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then 201 booking-3 confirmed; GET bookings and schedule persist both booking-1 and booking-3 for 12",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "23392ed1-e5bc-4544-804b-7a094b4363ea-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

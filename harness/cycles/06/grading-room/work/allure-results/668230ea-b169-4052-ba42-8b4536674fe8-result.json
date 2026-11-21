@@ -1,0 +1,88 @@
+{
+  "uuid": "668230ea-b169-4052-ba42-8b4536674fe8",
+  "name": "Booker standing is checked within the household's house",
+  "fullName": "loyly.house-policy.04-002",
+  "testCaseId": "loyly.house-policy.04-002",
+  "historyId": "loyly.house-policy.04-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST eligible shareholder in Soukanvuori and tenant in self-service confirmed; cross-house roles refused with each house policy."
+  },
+  "start": 1795281258661,
+  "stop": 1795281258661,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "A house owns its calendars and eligible booker roles"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: house A allows its configured booker role to request a slot; house B uses a different configured booker role",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST eligible shareholder in Soukanvuori and tenant in self-service confirmed; cross-house roles refused with each house policy."
+      }
+    },
+    {
+      "name": "When: an eligible house A household requests in house A and a house B household requests in house B",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST eligible shareholder in Soukanvuori and tenant in self-service confirmed; cross-house roles refused with each house policy."
+      }
+    },
+    {
+      "name": "Then: each decision uses that house's role policy; neither house inherits the other house's eligibility rule",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST eligible shareholder in Soukanvuori and tenant in self-service confirmed; cross-house roles refused with each house policy."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "observations.json",
+      "source": "eca73c12-e31a-4edb-9352-d98bd7f9f943-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "vm-final.log",
+      "source": "decc2474-a16e-48ef-9616-ba6684294da6-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "command.txt",
+      "source": "cb78ceb7-c814-4767-8259-0f135f5373a1-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "exit-final.txt",
+      "source": "9325335d-888c-4355-a9e3-161cdfdbdc0e-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

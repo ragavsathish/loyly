@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Löyly slot coordinates",
+  "description": "Named calendar coordinates, never fractional hours or unscoped timestamps. End is derived from resource duration. See API.md.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["resource", "weekday", "start"],
+      "properties": {
+        "resource": { "type": "string", "minLength": 1 },
+        "weekday": {
+          "enum": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ]
+        },
+        "start": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        }
+      },
+      "not": { "required": ["date"] }
+    },
+    {
+      "type": "object",
+      "required": ["resource", "date", "start"],
+      "properties": {
+        "resource": { "type": "string", "minLength": 1 },
+        "date": { "type": "string", "format": "date" },
+        "start": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        }
+      }
+    }
+  ]
+}

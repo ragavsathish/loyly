@@ -1,0 +1,64 @@
+{
+  "uuid": "a5527248-7b1f-40e1-a715-3da86635338f",
+  "name": "The queue is ordered by accepted request within its eligible group",
+  "fullName": "loyly.scarcity-forfeit.03-005",
+  "testCaseId": "loyly.scarcity-forfeit.03-005",
+  "historyId": "loyly.scarcity-forfeit.03-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET queues A and B: A head is 3, entries ordered 3 then 4; B queue empty."
+  },
+  "start": 1795282411714,
+  "stop": 1795282411993,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Group A full; 3 and 4 accepted into A queue in that order",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When GET queues A and B",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then A head is 3, entries ordered 3 then 4; B queue empty",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "2ce74d33-2e80-450b-ac71-260fdc06f75e-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

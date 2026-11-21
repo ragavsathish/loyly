@@ -1,0 +1,144 @@
+✔ @item-01-001 per-dressing-room weekly days (140.837ms)
+✔ @item-01-002 closed day names opening days (95.934792ms)
+✔ @item-01-003 confirmation recurs with configured duration (102.018792ms)
+✔ @item-01-004 held slot is refused without revealing holder (94.440542ms)
+✔ @item-01-005 second slot while room remains (93.589875ms)
+✔ @item-01-006 full schedule refusal does not suggest unavailable choices (106.586833ms)
+✔ @item-01-007 three views derive confirmation (87.362666ms)
+✔ @item-01-008 give up removes every current derived claim (89.869791ms)
+✔ @item-01-009 overlapping requests have one winner (96.288667ms)
+✔ @item-01-010 one hundred two-household races (1062.420418ms)
+✔ @item-01-011 actionable refusal HTTP replay (independent judging outstanding) (189.043833ms)
+✔ @item-02-001 FREE offers only one occurrence (143.920291ms)
+✔ @item-02-002 next Tuesday remains assigned (104.753417ms)
+✔ @item-02-003 unused offer preserves normal fee and holding (97.275041ms)
+✔ @item-02-004 free taker owes no charge, holder owes normal fee (96.149208ms)
+✔ @item-02-005 sale emits distinct priced policy-bound charge (94.7765ms)
+✔ @item-02-006 untaken withdrawal restores holder and prevents taking (93.085709ms)
+✔ @item-02-007 taken transfer cannot be withdrawn (94.878417ms)
+✔ @item-02-008 offer expires precisely at occurrence start (92.860875ms)
+✔ @item-02-009 one taker across all views (91.826376ms)
+✔ @item-02-010 concurrent takers have one winner (93.375417ms)
+✔ @item-03-001 free eligible capacity prevents notice (157.079291ms)
+✔ @item-03-002 full capacity alone is not scarcity (106.785417ms)
+✔ @item-03-003 release is not free standing capacity (108.768459ms)
+✔ @item-03-004 other resource group queue does not trigger notice (109.232666ms)
+✔ @item-03-005 accepted sequence gives scoped FIFO head (107.139209ms)
+✔ @item-03-014 repeated evaluation issues one active notice for three holdings (108.448417ms)
+✔ @item-03-006 holder chooses before shorter deadline but keeps using both (110.384875ms)
+✔ @item-03-007 choice right passes to queue-head at deadline (109.108625ms)
+✔ @item-03-008 choose deadline leaves loss deadline and holdings unchanged (108.15825ms)
+✔ @item-03-009 lapse removes only selected holding with consistent history (112.911542ms)
+✔ @item-03-010 confirmed claim is pending until lapse (117.9205ms)
+✔ @item-03-011 decline offers next eligible entry without early loss (116.37925ms)
+✔ @item-03-012 all declines return selected slot to pool at lapse (122.7045ms)
+✔ @item-03-013 queue withdrawal does not erase notice deadlines or rule (116.292958ms)
+✔ @item-04-001 calendars belong to their own house (164.386125ms)
+✔ @item-04-002 booker roles are checked per house (117.822042ms)
+✔ @item-04-003 manager route does not expose or accept self-service queue (104.754834ms)
+✔ @item-04-004 effective-dated rules record authorized governance (114.298875ms)
+✔ @item-04-005 configured dispute role reconstructs booking history (104.965ms)
+✔ @item-04-006 later revision cannot rewrite refusal evidence (103.799875ms)
+✔ @item-04-007 revisions affect new notice clocks only (131.731583ms)
+✔ @item-05-001 family cap identifies the existing household booking (167.546125ms)
+✔ @item-05-002 unrelated booking does not use family allowance (99.775291ms)
+✔ @item-05-003 family allowance does not block other classes (100.9115ms)
+✔ @item-05-004 caps do not leak between houses (111.627708ms)
+✔ @item-05-005 completed occurrence releases the class allowance (113.531583ms)
+✔ browser surface exposes the booking product, scripts and styles (138.457583ms)
+✖ scenario clock can return to real time (139.2075ms)
+✖ invalid calendar coordinates fail without an internal error (89.874166ms)
+✖ invalid house configuration cannot enter the record (86.992708ms)
+✖ overlapping configured windows are rejected (84.6505ms)
+✖ choice-right transition is recorded at its original instant (107.575125ms)
+✔ booking and derived views survive a process restart (173.804834ms)
+ℹ tests 54
+ℹ suites 0
+ℹ pass 49
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7412.207337
+
+✖ failing tests:
+
+test at tests/07-integrity.test.mjs:4:1
+✖ scenario clock can return to real time (139.2075ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  400 !== 200
+  
+      at TestContext.<anonymous> (file:///workspace/impl/tests/07-integrity.test.mjs:4:85)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 400,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/07-integrity.test.mjs:5:1
+✖ invalid calendar coordinates fail without an internal error (89.874166ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 400
+  
+      at TestContext.<anonymous> (file:///workspace/impl/tests/07-integrity.test.mjs:5:165)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/07-integrity.test.mjs:6:1
+✖ invalid house configuration cannot enter the record (86.992708ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (file:///workspace/impl/tests/07-integrity.test.mjs:6:146)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/07-integrity.test.mjs:7:1
+✖ overlapping configured windows are rejected (84.6505ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (file:///workspace/impl/tests/07-integrity.test.mjs:7:151)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/07-integrity.test.mjs:8:1
+✖ choice-right transition is recorded at its original instant (107.575125ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'at')
+      at TestContext.<anonymous> (file:///workspace/impl/tests/07-integrity.test.mjs:8:551)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
