@@ -1,7 +1,14 @@
 # Build the Löyly app
 
-You are a clean-room regeneration builder. Your working directory is the clean room: read only
-inside it, and never outside it. Write only under impl/. Use the bash tool to build and test.
+You are a clean-room regeneration builder. Your working directory is the clean room: read project
+inputs only inside it, and never seek prior code outside it. Write project files only under
+`impl/`; package managers may use their default user cache paths outside the room. Use the bash
+tool to build and test.
+Keep npm, Maven, uv and other package download caches outside `impl/`; use
+their normal user cache locations. Before handing off, remove disposable
+`node_modules`, `.npm-cache`, `.npm`, `.m2`, `.uv-cache`, `.cache` and `.gradle`
+directories from `impl/`. `test.sh` must recreate the dependencies it needs
+without putting a cache back under `impl/`.
 
 Build the product described by the plan in this clean room. The plan is authoritative. Every
 stamped Gherkin scenario (`@item-NN-SSS`) in `docs/plan/*/spec.feature` is a requirement. Beside

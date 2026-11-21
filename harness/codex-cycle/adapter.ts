@@ -26,6 +26,9 @@ import { validatePanelCoverage } from "../evidence-core/panel-selection.ts";
 const sha = (data: string | Buffer) =>
   createHash("sha256").update(data).digest("hex");
 const fileSha = (file: string) => sha(readFileSync(file));
+const DISPOSABLE_CACHE_DIRS = new Set([
+  ".npm-cache", ".npm", ".m2", ".uv-cache", ".cache", ".gradle", "node_modules",
+]);
 const CONTROLLER_ROOT = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "../..",
@@ -65,6 +68,31 @@ export interface CycleContract {
     allureSchema: PinnedFile;
     panelPlan: PinnedFile;
   };
+}
+
+/** Check the sealed candidate; post-gate permits installed dependencies in the gate-only copy. */
+export function checkCandidateCaches(room: string, mode: "sealed" | "post-gate" = "sealed") {
+  if (mode !== "sealed" && mode !== "post-gate") throw new Error(`invalid candidate cache mode: ${mode}`);
+  const candidate = join(resolve(room), "impl");
+  if (!existsSync(candidate) || !lstatSync(candidate).isDirectory())
+    throw new Error(`candidate impl directory missing: ${candidate}`);
+  const walk = (dir: string, relative: string): void => {
+    for (const name of readdirSync(dir)) {
+      const next = join(dir, name);
+      const path = relative ? `${relative}/${name}` : name;
+      const stat = lstatSync(next);
+      if (stat.isDirectory() && name === "node_modules" && mode === "post-gate") {
+        walk(next, path);
+        continue;
+      }
+      if (stat.isDirectory() && DISPOSABLE_CACHE_DIRS.has(name))
+        throw new Error(`candidate contains disposable package cache impl/${path}`);
+      if (stat.isDirectory()) walk(next, path);
+      else if (!stat.isFile()) throw new Error(`candidate contains special file impl/${path}`);
+    }
+  };
+  walk(candidate, "");
+  return { room: resolve(room), mode, cacheFree: true };
 }
 
 function requirePin(pin: PinnedFile): void {

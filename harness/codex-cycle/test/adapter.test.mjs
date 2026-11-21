@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { checkContract, checkEvidence, decideAttempt } from "../adapter.ts";
+import { checkCandidateCaches, checkContract, checkEvidence, decideAttempt } from "../adapter.ts";
 
 const hash = (file) =>
   createHash("sha256").update(readFileSync(file)).digest("hex");
@@ -15,6 +15,24 @@ const run = (cwd, ...args) => {
   assert.equal(result.status, 0, result.stderr);
   return result.stdout.trim();
 };
+
+test("candidate cache guard blocks a nested npm cache before grading", () => {
+  const room = mkdtempSync(join(tmpdir(), "loyly-codex-cache-"));
+  mkdirSync(join(room, "impl", "service"), { recursive: true });
+  writeFileSync(join(room, "impl", "service", "start.sh"), "#!/bin/sh\n");
+  assert.equal(checkCandidateCaches(room).cacheFree, true);
+  mkdirSync(join(room, "impl", "service", ".npm-cache"));
+  writeFileSync(join(room, "impl", "service", ".npm-cache", "tarball"), "cached bytes");
+  assert.throws(() => checkCandidateCaches(room), /disposable package cache.*\.npm-cache/);
+  assert.throws(() => checkCandidateCaches(room, "post-gate"), /disposable package cache.*\.npm-cache/);
+  rmSync(join(room, "impl", "service", ".npm-cache"), { recursive: true });
+  mkdirSync(join(room, "impl", "service", "node_modules"));
+  writeFileSync(join(room, "impl", "service", "node_modules", "package"), "installed dependency");
+  assert.throws(() => checkCandidateCaches(room), /disposable package cache.*node_modules/);
+  assert.equal(checkCandidateCaches(room, "post-gate").cacheFree, true);
+  mkdirSync(join(room, "impl", "service", "node_modules", ".cache"));
+  assert.throws(() => checkCandidateCaches(room, "post-gate"), /disposable package cache.*\.cache/);
+});
 
 test("pinned source and subagent inputs must stay byte identical", () => {
   const repo = mkdtempSync(join(tmpdir(), "loyly-codex-source-"));

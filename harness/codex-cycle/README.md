@@ -10,6 +10,17 @@ to decide the next phase and validate Allure before filing the legacy score.
 The grader's app observations run in private Gondolin VMs. The blind reviewer
 sees only the refusal and question.
 
+After each builder turn, run `node cli.ts candidate candidate-input.json`
+with `{ "room": "/absolute/path/to/builder-clean-room", "mode": "sealed" }`.
+After a green gate, run it on the independent gate room with `"mode":
+"post-gate"`; `test.sh` may legitimately have installed `node_modules` there,
+but a package download cache inside `impl/` still fails. Run sealed mode once
+more on the builder candidate immediately before copying it to the grading
+room. The sealed check rejects disposable npm, Maven, uv, and installed
+dependency caches anywhere under `impl/`, including nested projects. A green
+suite that recreates a local download cache needs a builder repair; the check
+is part of the gate handoff, not an item verdict.
+
 `node cli.ts preflight contract.json` checks the clean controller checkout at
 its approved commit, checks the source commit, derives the
 checklist afresh with the legacy generator and compares its bytes to the pin,
