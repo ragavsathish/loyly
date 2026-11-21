@@ -6,6 +6,36 @@ the original self-check and fence, and derives the original eleven-item checklis
 is graded and scored only after the original gate passes. The interactive replay is a projection
 of Pi's committed audit entries; it never invents ORC ticks.
 
+## Live product cycle, 2026-11-19
+
+The approved cut `b97e4eda015167c571eb3296fa03fe4fea366130` ran through a fresh
+Sol builder in Gondolin, three independent Terra grader VM shards, and a fresh blind Sol
+reviewer. The legacy gate passed on attempt 1. The builder's same-session continuation
+ran before that gate. All ten directly graded behavior items passed. The blind reviewer
+named `pukuhuone 9 | Thursday | 17:00 | 18:30` from the refusal alone, but the
+controller's hardcoded `POST /book` confirmation returned HTTP 404. The immutable filed
+score is **10/11**. Its surprise list is empty.
+
+The same answer, sent to the candidate's public booking form action `/request` in a
+fresh copy, returned HTTP 200 and “Standing slot confirmed” for apartment 12. The
+separate corrected probe also returned HTTP 200; neither observation changes the
+filed score. The full postflight matched the unchanged legacy shadow to the candidate,
+gate, and 10/11 score; it rendered 12 Allure cases, projected 21 committed Pi audit
+entries into Grain, and generated a local replay. The product profile is still missing.
+Acceptance and publication remain unauthorized.
+
+The controller fix discovers the action of the single public booking form containing
+the household, resource, weekday, and start fields. It records the resolved path in
+the probe evidence. A separate same-candidate correction verifies the original Pi
+audit, Terra Allure, blind agent launch and answer, and original 10/11 score. It runs
+the corrected HTTP probe against a fresh candidate copy and files cycle 03 with the
+unchanged legacy scorer: **11/11**, one newly passing item, zero newly failing.
+The original Pi cycle and its 10/11 score remain untouched on the pinned `44776a6`
+controller. The correction is supplementary evidence, not a new Pi cycle or an
+acceptance decision. A product-bound profile and operator review still remain.
+
+## Preparation snapshot before the live cycle
+
 | Requirement | Current evidence | Still required |
 | --- | --- | --- |
 | Original harness | The new spec-only source cut `b97e4eda015167c571eb3296fa03fe4fea366130` differs from the original `17d68d2` in only `spec.feature` and `decisions.md`; all root `harness/*` bytes are unchanged. Its clean legacy preflight passes, and it contains no prototype tooling. The Pi controller stays on the separate integration branch. | Run the approved real cycle from this cut and repeat the byte comparison at release. |
@@ -27,4 +57,5 @@ eleven item IDs (`01-001` through `01-011`) and checklist SHA-256
 `4acbadbce0e08cafd19ac89d2a0d909a564abd242ffecdb06b6184a1bbe631cc`.
 The exact revised `spec.feature` SHA-256 is
 `8dfa0eb3369fd1176e188bb84fbd229593ac6fe20aca3afce5f70d02807cc89e`.
-This cut has not yet been built or scored.
+This cut was built and scored in the live cycle above; its original 10/11 result remains
+the authoritative filed score for that controller version.

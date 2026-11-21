@@ -94,6 +94,19 @@ export function validateBlindReview({ packetDir, reviewFile, gradingRoom }) {
 }
 
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+function bookingFormAction(html) {
+  const attribute = (tag, name) => new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, "i")
+    .exec(tag)?.[1];
+  const forms = [...html.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/gi)].filter(([, tag, body]) =>
+    attribute(tag, "method")?.toLowerCase() === "post"
+    && ["household", "resource", "weekday", "start"].every((name) =>
+      new RegExp(`<(?:input|select)\\b[^>]*\\bname\\s*=\\s*["']${name}["']`, "i").test(body)));
+  if (forms.length !== 1) throw new Error("expected exactly one public booking form");
+  const path = attribute(forms[0][1], "action");
+  if (!/^\/[A-Za-z0-9/?=&%._-]*$/.test(path ?? "") || path.startsWith("//"))
+    throw new Error("booking form action must be a same-origin path");
+  return path;
+}
 async function freePort() {
   const server = createServer();
   await new Promise((resolve, reject) => server.once("error", reject).listen(0, "127.0.0.1", resolve));
@@ -106,7 +119,8 @@ export async function probeBlindAnswer({ packetDir, reviewFile, gradingRoom, req
   const { packet, reviewSha256, packetSha256, review } = validateBlindReview({ packetDir, reviewFile, gradingRoom });
   if (review.verdict !== "pass") throw new Error("a failed blind review needs no acceptance probe");
   if (existsSync(out)) throw new Error("blind review probe already exists");
-  if (request?.method !== "POST" || !/^\/[A-Za-z0-9/?=&%._-]*$/.test(request.path ?? "")
+  if (request?.method !== "POST" || (request.path !== "@booking-form"
+      && !/^\/[A-Za-z0-9/?=&%._-]*$/.test(request.path ?? ""))
       || typeof request.body !== "string" || request.body.length > 4096
       || request.matches_answer !== true)
     throw new Error("probe needs a POST path, bounded body and operator answer-match attestation");
@@ -124,21 +138,22 @@ export async function probeBlindAnswer({ packetDir, reviewFile, gradingRoom, req
   child.stderr.on("data", (data) => logs.push(String(data)));
   let response;
   try {
-    let ready = false;
+    let ready = false, homepage;
     for (let i = 0; i < 100; i++) {
       if (spawnError) throw spawnError;
       if (child.exitCode !== null) break;
       try {
         const health = await fetch(`http://127.0.0.1:${port}/`, { signal: AbortSignal.timeout(1000) });
-        if (health.ok) { ready = true; break; }
+        if (health.ok) { homepage = await health.text(); ready = true; break; }
       } catch { /* waiting for startup */ }
       await pause(100);
     }
     if (!ready) throw new Error("review probe app did not start within ten seconds");
-    const http = await fetch(`http://127.0.0.1:${port}${request.path}`, {
+    const resolvedPath = request.path === "@booking-form" ? bookingFormAction(homepage) : request.path;
+    const http = await fetch(`http://127.0.0.1:${port}${resolvedPath}`, {
       method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" },
       body: request.body, signal: AbortSignal.timeout(10_000) });
-    response = { status: http.status, body: await http.text() };
+    response = { status: http.status, body: await http.text(), resolvedPath };
   } finally {
     if (child.exitCode === null && child.signalCode === null && !spawnError)
       child.kill("SIGTERM");
@@ -148,7 +163,8 @@ export async function probeBlindAnswer({ packetDir, reviewFile, gradingRoom, req
   writeFileSync(join(out, "response.txt"), response.body);
   const verification = { schema: "loyly.blind-review-probe.v1", item: REVIEW_ID,
     candidate_sha256: packet.candidate_sha256, packet_sha256: packetSha256,
-    review_sha256: reviewSha256, request, http_status: response.status,
+    review_sha256: reviewSha256, request: { ...request, resolved_path: response.resolvedPath },
+    http_status: response.status,
     response_sha256: hash(response.body), accepted: response.status >= 200 && response.status < 300,
     observed_at: Date.now() };
   writeFileSync(join(out, "verification.json"), `${JSON.stringify(verification, null, 2)}\n`);
