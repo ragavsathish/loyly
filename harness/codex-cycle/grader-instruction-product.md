@@ -27,6 +27,15 @@ different fresh state for independent examples. A missing interaction or an unob
 a fail with evidence beginning `not reached:`. Do not infer behavior from a page title, a green
 suite, a fixed answer, or another item's result.
 
+For a deadline scenario, set a known baseline with `date -u -s` inside its fresh
+Gondolin VM before app startup. Read the actual start, end, choice, lapse or
+effective instant from the served app. Advance the guest clock past that
+instant inside the same VM, confirm the changed clock through the served app
+where it exposes time, and then observe every stated consequence over HTTP.
+Record the boundary, clock commands and responses. A failed clock command is
+an unreached setup, not a product verdict. Use the normal app clock; do not
+use hidden clock controls, source edits or direct record changes.
+
 - `01-001` and `01-002`: inspect each dressing room's days separately; for a closed-day refusal,
   record its exact text and the offered open days.
 - `01-003` through `01-006`: create and re-read actual standing bookings. Check the original
