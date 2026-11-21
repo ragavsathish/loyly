@@ -1,20 +1,46 @@
 // Continue the builder on selected, explicitly uncarried product items.
-import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { isSelectedChecklist } from './contracts.ts';
+import { Effect } from 'effect';
+import { isSelectedChecklist, type SelectedChecklist } from './contracts.ts';
+import {
+  InvalidWorkspaceData,
+  readWorkspaceJson,
+  WorkspaceFiles,
+  WorkspaceFilesLive,
+} from './workspace-effects.ts';
 
 export const MAX_CONTINUATIONS = 3;
 
-export function selectedUncarried(room: string, checklistFile: string): string[] {
-  const file = join(room, 'impl', 'UNCARRIED.md');
-  if (!existsSync(file)) return [];
-  const checklist: unknown = JSON.parse(readFileSync(checklistFile, 'utf8'));
-  if (!isSelectedChecklist(checklist)) throw new Error('invalid selected checklist');
+export function extractUncarried(checklist: SelectedChecklist, text: string): string[] {
   const selected = new Set(checklist.items.map((item) => item.id));
   const ids = new Set<string>();
-  for (const match of readFileSync(file, 'utf8').matchAll(/^\s*[-*]\s*`?@item-(\d{2}-\d{3})\b/gm))
+  for (const match of text.matchAll(/^\s*[-*]\s*`?@item-(\d{2}-\d{3})\b/gm))
     if (selected.has(match[1])) ids.add(match[1]);
   return [...ids].sort();
+}
+
+export function selectedUncarriedEffect(room: string, checklistFile: string) {
+  return Effect.gen(function* () {
+    const files = yield* WorkspaceFiles;
+    const file = join(room, 'impl', 'UNCARRIED.md');
+    if (!(yield* files.exists(file))) return [];
+    const checklist: unknown = yield* readWorkspaceJson(checklistFile);
+    if (!isSelectedChecklist(checklist))
+      return yield* Effect.fail(
+        new InvalidWorkspaceData({
+          path: checklistFile,
+          reason: 'invalid selected checklist',
+        }),
+      );
+    return extractUncarried(checklist, yield* files.readText(file));
+  });
+}
+
+// The Pi task still calls a synchronous function; only this edge runs Effect.
+export function selectedUncarried(room: string, checklistFile: string): string[] {
+  return Effect.runSync(
+    selectedUncarriedEffect(room, checklistFile).pipe(Effect.provide(WorkspaceFilesLive)),
+  );
 }
 
 export function continuationPrompt(ids: string[]): string {

@@ -2,7 +2,9 @@
   "name": "@loyly/pi-durable-harness",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24.12.0" },
+  "engines": {
+    "node": ">=24.12.0"
+  },
   "scripts": {
     "demo": "node demo.mjs",
     "export": "node export.mjs",
@@ -25,6 +27,7 @@
     "@opentelemetry/sdk-metrics": "3.1.1",
     "@opentelemetry/sdk-node": "0.301.2",
     "ajv": "^8.20.0",
+    "effect": "4.1.5",
     "playwright-core": "1.65.1"
   },
   "devDependencies": {

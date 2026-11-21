@@ -6,8 +6,10 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { Effect, Layer } from 'effect';
 import { readAuditRows } from "../audit-rows.mjs";
-import { continuationPrompt, selectedUncarried } from "../continuation.ts";
+import { continuationPrompt, selectedUncarried, selectedUncarriedEffect } from "../continuation.ts";
+import { WorkspaceFiles } from '../workspace-effects.ts';
 
 const here = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const root = resolve(here, "../..");
@@ -46,6 +48,31 @@ test("whole-product continuation carries selected items beyond booking core", ()
     assert.match(continuationPrompt(ids), /@item-02-005, @item-03-014/);
     assert.throws(() => continuationPrompt(["06-1"]), /selected product item IDs/);
   } finally { rmSync(scratch, { recursive: true, force: true }); }
+});
+
+test('continuation file effects are lazy and injectable', () => {
+  const reads = [];
+  const layer = Layer.succeed(WorkspaceFiles, {
+    exists: (path) => Effect.succeed(path === '/room/impl/UNCARRIED.md'),
+    readText: (path) => Effect.sync(() => {
+      reads.push(path);
+      return path === '/checklist'
+        ? JSON.stringify({ items: [{ id: '02-005' }] })
+        : '- @item-02-005: pending\n- @item-02-999: unrelated\n';
+    }),
+  });
+  const selection = selectedUncarriedEffect('/room', '/checklist').pipe(Effect.provide(layer));
+  assert.deepEqual(reads, []);
+  assert.deepEqual(Effect.runSync(selection), ['02-005']);
+  assert.deepEqual(reads, ['/checklist', '/room/impl/UNCARRIED.md']);
+  const invalid = Layer.succeed(WorkspaceFiles, {
+    exists: () => Effect.succeed(true),
+    readText: () => Effect.succeed('{broken'),
+  });
+  const error = Effect.runSync(Effect.flip(
+    selectedUncarriedEffect('/room', '/checklist').pipe(Effect.provide(invalid))));
+  assert.equal(error._tag, 'InvalidWorkspaceData');
+  assert.equal(error.path, '/checklist');
 });
 
 function fixtureEnv(scratch, mode = "carry", builderCommand) {

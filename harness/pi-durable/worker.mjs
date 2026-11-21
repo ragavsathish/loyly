@@ -10,6 +10,8 @@ import { createModels } from "@earendil-works/pi-ai";
 import { Harness, createRegistry, defineEntry, defineExtension, defineTask } from "@earendil-works/pi-durable";
 import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite/node";
 import { runGate } from "./gate-adapter.mjs";
+import { Effect, Layer } from 'effect';
+import { GateRunError, GateRunner, verifyCandidate } from './gate-effects.ts';
 import { hasBuilderLaunch, runBuilder } from "./builder-adapter.mjs";
 import { candidateDigest as digestCandidate, prepareGradingRoom, verifyGradingRoom } from "./grading-room.mjs";
 import { prepareShards, combineShards } from "./grader-shards.mjs";
@@ -410,6 +412,13 @@ const Builder = defineTask({
   abort: (_task, runtime) => runtime.commit(() => ({ status: "terminal", outcome: { status: "aborted" } }), ctx),
 });
 
+const gateRunner = Layer.succeed(GateRunner, {
+  run: (request) => Effect.tryPromise({
+    try: () => runGate(request),
+    catch: (cause) => new GateRunError({ reason: String(cause) }),
+  }),
+});
+
 const Gate = defineTask({
   name: "loyly.proto.gate", version: 1,
   initial: () => ({ phase: "verify" }),
@@ -419,15 +428,15 @@ const Gate = defineTask({
       const out = join(scratch, `gate-${attempt}-evidence`);
       const digest = candidateDigest();
       const gateRoom = gateRoomFor(attempt, digest);
-      const r = await runGate({ room: gateRoom, out, candidateSha256: digest, timeoutMs: 900_000 });
-      const log = join(out, "gate.log");
+      const r = await Effect.runPromise(verifyCandidate({ room: gateRoom, out,
+        candidateSha256: digest, timeoutMs: 900_000 }).pipe(Effect.provide(gateRunner)));
       await runtime.commit(async (tx) => {
-        await audit(tx, task, "gate", r.exit === 0 ? "passed" : "failed", {
-          attempt, gate_log: log, gate_log_sha256: r.logSha256, exit: r.exit,
+        await audit(tx, task, "gate", r.passed ? "passed" : "failed", {
+          attempt, gate_log: r.log, gate_log_sha256: r.logSha256, exit: r.exit,
           candidate_digest: digest, reconciled: r.reconciled,
         });
         return { status: "terminal", outcome: { status: "completed", result: {
-          passed: r.exit === 0, log, logSha256: r.logSha256, candidateSha256: digest,
+          passed: r.passed, log: r.log, logSha256: r.logSha256, candidateSha256: digest,
         } } };
       }, ctx);
     },
