@@ -1,0 +1,67 @@
+{
+  "uuid": "5beee3b6-d351-4d3d-b607-e5c36af9f307",
+  "name": "A completed family-time occurrence no longer uses the allowance",
+  "fullName": "loyly.time-classes.05-005",
+  "testCaseId": "loyly.time-classes.05-005",
+  "historyId": "loyly.time-classes.05-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After the first booking\u2019s returned endsAt, the next family occurrence request succeeded."
+  },
+  "start": 1795274254774,
+  "stop": 1795274305723,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: establish scenario from fresh state",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: perform action and cross applicable boundary",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: inspect public HTTP observations",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "After the first booking\u2019s returned endsAt, the next family occurrence request succeeded."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command, package installation, clock and HTTP receipt",
+      "source": "2f492aa3-f15d-4e4a-a724-63c65c7d040e-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

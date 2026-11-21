@@ -1,0 +1,263 @@
+(1/6) Installing icu-data-full (78.1-r0)
+(2/6) Installing ada-libs (4.0.0-r0)
+(3/6) Installing icu-libs (78.1-r0)
+(4/6) Installing simdjson (4.2.4-r0)
+(5/6) Installing simdutf (9.0.0-r0)
+(6/6) Installing nodejs (24.22.3-r0)
+Executing busybox-1.37.0-r31.trigger
+OK: 159.2 MiB in 100 packages
+v24.22.3
+Tue Jan  1 08:00:00 UTC 2030
+'use strict'
+const select = id => document.getElementById(id)
+const house = select('house')
+const book = select('book')
+const manage = select('manage')
+const dateView = select('date-view')
+const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const classLabel = value => value === 'family' ? 'Family time' : value
+const create = (tag, value) => {
+  const node = document.createElement(tag)
+  if (value !== undefined) node.textContent = value
+  return node
+}
+const endpoint = (action, id = house.value) => '/api/' + encodeURIComponent(id) + '/' + action
+let currentDate = ''
+let currentRoute
+let revision = 0
+
+async function api(path, body) {
+  const response = await fetch(path, body === undefined ? {} : {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body)
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    const message = data.message + (data.decisionId ? '\nDecision ' + data.decisionId + ' · Policy ' + data.policyVersion : '')
+    throw new Error(message)
+  }
+  return data
+}
+function status(message, error = false) {
+  select('status').textContent = message
+  select('status').classList.toggle('error', error)
+}
+function options(node, choices) {
+  const selected = node.value
+  node.replaceChildren(...choices.map(choice => {
+    const [value, label] = Array.isArray(choice) ? choice : [choice, choice]
+    const option = create('option', label)
+    option.value = value
+    return option
+  }))
+  if (Array.from(node.options).some(option => option.value === selected)) node.value = selected
+}
+function table(headers, rows) {
+  const wrapper = create('div')
+  wrapper.className = 'scroll'
+  const grid = create('table')
+  const head = grid.createTHead().insertRow()
+  for (const header of headers) {
+    const th = create('th', header)
+    th.scope = 'col'
+    head.append(th)
+  }
+  const body = grid.createTBody()
+  for (const row of rows) {
+    const output = body.insertRow()
+    for (const value of row) {
+      const cell = output.insertCell()
+      if (value instanceof Node) cell.append(value)
+      else cell.textContent = value ?? ''
+    }
+  }
+  wrapper.append(grid)
+  return wrapper
+}
+function fillSlot(slot) {
+  book.elements.resource.value = slot.resource
+  book.elements.weekday.value = slot.weekday
+  book.elements.start.value = slot.start
+  book.elements.household.focus()
+}
+function weeklySchedule(slots) {
+  const groups = Map.groupBy(slots, slot => slot.resource)
+  select('schedule').replaceChildren()
+  for (const resourceSlots of groups.values()) {
+    const { room, sauna, group } = resourceSlots[0]
+    const starts = [...new Set(resourceSlots.map(s => s.start))].sort()
+    const rows = starts.map(start => [start, ...weekdays.map(day => {
+      const slot = resourceSlots.find(s => s.start === start && s.weekday === day)
+      if (!slot) return ''
+      const content = create('div')
+      const label = slot.end + ' · ' + (slot.state === 'held' ? 'Held by apartment ' + slot.household : 'Free')
+        + (slot.timeClass === 'general' ? '' : ' · ' + classLabel(slot.timeClass))
+      if (slot.state === 'free') {
+        const button = create('button', label)
+        button.type = 'button'
+        button.className = 'slot'
+        button.addEventListener('click', () => fillSlot(slot))
+        content.append(button)
+      } else {
+        content.textContent = label
+        content.append(create('div', slot.bookingId))
+      }
+      return content
+    })])
+    select('schedule').append(create('h3', sauna + ' · ' + room + ' · Group ' + group), table(['Starts', ...weekdays], rows))
+  }
+}
+function section(name, headers, rows, empty) {
+  const box = create('div')
+  box.append(create('h3', name), rows.length ? table(headers, rows) : create('p', empty))
+  return box
+}
+function showViews(views) {
+  const address = row => [row.date ?? row.weekday, row.room, row.start + '–' + row.end]
+  const id = row => row.occurrenceId ?? row.bookingId
+  select('views').replaceChildren(
+    section('Posted slot list', ['When', 'Dressing room', 'Time', 'Apartment', 'Booking or occurrence'], views.posted.map(r => [
+      ...address(r), r.household, id(r)
+    ]), 'No assigned slots.'),
+    section('Heater schedule', ['When', 'Dressing room', 'Heat interval', 'Apartment', 'Booking or occurrence'], views.heater.map(r => [
+      ...address(r), r.household, id(r)
+    ]), 'No heater intervals.'),
+    section('Billing signals', ['Charge', 'Payer apartment', 'Booking or occurrence', 'Policy', 'Price reference', 'Billing role'], views.billing.map(r => [
+      r.kind, r.payer, id(r), r.policyVersion, r.priceReference, r.billingRole
+    ]), 'No billing signals.'),
+    section(currentDate ? 'Occurrence offers' : 'Available occurrence offers', ['Date', 'Start (UTC)', 'Mode', 'State', 'Holder', 'Taker', 'Offer ID'],
+      views.offers.map(o => [o.date, o.startsAt, o.mode, o.state, o.household, o.taker, o.id]), 'No occurrence offers.')
+  )
+}
+const operations = {
+  'give-up': ['Give up a standing slot', ['bookingId', 'household']],
+  release: ['Release one occurrence', ['bookingId', 'household', 'date', 'mode']],
+  take: ['Take or buy an occurrence', ['offerId', 'household', 'role']],
+  'withdraw-offer': ['Withdraw an occurrence offer', ['offerId', 'household']],
+  queue: ['Join the waiting queue', ['group', 'household', 'role']],
+  'withdraw-queue': ['Withdraw from the waiting queue', ['group', 'household']],
+  'evaluate-scarcity': ['Evaluate scarcity for a group', ['group', 'role']],
+  choose: ['Select a holding to lapse', ['noticeId', 'bookingId', 'household']],
+  claim: ['Respond to a pending claim', ['noticeId', 'household', 'decision']],
+  policies: ['Record a policy revision', ['version', 'effectiveAt', 'authority', 'role', 'changes']],
+  disputes: ['Open a booking dispute', ['bookingId', 'role']],
+  history: ['Look up a booking or refusal', ['bookingId', 'decisionId']]
+}
+const queueActions = new Set(['queue', 'withdraw-queue', 'evaluate-scarcity', 'choose', 'claim'])
+const fields = {
+  bookingId: 'Booking ID', household: 'Apartment', date: 'Occurrence date', mode: 'Release mode',
+  offerId: 'Offer ID', role: 'Acting role', group: 'Resource group', noticeId: 'Notice ID',
+  decision: 'Decision', version: 'New version', effectiveAt: 'Effective instant (ISO 8601)',
+  authority: 'Authorizing party', changes: 'Policy changes (JSON)', decisionId: 'Refusal decision ID'
+}
+function manageFields() {
+  const action = manage.elements.action.value
+  const inputs = operations[action][1].map(name => {
+    const label = create('label', fields[name])
+    const input = create(name === 'changes' ? 'textarea' : ['mode', 'decision'].includes(name) ? 'select' : 'input')
+    input.name = name
+    input.required = action !== 'history'
+    if (name === 'date') input.type = 'date'
+    if (name === 'household') input.value = book.elements.household.value
+    if (name === 'role') input.value = action === 'disputes' ? currentRoute.disputeRole :
+      action === 'evaluate-scarcity' ? currentRoute.bookingOperatorRole : book.elements.role.value
+    if (name === 'mode') options(input, [['free', 'Free'], ['sale', 'For sale']])
+    if (name === 'decision') options(input, [['confirm', 'Confirm'], ['decline', 'Decline']])
+    if (name === 'changes') input.placeholder = '{"chooseDays":14,"lapseDays":30}'
+    if (name === 'effectiveAt') input.placeholder = '2030-01-01T12:00:00Z'
+    label.append(input)
+    return label
+  })
+  select('manage-fields').replaceChildren(...inputs)
+}
+function disclose(title, data) {
+  const box = create('details')
+  box.append(create('summary', title), create('pre', JSON.stringify(data, null, 2)))
+  return box
+}
+async function refresh(setup = false) {
+  const version = ++revision
+  const id = house.value
+  const get = action => api(endpoint(action, id))
+  const [schedule, route, policies, notices, views] = await Promise.all([
+    get('schedule'), get('route'), get('policies'), get('notices'),
+    get('views' + (currentDate ? '?date=' + encodeURIComponent(currentDate) : ''))
+  ])
+  const queue = route.queueAvailable ? await get('queue') : null
+  if (revision !== version) return
+  currentRoute = route
+  select('route').textContent = route.queueAvailable ? 'Residents can request slots and join their resource group’s waiting queue.' :
+    'Booking requests are handled through the ' + route.bookingOperatorRole + '.'
+  if (setup) {
+    options(book.elements.role, [...new Set([...route.bookerRoles, 'shareholder', 'tenant'])])
+    options(manage.elements.action, Object.entries(operations).filter(([action]) => route.queueAvailable || !queueActions.has(action))
+      .map(([action, [name]]) => [action, name]))
+    dateView.elements.date.value = route.today
+    book.elements.date.value = route.today
+    manageFields()
+  }
+  options(book.elements.resource, [...new Map(schedule.slots.map(slot => [slot.resource, slot.room])).entries()])
+  weeklySchedule(schedule.slots)
+  showViews(views)
+  const content = [disclose('Policy versions · current ' + policies.current.version, policies.policies)]
+  if (queue) content.push(disclose('Waiting queues by resource group', queue.groups), disclose('Scarcity notices', notices.notices))
+  select('operations').replaceChildren(...content)
+}
+const report = error => status(error.message, true)
+book.elements.kind.addEventListener('change', () => {
+  const dated = book.elements.kind.value === 'occurrences'
+  select('weekday-field').hidden = dated
+  select('date-field').hidden = !dated
+  book.elements.date.required = dated
+})
+book.addEventListener('submit', async event => {
+  event.preventDefault()
+  const { kind, ...data } = Object.fromEntries(new FormData(book))
+  try {
+    const { booking } = await api(endpoint(kind), data)
+    status('Confirmed for apartment ' + booking.household + '\n' + booking.room + ' · ' +
+      (booking.date ?? ('every ' + booking.weekday)) + ' · ' + booking.start + '–' + booking.end + '\nBooking ' + booking.id +
+      ' · Policy ' + booking.policyVersion)
+    if (booking.date) {
+      currentDate = booking.date
+      dateView.elements.date.value = booking.date
+    }
+    await refresh()
+  } catch (error) { report(error) }
+})
+manage.elements.action.addEventListener('change', manageFields)
+manage.addEventListener('submit', async event => {
+  event.preventDefault()
+  const { action, ...data } = Object.fromEntries(new FormData(manage))
+  try {
+    if (data.changes) data.changes = JSON.parse(data.changes)
+    const history = action === 'history'
+    const result = await api(endpoint(history ? 'history?' + new URLSearchParams(data) : action), history ? undefined : data)
+    status(operations[action][0] + ' completed.')
+    const details = disclose('Action result', result)
+    details.open = true
+    select('outcome').replaceChildren(details)
+    await refresh()
+  } catch (error) { report(error) }
+})
+dateView.addEventListener('submit', event => {
+  event.preventDefault()
+  currentDate = dateView.elements.date.value
+  refresh().catch(report)
+})
+select('weekly').addEventListener('click', () => {
+  currentDate = ''
+  refresh().catch(report)
+})
+house.addEventListener('change', () => {
+  currentDate = ''
+  status('')
+  select('outcome').replaceChildren()
+  refresh(true).catch(report)
+})
+options(book.elements.weekday, weekdays)
+book.elements.weekday.value = 'Tuesday'
+api('/api').then(({ houses }) => {
+  options(house, houses.map(item => [item.id, item.name]))
+  return refresh(true)
+}).catch(report)
+Terminated

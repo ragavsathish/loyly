@@ -1,0 +1,79 @@
+{
+  "schema": "loyly.codex-grader-reassessment.v1",
+  "controllerCommit": "448ad117cb2fc0335390b190d42c264165633102",
+  "reassessmentId": "cycle-04-clock-aware-01",
+  "output": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-reassessment-04-01/grading-room",
+  "original": {
+    "cycleDir": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/cycles/04",
+    "sourceCommit": "7e2fb1c0ba88c6b941a296a1298b89dd0bd5db5a",
+    "builderModel": "gpt-6.2-sol",
+    "candidateSha256": "c7cca9085c5d9b584b3710be78f5b5b68318a18342ec5f0cfb654d9366634340",
+    "scoreSha256": "bd830a644b5f8c9057051038a8fd135d08471e89f4d4b1696b6065934b432d87",
+    "checklistSha256": "06f0dba7ba9aa07152950cd0bc6c38560f6c6b95a3fa88354909a4561434dda2",
+    "runContractSha256": "9b566a38c40856b575b7a970dd1fe047bf5d38b6a3d7c9d75bdeda2fe3c47d90"
+  },
+  "selection": {
+    "itemIds": [
+      "02-003",
+      "02-008",
+      "03-007",
+      "03-008",
+      "03-009",
+      "03-012",
+      "03-013",
+      "04-004",
+      "04-007",
+      "05-004",
+      "05-005"
+    ],
+    "checklist": {
+      "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-reassessment-04-01/checklist.json",
+      "sha256": "8094d23f4322d39d64eb5927bf2464c7393c2b6bd52595c74fbf7ecb3969a427"
+    },
+    "specs": [
+      {
+        "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/cycles/04/grading-room/plan/02-occurrence-release/spec.feature",
+        "sha256": "041c53f7d6109b68814ebaa2547bd77b0b2e4e0dd50d3c8c51bf637be8fb9710"
+      },
+      {
+        "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/cycles/04/grading-room/plan/03-scarcity-forfeit/spec.feature",
+        "sha256": "42c15ee5e43d538732d4acc50e022395340a590801405e45b3a2a889fd81ac87"
+      },
+      {
+        "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/cycles/04/grading-room/plan/04-house-policy/spec.feature",
+        "sha256": "133040121a0bbcfd5f3d7e6fcf22867708315d7a1cd72cf8d40b488356b767bf"
+      },
+      {
+        "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/cycles/04/grading-room/plan/05-time-classes/spec.feature",
+        "sha256": "1a837975f3fffe4ae503b03ff5158ab74cfc55c7216d3983704ee9b7b82a8e3e"
+      }
+    ]
+  },
+  "grader": {
+    "model": "gpt-6.1-terra",
+    "instruction": {
+      "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/grader-reassessment-instruction.md",
+      "sha256": "aa2b7aa23e3e9776a250026c2e4b213e970f2fb3317256e8f08d4f567c97e2bc"
+    },
+    "wrapper": {
+      "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/grader-preamble.md",
+      "sha256": "19bb64ad20f2de25a4cca0c81484675ebe73970f03dcd097cbd5ed7d31016610"
+    }
+  },
+  "execution": {
+    "engine": "codex-subagent",
+    "runtime": "gondolin-qemu-vm",
+    "graderImageManifest": {
+      "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/.state/assets/builder-clojure/manifest.json",
+      "sha256": "5eaa21b5f1e346086ba2e628d365a20222c1a72246ebaf7af82b75092c7b76b1"
+    },
+    "allureSchema": {
+      "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/evidence-core/allure-lifecycle-result.schema.json",
+      "sha256": "0eef607c5d9eef4a190ea0deb7c7a61228267d8ec556b722b37dd83ef253fee1"
+    },
+    "panelPlan": {
+      "path": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/whole-product-reassessment.panel.json",
+      "sha256": "b1c460f01b14eabfd97ac7927c5e3c4b58bbcf2865ba4535fb0146b527e9fd15"
+    }
+  }
+}

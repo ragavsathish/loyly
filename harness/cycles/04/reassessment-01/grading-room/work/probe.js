@@ -1,0 +1,1 @@
+(async()=>{for(const p of ['/','/api','/api/a/route','/api/a/schedule','/api/a/policies','/api/b/policies']){try{let r=await fetch('http://localhost:3000'+p);console.log('\nGET',p,r.status,await r.text())}catch(e){console.log(e)}}})()

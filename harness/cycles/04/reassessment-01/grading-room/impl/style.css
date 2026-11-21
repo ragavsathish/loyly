@@ -1,0 +1,48 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, sans-serif;
+  color: #262c25;
+  background: #f4f2eb;
+  line-height: 1.5;
+}
+* { box-sizing: border-box }
+body { margin: 0 }
+header, main { padding-inline: max(1.25rem, calc((100vw - 75rem) / 2)) }
+header {
+  background: #263e31;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1.35rem;
+}
+h1, h2, h3 { line-height: 1.15 }
+h1 { font: 600 2.8rem Georgia, serif; margin: 0 }
+header p, section > p { margin: .35rem 0 }
+main { padding-block: 1.25rem 3rem; display: grid; gap: 1rem }
+section { background: #fffdf8; border: 1px solid #dedfd3; border-radius: .8rem; padding: 1.1rem; min-width: 0 }
+h2 { font: 600 1.6rem Georgia, serif; margin: 0 0 .8rem }
+h3 { margin: .8rem 0 .45rem; font-size: 1rem }
+.scroll { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; margin-bottom: .7rem; font-size: .9rem }
+th, td { padding: .52rem .6rem; text-align: left; border-bottom: 1px solid #dedfd3; vertical-align: top }
+thead th { background: #e9eee5 }
+form, .fields { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; margin-block: .7rem }
+.fields { margin: 0 }
+label { display: grid; gap: .28rem; font-size: .88rem; font-weight: 650 }
+input, select, textarea, button {
+  font: inherit; color: #262c25; border: 1px solid #939b8c; border-radius: .35rem;
+  background: #fff; min-height: 2.5rem; padding: .42rem .6rem; max-width: 100%;
+}
+button { background: #356047; border-color: #356047; color: #fff; font-weight: 600; cursor: pointer }
+button:hover { background: #274936 }
+button.slot { min-height: unset; padding: .25rem .45rem; text-align: left; white-space: nowrap }
+td > div + div { margin-top: .3rem }
+[hidden] { display: none }
+:focus-visible { outline: 3px solid #a05c23; outline-offset: 2px }
+#status { white-space: pre-wrap; color: #254d38; font-weight: 600 }
+#status.error { color: #972f22 }
+summary { cursor: pointer; font-weight: 600; margin-block: .5rem }
+pre { max-height: 24rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #edf1e9; padding: .7rem }
+code { overflow-wrap: anywhere }

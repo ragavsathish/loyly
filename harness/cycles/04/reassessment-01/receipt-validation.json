@@ -1,0 +1,94 @@
+{
+  "schema": "loyly.reassessment-receipts.v1",
+  "count": 11,
+  "items": [
+    {
+      "id": "02-003",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "3a67a199-7299-4864-9a86-197c7ba0d54f-result.json",
+      "attachment": "65325f2f-acf4-4c31-a977-a1b1e0dc8bef-attachment.txt"
+    },
+    {
+      "id": "02-008",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "e668f4d3-0043-46af-a89a-c2011ae9743f-result.json",
+      "attachment": "1ae01aa5-67b3-4adb-b25a-9dd18632c7eb-attachment.txt"
+    },
+    {
+      "id": "03-007",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "f3b45b53-265e-45ac-a71e-c0f3c1d06bc6-result.json",
+      "attachment": "61d4ab00-1431-4735-92d4-68d01fc8fb87-attachment.txt"
+    },
+    {
+      "id": "03-008",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "c55f09e3-084d-4c09-b84f-4fae7609c5bb-result.json",
+      "attachment": "2a248999-6065-459b-9266-3c7454f11791-attachment.txt"
+    },
+    {
+      "id": "03-009",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "10011a5a-3bc4-4b90-82b6-931603172aaa-result.json",
+      "attachment": "5edec199-33a3-4a57-ba5c-5a27c2eb3cdd-attachment.txt"
+    },
+    {
+      "id": "03-012",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "6c93dbcc-bd69-40aa-831a-1c9ecac383f8-result.json",
+      "attachment": "ac056cc8-723d-4ff9-a633-b659db162fc6-attachment.txt"
+    },
+    {
+      "id": "03-013",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "3b8a70d9-3330-486f-9380-2d586b16731c-result.json",
+      "attachment": "6dd526e1-9f13-44d5-94a2-ee435664d025-attachment.txt"
+    },
+    {
+      "id": "04-004",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "cad335a4-b2f5-4a3a-a9f0-5e79872cb871-result.json",
+      "attachment": "90edac2d-5103-40a6-99b7-f2a02e857ed6-attachment.txt"
+    },
+    {
+      "id": "04-007",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "ef7b8fe4-cc9b-415c-81b5-f59422736922-result.json",
+      "attachment": "653ad7fd-87a3-4501-ba80-f62f2c56cd74-attachment.txt"
+    },
+    {
+      "id": "05-004",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "07087a4d-e91c-437e-a257-70c1637af318-result.json",
+      "attachment": "db3cb8de-eadc-4df5-86bd-b092c2cb1f02-attachment.txt"
+    },
+    {
+      "id": "05-005",
+      "vmExit": 0,
+      "hasHttp": true,
+      "hasGuestClock": true,
+      "result": "5beee3b6-d351-4d3d-b607-e5c36af9f307-result.json",
+      "attachment": "2f492aa3-f15d-4e4a-a724-63c65c7d040e-attachment.txt"
+    }
+  ]
+}
