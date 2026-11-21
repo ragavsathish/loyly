@@ -126,8 +126,8 @@ live cycle still needs the exact approval described in `AGENTS.md`.
 ## Code quality checks
 
 Run `npm run quality` to type-check the Pi modules and both independent core
-folders with strict indexed and optional-property checks, lint the harness
-and its tests, and check formatting of the TypeScript and tool configuration.
+folders with strict indexed and optional-property checks, lint the Pi harness,
+both cores and their tests, and check formatting of the TypeScript and tool configuration.
 TypeScript source runs
 directly on the host's Node 26 and in the panel VM's Node 24; `tsc` does not
 emit JavaScript.

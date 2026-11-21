@@ -10,7 +10,8 @@
     "export": "node export.mjs",
     "check": "tsc -p tsconfig.json && tsc -p ../cycle-core/tsconfig.json && tsc -p ../evidence-core/tsconfig.json && cmp -s allure-lifecycle-result.schema.json ../evidence-core/allure-lifecycle-result.schema.json",
     "quality": "npm run check && npm run lint && npm run format:check -- '*.ts' 'tasks/*.ts' '../cycle-core/*.ts' '../evidence-core/*.ts' eslint.config.mjs package.json tsconfig.json",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run lint:core",
+    "lint:core": "cd .. && ./pi-durable/node_modules/.bin/eslint --config pi-durable/eslint.config.mjs cycle-core evidence-core",
     "format": "prettier --write",
     "format:check": "prettier --check",
     "test": "node --test --test-concurrency=1 test/*.test.mjs ../cycle-core/test/*.test.mjs ../evidence-core/test/*.test.mjs"
