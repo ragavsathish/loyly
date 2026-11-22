@@ -1,0 +1,89 @@
+{
+  "uuid": "1197d3b9-d60f-4a4c-aa8b-13c3de5357ce",
+  "historyId": "loyly.booking-core.01-004",
+  "testCaseId": "loyly.booking-core.01-004",
+  "fullName": "loyly.booking-core.01-004",
+  "name": "A held slot cannot be confirmed for another household",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Request: after apartment 12 held Tuesday 17:00 in pukuhuone 8, POST /api/standing-slots/request {\"apartment\":3,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"}. Observed: HTTP 409 {\"ok\":false,\"reason\":\"slot_held\",\"message\":\"The slot on Tuesday at 17:00 in pukuhuone 8 is already held.\",\"holder\":12}. Re-read: schedule holder remains 12; posted list still shows only apartment 12 for that slot. Consequence: the second household is refused because the slot is held, and apartment 12 still holds it."
+  },
+  "start": 1795357280097,
+  "stop": 1795357283272,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given the household in apartment 12 holds the Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357280097,
+      "stop": 1795357283272,
+      "statusDetails": {
+        "message": "First confirmation left holder 12."
+      }
+    },
+    {
+      "name": "When the household in apartment 3 requests a standing slot on Tuesday at 17:00 in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357280097,
+      "stop": 1795357283272,
+      "statusDetails": {
+        "message": "POST returned HTTP 409 slot_held."
+      }
+    },
+    {
+      "name": "Then the request is refused because the slot is held",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357280097,
+      "stop": 1795357283272,
+      "statusDetails": {
+        "message": "Message says the slot is already held; holder 12."
+      }
+    },
+    {
+      "name": "And the household in apartment 12 still holds the slot",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357280097,
+      "stop": 1795357283272,
+      "statusDetails": {
+        "message": "Schedule holder 12 and posted list still names apartment 12 only."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Conflict request and holder re-read",
+      "source": "dd7bd786-e312-49ed-9055-a1459642184c-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

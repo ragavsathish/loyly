@@ -1,0 +1,23 @@
+{
+  "blindLine": "REQUEST: pukuhuone 8 | Tuesday | 17:00",
+  "blindAgentId": "bc-ac57808a-89ac-582a-8a14-9583394411e6",
+  "httpRequest": {
+    "household": "apartment 12",
+    "dressingRoom": "pukuhuone 8",
+    "weekday": "Tuesday",
+    "startTime": "17:00"
+  },
+  "response": {
+    "ok": true,
+    "slot": {
+      "id": "ss-1",
+      "dressingRoom": "pukuhuone 8",
+      "weekday": "Tuesday",
+      "startTime": "17:00",
+      "endTime": "18:30",
+      "slotMinutes": 90
+    },
+    "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+  },
+  "passed": true
+}

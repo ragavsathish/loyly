@@ -1,0 +1,89 @@
+{
+  "uuid": "0e90b2c9-3318-4c3d-a106-4aa355e8df37",
+  "historyId": "loyly.booking-core.01-003",
+  "testCaseId": "loyly.booking-core.01-003",
+  "fullName": "loyly.booking-core.01-003",
+  "name": "A requested slot on an open day is confirmed",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Request: POST /api/standing-slots/request {\"apartment\":12,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"} while that slot was free. Observed: HTTP 200 slot ss-1 apartment 12, Tuesday 17:00–18:30, message \"Standing slot confirmed for 17:00 to 18:30 every Tuesday.\" Re-read: schedule status held holder 12; posted list shows apartment 12 for pukuhuone 8 Tuesday 17:00–18:30. Consequence: the standing slot is confirmed for 17:00 to 18:30 and apartment 12 holds it on the weekly Tuesday."
+  },
+  "start": 1795357276921,
+  "stop": 1795357280096,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-003"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Tuesday at 17:00 in pukuhuone 8 is free",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357276921,
+      "stop": 1795357280096,
+      "statusDetails": {
+        "message": "Schedule status free, holder null."
+      }
+    },
+    {
+      "name": "When the household in apartment 12 requests a standing slot on Tuesday at 17:00 in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357276921,
+      "stop": 1795357280096,
+      "statusDetails": {
+        "message": "POST /api/standing-slots/request."
+      }
+    },
+    {
+      "name": "Then the standing slot is confirmed for 17:00 to 18:30",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357276921,
+      "stop": 1795357280096,
+      "statusDetails": {
+        "message": "Response slot endTime 18:30, slotMinutes 90."
+      }
+    },
+    {
+      "name": "And the household in apartment 12 holds it for every coming Tuesday",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357276921,
+      "stop": 1795357280096,
+      "statusDetails": {
+        "message": "Confirmation says every Tuesday; schedule and posted list still show apartment 12 on Tuesday 17:00–18:30."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Confirm request and re-read",
+      "source": "962eb5bd-bb62-49b5-8680-d954b89e601c-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

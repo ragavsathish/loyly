@@ -1,0 +1,57 @@
+[
+  {
+    "id": "01-001",
+    "verdict": "pass",
+    "evidence": "Request: GET /api/schedule. Observed: sauna-F weekly schedule gives pukuhuone 8 only Tuesday 17:00\u201318:30 status free, and pukuhuone 9 Thursday, Friday and Saturday 17:00\u201318:30 status free, with no Tuesday key. Consequence: Tuesday shows a bookable slot for pukuhuone 8 and no slots for pukuhuone 9."
+  },
+  {
+    "id": "01-002",
+    "verdict": "pass",
+    "evidence": "Request: POST /api/standing-slots/request {\"apartment\":12,\"dressingRoom\":\"pukuhuone 9\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"}. Observed: HTTP 409 {\"ok\":false,\"reason\":\"closed_day\",\"message\":\"Valitettavasti pukuhuone 9 ei ole saunap\u00e4iv\u00e4\u00e4 Tuesdayna. pukuhuone 9 on auki: Thursday, Friday, Saturday. Voit varata seisovan vuoron Tuesday klo 17:00 pukuhuone 8ssa.\",\"openDays\":[\"Thursday\",\"Friday\",\"Saturday\"],\"alternative\":{\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"}} Consequence: the request is refused because pukuhuone 9 has no sauna day on Tuesday, and the refusal names Thursday, Friday and Saturday. The schedule still has no Tuesday slot for pukuhuone 9."
+  },
+  {
+    "id": "01-003",
+    "verdict": "pass",
+    "evidence": "Request: POST /api/standing-slots/request {\"apartment\":12,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"} while that slot was free. Observed: HTTP 200 slot ss-1 apartment 12, Tuesday 17:00\u201318:30, message \"Standing slot confirmed for 17:00 to 18:30 every Tuesday.\" Re-read: schedule status held holder 12; posted list shows apartment 12 for pukuhuone 8 Tuesday 17:00\u201318:30. Consequence: the standing slot is confirmed for 17:00 to 18:30 and apartment 12 holds it on the weekly Tuesday."
+  },
+  {
+    "id": "01-004",
+    "verdict": "pass",
+    "evidence": "Request: after apartment 12 held Tuesday 17:00 in pukuhuone 8, POST /api/standing-slots/request {\"apartment\":3,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"}. Observed: HTTP 409 {\"ok\":false,\"reason\":\"slot_held\",\"message\":\"The slot on Tuesday at 17:00 in pukuhuone 8 is already held.\",\"holder\":12}. Re-read: schedule holder remains 12; posted list still shows only apartment 12 for that slot. Consequence: the second household is refused because the slot is held, and apartment 12 still holds it."
+  },
+  {
+    "id": "01-005",
+    "verdict": "pass",
+    "evidence": "Request: apartment 12, already holding Tuesday 17:00 in pukuhuone 8 with other slots free, POST /api/standing-slots/request {\"apartment\":12,\"dressingRoom\":\"pukuhuone 9\",\"weekday\":\"Thursday\",\"startTime\":\"17:00\"}. Observed: HTTP 200 slot ss-2 Thursday 17:00\u201318:30, message \"Standing slot confirmed for 17:00 to 18:30 every Thursday.\" Re-read: schedule and posted list both show apartment 12 holding Tuesday pukuhuone 8 and Thursday pukuhuone 9. Consequence: the second standing slot is confirmed and persisted."
+  },
+  {
+    "id": "01-006",
+    "verdict": "pass",
+    "evidence": "Request: with apartment 12 holding only Tuesday 17:00 in pukuhuone 8 and apartments 3, 5 and 7 holding the other three weekly slots, POST /api/standing-slots/request {\"apartment\":12,\"dressingRoom\":\"pukuhuone 9\",\"weekday\":\"Friday\",\"startTime\":\"17:00\"}. Observed: HTTP 409 {\"ok\":false,\"reason\":\"schedule_full\",\"message\":\"The weekly schedule has no free standing slot. No slot is available to book.\",\"householdSlots\":1}. The message does not name a day or time to choose and alternative is absent. Re-read: apartment 12 still holds exactly Tuesday 17:00 in pukuhuone 8. Consequence: the second slot is refused because the schedule has no free standing slot, and the original hold remains the only one."
+  },
+  {
+    "id": "01-007",
+    "verdict": "pass",
+    "evidence": "Request: POST /api/standing-slots/request {\"apartment\":12,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"} on a free slot. Observed confirmation HTTP 200 slot ss-1 17:00\u201318:30. Re-read of the same booking: schedule holder 12 status held end 18:30; posted list shows apartment 12 for that slot; heater schedule heats pukuhuone 8 Tuesday 17:00\u201318:30; invoicing signal inv-1 type standing_slot_charge names apartment 12 for that slot. Consequence: the posted list, heater schedule and billing signal all match the one confirmed booking."
+  },
+  {
+    "id": "01-008",
+    "verdict": "fail",
+    "evidence": "Request: POST /api/standing-slots/give-up {\"apartment\":12,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"} after that standing slot was confirmed. Observed: HTTP 200 {\"ok\":true}. Re-read: posted list {\"slots\":[]}; heater schedule {\"entries\":[]}; schedule shows Tuesday 17:00 in pukuhuone 8 free with holder null. Invoicing signals still contain standing_slot_charge inv-1 for apartment 12, pukuhuone 8, Tuesday 17:00\u201318:30 and also standing_slot_cancelled inv-2 for apartment 12 at that slot. Consequence: the list and heater no longer claim the slot, but a standing-slot charge for apartment 12 remains, so the billing view disagrees with the other derived views."
+  },
+  {
+    "id": "01-009",
+    "verdict": "pass",
+    "evidence": "Request: both households POST /api/standing-slots/request for Tuesday 17:00 in pukuhuone 8, apartment 12 and apartment 3; both request bodies were sent before either response was read (send gap 0.093 ms). Observed: apartment 12 HTTP 200 confirmed slot ss-1 17:00\u201318:30; apartment 3 HTTP 409 slot_held, message \"The slot on Tuesday at 17:00 in pukuhuone 8 is already held.\", holder 12. Re-read: schedule holder 12; posted list only apartment 12; heater heats that one window; invoicing has one standing_slot_charge for apartment 12. Consequence: exactly one request was confirmed, the other was refused because the slot is held, and no derived view shows two holders."
+  },
+  {
+    "id": "01-010",
+    "verdict": "pass",
+    "evidence": "Request: the same in-flight pair, apartments 12 and 3 both posting Tuesday 17:00 in pukuhuone 8 before either response was read, repeated 100 times. Each run started only after GET /api/schedule showed that slot free; a prior holder was released with POST /api/standing-slots/give-up. Observed counts: one-confirmed 100, both-confirmed 0, neither-confirmed 0. Apartment 12 was the confirmed household on 51 runs and apartment 3 on 49. Every refused response was HTTP 409 reason slot_held. Every run left exactly one posted holder matching the confirmation. Consequence: all 100 runs confirmed exactly one household; none confirmed both; none refused both."
+  },
+  {
+    "id": "01-011",
+    "verdict": "pass",
+    "evidence": "Blind REQUEST: pukuhuone 8 | Tuesday | 17:00 confirmed over HTTP 200 with standing slot confirmation."
+  }
+]

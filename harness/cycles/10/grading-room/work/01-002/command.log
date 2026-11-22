@@ -1,0 +1,13 @@
+$ cp -a /tmp/loyly-cursor-cycle-10/grading-room/impl/. /tmp/loyly-cursor-cycle-10/grading-room/work/01-002/runtime/
+$ cd /tmp/loyly-cursor-cycle-10/grading-room/work/01-002/runtime && ./start.sh 18102
+start_pid=27687
+GET /api/health -> 200 {"ok":true,"sauna":"sauna-F"}
+listeners=[27687]
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ POST /api/standing-slots/request {"apartment": 12, "dressingRoom": "pukuhuone 9", "weekday": "Tuesday", "startTime": "17:00"}
+-> 409 {"ok":false,"reason":"closed_day","message":"Valitettavasti pukuhuone 9 ei ole saunapäivää Tuesdayna. pukuhuone 9 on auki: Thursday, Friday, Saturday. Voit varata seisovan vuoron Tuesday klo 17:00 pukuhuone 8ssa.","openDays":["Thursday","Friday","Saturday"],"alternative":{"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00"}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+reap pids=[27687]
+stopped listeners=[] exit=-15

@@ -1,0 +1,131 @@
+{
+  "item": "01-001",
+  "port": 18101,
+  "startMs": 1795357270558,
+  "exchanges": [
+    {
+      "method": "GET",
+      "path": "/api/schedule",
+      "request": null,
+      "status": 200,
+      "bodyText": "{\"saunaId\":\"sauna-F\",\"dressingRooms\":{\"pukuhuone 8\":{\"Tuesday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}]},\"pukuhuone 9\":{\"Thursday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Friday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Saturday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}]}}}",
+      "body": {
+        "saunaId": "sauna-F",
+        "dressingRooms": {
+          "pukuhuone 8": {
+            "Tuesday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ]
+          },
+          "pukuhuone 9": {
+            "Thursday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Friday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Saturday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ]
+          }
+        }
+      },
+      "elapsedMs": 1.329
+    }
+  ],
+  "checks": [
+    {
+      "name": "Tuesday shows bookable slots for pukuhuone 8",
+      "ok": true,
+      "detail": {
+        "tuesdaySlots": [
+          {
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "status": "free",
+            "holder": null
+          }
+        ],
+        "bookable": [
+          {
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "status": "free",
+            "holder": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tuesday shows no slots for pukuhuone 9",
+      "ok": true,
+      "detail": {
+        "tuesdayForRoom9": null,
+        "room9Weekdays": [
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ]
+      }
+    }
+  ],
+  "notes": [],
+  "room8Days": {
+    "Tuesday": [
+      {
+        "startTime": "17:00",
+        "endTime": "18:30",
+        "status": "free",
+        "holder": null
+      }
+    ]
+  },
+  "room9Days": {
+    "Thursday": [
+      {
+        "startTime": "17:00",
+        "endTime": "18:30",
+        "status": "free",
+        "holder": null
+      }
+    ],
+    "Friday": [
+      {
+        "startTime": "17:00",
+        "endTime": "18:30",
+        "status": "free",
+        "holder": null
+      }
+    ],
+    "Saturday": [
+      {
+        "startTime": "17:00",
+        "endTime": "18:30",
+        "status": "free",
+        "holder": null
+      }
+    ]
+  },
+  "saunaId": "sauna-F",
+  "stopMs": 1795357273746
+}
