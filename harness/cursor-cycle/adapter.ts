@@ -11,7 +11,6 @@ import {
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { Ajv2020 } from "ajv/dist/2020.js";
 import { createLifecycle } from "../cycle-core/lifecycle.ts";
 import type {
   BuildResult,
@@ -19,7 +18,18 @@ import type {
   TaskOutcome,
 } from "../cycle-core/types.ts";
 import { isSelectedChecklist } from "../evidence-core/types.ts";
-import { validateResultEvidence } from "../evidence-core/validate-result.ts";
+import {
+  allureFullName,
+  assertAllureIdentity,
+  featureTitleFromSpec,
+  parsePlanSource,
+  stampedItemId,
+} from "../evidence-core/validate-identity.ts";
+import {
+  validateResultEvidence,
+  type EvidenceResult,
+} from "../evidence-core/validate-result.ts";
+import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { validateVerdictData } from "../evidence-core/validate-verdicts.ts";
 import { validatePanelCoverage } from "../evidence-core/panel-selection.ts";
 
@@ -394,68 +404,54 @@ export function checkEvidence(files: EvidenceFiles) {
     if (!existsSync(file) || !lstatSync(file).isFile())
       throw new Error(`missing surprise evidence: ${surprise.evidence_file}`);
   }
-  const schema = JSON.parse(
-    readFileSync(
-      new URL(
-        "../evidence-core/allure-lifecycle-result.schema.json",
-        import.meta.url,
+  const validateSchema = compileAllureSchema(
+    JSON.parse(
+      readFileSync(
+        new URL(
+          "../evidence-core/allure-lifecycle-result.schema.json",
+          import.meta.url,
+        ),
+        "utf8",
       ),
-      "utf8",
-    ),
-  ) as object;
-  const validate = new Ajv2020({ strict: false }).compile(schema);
+    ) as object,
+  );
   function readResult(dir: string, name: string, blind = false) {
-    const result: unknown = JSON.parse(readFileSync(join(dir, name), "utf8"));
-    if (!validate(result))
-      throw new Error(
-        `Allure schema failed: ${name}: ${JSON.stringify(validate.errors)}`,
-      );
-    const row = result as {
-      labels: { name: string; value: string }[];
-      status: string;
-      attachments: { source: string }[];
-      fullName?: string;
-      testCaseId?: string;
-      historyId?: string;
-      name?: string;
-    };
-    const item = row.labels
-      .find((label) => label.name === "tag")
-      ?.value?.replace(/^@item-/, "");
-    if (
-      !item ||
-      !selectedChecklist.items.some((selected) => selected.id === item)
-    )
-      throw new Error(`unselected Allure item ${item ?? name}`);
+    const raw: unknown = JSON.parse(readFileSync(join(dir, name), "utf8"));
+    validateSchema(raw, name);
+    const row = raw as EvidenceResult;
+    const item = stampedItemId(row);
+    if (!selectedChecklist.items.some((selected) => selected.id === item))
+      throw new Error(`unselected Allure item ${item}`);
     const selected = selectedChecklist.items.find(
       (entry) => entry.id === item,
     ) as { id: string; name?: string; rule?: string; source?: string };
     if (selected.source) {
-      const match =
-        /^docs\/plan\/[0-9]{2}-([a-z][a-z0-9-]*)\/spec\.feature:[0-9]+$/.exec(
-          selected.source,
-        );
-      if (!match) throw new Error(`invalid checklist source for ${item}`);
-      const slice = selected.source.split("/")[2];
-      const feature = /^Feature:\s*(.+?)\s*$/m.exec(
-        readFileSync(join(files.room, "plan", slice!, "spec.feature"), "utf8"),
-      )?.[1];
-      const fullName = `loyly.${match[1]}.${item}${blind ? ".blind-agent-review" : ""}`;
-      const label = (key: string) =>
-        row.labels.find((entry) => entry.name === key)?.value;
       if (
-        !feature ||
-        row.fullName !== fullName ||
-        row.testCaseId !== fullName ||
-        row.historyId !== fullName ||
-        row.name !== selected.name ||
-        label("feature") !== feature ||
-        label("story") !== selected.rule
+        typeof selected.name !== "string" ||
+        typeof selected.rule !== "string"
       )
-        throw new Error(`Allure identity or Gherkin labels differ for ${item}`);
+        throw new Error(`checklist item ${item} needs name and rule`);
+      const { planDir, sliceKey } = parsePlanSource(selected.source);
+      assertAllureIdentity(row, {
+        itemId: item,
+        name: selected.name,
+        rule: selected.rule,
+        feature: featureTitleFromSpec(
+          readFileSync(
+            join(files.room, "plan", planDir, "spec.feature"),
+            "utf8",
+          ),
+        ),
+        fullName: allureFullName({
+          project: "loyly",
+          sliceKey,
+          itemId: item,
+          blind,
+        }),
+      });
     }
     validateResultEvidence(row, item);
-    for (const attachment of row.attachments) {
+    for (const attachment of row.attachments ?? []) {
       if (
         basename(attachment.source) !== attachment.source ||
         !existsSync(join(dir, attachment.source)) ||

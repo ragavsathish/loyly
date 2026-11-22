@@ -1,10 +1,16 @@
 # Evidence core: Allure schema, panel roles, tool catalog
 
-Adapter-agnostic package shared by Pi durable, Codex cycle, and Cursor cycle.
-It owns the approved Allure lifecycle result schema, pure validation of one
-result and of projected verdicts, and panel-plan selection / evaluation policy.
-Adapters seal digests and runtimes; this package does not launch VMs or call
-models.
+**One job:** validate evidence. Adapters read rooms, seal tool strings, and
+run effects. `cycle-core` decides the next phase. This package judges Allure
+payloads and panel coverage — Unix “do one thing well,” aligned with Löyly’s
+one-record / derived-views split (docs and scores are SoT; adapters are
+readings).
+
+Shared by Pi durable, Codex cycle, and Cursor cycle. Owns the approved Allure
+lifecycle result schema, Ajv compilation for that schema, Gherkin identity
+checks, observation-shape checks, verdict coverage, and panel-plan selection /
+evaluation. Does not launch VMs, call models, or touch the filesystem except
+through values adapters already loaded.
 
 The legacy measure module under `harness/` (stamp, checklist, score, oracle)
 guards denominators. This package validates the Allure bytes those adapters
@@ -99,24 +105,26 @@ files; those stay task-narrow. Point agents here from `AGENTS.md` and
 | Core API | Pi durable | Codex cycle | Cursor cycle |
 | --- | --- | --- | --- |
 | `createLifecycle` (via cycle-core) | full build→gate→grade→blind→panel→score | build/gate decide + post-grade next phase | same as Codex |
-| `validatePanelCoverage` | yes (live contract / panel) | yes (contract) | yes (contract) |
+| `compileAllureSchema` | allure-results, blind, panel, supplemental | checkEvidence | checkEvidence |
+| `assertAllureIdentity` / `stampedItemId` | allure-results | checkEvidence | checkEvidence |
+| `validateResultEvidence` | yes | yes | yes |
+| `validatePanelCoverage` | yes | yes | yes |
 | `validateVerdictData` | yes | yes | yes |
-| `validateResultEvidence` | yes (plus room I/O) | yes (inside checkEvidence) | yes (inside checkEvidence) |
-| Ajv full schema compile | Pi allure / panel paths | duplicated in adapter | duplicated in adapter |
 | `evaluatePanel` | yes (`panel-compile.mjs`) | not wired (panel reassessment separate) | not wired |
 
 Product blind item `01-011` stays in adapters (instruction digests, pending
 rules). Cores take an optional `handoffItem` and never hard-code that id.
-Schema Ajv validation and Gherkin identity (`loyly.<slice>.<item>`) still live
-in adapters; lifting a pure schema helper into this package is the next
-extraction step.
+Adapters still prove attachment bytes exist on disk and seal grader/blind
+tool strings.
 
 ## Package surface
 
 | Path | Duty |
 | --- | --- |
 | `allure-lifecycle-result.schema.json` | approved result shape |
-| `validate-result.ts` | one result evidence shape (timing, steps, attachments) |
+| `validate-schema.ts` | Ajv compile/apply for that schema only |
+| `validate-identity.ts` | stamped tags, plan source, Gherkin identity |
+| `validate-result.ts` | observation shape; optional `assertAllureResult` compose |
 | `validate-verdicts.ts` | projected checklist verdicts |
 | `panel-selection.ts` | which checks apply to a cut |
 | `panel-policy.ts` | evaluate observations vs plan and filed score |

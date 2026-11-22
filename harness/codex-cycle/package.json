@@ -13,9 +13,7 @@
     "evidence": "node cli.ts evidence",
     "test": "node --test test/*.test.mjs"
   },
-  "dependencies": {
-    "ajv": "8.20.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "24.19.2",
     "typescript": "6.0.3"

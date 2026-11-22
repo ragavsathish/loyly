@@ -65,7 +65,8 @@ self-check, fence, checklist, gate, score and scoreboard.
 Remote-session Cursor runs need no extra container; host-machine Cursor runs
 isolate probes in Docker from `harness/pi-durable/Dockerfile.panel-multistack`.
 
-Allure instrumentation tools, panel roles, and the
+`cycle-core` decides phases; `evidence-core` validates Allure and panel
+evidence (one job each). Tool catalog, panel roles, and the
 panel.tool → instruction → labels.tool → adapter seal chain live in
 `harness/evidence-core/README.md`. Oracle/measure tools stay in
 `harness/README.md`; do not confuse the two.

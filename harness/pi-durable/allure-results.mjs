@@ -2,26 +2,37 @@
 import { existsSync, lstatSync, readFileSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
-import Ajv2020 from "ajv/dist/2020.js";
-import { validateResultEvidence } from '../evidence-core/validate-result.ts';
+import {
+  allureFullName,
+  assertAllureIdentity,
+  featureTitleFromSpec,
+  parsePlanSource,
+  stampedItemId,
+} from "../evidence-core/validate-identity.ts";
+import { validateResultEvidence } from "../evidence-core/validate-result.ts";
+import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 
 const RESULT = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-result\.json$/;
 // Preserve the old calibration room, while requiring the revised handoff in every new cut.
 const PERSON_SPEC_SHA256 = "b28ee83dfaada8df0ed99b90121a50f3c55885ade4db323b68e03c4d5f15005e";
-const labelValues = (result, name) => result.labels.filter((label) => label.name === name).map((label) => label.value);
+
 function identity(room, item, project) {
-  const source = /^docs\/plan\/(\d\d-([a-z][a-z0-9-]*))\/spec\.feature:\d+$/.exec(item.source ?? "");
-  if (!source || source[1].slice(0, 2) !== item.id?.slice(0, 2))
+  const { planDir, sliceKey } = parsePlanSource(item.source ?? "");
+  if (planDir.slice(0, 2) !== item.id?.slice(0, 2))
     throw new Error(`Allure item has no matching numbered plan source: ${item.id ?? "unknown"}`);
-  const spec = readFileSync(join(room, "plan", source[1], "spec.feature"), "utf8");
-  const feature = /^Feature:\s*(.+?)\s*$/m.exec(spec)?.[1];
-  if (!feature) throw new Error(`selected plan has no Feature title: ${source[1]}`);
-  return { fullName: `${project}.${source[2]}.${item.id}`, feature };
+  const feature = featureTitleFromSpec(
+    readFileSync(join(room, "plan", planDir, "spec.feature"), "utf8"),
+  );
+  return {
+    fullName: allureFullName({ project, sliceKey, itemId: item.id }),
+    feature,
+  };
 }
 
 export function readAllureResults(room) {
-  const schema = JSON.parse(readFileSync(join(room, "allure-lifecycle-result.schema.json"), "utf8"));
-  const validate = new Ajv2020({ strict: false }).compile(schema);
+  const validateSchema = compileAllureSchema(
+    JSON.parse(readFileSync(join(room, "allure-lifecycle-result.schema.json"), "utf8")),
+  );
   const checklist = JSON.parse(readFileSync(join(room, "checklist.json"), "utf8"));
   const items = checklist.items;
   const receipt = JSON.parse(readFileSync(join(room, '.grading-room.json'), 'utf8'));
@@ -43,21 +54,19 @@ export function readAllureResults(room) {
   const byId = new Map();
   for (const file of files) {
     const result = JSON.parse(readFileSync(join(dir, file), "utf8"));
-    if (!validate(result)) throw new Error(`Allure schema rejected ${file}: ${JSON.stringify(validate.errors)}`);
+    validateSchema(result, file);
     if (file !== `${result.uuid}-result.json`) throw new Error(`Allure UUID differs from filename: ${file}`);
-    const tags = labelValues(result, "tag").filter((tag) => /^@item-\d\d-\d\d\d$/.test(tag));
-    if (tags.length !== 1) throw new Error(`${file} needs one stamped item tag`);
-    const id = tags[0].slice(6);
+    const id = stampedItemId(result);
     const item = items.find((x) => x.id === id);
     if (!item || byId.has(id)) throw new Error(`unknown or duplicate Allure item ${id}`);
     const expected = identities.get(id);
-    if (result.name !== item.name || result.fullName !== expected.fullName
-        || result.testCaseId !== result.fullName || result.historyId !== result.fullName
-        || labelValues(result, "feature").join() !== expected.feature
-        || labelValues(result, "story").join() !== item.rule
-        || labelValues(result, "lifecycle").join() !== "pre-production"
-        || !labelValues(result, "tool").length || !labelValues(result, "technique").length)
-      throw new Error(`Allure identity or Gherkin labels differ for ${id}`);
+    assertAllureIdentity(result, {
+      itemId: id,
+      name: item.name,
+      rule: item.rule,
+      feature: expected.feature,
+      fullName: expected.fullName,
+    });
     validateResultEvidence(result, id);
     for (const attachment of result.attachments) {
       const path = join(dir, attachment.source);
