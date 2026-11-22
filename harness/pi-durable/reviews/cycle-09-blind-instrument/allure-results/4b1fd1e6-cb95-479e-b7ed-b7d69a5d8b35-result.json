@@ -1,0 +1,64 @@
+{
+  "uuid": "4b1fd1e6-cb95-479e-b7ed-b7d69a5d8b35",
+  "name": "An accepted transfer cannot be withdrawn by the original holder",
+  "fullName": "loyly.occurrence-release.02-007",
+  "testCaseId": "loyly.occurrence-release.02-007",
+  "historyId": "loyly.occurrence-release.02-007",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST withdraw after 3 took offer-6 refused: only an untaken offer may be withdrawn. GET releases and dated views still name 3; standing and later week remain 12, no taker fee."
+  },
+  "start": 1795341627145,
+  "stop": 1795341627433,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 3 takes apartment 12\u2019s FREE offer",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: 12 tries to withdraw",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: withdrawal refused and release, list and heat retain taker 3",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "9e0ef37c-8102-467d-9a4b-87898e67893b-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "uuid": "4ba15c03-63a1-4e42-9071-cc90f311a667",
+  "name": "A queue-head decline offers the holding to the next eligible entry",
+  "fullName": "loyly.scarcity-forfeit.03-011",
+  "testCaseId": "loyly.scarcity-forfeit.03-011",
+  "historyId": "loyly.scarcity-forfeit.03-011",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": ">>> POST /api/houses/house-a/notices/notice-13/decline {\"household\": \"3\"}; <<< HTTP 200 {\"id\":\"notice-13\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.050Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.050Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.050Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":\"booking-5\",\"pendingSuccessor\":null,\"declined\":[\"3\"],\"pendingQueueId\":null,\"choiceHousehold\":null,\"offeredTo\":\"4\"}; checked: two standing holdings confirmed; first household waiting; second household waiting; one notice started; selected specified holding; both holdings retained before lapse; holder can still use selected holding; offer passed to second eligible household; holder still uses slot. Full transcript attached."
+  },
+  "start": 1767225601046,
+  "stop": 1767225601062,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-011"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a selected holding is under notice and two eligible households wait in order",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: the queue-head declines that holding",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: the next eligible household is offered the pending claim; the original holder keeps using the holding until its recorded notice deadline",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock evidence",
+      "source": "265ed994-67cc-4f39-b981-c4a8135732a2-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

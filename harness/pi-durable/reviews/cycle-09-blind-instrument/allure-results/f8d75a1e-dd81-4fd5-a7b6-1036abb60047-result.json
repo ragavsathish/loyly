@@ -1,0 +1,64 @@
+{
+  "uuid": "f8d75a1e-dd81-4fd5-a7b6-1036abb60047",
+  "name": "A standing slot cannot be requested on a closed day",
+  "fullName": "loyly.booking-core.01-002",
+  "testCaseId": "loyly.booking-core.01-002",
+  "historyId": "loyly.booking-core.01-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST bookings room 9 Tuesday 17:00 for apartment 12 returned refused: \"pukuhuone 9 has no sauna day/window on Tuesday at 17:00. Its opening days are Thursday, Friday, Saturday. You can request a standing slot in pukuhuone 8 on Tuesday at 17:00 (18:30 end).\""
+  },
+  "start": 1795341625799,
+  "stop": 1795341626070,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Availability is per dressing room, per weekday"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: room 9 opens Thursday, Friday and Saturday",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: apartment 12 requests room 9 Tuesday 17:00",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: refusal names the closed day and Thursday, Friday, Saturday opening days",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "d1e21a4b-6494-4285-bcb8-6929252401aa-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "uuid": "1fe91c62-5382-4aae-a099-dbfd555c3696",
+  "name": "Two households request the same free slot with neither request answered",
+  "fullName": "loyly.booking-core.01-009",
+  "testCaseId": "loyly.booking-core.01-009",
+  "historyId": "loyly.booking-core.01-009",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST both bookings over sockets before reading either reply: 12 confirmed, 3 refused because held. GET bookings and views show only 12, including posted list, heat and billing."
+  },
+  "start": 1795347945397,
+  "stop": 1795347948397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Two households requesting one free slot leave exactly one holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Tuesday 17:00 in pukuhuone 8 is free for both households",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When both households send standing requests before either response is received",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then exactly one is confirmed, the other refused as held, and one holder appears in all derived views",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "63a24749-ceed-4891-a168-8271da17cf21-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "uuid": "8d9058f0-84a9-4a8b-9933-d82ecb6d1a71",
+  "name": "If all claimants decline, the selected holding returns to the pool at lapse",
+  "fullName": "loyly.scarcity-forfeit.03-012",
+  "testCaseId": "loyly.scarcity-forfeit.03-012",
+  "historyId": "loyly.scarcity-forfeit.03-012",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": ">>> POST /api/houses/house-a/notices/notice-13/decline {\"household\": \"4\"}; <<< HTTP 200 {\"id\":\"notice-13\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.025Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.025Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.025Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":\"booking-5\",\"pendingSuccessor\":null,\"declined\":[\"3\",\"4\"],\"pendingQueueId\":null,\"choiceHousehold\":null,\"offeredTo\":null}; checked: two standing holdings confirmed; first household waiting; second household waiting; one notice started; selected specified holding; both holdings retained before lapse; holder can still use selected holding; offer passed to second eligible household; holder still uses slot; served real clock past 2026-01-31T00:00:01.025Z; only selected holding ended; list shows remaining holding only; billing shows remaining holding only; selected slot returns to pool. Full transcript attached."
+  },
+  "start": 1767225601065,
+  "stop": 1769817606004,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-012"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a selected holding is under notice and every eligible claimant has declined",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: its recorded notice deadline passes",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: the original household loses only that holding; the holding becomes available in its eligible group",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock evidence",
+      "source": "44975f7f-66db-4040-9ea8-8fc1e77d23bd-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

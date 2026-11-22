@@ -1,0 +1,64 @@
+{
+  "uuid": "df5220ee-4edb-42a3-9a52-1fc333007316",
+  "name": "A policy revision does not rewrite an earlier refusal",
+  "fullName": "loyly.house-policy.04-006",
+  "testCaseId": "loyly.house-policy.04-006",
+  "historyId": "loyly.house-policy.04-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Board POST policy-6 effective 2026-12-01; GET history preserves refusal-4 reason and policy-2 unchanged after policy revision."
+  },
+  "start": 1795347951602,
+  "stop": 1795347951602,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Room 9 Tuesday request refused as closed under policy-2",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When Board POST policy-6 effective 2026-12-01",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then GET history preserves refusal-4 reason and policy-2 unchanged after policy revision.",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "108c05f3-e5e6-4b99-abab-41894a1b7159-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,1185 @@
+✖ @item-01-001 weekly schedule per dressing room (74.924ms)
+✖ @item-01-002 closed day refusal names opening days (0.46175ms)
+✖ @item-01-003 confirmed recurring 90 minute slot (0.078041ms)
+✖ @item-01-004 held slot refuses other household (0.054333ms)
+✖ @item-01-005 second standing slot while room remains (0.037834ms)
+✖ @item-01-006 full schedule refusal offers no imaginary choice (0.030167ms)
+✖ @item-01-007 all views derive confirmation (0.033375ms)
+✖ @item-01-008 give up clears current derived views, keeps history (0.047708ms)
+✖ @item-01-009 two in-flight standing requests have one winner (0.039291ms)
+✖ @item-01-010 one hundred concurrent races (0.040875ms)
+✖ @item-01-011 refusal-only alternative replay (independent judgment external) (0.017584ms)
+✖ @item-02-001 free release preserves weekly holding (0.015959ms)
+✖ @item-02-002 taking selected week does not change following week (0.026709ms)
+✖ @item-02-003 untaken release unused but normal fee due (0.012708ms)
+✖ @item-02-004 free taker has no charge (0.028917ms)
+✖ @item-02-005 sale creates distinct traceable resale signal (0.041416ms)
+✖ @item-02-006 withdraw untaken restores occurrence (0.012792ms)
+✖ @item-02-007 cannot withdraw accepted transfer (0.021667ms)
+✖ @item-02-008 offer expires at occurrence start (0.015416ms)
+✖ @item-02-009 taken occurrence agrees in derived views (0.012666ms)
+✖ @item-02-010 two concurrent taking requests one winner (0.010167ms)
+✖ @item-03-001 free eligible standing slot prevents notice (0.015958ms)
+✖ @item-03-002 empty queue prevents notice (0.013625ms)
+✖ @item-03-003 occurrence release is not standing capacity (0.011791ms)
+✖ @item-03-004 unrelated queue cannot trigger notice (0.010583ms)
+✖ @item-03-005 FIFO queue scoped by eligible group (0.02675ms)
+✖ @item-03-014 one active notice per multi-holder (0.013834ms)
+✖ @item-03-006 holder chooses but keeps using until lapse (0.025667ms)
+✖ @item-03-007 queue-head gains choice after shorter clock (0.01375ms)
+✖ @item-03-008 choose clock does not change loss clock (0.015709ms)
+✖ @item-03-009 lapse removes only chosen holding from all views (0.0115ms)
+✖ @item-03-010 confirmed queue claim stays pending until lapse (0.014167ms)
+✖ @item-03-011 decline moves to next eligible claimant (0.01175ms)
+✖ @item-03-012 all decline returns selected slot to pool at lapse (0.009959ms)
+✖ @item-03-013 queue withdrawal preserves notice and deadlines (0.009292ms)
+✖ @item-04-001 calendars belong to their house (0.012875ms)
+✖ @item-04-002 booker role eligibility is house scoped (0.010292ms)
+✖ @item-04-003 manager route has no resident queue (0.013125ms)
+✖ @item-04-004 revision authority and future effective date (0.038833ms)
+✖ @item-04-005 dispute reconstructs confirmation and change (0.021917ms)
+✖ @item-04-006 revision cannot rewrite past refusal (0.013875ms)
+✖ @item-04-007 notices pin original policy clocks (0.014625ms)
+✖ @item-05-001 family cap refuses second and identifies existing (0.012042ms)
+✖ @item-05-002 other class does not consume allowance (0.015458ms)
+✖ @item-05-003 family cap does not block another class (0.0125ms)
+✖ @item-05-004 house without cap never inherits it (0.011959ms)
+✖ @item-05-005 completed family occurrence no longer counts (0.011084ms)
+ℹ tests 47
+ℹ suites 0
+ℹ pass 0
+ℹ fail 47
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 153.884959
+
+✖ failing tests:
+
+test at test/acceptance.test.mjs:29:1
+✖ @item-01-001 weekly schedule per dressing room (74.924ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:30:1
+✖ @item-01-002 closed day refusal names opening days (0.46175ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:31:1
+✖ @item-01-003 confirmed recurring 90 minute slot (0.078041ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:32:1
+✖ @item-01-004 held slot refuses other household (0.054333ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:33:1
+✖ @item-01-005 second standing slot while room remains (0.037834ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:34:1
+✖ @item-01-006 full schedule refusal offers no imaginary choice (0.030167ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:35:1
+✖ @item-01-007 all views derive confirmation (0.033375ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:36:1
+✖ @item-01-008 give up clears current derived views, keeps history (0.047708ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:38:1
+✖ @item-01-009 two in-flight standing requests have one winner (0.039291ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:39:1
+✖ @item-01-010 one hundred concurrent races (0.040875ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:40:1
+✖ @item-01-011 refusal-only alternative replay (independent judgment external) (0.017584ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:42:1
+✖ @item-02-001 free release preserves weekly holding (0.015959ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:43:1
+✖ @item-02-002 taking selected week does not change following week (0.026709ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:44:1
+✖ @item-02-003 untaken release unused but normal fee due (0.012708ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:45:1
+✖ @item-02-004 free taker has no charge (0.028917ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:46:1
+✖ @item-02-005 sale creates distinct traceable resale signal (0.041416ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:47:1
+✖ @item-02-006 withdraw untaken restores occurrence (0.012792ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:48:1
+✖ @item-02-007 cannot withdraw accepted transfer (0.021667ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:49:1
+✖ @item-02-008 offer expires at occurrence start (0.015416ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:50:1
+✖ @item-02-009 taken occurrence agrees in derived views (0.012666ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:51:1
+✖ @item-02-010 two concurrent taking requests one winner (0.010167ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:53:1
+✖ @item-03-001 free eligible standing slot prevents notice (0.015958ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:54:1
+✖ @item-03-002 empty queue prevents notice (0.013625ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:55:1
+✖ @item-03-003 occurrence release is not standing capacity (0.011791ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:56:1
+✖ @item-03-004 unrelated queue cannot trigger notice (0.010583ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:57:1
+✖ @item-03-005 FIFO queue scoped by eligible group (0.02675ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:58:1
+✖ @item-03-014 one active notice per multi-holder (0.013834ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:59:1
+✖ @item-03-006 holder chooses but keeps using until lapse (0.025667ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:60:1
+✖ @item-03-007 queue-head gains choice after shorter clock (0.01375ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:61:1
+✖ @item-03-008 choose clock does not change loss clock (0.015709ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:62:1
+✖ @item-03-009 lapse removes only chosen holding from all views (0.0115ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:63:1
+✖ @item-03-010 confirmed queue claim stays pending until lapse (0.014167ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:64:1
+✖ @item-03-011 decline moves to next eligible claimant (0.01175ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:65:1
+✖ @item-03-012 all decline returns selected slot to pool at lapse (0.009959ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:66:1
+✖ @item-03-013 queue withdrawal preserves notice and deadlines (0.009292ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:68:1
+✖ @item-04-001 calendars belong to their house (0.012875ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:69:1
+✖ @item-04-002 booker role eligibility is house scoped (0.010292ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:70:1
+✖ @item-04-003 manager route has no resident queue (0.013125ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:71:1
+✖ @item-04-004 revision authority and future effective date (0.038833ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:72:1
+✖ @item-04-005 dispute reconstructs confirmation and change (0.021917ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:73:1
+✖ @item-04-006 revision cannot rewrite past refusal (0.013875ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:74:1
+✖ @item-04-007 notices pin original policy clocks (0.014625ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:77:1
+✖ @item-05-001 family cap refuses second and identifies existing (0.012042ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:78:1
+✖ @item-05-002 other class does not consume allowance (0.015458ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:79:1
+✖ @item-05-003 family cap does not block another class (0.0125ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:80:1
+✖ @item-05-004 house without cap never inherits it (0.011959ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at test/acceptance.test.mjs:81:1
+✖ @item-05-005 completed family occurrence no longer counts (0.011084ms)
+  Error: node:internal/modules/cjs/loader:1568
+    throw err;
+    ^
+  
+  Error: Cannot find module '/workspace/impl/server.mjs'
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+      at Module._load (node:internal/modules/cjs/loader:1341:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+  
+  Node.js v24.22.3
+  
+      at TestContext.<anonymous> (file:///workspace/impl/test/acceptance.test.mjs:11:134)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)

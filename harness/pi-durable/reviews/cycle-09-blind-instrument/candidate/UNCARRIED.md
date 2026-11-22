@@ -1,0 +1,1 @@
+- @item-01-011: The fresh, context-isolated blind-agent judgment is reserved for independent grading by operator direction. The app's actionable refusal and fresh-state suggested-request HTTP replay pass; no builder-side judgment is claimed.

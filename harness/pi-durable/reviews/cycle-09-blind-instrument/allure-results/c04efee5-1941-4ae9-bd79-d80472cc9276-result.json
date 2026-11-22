@@ -1,0 +1,64 @@
+{
+  "uuid": "c04efee5-1941-4ae9-bd79-d80472cc9276",
+  "name": "Taking a free occurrence charges no fee to the taker",
+  "fullName": "loyly.occurrence-release.02-004",
+  "testCaseId": "loyly.occurrence-release.02-004",
+  "historyId": "loyly.occurrence-release.02-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST FREE release and take: offer-6 taken by 3 for 2026-11-24; dated list and heat show 3; billing only standing payer 12, no taker charge; 2026-12-01 list and heat show 12."
+  },
+  "start": 1795341626120,
+  "stop": 1795341626409,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12 holds booking-4 and offers 2026-11-24 FREE",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: apartment 3 takes offer-6",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: dated list and heater show 3; no taker fee; standing fee and next Tuesday remain with 12",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "1149a1b0-9b35-4eef-999b-b62b66d87af0-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

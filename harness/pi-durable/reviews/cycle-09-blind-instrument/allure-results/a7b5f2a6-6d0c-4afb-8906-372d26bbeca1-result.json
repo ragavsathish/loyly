@@ -1,0 +1,73 @@
+{
+  "uuid": "a7b5f2a6-6d0c-4afb-8906-372d26bbeca1",
+  "name": "A completed family-time occurrence no longer uses the allowance",
+  "fullName": "loyly.time-classes.05-005",
+  "testCaseId": "loyly.time-classes.05-005",
+  "historyId": "loyly.time-classes.05-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "House A cap 1; confirmed dated family occurrence 2026-11-24 17:00–18:30. Guest clock advanced to 2026-11-24 18:31, verified through GET clock; upcoming 2026-12-01 family occurrence confirmed booking-7."
+  },
+  "start": 1795341600209,
+  "stop": 1795545060001,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: House A cap 1; confirmed dated family occurrence 2026-11-24 17:00–18:30.",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "House A cap 1; confirmed dated family occurrence 2026-11-24 17:00–18:30."
+      }
+    },
+    {
+      "name": "When: A completed family-time occurrence no longer uses the allowance",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Guest clock advanced to 2026-11-24 18:31, verified through GET clock; upcoming 2026-12-01 family occurrence confirmed booking-7."
+      }
+    },
+    {
+      "name": "Then: A cap counts only bookings in its configured class",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Guest clock advanced to 2026-11-24 18:31, verified through GET clock; upcoming 2026-12-01 family occurrence confirmed booking-7."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and clock observations",
+      "source": "5d8a8141-30f3-4b8c-b04f-48cda43ea1c5-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "uuid": "ec462371-1dc7-42b7-b628-4701a467283c",
+  "name": "An empty queue does not put a multi-slot household under notice",
+  "fullName": "loyly.scarcity-forfeit.03-002",
+  "testCaseId": "loyly.scarcity-forfeit.03-002",
+  "historyId": "loyly.scarcity-forfeit.03-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "12 held both A slots and A queue was empty; POST notices/evaluate group A returned []; GET notices returned []; both holdings remained confirmed"
+  },
+  "start": 1795347929211,
+  "stop": 1795347944211,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given 12 held both A slots and A queue was empty",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST notices/evaluate group A returned []",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then GET notices returned []; both holdings remained confirmed",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "e20a4427-ca18-4a95-893c-bcf4c1e5cbfa-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

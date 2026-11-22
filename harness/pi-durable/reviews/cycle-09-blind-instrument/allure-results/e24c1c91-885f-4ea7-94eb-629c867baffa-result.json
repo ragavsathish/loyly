@@ -1,0 +1,64 @@
+{
+  "uuid": "e24c1c91-885f-4ea7-94eb-629c867baffa",
+  "name": "Withdrawing an untaken offer before its occurrence begins",
+  "fullName": "loyly.occurrence-release.02-006",
+  "testCaseId": "loyly.occurrence-release.02-006",
+  "historyId": "loyly.occurrence-release.02-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST withdraw before start returned withdrawn; apartment 3 take refused as no longer available; dated and following week list and heat show 12, billing standing payer 12."
+  },
+  "start": 1795341626804,
+  "stop": 1795341627094,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12 offers 2026-11-24 FREE, untaken",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: 12 withdraws before occurrence",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: dated list returns 12, take by 3 refused, standing holding and fee remain 12",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "bfe64b52-3dd9-4f7f-a97a-0386654fab1a-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

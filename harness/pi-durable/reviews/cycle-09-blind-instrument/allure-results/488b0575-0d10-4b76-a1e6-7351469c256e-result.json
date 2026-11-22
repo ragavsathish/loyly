@@ -1,0 +1,73 @@
+{
+  "uuid": "488b0575-0d10-4b76-a1e6-7351469c256e",
+  "name": "A household with one family-time booking cannot take another",
+  "fullName": "loyly.time-classes.05-001",
+  "testCaseId": "loyly.time-classes.05-001",
+  "historyId": "loyly.time-classes.05-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "House A family cap 1; apartment 12 confirmed booking-5 in family class. Second family request refused: family cap 1 and existing booking-5 identified; original persisted."
+  },
+  "start": 1795545060247,
+  "stop": 1795545060258,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: House A family cap 1; apartment 12 confirmed booking-5 in family class.",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "House A family cap 1; apartment 12 confirmed booking-5 in family class."
+      }
+    },
+    {
+      "name": "When: A household with one family-time booking cannot take another",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Second family request refused: family cap 1 and existing booking-5 identified; original persisted."
+      }
+    },
+    {
+      "name": "Then: A cap counts only bookings in its configured class",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Second family request refused: family cap 1 and existing booking-5 identified; original persisted."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and clock observations",
+      "source": "ca327764-b82b-4951-82a8-9c4f2427963d-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

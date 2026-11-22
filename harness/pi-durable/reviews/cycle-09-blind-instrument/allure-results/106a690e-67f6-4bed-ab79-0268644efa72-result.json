@@ -1,0 +1,64 @@
+{
+  "uuid": "106a690e-67f6-4bed-ab79-0268644efa72",
+  "name": "One multi-holding household receives only one active notice",
+  "fullName": "loyly.scarcity-forfeit.03-014",
+  "testCaseId": "loyly.scarcity-forfeit.03-014",
+  "historyId": "loyly.scarcity-forfeit.03-014",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "12 held all three A slots and 3 waited in A; POST notices/evaluate group A twice returned the same active notice-13; GET notices contained just notice-13 with selectedBookingId null; all three bookings remained held"
+  },
+  "start": 1795347930358,
+  "stop": 1795347945358,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-014"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given 12 held all three A slots and 3 waited in A",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST notices/evaluate group A twice returned the same active notice-13",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then GET notices contained just notice-13 with selectedBookingId null; all three bookings remained held",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "3767f63e-5428-4085-b573-60183f2f8df3-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

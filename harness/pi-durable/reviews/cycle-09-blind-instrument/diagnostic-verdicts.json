@@ -1,0 +1,237 @@
+[
+  {
+    "id": "01-001",
+    "verdict": "pass",
+    "evidence": "GET config and schedule: resource 8 opens Tuesday, resource 9 opens Thursday, Friday, Saturday; schedule has two free Tuesday slots for 8 and none for 9."
+  },
+  {
+    "id": "01-002",
+    "verdict": "pass",
+    "evidence": "POST bookings room 9 Tuesday 17:00 for apartment 12 returned refused: \"pukuhuone 9 has no sauna day/window on Tuesday at 17:00. Its opening days are Thursday, Friday, Saturday. You can request a standing slot in pukuhuone 8 on Tuesday at 17:00 (18:30 end).\""
+  },
+  {
+    "id": "01-003",
+    "verdict": "pass",
+    "evidence": "POST bookings apartment 12; Confirmed booking-4 17:00–18:30, standing Tuesday, reread bookings and schedule held by 12."
+  },
+  {
+    "id": "01-004",
+    "verdict": "pass",
+    "evidence": "POST same slot for apartment 3; Refused: The slot is held. The existing holding remains unchanged. GET bookings and schedule still identify apartment 12."
+  },
+  {
+    "id": "01-005",
+    "verdict": "pass",
+    "evidence": "12 held Tuesday 17:00 and 18:30 was free; POST demo/bookings for 12 at 18:30 returned confirmed booking-6; GET bookings and schedule persisted booking-4 and booking-6 for 12, both confirmed"
+  },
+  {
+    "id": "01-006",
+    "verdict": "pass",
+    "evidence": "Trial schedule had two slots held by 12 and 3; POST bookings for 12 at 18:30 returned refused: The weekly schedule has no free standing slot.; GET bookings and schedule still show exactly one holding for 12 and the other for 3; no alternative suggested"
+  },
+  {
+    "id": "01-007",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/demo/bookings {\"household\": \"12\", \"role\": \"tenant\", \"resource\": \"8\", \"weekday\": \"Tuesday\", \"start\": \"17:00\"}; <<< HTTP 200 {\"id\":\"booking-4\",\"status\":\"confirmed\",\"kind\":\"standing\",\"household\":\"12\",\"resource\":\"8\",\"sauna\":\"F\",\"resourceName\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"start\":\"17:00\",\"end\":\"18:30\",\"duration\":90,\"timeClass\":\"ordinary\",\"group\":\"ph8\",\"date\":null,\"createdAt\":\"2026-01-31T00:00:23.760Z\",\"endedAt\":null,\"policyVersion\":\"policy-2\",\"priceRef\":\"house standing tariff\"}; checked: standing booking confirmed; all three views show same confirmed holding and payer. Full transcript attached."
+  },
+  {
+    "id": "01-008",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/demo/bookings/booking-4/give-up {\"household\": \"12\"}; <<< HTTP 200 {\"id\":\"booking-4\",\"status\":\"given-up\",\"kind\":\"standing\",\"household\":\"12\",\"resource\":\"8\",\"sauna\":\"F\",\"resourceName\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"start\":\"17:00\",\"end\":\"18:30\",\"duration\":90,\"timeClass\":\"ordinary\",\"group\":\"ph8\",\"date\":null,\"createdAt\":\"2026-01-31T00:00:24.870Z\",\"endedAt\":\"2026-01-31T00:00:24.876Z\",\"policyVersion\":\"policy-2\",\"priceRef\":\"house standing tariff\"}; checked: standing booking confirmed; all three views show same confirmed holding and payer; list, heater and billing no longer show holding. Full transcript attached."
+  },
+  {
+    "id": "01-009",
+    "verdict": "pass",
+    "evidence": "POST both bookings over sockets before reading either reply: 12 confirmed, 3 refused because held. GET bookings and views show only 12, including posted list, heat and billing."
+  },
+  {
+    "id": "01-010",
+    "verdict": "pass",
+    "evidence": "100 in-flight pairs, checking free slot before each and giving up the winner between runs: one confirmed 100, both confirmed 0, neither confirmed 0."
+  },
+  {
+    "id": "01-011",
+    "verdict": "pass",
+    "evidence": "The fresh agent named a request from the refusal; HTTP confirmation follows. Answer: REQUEST: pukuhuone 8 | Tuesday | 17:00"
+  },
+  {
+    "id": "02-001",
+    "verdict": "pass",
+    "evidence": "Confirmed booking-4 for apartment 12, room 8 Tuesday 17:00–18:30. Released 2026-11-24 FREE; offered, then taken by apartment 3; dated views show 3 and heat, only apartment 12 standing fee; 2026-12-01 remains held by 12."
+  },
+  {
+    "id": "02-002",
+    "verdict": "pass",
+    "evidence": "Confirmed booking-4 for apartment 12, room 8 Tuesday 17:00–18:30. Released 2026-11-24 FREE; apartment 3 took offer-6; next Tuesday 2026-12-01 list and heat remain with 12, with 12 standing fee."
+  },
+  {
+    "id": "02-003",
+    "verdict": "pass",
+    "evidence": "Confirmed booking-4 and offered 2026-11-24 FREE; nobody took it. After guest clock advanced past 18:30 end, clock reported 18:31 uncontrolled; release and dated list say unclaimed, heater empty, billing charges 12 standing; following Tuesday held by 12."
+  },
+  {
+    "id": "02-004",
+    "verdict": "pass",
+    "evidence": "POST FREE release and take: offer-6 taken by 3 for 2026-11-24; dated list and heat show 3; billing only standing payer 12, no taker charge; 2026-12-01 list and heat show 12."
+  },
+  {
+    "id": "02-005",
+    "verdict": "pass",
+    "evidence": "POST SALE release and take: offer-6 taken by 3; dated views show taker 3 and heat, standing payer 12 and resale payer 3, occurrence 2026-11-24 room 8 17:00, policy-1 and house resale tariff; next week held by 12."
+  },
+  {
+    "id": "02-006",
+    "verdict": "pass",
+    "evidence": "POST withdraw before start returned withdrawn; apartment 3 take refused as no longer available; dated and following week list and heat show 12, billing standing payer 12."
+  },
+  {
+    "id": "02-007",
+    "verdict": "pass",
+    "evidence": "POST withdraw after 3 took offer-6 refused: only an untaken offer may be withdrawn. GET releases and dated views still name 3; standing and later week remain 12, no taker fee."
+  },
+  {
+    "id": "02-008",
+    "verdict": "pass",
+    "evidence": "Baseline guest date 2026-11-22 10:00 UTC; offer starts 2026-11-24 17:00. date -u -s advanced to 17:00:01, GET clock confirmed normal clock. POST take refused; GET releases and views show unclaimed, no heat, standing holder and fee 12; later Tuesday remains 12."
+  },
+  {
+    "id": "02-009",
+    "verdict": "pass",
+    "evidence": "POST offer-6/take by 3 and then 4; 3 took it; 4 refused. Dated list and heat name 3, billing has only standing payer 12. Following Tuesday list and heat name 12."
+  },
+  {
+    "id": "02-010",
+    "verdict": "pass",
+    "evidence": "Sent take requests for 3 and 4 before reading either response; 3 took; 4 refused. Dated list and heat name 3, billing has only standing payer 12; following Tuesday remains with 12."
+  },
+  {
+    "id": "03-001",
+    "verdict": "pass",
+    "evidence": "12 held two of three A slots; 3 waited in A; POST notices/evaluate group A returned []; GET notices was []; 20:00 remained free and both holdings remained confirmed"
+  },
+  {
+    "id": "03-002",
+    "verdict": "pass",
+    "evidence": "12 held both A slots and A queue was empty; POST notices/evaluate group A returned []; GET notices returned []; both holdings remained confirmed"
+  },
+  {
+    "id": "03-003",
+    "verdict": "pass",
+    "evidence": "12 held both A slots, 3 waited, and booking-5 was offered FREE for 2026-11-24; POST notices/evaluate group A returned active notice-13 for 12, eligible bookings 5 and 7; Schedule remained fully held, queue still contained 3; 4 took the offer, dated list and heat show 4 and standing holder 12, billing charges 12 only; 2026-12-01 views show 12 and standing charges"
+  },
+  {
+    "id": "03-004",
+    "verdict": "pass",
+    "evidence": "12 held both group A slots, A queue empty and 3 waiting in B; POST notices/evaluate group A returned []; GET notices returned []; A remained held and B queue contained 3"
+  },
+  {
+    "id": "03-005",
+    "verdict": "pass",
+    "evidence": "A was full with holdings for 12 and 4; POST queue A for 3 accepted sequence 9 before 5 sequence 11; GET queue A returned 3 then 5; GET queue B returned []"
+  },
+  {
+    "id": "03-014",
+    "verdict": "pass",
+    "evidence": "12 held all three A slots and 3 waited in A; POST notices/evaluate group A twice returned the same active notice-13; GET notices contained just notice-13 with selectedBookingId null; all three bookings remained held"
+  },
+  {
+    "id": "03-006",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/house-a/notices/notice-11/choose {\"household\": \"12\", \"bookingId\": \"booking-5\"}; <<< HTTP 200 {\"id\":\"notice-11\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.037Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.037Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.037Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":\"booking-5\",\"pendingSuccessor\":null,\"declined\":[],\"choiceHousehold\":null,\"offeredTo\":\"3\"}; checked: two standing holdings confirmed; first household waiting; one notice started; selected specified holding; both holdings retained before lapse; holder can still use selected holding. Full transcript attached."
+  },
+  {
+    "id": "03-007",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/house-a/notices/evaluate {\"group\": \"A\"}; <<< HTTP 200 [{\"id\":\"notice-11\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.048Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.048Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.048Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":null,\"pendingSuccessor\":null,\"declined\":[],\"choiceHousehold\":\"12\",\"offeredTo\":\"3\"}]; checked: two standing holdings confirmed; first household waiting; one notice started; served real clock past 2026-01-15T00:00:01.048Z; queue head has choice; loss deadline unchanged; both holdings remain active. Full transcript attached."
+  },
+  {
+    "id": "03-008",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/house-a/notices/evaluate {\"group\": \"A\"}; <<< HTTP 200 [{\"id\":\"notice-11\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.047Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.047Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.047Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":null,\"pendingSuccessor\":null,\"declined\":[],\"choiceHousehold\":\"12\",\"offeredTo\":\"3\"}]; checked: two standing holdings confirmed; first household waiting; one notice started; served real clock past 2026-01-15T00:00:01.047Z; queue head has choice; loss deadline unchanged; both holdings remain active. Full transcript attached."
+  },
+  {
+    "id": "03-009",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/house-a/notices/notice-11/choose {\"household\": \"12\", \"bookingId\": \"booking-5\"}; <<< HTTP 200 {\"id\":\"notice-11\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.044Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.044Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.044Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":\"booking-5\",\"pendingSuccessor\":null,\"declined\":[],\"choiceHousehold\":null,\"offeredTo\":\"3\"}; checked: two standing holdings confirmed; first household waiting; one notice started; selected specified holding; both holdings retained before lapse; holder can still use selected holding; served real clock past 2026-01-31T00:00:01.044Z; only selected holding ended; list shows remaining holding only; billing shows remaining holding only; selected slot returns to pool; historical list and billing reflect selected holding before lapse. Full transcript attached."
+  },
+  {
+    "id": "03-010",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/house-a/notices/notice-11/claim {\"household\": \"3\"}; <<< HTTP 200 {\"id\":\"notice-11\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.032Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.032Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.032Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":\"booking-5\",\"pendingSuccessor\":\"3\",\"declined\":[],\"pendingQueueId\":\"queue-9\",\"choiceHousehold\":null,\"offeredTo\":\"3\"}; checked: two standing holdings confirmed; first household waiting; one notice started; selected specified holding; both holdings retained before lapse; holder can still use selected holding; queue head pending successor; original holder remains on posted list. Full transcript attached."
+  },
+  {
+    "id": "03-011",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/house-a/notices/notice-13/decline {\"household\": \"3\"}; <<< HTTP 200 {\"id\":\"notice-13\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.050Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.050Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.050Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":\"booking-5\",\"pendingSuccessor\":null,\"declined\":[\"3\"],\"pendingQueueId\":null,\"choiceHousehold\":null,\"offeredTo\":\"4\"}; checked: two standing holdings confirmed; first household waiting; second household waiting; one notice started; selected specified holding; both holdings retained before lapse; holder can still use selected holding; offer passed to second eligible household; holder still uses slot. Full transcript attached."
+  },
+  {
+    "id": "03-012",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/house-a/notices/notice-13/decline {\"household\": \"4\"}; <<< HTTP 200 {\"id\":\"notice-13\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.025Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.025Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.025Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":\"booking-5\",\"pendingSuccessor\":null,\"declined\":[\"3\",\"4\"],\"pendingQueueId\":null,\"choiceHousehold\":null,\"offeredTo\":null}; checked: two standing holdings confirmed; first household waiting; second household waiting; one notice started; selected specified holding; both holdings retained before lapse; holder can still use selected holding; offer passed to second eligible household; holder still uses slot; served real clock past 2026-01-31T00:00:01.025Z; only selected holding ended; list shows remaining holding only; billing shows remaining holding only; selected slot returns to pool. Full transcript attached."
+  },
+  {
+    "id": "03-013",
+    "verdict": "pass",
+    "evidence": ">>> POST /api/houses/house-a/queue/queue-9/withdraw {\"household\": \"3\"}; <<< HTTP 200 {\"id\":\"queue-9\",\"sequence\":9,\"group\":\"A\",\"household\":\"3\",\"role\":\"tenant\",\"status\":\"withdrawn\",\"acceptedAt\":\"2026-01-01T00:00:01.038Z\",\"policyVersion\":\"policy-4\"}; checked: two standing holdings confirmed; first household waiting; one notice started; selected specified holding; both holdings retained before lapse; holder can still use selected holding; notice deadlines and policy pinned after withdrawal; served real clock past 2026-01-31T00:00:01.041Z; only selected holding ended; list shows remaining holding only; billing shows remaining holding only; selected slot returns to pool. Full transcript attached."
+  },
+  {
+    "id": "04-001",
+    "verdict": "pass",
+    "evidence": "POST two houses with distinct calendars, then GET each schedule: A shows Tuesday resource r; B shows only Thursday."
+  },
+  {
+    "id": "04-002",
+    "verdict": "pass",
+    "evidence": "POST bookings for each house: A shareholder and B tenant confirmed; A tenant and B shareholder refused with their own policy versions. GET bookings re-reads both confirmations."
+  },
+  {
+    "id": "04-003",
+    "verdict": "pass",
+    "evidence": "GET routes: A directs residents to manager with queueEnabled false; B allows self-service and queueEnabled true. POST queue refused in A and accepted and re-read in B."
+  },
+  {
+    "id": "04-004",
+    "verdict": "pass",
+    "evidence": "Board POST policy-4 effective 2026-11-23 10:00 UTC; Before boundary booking names policy-2; date -u -s advanced to 10:01 and GET clock confirmed normal clock; afterward booking names policy-4. Policies record board and effective instant."
+  },
+  {
+    "id": "04-005",
+    "verdict": "pass",
+    "evidence": "Manager POST dispute for booking-4; Dispute and history show confirmed and given-up actions for booking-4, both policy-2."
+  },
+  {
+    "id": "04-006",
+    "verdict": "pass",
+    "evidence": "Board POST policy-6 effective 2026-12-01; GET history preserves refusal-4 reason and policy-2 unchanged after policy revision."
+  },
+  {
+    "id": "04-007",
+    "verdict": "pass",
+    "evidence": "Board POST policy-12 with 7/20 days effective 2026-11-22 10:01; advance real clock past effective instant; GET clock confirms 10:01:01; original deadlines stay Dec 6 and Dec 22; later notice-28 under policy-12 has Nov 29/Dec 12 deadlines."
+  },
+  {
+    "id": "05-001",
+    "verdict": "pass",
+    "evidence": "House A family cap 1; apartment 12 confirmed booking-5 in family class. Second family request refused: family cap 1 and existing booking-5 identified; original persisted."
+  },
+  {
+    "id": "05-002",
+    "verdict": "pass",
+    "evidence": "House A family cap 1; apartment 12 confirmed other-class booking-5. Family request confirmed booking-7; both bookings persisted."
+  },
+  {
+    "id": "05-003",
+    "verdict": "pass",
+    "evidence": "House A family cap 1; apartment 12 confirmed family booking-5. Other-class request confirmed booking-7; both bookings persisted."
+  },
+  {
+    "id": "05-004",
+    "verdict": "pass",
+    "evidence": "House A cap 1, house B no class cap; family windows free. House B apartment 12 confirmed two family bookings under policy-5 despite house A cap."
+  },
+  {
+    "id": "05-005",
+    "verdict": "pass",
+    "evidence": "House A cap 1; confirmed dated family occurrence 2026-11-24 17:00–18:30. Guest clock advanced to 2026-11-24 18:31, verified through GET clock; upcoming 2026-12-01 family occurrence confirmed booking-7."
+  }
+]

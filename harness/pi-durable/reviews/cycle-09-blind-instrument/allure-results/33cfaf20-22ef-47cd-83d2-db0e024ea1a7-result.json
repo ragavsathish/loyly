@@ -1,0 +1,64 @@
+{
+  "uuid": "33cfaf20-22ef-47cd-83d2-db0e024ea1a7",
+  "name": "Passing the choose deadline does not pass the loss deadline",
+  "fullName": "loyly.scarcity-forfeit.03-008",
+  "testCaseId": "loyly.scarcity-forfeit.03-008",
+  "historyId": "loyly.scarcity-forfeit.03-008",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": ">>> POST /api/houses/house-a/notices/evaluate {\"group\": \"A\"}; <<< HTTP 200 [{\"id\":\"notice-11\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.047Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.047Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.047Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":null,\"pendingSuccessor\":null,\"declined\":[],\"choiceHousehold\":\"12\",\"offeredTo\":\"3\"}]; checked: two standing holdings confirmed; first household waiting; one notice started; served real clock past 2026-01-15T00:00:01.047Z; queue head has choice; loss deadline unchanged; both holdings remain active. Full transcript attached."
+  },
+  "start": 1768435206006,
+  "stop": 1768435206006,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-008"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a household with two holdings received a scarcity notice",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: the choose deadline passes without a choice",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: the notice deadline remains the later deadline recorded at notice start; the household still holds both slots until that deadline",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock evidence",
+      "source": "61ba08f6-a61d-4726-a96b-60291d7cb95b-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

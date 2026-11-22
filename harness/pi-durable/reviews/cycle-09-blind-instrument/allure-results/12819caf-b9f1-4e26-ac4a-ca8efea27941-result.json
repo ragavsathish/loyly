@@ -1,0 +1,64 @@
+{
+  "uuid": "12819caf-b9f1-4e26-ac4a-ca8efea27941",
+  "name": "The queue is ordered by accepted request within its eligible group",
+  "fullName": "loyly.scarcity-forfeit.03-005",
+  "testCaseId": "loyly.scarcity-forfeit.03-005",
+  "historyId": "loyly.scarcity-forfeit.03-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "A was full with holdings for 12 and 4; POST queue A for 3 accepted sequence 9 before 5 sequence 11; GET queue A returned 3 then 5; GET queue B returned []"
+  },
+  "start": 1795347930062,
+  "stop": 1795347945062,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given A was full with holdings for 12 and 4",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST queue A for 3 accepted sequence 9 before 5 sequence 11",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then GET queue A returned 3 then 5; GET queue B returned []",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "af47fed9-5b91-4536-ae96-7bd012163134-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}
