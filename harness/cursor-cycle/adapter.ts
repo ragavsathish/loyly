@@ -215,6 +215,7 @@ export function checkContract(
     throw new Error("source checkout is dirty or differs from approved commit");
   requirePin(source.checklist);
   const derived = mkdtempSync(join(tmpdir(), "loyly-cursor-checklist-"));
+  let fullItems: { id: string; source?: string }[] = [];
   try {
     const output = join(derived, "checklist.json");
     const generated = spawnSync(
@@ -222,17 +223,35 @@ export function checkContract(
       ["harness/gen_checklist.clj", "--out", output],
       { cwd: source.repo, encoding: "utf8" },
     );
-    if (
-      generated.status !== 0 ||
-      !existsSync(output) ||
-      !readFileSync(output).equals(readFileSync(source.checklist.path))
-    )
+    if (generated.status !== 0 || !existsSync(output))
       throw new Error(
         "pinned checklist differs from the source-derived checklist",
       );
+    const full = JSON.parse(readFileSync(output, "utf8")) as {
+      items: { id: string; source?: string }[];
+    };
+    if (!isSelectedChecklist(full))
+      throw new Error("source-derived checklist is invalid");
+    fullItems = full.items;
   } finally {
     rmSync(derived, { recursive: true, force: true });
   }
+  const fullIds = fullItems.map((item) => item.id);
+  if (
+    !source.itemIds.length ||
+    new Set(source.itemIds).size !== source.itemIds.length
+  )
+    throw new Error("approved item list differs from checklist");
+  let cursor = 0;
+  for (const id of source.itemIds) {
+    const next = fullIds.indexOf(id, cursor);
+    if (next < 0)
+      throw new Error(`selected item ${id} is absent from the derived checklist`);
+    cursor = next + 1;
+  }
+  const selectedItems = source.itemIds.map(
+    (id) => fullItems.find((item) => item.id === id)!,
+  );
   const checklist: unknown = JSON.parse(
     readFileSync(source.checklist.path, "utf8"),
   );
@@ -240,9 +259,8 @@ export function checkContract(
     throw new Error("invalid selected checklist");
   const ids = checklist.items.map((item) => item.id);
   if (
-    !ids.length ||
-    new Set(ids).size !== ids.length ||
-    JSON.stringify(ids) !== JSON.stringify(source.itemIds)
+    JSON.stringify(ids) !== JSON.stringify(source.itemIds) ||
+    JSON.stringify(checklist.items) !== JSON.stringify(selectedItems)
   )
     throw new Error("approved item list differs from checklist");
   const selectedSpecs = new Set<string>();

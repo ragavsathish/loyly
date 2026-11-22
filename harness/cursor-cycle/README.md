@@ -31,8 +31,9 @@ A remote-session contract must not pin Docker inputs.
 ## CLI
 
 `node cli.ts preflight contract.json` checks the clean controller checkout,
-source commit, derived checklist, model separation, instruction digests, panel
-coverage, Allure schema, and the remote-or-docker probe boundary.
+source commit, selected checklist (an ordered subset of the source-derived
+items), model separation, instruction digests, panel coverage, Allure schema,
+and the remote-or-docker probe boundary.
 `node cli.ts candidate candidate-input.json` seals disposable package caches
 under `impl/`. `node cli.ts decide attempt.json` applies the three-attempt
 `cycle-core` policy. `node cli.ts evidence evidence.json` validates grader and
