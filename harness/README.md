@@ -55,6 +55,13 @@ cover what nobody wrote down. The scoreboard counts verdicts and cannot tell a w
 verdict from a careful one. What is left over is found by a person driving the real
 interface, which is why the failure modes at the bottom of this file read as they do.
 
+These measure tools are **not** Allure producers. Graders, blind review, and
+specialist panel workers write Allure under the schema in
+[`evidence-core/`](evidence-core/); their tool catalog, panel roles, and
+alignment chain are in [`evidence-core/README.md`](evidence-core/README.md).
+`oracle.sh` guards checklist/score goldens; it does not validate Allure bytes.
+Adapters validate Allure via evidence-core, then hand verdicts to `score.clj`.
+
 ## The three modules, and the check that they have not forked
 
 This harness exists in three repositories: löyly, saunavuoro and kalibra. They are not
