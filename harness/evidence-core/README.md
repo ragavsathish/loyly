@@ -94,12 +94,29 @@ Do **not** put this catalog into digest-pinned `grader-instruction*.md`
 files; those stay task-narrow. Point agents here from `AGENTS.md` and
 `harness/README.md`.
 
+## Adapter coverage (Pi · Codex · Cursor)
+
+| Core API | Pi durable | Codex cycle | Cursor cycle |
+| --- | --- | --- | --- |
+| `createLifecycle` (via cycle-core) | full build→gate→grade→blind→panel→score | build/gate decide + post-grade next phase | same as Codex |
+| `validatePanelCoverage` | yes (live contract / panel) | yes (contract) | yes (contract) |
+| `validateVerdictData` | yes | yes | yes |
+| `validateResultEvidence` | yes (plus room I/O) | yes (inside checkEvidence) | yes (inside checkEvidence) |
+| Ajv full schema compile | Pi allure / panel paths | duplicated in adapter | duplicated in adapter |
+| `evaluatePanel` | yes (`panel-compile.mjs`) | not wired (panel reassessment separate) | not wired |
+
+Product blind item `01-011` stays in adapters (instruction digests, pending
+rules). Cores take an optional `handoffItem` and never hard-code that id.
+Schema Ajv validation and Gherkin identity (`loyly.<slice>.<item>`) still live
+in adapters; lifting a pure schema helper into this package is the next
+extraction step.
+
 ## Package surface
 
 | Path | Duty |
 | --- | --- |
 | `allure-lifecycle-result.schema.json` | approved result shape |
-| `validate-result.ts` | one result + attachment hashes |
+| `validate-result.ts` | one result evidence shape (timing, steps, attachments) |
 | `validate-verdicts.ts` | projected checklist verdicts |
 | `panel-selection.ts` | which checks apply to a cut |
 | `panel-policy.ts` | evaluate observations vs plan and filed score |
