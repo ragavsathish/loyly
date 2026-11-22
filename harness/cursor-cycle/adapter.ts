@@ -18,6 +18,10 @@ import type {
   TaskOutcome,
 } from "../cycle-core/types.ts";
 import {
+  assessRoomPanel,
+  type RoomPanelFiles,
+} from "../evidence-core/assess-room-panel.ts";
+import {
   checkRoomEvidence,
   type RoomEvidenceFiles,
 } from "../evidence-core/check-room-evidence.ts";
@@ -385,5 +389,18 @@ export function checkEvidence(files: EvidenceFiles) {
     nextPhase: createLifecycle({
       assessments: report.assessments,
     }).afterGrade({ status: "completed" }),
+  };
+}
+
+export type PanelFiles = RoomPanelFiles;
+
+/** Run evidence-core evaluatePanel over room Allure + filed verdicts. */
+export function checkPanel(files: PanelFiles) {
+  const panel = assessRoomPanel(files);
+  return {
+    ...panel,
+    nextPhase: createLifecycle({
+      assessments: ["panel"],
+    }).afterAssessment("panel", panel.panel_outcome === "ready-for-review"),
   };
 }

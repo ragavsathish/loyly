@@ -16,6 +16,7 @@ import {
   checkCandidateCaches,
   checkContract,
   checkEvidence,
+  checkPanel,
   decideAttempt,
 } from "../adapter.ts";
 
@@ -261,5 +262,85 @@ test("raw Cursor Allure and final verdict must agree", () => {
   );
   const files = { checklist, verdicts, surprises, room, rawAllureDirs: [dir] };
   assert.equal(checkEvidence(files).passed, 1);
+  rmSync(room, { recursive: true, force: true });
+});
+
+test("checkPanel evaluates raw grader Allure against the filed score", () => {
+  const room = mkdtempSync(join(tmpdir(), "loyly-cursor-panel-"));
+  const dir = join(room, "work/allure-results");
+  mkdirSync(dir, { recursive: true });
+  const plan = join(room, "panel.json");
+  const checklist = join(room, "checklist.json");
+  const verdicts = join(room, "verdicts.json");
+  const surprises = join(room, "work/surprises.json");
+  writeFileSync(
+    plan,
+    JSON.stringify({
+      checks: [
+        {
+          id: "black-box",
+          source: "raw-grader",
+          role: "scored",
+          tool: "Cursor black-box grader",
+          technique: "acceptance",
+          items: ["01-001"],
+          criterion: "observed",
+          failure: "missing",
+          target_runtime: "cursor-remote-session",
+        },
+      ],
+    }),
+  );
+  writeFileSync(
+    checklist,
+    JSON.stringify({
+      items: [{ id: "01-001", rule: "One holder", name: "One booking" }],
+    }),
+  );
+  writeFileSync(
+    verdicts,
+    JSON.stringify([
+      { id: "01-001", verdict: "pass", evidence: "HTTP observed" },
+    ]),
+  );
+  writeFileSync(surprises, "[]");
+  const uuid = randomUUID();
+  writeFileSync(join(dir, `${uuid}-attachment.txt`), "HTTP 200");
+  writeFileSync(
+    join(dir, `${uuid}-result.json`),
+    JSON.stringify({
+      uuid,
+      name: "One booking",
+      status: "passed",
+      stage: "finished",
+      statusDetails: { message: "HTTP observed" },
+      start: 1,
+      stop: 2,
+      labels: [
+        { name: "lifecycle", value: "pre-production" },
+        { name: "technique", value: "acceptance" },
+        { name: "tool", value: "Cursor black-box grader" },
+        { name: "tag", value: "@item-01-001" },
+      ],
+      steps: [{ name: "Request", status: "passed", stage: "finished" }],
+      attachments: [
+        {
+          name: "response",
+          source: `${uuid}-attachment.txt`,
+          type: "text/plain",
+        },
+      ],
+    }),
+  );
+  const report = checkPanel({
+    plan,
+    checklist,
+    verdicts,
+    surprises,
+    rawAllureDirs: [dir],
+    runtime: "cursor-remote-session",
+  });
+  assert.equal(report.panel_outcome, "ready-for-review");
+  assert.equal(report.nextPhase.phase, "score");
   rmSync(room, { recursive: true, force: true });
 });

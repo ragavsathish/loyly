@@ -39,6 +39,7 @@ export function isSelectedChecklist(
 
 export interface PanelCheck {
   id: string;
+  source: "raw-grader" | "blind-review" | "specialist";
   role: PanelRole;
   tool: string;
   technique: string;

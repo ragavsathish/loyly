@@ -37,7 +37,8 @@ and the remote-or-docker probe boundary.
 `node cli.ts candidate candidate-input.json` seals disposable package caches
 under `impl/`. `node cli.ts decide attempt.json` applies the three-attempt
 `cycle-core` policy. `node cli.ts evidence evidence.json` validates grader and
-blind Allure through `evidence-core`.
+blind Allure through `evidence-core`. `node cli.ts panel panel.json` runs
+`evaluatePanel` over the room's Allure dirs and filed verdicts.
 
 These commands only read evidence and print reports. They do not fence, build,
 grade or score. A new scored run needs fresh Cursor agents and a newly approved

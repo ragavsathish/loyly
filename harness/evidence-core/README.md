@@ -108,10 +108,10 @@ files; those stay task-narrow. Point agents here from `AGENTS.md` and
 | `compileAllureSchema` | allure-results, blind, panel, supplemental | via `checkRoomEvidence` | via `checkRoomEvidence` |
 | `assertAllureIdentity` / `stampedItemId` | allure-results | via `checkRoomEvidence` | via `checkRoomEvidence` |
 | `checkRoomEvidence` | Pi keeps `allure-results.mjs` | yes (tool seals) | yes (tool seals) |
+| `assessRoomPanel` / `evaluatePanel` | yes (`panel-compile.mjs`) | `cli.ts panel` | `cli.ts panel` |
 | `validateResultEvidence` | yes | via room check | via room check |
 | `validatePanelCoverage` | yes | yes | yes |
 | `validateVerdictData` | yes | yes | yes |
-| `evaluatePanel` | yes (`panel-compile.mjs`) | not wired (panel reassessment separate) | not wired |
 
 Product blind item `01-011` stays in adapters (instruction digests, pending
 rules). Cores take an optional `handoffItem` and never hard-code that id.
@@ -127,6 +127,7 @@ tool strings.
 | `validate-identity.ts` | stamped tags, plan source, Gherkin identity |
 | `validate-result.ts` | observation shape; optional `assertAllureResult` compose |
 | `check-room-evidence.ts` | shared Codex/Cursor room check (seals injected) |
+| `assess-room-panel.ts` | build observations from room Allure → `evaluatePanel` |
 | `validate-verdicts.ts` | projected checklist verdicts |
 | `panel-selection.ts` | which checks apply to a cut |
 | `panel-policy.ts` | evaluate observations vs plan and filed score |
