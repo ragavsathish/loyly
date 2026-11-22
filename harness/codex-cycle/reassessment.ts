@@ -7,6 +7,7 @@ import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isSelectedChecklist } from "../evidence-core/types.ts";
 import { validatePanelCoverage } from "../evidence-core/panel-selection.ts";
+import { CODEX_GRADER_TOOL } from "./adapter.ts";
 
 interface PinnedFile {
   path: string;
@@ -252,7 +253,7 @@ export function checkReassessment(
       (check) =>
         check.source !== "raw-grader" ||
         check.role !== "scored" ||
-        (check as { tool?: string }).tool !== "Codex black-box grader",
+        (check as { tool?: string }).tool !== CODEX_GRADER_TOOL,
     )
   )
     throw new Error(

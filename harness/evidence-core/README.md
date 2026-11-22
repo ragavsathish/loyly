@@ -105,9 +105,10 @@ files; those stay task-narrow. Point agents here from `AGENTS.md` and
 | Core API | Pi durable | Codex cycle | Cursor cycle |
 | --- | --- | --- | --- |
 | `createLifecycle` (via cycle-core) | full build→gate→grade→blind→panel→score | build/gate decide + post-grade next phase | same as Codex |
-| `compileAllureSchema` | allure-results, blind, panel, supplemental | checkEvidence | checkEvidence |
-| `assertAllureIdentity` / `stampedItemId` | allure-results | checkEvidence | checkEvidence |
-| `validateResultEvidence` | yes | yes | yes |
+| `compileAllureSchema` | allure-results, blind, panel, supplemental | via `checkRoomEvidence` | via `checkRoomEvidence` |
+| `assertAllureIdentity` / `stampedItemId` | allure-results | via `checkRoomEvidence` | via `checkRoomEvidence` |
+| `checkRoomEvidence` | Pi keeps `allure-results.mjs` | yes (tool seals) | yes (tool seals) |
+| `validateResultEvidence` | yes | via room check | via room check |
 | `validatePanelCoverage` | yes | yes | yes |
 | `validateVerdictData` | yes | yes | yes |
 | `evaluatePanel` | yes (`panel-compile.mjs`) | not wired (panel reassessment separate) | not wired |
@@ -125,6 +126,7 @@ tool strings.
 | `validate-schema.ts` | Ajv compile/apply for that schema only |
 | `validate-identity.ts` | stamped tags, plan source, Gherkin identity |
 | `validate-result.ts` | observation shape; optional `assertAllureResult` compose |
+| `check-room-evidence.ts` | shared Codex/Cursor room check (seals injected) |
 | `validate-verdicts.ts` | projected checklist verdicts |
 | `panel-selection.ts` | which checks apply to a cut |
 | `panel-policy.ts` | evaluate observations vs plan and filed score |

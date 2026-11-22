@@ -9,7 +9,7 @@ import {
   rmSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createLifecycle } from "../cycle-core/lifecycle.ts";
 import type {
@@ -17,21 +17,15 @@ import type {
   GateResult,
   TaskOutcome,
 } from "../cycle-core/types.ts";
+import {
+  checkRoomEvidence,
+  type RoomEvidenceFiles,
+} from "../evidence-core/check-room-evidence.ts";
 import { isSelectedChecklist } from "../evidence-core/types.ts";
-import {
-  allureFullName,
-  assertAllureIdentity,
-  featureTitleFromSpec,
-  parsePlanSource,
-  stampedItemId,
-} from "../evidence-core/validate-identity.ts";
-import {
-  validateResultEvidence,
-  type EvidenceResult,
-} from "../evidence-core/validate-result.ts";
-import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
-import { validateVerdictData } from "../evidence-core/validate-verdicts.ts";
 import { validatePanelCoverage } from "../evidence-core/panel-selection.ts";
+
+export const CODEX_GRADER_TOOL = "Codex black-box grader";
+export const CODEX_BLIND_TOOL = "fresh blind subagent";
 
 const sha = (data: string | Buffer) =>
   createHash("sha256").update(data).digest("hex");
@@ -238,12 +232,12 @@ export function checkContract(
     panel.checks.some(
       (check) =>
         check.source === "raw-grader" &&
-        (check as { tool?: string }).tool !== "Codex black-box grader",
+        (check as { tool?: string }).tool !== CODEX_GRADER_TOOL,
     ) ||
     panel.checks.some(
       (check) =>
         check.source === "blind-review" &&
-        (check as { tool?: string }).tool !== "fresh blind subagent",
+        (check as { tool?: string }).tool !== CODEX_BLIND_TOOL,
     )
   )
     throw new Error("panel tool labels differ from Codex subagents");
@@ -273,157 +267,18 @@ export function decideAttempt(
   return { afterBuild, afterGate: lifecycle.afterGate(attempt, gate) };
 }
 
-export interface EvidenceFiles {
-  checklist: string;
-  verdicts: string;
-  surprises: string;
-  room: string;
-  rawAllureDirs: string[];
-  blindAllureDir?: string;
-}
+export type EvidenceFiles = RoomEvidenceFiles;
 
 export function checkEvidence(files: EvidenceFiles) {
-  const checklist: unknown = JSON.parse(readFileSync(files.checklist, "utf8"));
-  const verdicts: unknown = JSON.parse(readFileSync(files.verdicts, "utf8"));
-  const surprises: unknown = JSON.parse(readFileSync(files.surprises, "utf8"));
-  const judged = validateVerdictData(checklist, verdicts, surprises);
-  if (!isSelectedChecklist(checklist))
-    throw new Error("invalid selected checklist");
-  const selectedChecklist = checklist;
-  const blindSelected = checklist.items.some((item) => item.id === "01-011");
-  for (const surprise of judged.surprises) {
-    const file = join(files.room, surprise.evidence_file);
-    if (!existsSync(file) || !lstatSync(file).isFile())
-      throw new Error(`missing surprise evidence: ${surprise.evidence_file}`);
-  }
-  const validateSchema = compileAllureSchema(
-    JSON.parse(
-      readFileSync(
-        new URL(
-          "../evidence-core/allure-lifecycle-result.schema.json",
-          import.meta.url,
-        ),
-        "utf8",
-      ),
-    ) as object,
-  );
-  function readResult(dir: string, name: string, blind = false) {
-    const raw: unknown = JSON.parse(readFileSync(join(dir, name), "utf8"));
-    validateSchema(raw, name);
-    const row = raw as EvidenceResult;
-    const item = stampedItemId(row);
-    if (!selectedChecklist.items.some((selected) => selected.id === item))
-      throw new Error(`unselected Allure item ${item}`);
-    const selected = selectedChecklist.items.find(
-      (entry) => entry.id === item,
-    ) as { id: string; name?: string; rule?: string; source?: string };
-    if (selected.source) {
-      if (
-        typeof selected.name !== "string" ||
-        typeof selected.rule !== "string"
-      )
-        throw new Error(`checklist item ${item} needs name and rule`);
-      const { planDir, sliceKey } = parsePlanSource(selected.source);
-      assertAllureIdentity(row, {
-        itemId: item,
-        name: selected.name,
-        rule: selected.rule,
-        feature: featureTitleFromSpec(
-          readFileSync(
-            join(files.room, "plan", planDir, "spec.feature"),
-            "utf8",
-          ),
-        ),
-        fullName: allureFullName({
-          project: "loyly",
-          sliceKey,
-          itemId: item,
-          blind,
-        }),
-      });
-    }
-    validateResultEvidence(row, item);
-    for (const attachment of row.attachments ?? []) {
-      if (
-        basename(attachment.source) !== attachment.source ||
-        !existsSync(join(dir, attachment.source)) ||
-        !lstatSync(join(dir, attachment.source)).isFile()
-      )
-        throw new Error(`missing or unsafe attachment ${attachment.source}`);
-    }
-    return { row, item };
-  }
-  const observed = new Map<string, string>();
-  let rawCount = 0;
-  for (const dir of files.rawAllureDirs) {
-    for (const name of readdirSync(dir).filter((entry) =>
-      entry.endsWith("-result.json"),
-    )) {
-      const { row, item } = readResult(dir, name);
-      if (observed.has(item))
-        throw new Error(`duplicate raw Allure item ${item}`);
-      if (
-        row.labels.find((label) => label.name === "tool")?.value !==
-        "Codex black-box grader"
-      )
-        throw new Error(
-          `raw Allure tool differs from sealed Codex grader for ${item}`,
-        );
-      observed.set(item, row.status);
-      rawCount++;
-    }
-  }
-  if (rawCount !== checklist.items.length)
-    throw new Error("raw Allure coverage differs from checklist");
-  if (blindSelected && observed.get("01-011") !== "skipped")
-    throw new Error("01-011 must remain pending for the blind reviewer");
-  const blindResults = files.blindAllureDir
-    ? readdirSync(files.blindAllureDir).filter((name) =>
-        name.endsWith("-result.json"),
-      )
-    : [];
-  if (blindResults.length > 1) throw new Error("multiple blind Allure results");
-  if (blindSelected && blindResults.length !== 1)
-    throw new Error("booking refusal needs exactly one blind Allure result");
-  let blindStatus: string | undefined;
-  if (blindResults[0] && files.blindAllureDir) {
-    const { row, item } = readResult(
-      files.blindAllureDir,
-      blindResults[0],
-      true,
-    );
-    if (
-      item !== "01-011" ||
-      observed.get(item) !== "skipped" ||
-      row.labels.find((label) => label.name === "tool")?.value !==
-        "fresh blind subagent" ||
-      !["passed", "failed"].includes(row.status)
-    )
-      throw new Error(
-        "blind Allure result does not resolve the pending refusal",
-      );
-    blindStatus = row.status;
-  }
-  for (const verdict of judged.verdicts) {
-    const rawStatus = observed.get(verdict.id);
-    const status = rawStatus === "skipped" ? blindStatus : rawStatus;
-    if (
-      !status ||
-      (status !== "passed" && status !== "failed") ||
-      verdict.verdict !== (status === "passed" ? "pass" : "fail")
-    )
-      throw new Error(
-        `filed verdict differs from independent Allure evidence: ${verdict.id}`,
-      );
-  }
-  const lifecycle = createLifecycle({
-    assessments: blindResults.length ? ["blind-review"] : [],
+  const report = checkRoomEvidence(files, {
+    graderTool: CODEX_GRADER_TOOL,
+    blindTool: CODEX_BLIND_TOOL,
+    handoffItem: "01-011",
   });
   return {
-    items: checklist.items.length,
-    passed: judged.pass,
-    rawAllureResults: rawCount,
-    blindAllureResults: blindResults.length,
-    nextPhase: lifecycle.afterGrade({ status: "completed" }),
+    ...report,
+    nextPhase: createLifecycle({
+      assessments: report.assessments,
+    }).afterGrade({ status: "completed" }),
   };
 }
