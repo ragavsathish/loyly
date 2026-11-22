@@ -1,0 +1,89 @@
+{
+  "uuid": "e45247e4-0a32-451c-b0e3-574ed8e36c12",
+  "name": "A released occurrence is not a free standing slot",
+  "fullName": "loyly.scarcity-forfeit.03-003",
+  "testCaseId": "loyly.scarcity-forfeit.03-003",
+  "historyId": "loyly.scarcity-forfeit.03-003",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "not reached: default house refused the waiting household, so the required full group with a waiting household was not established."
+  },
+  "start": 1795305924806,
+  "stop": 1795306044806,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-003"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given every eligible standing slot is held and a household is waiting",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Given: And one holder has offered a single week's occurrence to another household",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "When: When the scarcity rule is evaluated",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Then: Then the occurrence offer does not make a standing slot free",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Then: And the scarcity decision uses the standing holdings and the waiting queue",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "a177c77d-c32c-4583-8069-933365243105-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

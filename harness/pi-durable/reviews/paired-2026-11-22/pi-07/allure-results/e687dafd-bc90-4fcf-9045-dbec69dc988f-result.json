@@ -1,0 +1,89 @@
+{
+  "uuid": "e687dafd-bc90-4fcf-9045-dbec69dc988f",
+  "name": "A taken occurrence has one taker in every view",
+  "fullName": "loyly.occurrence-release.02-009",
+  "testCaseId": "loyly.occurrence-release.02-009",
+  "historyId": "loyly.occurrence-release.02-009",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "FREE release: 3 alone took; dated list, heat and standing-only billing checked; following Tuesday remains 12."
+  },
+  "start": 1861920000234,
+  "stop": 1861920000241,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "The three derived views describe one occurrence holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12 has released one Tuesday occurrence",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached HTTP observations."
+      }
+    },
+    {
+      "name": "When: apartment 3 takes it",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached HTTP observations."
+      }
+    },
+    {
+      "name": "Then: no other household can take that same occurrence",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached HTTP observations."
+      }
+    },
+    {
+      "name": "Then: the posted list names apartment 3 while the heater schedule heats that occurrence",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached HTTP observations."
+      }
+    },
+    {
+      "name": "Then: the billing signal follows the release mode without a second stored copy",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached HTTP observations."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and clock observations",
+      "source": "f442c1f8-f4fd-4e35-a1e8-2746c58a1288-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

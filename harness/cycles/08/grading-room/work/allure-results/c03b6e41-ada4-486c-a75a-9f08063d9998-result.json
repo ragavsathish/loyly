@@ -1,0 +1,64 @@
+{
+  "uuid": "c03b6e41-ada4-486c-a75a-9f08063d9998",
+  "name": "A policy revision does not rewrite an earlier refusal",
+  "fullName": "loyly.house-policy.04-006",
+  "testCaseId": "loyly.house-policy.04-006",
+  "historyId": "loyly.house-policy.04-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Refusal b1 under v1 and its reason remain in state after board revision v2."
+  },
+  "start": 1795306092397,
+  "stop": 1795306092397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a house refused a request under an identified policy version",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When an authorized party records a later policy revision",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then the refusal still names the version and reason used at its decision time",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "72378af7-3e17-47c2-8f4f-beac3c504bc6-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

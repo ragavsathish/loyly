@@ -1,0 +1,64 @@
+{
+  "uuid": "82e62c93-d7cd-4ae3-94c9-eb45290af8e8",
+  "name": "A free release offers only the selected occurrence",
+  "fullName": "loyly.occurrence-release.02-001",
+  "testCaseId": "loyly.occurrence-release.02-001",
+  "historyId": "loyly.occurrence-release.02-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST booking-2/releases FREE 2026-06-02 offered occurrence-4; apartment 3 took it. Dated list and heat show 3, only 12 has standing fee; June 9 list and heat show 12."
+  },
+  "start": 1780272000000,
+  "stop": 1780272002000,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Releasing one week preserves the standing holding"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12 confirmed ph8 Tuesday 17:00 standing booking-2",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: free release for 2026-06-02 offered",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: apartment 3 takes it; later Tuesday remains 12, with matching list, heat and billing",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock observations",
+      "source": "b2bdcb80-c6fa-4085-8bdf-2bd8b733bb81-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

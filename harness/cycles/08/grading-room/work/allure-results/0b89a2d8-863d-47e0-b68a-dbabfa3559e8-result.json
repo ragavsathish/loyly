@@ -1,0 +1,79 @@
+{
+  "uuid": "0b89a2d8-863d-47e0-b68a-dbabfa3559e8",
+  "name": "Taking a sale occurrence raises a distinct resale signal",
+  "fullName": "loyly.occurrence-release.02-005",
+  "testCaseId": "loyly.occurrence-release.02-005",
+  "historyId": "loyly.occurrence-release.02-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "SALE offer o2 taken by 3; billing names payer 3, occurrence o2, resale, v1 and house-resale-tariff; standing payer 12 and next-week holding remain."
+  },
+  "start": 1795306092397,
+  "stop": 1795306092397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given apartment 12 has released one Tuesday occurrence for sale",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When apartment 3 buys that occurrence under the house's sale policy",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then apartment 3 is the taker for that one Tuesday occurrence",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And a resale billing signal identifies apartment 3, that occurrence, the charge kind, the governing policy version and the house price reference",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And apartment 12's normal standing-slot fee remains due",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And apartment 12 still holds the standing slot on later Tuesdays",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "bb6254e4-8772-4855-bea0-c5b7804c7ad0-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

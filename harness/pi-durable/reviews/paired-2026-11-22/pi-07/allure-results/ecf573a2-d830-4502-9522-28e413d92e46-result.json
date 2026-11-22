@@ -1,0 +1,69 @@
+{
+  "uuid": "ecf573a2-d830-4502-9522-28e413d92e46",
+  "name": "An untaken offer expires when its occurrence begins",
+  "fullName": "loyly.occurrence-release.02-008",
+  "testCaseId": "loyly.occurrence-release.02-008",
+  "historyId": "loyly.occurrence-release.02-008",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Set baseline 2026-01-05 12:00 UTC before startup, offer beginsAt 2026-01-06T17:00:00Z; date -u -s 2026-01-06 17:00:01 succeeded; GET views now 17:00:01Z shows unclaimed, no household or heat, holder 12 and standing fee; take returned HTTP 422 not-offered; next Tuesday held by 12."
+  },
+  "start": 1767614399273,
+  "stop": 1767718801013,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-008"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given apartment 12 has released one Tuesday occurrence and nobody has taken it",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When that occurrence begins",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the offer is unclaimed and cannot be taken afterward",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12 keeps its standing holding and still owes the normal fee",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and clock observations",
+      "source": "3ae1d2aa-3e9c-40f7-a2b7-66b8a13e0fe0-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

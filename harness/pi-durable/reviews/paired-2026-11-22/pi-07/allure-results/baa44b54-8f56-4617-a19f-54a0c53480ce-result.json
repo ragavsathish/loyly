@@ -1,0 +1,64 @@
+{
+  "uuid": "baa44b54-8f56-4617-a19f-54a0c53480ce",
+  "name": "Different houses can open different resources and days",
+  "fullName": "loyly.house-policy.04-001",
+  "testCaseId": "loyly.house-policy.04-001",
+  "historyId": "loyly.house-policy.04-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET /api/houses/demo/views shows three free Tuesday ph8 windows; GET /api/houses/masthugget/views shows Saturday, Sunday and Friday windows, none Tuesday."
+  },
+  "start": 1795305094554,
+  "stop": 1795305094678,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "A house owns its calendars and eligible booker roles"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given demo has a Tuesday resource and masthugget has none",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When both house schedules are read",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then demo offers Tuesday and masthugget does not",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and measurements",
+      "source": "976067b7-2fce-4462-bf56-c4969527a26f-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

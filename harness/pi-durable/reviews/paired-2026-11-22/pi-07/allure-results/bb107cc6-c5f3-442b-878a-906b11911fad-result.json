@@ -1,0 +1,74 @@
+{
+  "uuid": "bb107cc6-c5f3-442b-878a-906b11911fad",
+  "name": "Taking a free occurrence charges no fee to the taker",
+  "fullName": "loyly.occurrence-release.02-004",
+  "testCaseId": "loyly.occurrence-release.02-004",
+  "historyId": "loyly.occurrence-release.02-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST FREE release and apartment 3 take: HTTP 200 taken; dated list and heater show apartment 3 on 2026-01-06; billing only standing-slot payer 12, no taker fee; 2026-01-13 shows 12, standing holding retained."
+  },
+  "start": 1767614434230,
+  "stop": 1767614435259,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given apartment 12 has released one Tuesday occurrence for free",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 3 takes that occurrence",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then apartment 3 may use that one Tuesday occurrence without an occurrence charge",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12 remains responsible for its normal standing-slot fee",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12 holds the standing slot on later Tuesdays",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and clock observations",
+      "source": "ccbd4909-675a-45ad-899d-5950f94d8ebd-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

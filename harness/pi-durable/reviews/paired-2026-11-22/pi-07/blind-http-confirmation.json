@@ -1,0 +1,16 @@
+{
+  "housesStatus": 200,
+  "request": {
+    "house": "demo",
+    "household": "12",
+    "resource": "ph8",
+    "weekday": "Tuesday",
+    "start": "17:00",
+    "kind": "standing",
+    "bookerRole": "resident",
+    "actorRole": "resident"
+  },
+  "responseStatus": 200,
+  "responseText": "{\"status\":\"confirmed\",\"booking\":{\"id\":\"booking-2\",\"type\":\"standing\",\"state\":\"held\",\"household\":\"12\",\"resource\":\"ph8\",\"resourceName\":\"pukuhuone 8\",\"sauna\":\"sauna F\",\"weekday\":\"Tuesday\",\"start\":\"17:00\",\"duration\":90,\"class\":\"ordinary\",\"end\":\"18:30\",\"recurrence\":\"weekly\",\"confirmedAt\":\"2026-11-21T23:56:28.248Z\",\"policyVersion\":\"v1\",\"priceReference\":\"standing-fee\",\"bookerRole\":\"resident\",\"actorRole\":\"resident\"}}",
+  "accepted": true
+}

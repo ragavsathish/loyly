@@ -1,0 +1,64 @@
+{
+  "uuid": "2f57c473-c4f3-48d6-9776-3af6351a6fa3",
+  "name": "A house without the family-time cap does not inherit it",
+  "fullName": "loyly.time-classes.05-004",
+  "testCaseId": "loyly.time-classes.05-004",
+  "historyId": "loyly.time-classes.05-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET masthugget policy cap 1; POST house-b with no class cap; POST family 10:00 and 11:30 both confirmed for same eligible tenant, persisted in house-b view."
+  },
+  "start": 1780272000000,
+  "stop": 1780272002000,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: house A cap 1; house B created without cap",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: house B tenant requests family windows",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: both confirmed; A cap not inherited",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock observations",
+      "source": "2c1f0149-6e36-43cf-9d93-4bdcd45ada71-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

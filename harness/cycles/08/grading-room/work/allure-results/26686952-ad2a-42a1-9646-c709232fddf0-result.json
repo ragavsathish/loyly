@@ -1,0 +1,81 @@
+{
+  "uuid": "26686952-ad2a-42a1-9646-c709232fddf0",
+  "name": "A free eligible slot does not put a multi-slot household under notice",
+  "fullName": "loyly.scarcity-forfeit.03-001",
+  "testCaseId": "loyly.scarcity-forfeit.03-001",
+  "historyId": "loyly.scarcity-forfeit.03-001",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "not reached: the requested waiting household was refused by the default manager-mediated house; scarcity returned no notices without the required queue."
+  },
+  "start": 1795305924806,
+  "stop": 1795306044806,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a household holds two standing slots and an eligible slot is free",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Given: And another household is waiting",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "When: When the scarcity rule is evaluated",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Then: Then neither standing holding is put under notice",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "19cc1278-0397-492c-a991-1025df6dbf76-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "uuid": "04fa6054-9bbe-4baf-8448-7df4bab00566",
+  "name": "An accepted transfer cannot be withdrawn by the original holder",
+  "fullName": "loyly.occurrence-release.02-007",
+  "testCaseId": "loyly.occurrence-release.02-007",
+  "historyId": "loyly.occurrence-release.02-007",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After 3 took o2, holder withdrawal was refused; posted and heater retain 3, fee and next-week holding retain 12."
+  },
+  "start": 1795306092397,
+  "stop": 1795306092397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given apartment 3 has taken apartment 12's released Tuesday occurrence",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When apartment 12 tries to withdraw that offer",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then the withdrawal is refused and apartment 3 remains the taker",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "3365fd18-2a6a-496f-b24f-7ac0fc4fe39d-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

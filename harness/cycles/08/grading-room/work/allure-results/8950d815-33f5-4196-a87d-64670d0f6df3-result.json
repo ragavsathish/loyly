@@ -1,0 +1,89 @@
+{
+  "uuid": "8950d815-33f5-4196-a87d-64670d0f6df3",
+  "name": "A taken occurrence has one taker in every view",
+  "fullName": "loyly.occurrence-release.02-009",
+  "testCaseId": "loyly.occurrence-release.02-009",
+  "historyId": "loyly.occurrence-release.02-009",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "FREE release taken by apartment 3; apartment 4 refused; posted and heater identify 3, billing charges only standing holder 12, and next Tuesday remains with 12."
+  },
+  "start": 1795305924806,
+  "stop": 1795306044806,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "The three derived views describe one occurrence holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given apartment 12 has released one Tuesday occurrence",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "FREE release taken by apartment 3; apartment 4 refused; posted and heater identify 3, billing charges only standing holder 12, and next Tuesday remains with 12."
+      }
+    },
+    {
+      "name": "When: When apartment 3 takes it",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "FREE release taken by apartment 3; apartment 4 refused; posted and heater identify 3, billing charges only standing holder 12, and next Tuesday remains with 12."
+      }
+    },
+    {
+      "name": "Then: Then no other household can take that same occurrence",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "FREE release taken by apartment 3; apartment 4 refused; posted and heater identify 3, billing charges only standing holder 12, and next Tuesday remains with 12."
+      }
+    },
+    {
+      "name": "Then: And the posted list names apartment 3 while the heater schedule heats that occurrence",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "FREE release taken by apartment 3; apartment 4 refused; posted and heater identify 3, billing charges only standing holder 12, and next Tuesday remains with 12."
+      }
+    },
+    {
+      "name": "Then: And the billing signal follows the release mode without a second stored copy",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "FREE release taken by apartment 3; apartment 4 refused; posted and heater identify 3, billing charges only standing holder 12, and next Tuesday remains with 12."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "edbb9ec6-2108-4218-bcfa-7e0422100264-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

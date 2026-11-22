@@ -1,0 +1,12 @@
+(1/6) Installing ada-libs (4.0.0-r0)
+(2/6) Installing icu-data-en (78.1-r0)
+  Executing icu-data-en-78.1-r0.post-install
+(3/6) Installing icu-libs (78.1-r0)
+(4/6) Installing simdjson (4.2.4-r0)
+(5/6) Installing simdutf (9.0.0-r0)
+(6/6) Installing nodejs (24.22.3-r0)
+Executing busybox-1.37.0-r31.trigger
+OK: 130.5 MiB in 100 packages
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Löyly · sauna bookings</title><link rel="stylesheet" href="/style.css"><body><header><span class="brand">Löyly <small>sauna & community</small></span><span id="clock"></span></header><main><section class="intro"><p class="eyebrow">A little warmth, every week</p><h1>Your sauna time,<br>held together.</h1><p>One booking record. A shared schedule, heating signal and billing history that agree.</p></section><section class="toolbar"><label>House<select id="house"></select></label><label>Apartment<input id="household" value="12"></label><label>Booker role<select id="role"><option>shareholder</option><option>tenant</option></select></label><button id="refresh">Refresh</button></section><p id="route"></p><nav><button data-tab="schedule">Weekly schedule</button><button data-tab="holdings">My bookings & releases</button><button data-tab="fairness">Queue & notices</button><button data-tab="signals">Derived views</button><button data-tab="management">House & policy</button></nav><div id="message" role="status" aria-live="polite"></div><section id="content"></section><details><summary>Public HTTP API & response</summary><p>All product actions are available as JSON under <a href="/api/docs">/api/docs</a>. Calendar dates and simulation instants use UTC.</p><pre id="result"></pre></details><footer>Heating and invoicing are derived signals. Löyly does not command equipment or collect money.</footer></main><script src="/app.js"></script></body></html>
+  * If you need ICU with non-English locales and legacy charset support, install
+  * package icu-data-full.

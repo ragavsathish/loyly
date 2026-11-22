@@ -1,0 +1,73 @@
+{
+  "uuid": "673d243f-139d-48d2-a2fa-25e53244054c",
+  "name": "A policy revision does not rewrite an earlier refusal",
+  "fullName": "loyly.house-policy.04-006",
+  "testCaseId": "loyly.house-policy.04-006",
+  "historyId": "loyly.house-policy.04-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Closed-day refusal retained its original reason and policy version after board revision."
+  },
+  "start": 1861920000232,
+  "stop": 1861920000247,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a house refused a request under an identified policy version",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached HTTP observations."
+      }
+    },
+    {
+      "name": "When: an authorized party records a later policy revision",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached HTTP observations."
+      }
+    },
+    {
+      "name": "Then: the refusal still names the version and reason used at its decision time",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached HTTP observations."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and clock observations",
+      "source": "d4576d94-288d-431a-95ba-ddfceeacae9e-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

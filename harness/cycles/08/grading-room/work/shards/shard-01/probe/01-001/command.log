@@ -1,0 +1,193 @@
++ cp -R /candidate /tmp/app
++ cd /tmp/app
++ pid=629
++ trap 'kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null' EXIT
++ seq 1 60
++ ./start.sh 8123
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -fsS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ sleep 1
++ curl -isS http://127.0.0.1:8123/
+curl: (7) Failed to connect to 127.0.0.1:8123 after 0 ms: Could not connect to server
++ http://127.0.0.1:8123/
+/out/probe.sh: line 8: http://127.0.0.1:8123/: not found
++ kill 629
++ wait 629
+exit=127

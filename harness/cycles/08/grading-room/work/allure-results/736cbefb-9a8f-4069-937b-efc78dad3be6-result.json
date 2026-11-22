@@ -1,0 +1,74 @@
+{
+  "uuid": "736cbefb-9a8f-4069-937b-efc78dad3be6",
+  "name": "Booker standing is checked within the household's house",
+  "fullName": "loyly.house-policy.04-002",
+  "testCaseId": "loyly.house-policy.04-002",
+  "historyId": "loyly.house-policy.04-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "House A shareholder and house B tenant confirmed; cross-role requests refused with each house policy."
+  },
+  "start": 1795306092397,
+  "stop": 1795306092397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "A house owns its calendars and eligible booker roles"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given house A allows its configured booker role to request a slot",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Given: And house B uses a different configured booker role",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When an eligible house A household requests in house A and a house B household requests in house B",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then each decision uses that house's role policy",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And neither house inherits the other house's eligibility rule",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "29488b4e-d5e8-4448-8c61-917951c301d8-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

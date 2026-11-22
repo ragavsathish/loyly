@@ -1,0 +1,64 @@
+{
+  "uuid": "890244cd-d6a8-461e-9fd2-6c81260c4778",
+  "name": "An unrelated class does not consume the family-time allowance",
+  "fullName": "loyly.time-classes.05-002",
+  "testCaseId": "loyly.time-classes.05-002",
+  "historyId": "loyly.time-classes.05-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST ordinary June 5 17:00 confirmed booking-2; POST family June 6 10:00 confirmed booking-4; reread lists both."
+  },
+  "start": 1780272000000,
+  "stop": 1780272002000,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: cap 1 and apartment 12 ordinary upcoming booking",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: request free family window",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: family booking confirmed; ordinary did not trigger cap",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock observations",
+      "source": "e88ce417-1d0c-4ddc-9253-e1a60526fdc1-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

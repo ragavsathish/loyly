@@ -1,0 +1,89 @@
+{
+  "uuid": "43b75242-23ba-41c2-81fe-e24868f53497",
+  "name": "The holder chooses before the choose deadline",
+  "fullName": "loyly.scarcity-forfeit.03-006",
+  "testCaseId": "loyly.scarcity-forfeit.03-006",
+  "historyId": "loyly.scarcity-forfeit.03-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST notice choose selected booking-2; GET views before deadlines showed booking-2 and booking-4 still held by 12, with only booking-2 selected for lapse on the recorded notice deadline."
+  },
+  "start": 1795305177808,
+  "stop": 1795305177808,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a scarcity notice has started a 14-day choose clock and 30-day notice clock for a household with two holdings",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "When: When the household chooses one holding before the choose deadline",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: Then that holding is identified for loss at the notice deadline",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: And the household keeps using it until the notice deadline",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: And its other holding is not identified for loss",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP observations and clock commands",
+      "source": "14a472e2-3920-4561-973e-59e2aa99a820-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

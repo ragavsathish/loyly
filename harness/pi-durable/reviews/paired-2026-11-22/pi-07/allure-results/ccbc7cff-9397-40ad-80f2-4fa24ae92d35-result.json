@@ -1,0 +1,81 @@
+{
+  "uuid": "ccbc7cff-9397-40ad-80f2-4fa24ae92d35",
+  "name": "Passing the choose deadline does not pass the loss deadline",
+  "fullName": "loyly.scarcity-forfeit.03-008",
+  "testCaseId": "loyly.scarcity-forfeit.03-008",
+  "historyId": "loyly.scarcity-forfeit.03-008",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After advancing past recorded choose deadline GET views reported unchanged later noticeDeadline and both holdings still held by 12."
+  },
+  "start": 1796472002196,
+  "stop": 1796472002196,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-008"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a household with two holdings received a scarcity notice",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "When: When the choose deadline passes without a choice",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: Then the notice deadline remains the later deadline recorded at notice start",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: And the household still holds both slots until that deadline",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP observations and clock commands",
+      "source": "1162c3e6-ae89-4bc5-8cb9-9b464b9d280b-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

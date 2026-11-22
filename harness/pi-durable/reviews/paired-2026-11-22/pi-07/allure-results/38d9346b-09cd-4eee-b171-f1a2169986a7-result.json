@@ -1,0 +1,69 @@
+{
+  "uuid": "38d9346b-09cd-4eee-b171-f1a2169986a7",
+  "name": "A standing slot cannot be requested on a closed day",
+  "fullName": "loyly.booking-core.01-002",
+  "testCaseId": "loyly.booking-core.01-002",
+  "historyId": "loyly.booking-core.01-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST /api/houses/demo/bookings for apartment 12, ph9 Tuesday 17:00: HTTP 409 closed-day; exact reason: \"pukuhuone 9 has no sauna day on Tuesday. It opens on Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 (ph8) instead.\" openDays Thursday, Friday, Saturday; views still empty."
+  },
+  "start": 1767614433791,
+  "stop": 1767614434800,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Availability is per dressing room, per weekday"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given pukuhuone 9's sauna days are Thursday, Friday and Saturday",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When the household in apartment 12 requests a standing slot on Tuesday at 17:00 in pukuhuone 9",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the request is refused because pukuhuone 9 has no sauna day on Tuesday",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And the refusal names the days pukuhuone 9 does open",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and clock observations",
+      "source": "be899284-5eb5-4ccc-b55b-be5f68152743-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

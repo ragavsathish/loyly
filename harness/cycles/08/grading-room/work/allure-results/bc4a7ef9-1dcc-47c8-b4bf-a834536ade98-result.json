@@ -1,0 +1,81 @@
+{
+  "uuid": "bc4a7ef9-1dcc-47c8-b4bf-a834536ade98",
+  "name": "A house without the family-time cap does not inherit it",
+  "fullName": "loyly.time-classes.05-004",
+  "testCaseId": "loyly.time-classes.05-004",
+  "historyId": "loyly.time-classes.05-004",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "not reached: two houses with the specified distinct policies were not established."
+  },
+  "start": 1795305924806,
+  "stop": 1795306044806,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given house A caps its family-time class at one active or upcoming booking",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Given: And house B has not configured that cap",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "When: When an eligible house B household requests a free family-time window",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Then: Then house A's cap is not used to decide the house B request",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "df4dac2c-707a-4c6c-8852-c60613024204-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

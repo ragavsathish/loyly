@@ -1,0 +1,8 @@
+COMMAND ['gondolin', 'exec', '--dns', 'open', '--image', '/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/.state/assets/builder-clojure', '--mount-hostfs', '/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-compare-codex-02/grader-shards/shard-01/grading-shard-01/impl:/candidate:ro', '--mount-hostfs', '/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-compare-codex-02/grader-shards/shard-01/grading-shard-01/work/probe/04-004:/out', '--', 'sh', '/out/probe.sh']
++ timeout 25 sh -c 'apt-get update && apt-get install -y nodejs'
+sh: apt-get: not found
++ node --version
+/out/probe.sh: line 3: node: not found
++ exit 42
+
+EXIT 42

@@ -1,0 +1,74 @@
+{
+  "uuid": "1fbe90e6-2e3a-4719-93fd-c36021975009",
+  "name": "The weekly schedule shows each dressing room's own sauna days",
+  "fullName": "loyly.booking-core.01-001",
+  "testCaseId": "loyly.booking-core.01-001",
+  "historyId": "loyly.booking-core.01-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET schedule: room 8 offered Tuesday slots; room 9 only Thursday, Friday and Saturday."
+  },
+  "start": 1795306092397,
+  "stop": 1795306092397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Availability is per dressing room, per weekday"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given pukuhuone 9's sauna days are Thursday, Friday and Saturday",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Given: And pukuhuone 8's sauna days include Tuesday",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When a resident views the weekly schedule for sauna F",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then Tuesday shows bookable slots for pukuhuone 8",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And Tuesday shows no slots for pukuhuone 9",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "bc655009-54b4-478e-98cf-ba28805277a2-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

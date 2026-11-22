@@ -1,0 +1,69 @@
+{
+  "uuid": "4501819b-906e-482a-b17d-565d4bddaf61",
+  "name": "Passing the choose deadline does not pass the loss deadline",
+  "fullName": "loyly.scarcity-forfeit.03-008",
+  "testCaseId": "loyly.scarcity-forfeit.03-008",
+  "historyId": "loyly.scarcity-forfeit.03-008",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After advancing past choose deadline, the recorded later lapse deadline remains unchanged and both holdings remain held."
+  },
+  "start": 1795306260265,
+  "stop": 1795306261265,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-008"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given a household with two holdings received a scarcity notice",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When the choose deadline passes without a choice",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the notice deadline remains the later deadline recorded at notice start",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the household still holds both slots until that deadline",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP observations",
+      "source": "344bab96-bda5-4751-bfce-6244dad1f0a2-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

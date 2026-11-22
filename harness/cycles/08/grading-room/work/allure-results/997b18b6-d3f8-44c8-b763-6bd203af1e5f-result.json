@@ -1,0 +1,89 @@
+{
+  "uuid": "997b18b6-d3f8-44c8-b763-6bd203af1e5f",
+  "name": "A household with one family-time booking cannot take another",
+  "fullName": "loyly.time-classes.05-001",
+  "testCaseId": "loyly.time-classes.05-001",
+  "historyId": "loyly.time-classes.05-001",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "not reached: the available default house has only general time classes and no family cap; the requested family-time setup was not established."
+  },
+  "start": 1795305924806,
+  "stop": 1795306044806,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a house caps family time at one active or upcoming booking per household",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Given: And apartment 12 already has an upcoming family-time booking",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "When: When apartment 12 requests another family-time window",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Then: Then the request is refused with the family-time cap as its reason",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Then: And the existing family-time booking is identified",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "e16ea505-1ebf-49e4-a77d-624fb09abd14-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}
