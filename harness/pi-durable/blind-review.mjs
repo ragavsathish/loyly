@@ -120,8 +120,10 @@ async function publicJsonBooking(base, body, answer) {
   const matches = [];
   for (const house of houses) {
     if (typeof house.id !== "string" || !/^[A-Za-z0-9_-]+$/.test(house.id)) continue;
-    let policy = house.policy, resources = policy?.resources, route = policy?.route;
-    let path = "/api/bookings";
+    let policy = house.policy, resources = policy?.resources;
+    let route = policy?.route ?? policy?.bookingMode;
+    const houseScoped = typeof policy?.bookingMode === "string";
+    let path = houseScoped ? `/api/houses/${house.id}/bookings` : "/api/bookings";
     if (!Array.isArray(resources)) {
       const stateResponse = await fetch(`${base}/api/houses/${house.id}/state`,
         { signal: AbortSignal.timeout(1000) });
@@ -136,12 +138,13 @@ async function publicJsonBooking(base, body, answer) {
       resource.name?.trim().toLowerCase() === `pukuhuone ${room}`) ?? [];
     if (route === "self-service" && named.length === 1)
       matches.push({ house: house.id, resource: named[0].id,
-        role: policy?.eligibleRoles?.[0] ?? policy?.bookerRoles?.[0], path });
+        role: policy?.eligibleRoles?.[0] ?? policy?.bookerRoles?.[0], path, houseScoped });
   }
   if (matches.length !== 1) throw new Error("blind room is not unique in the public self-service API");
   const match = matches[0];
   const payload = { house: match.house, household: params.get("household"), resource: match.resource,
-    weekday: params.get("weekday"), start: params.get("start"), kind: "standing", role: match.role };
+    weekday: params.get("weekday"), start: params.get("start"), kind: "standing",
+    ...(match.houseScoped ? { bookerRole: match.role, actorRole: match.role } : { role: match.role }) };
   if (!Object.values(payload).every((value) => typeof value === "string" && value.trim()))
     throw new Error("public booking request is incomplete");
   return { path: match.path, body: JSON.stringify(payload), contentType: "application/json" };

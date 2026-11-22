@@ -164,6 +164,35 @@ test("a blind subagent's Allure result is separate, bound and confirmed over HTT
     request: parsed.request, out: join(root, "workbench-probe") });
   assert.equal(workbenchProbe.http_status, 200);
   assert.equal(workbenchProbe.request.resolved_path, "/api/bookings");
+  const scopedRoom = join(root, "scoped-room"), scopedPacket = join(root, "scoped-packet");
+  cpSync(room, scopedRoom, { recursive: true });
+  writeFileSync(join(scopedRoom, "impl", "server.js"), `require("http").createServer((req,res)=>{
+    const send=(status,body)=>{res.statusCode=status;res.setHeader("content-type","application/json");res.end(JSON.stringify(body))};
+    if(req.url==="/"){res.statusCode=200;res.end('<form id="booking-form"></form>');return}
+    if(req.url==="/api/houses")return send(200,{houses:[
+      {id:"demo",policy:{bookingMode:"self-service",bookerRoles:["resident"],
+        resources:[{id:"ph8",name:"pukuhuone 8"}]}},
+      {id:"managed",policy:{bookingMode:"manager-mediated",bookerRoles:["shareholder"],
+        resources:[{id:"ph8",name:"pukuhuone 8"}]}}]});
+    let body="";req.on("data",x=>body+=x);req.on("end",()=>{
+      const p=JSON.parse(body);send(req.url==="/api/houses/demo/bookings"
+        &&p.resource==="ph8"&&p.weekday==="Tuesday"&&p.start==="17:00"
+        &&p.bookerRole==="resident"&&p.actorRole==="resident"?200:409,{status:"confirmed"})
+    });
+  }).listen(Number(process.argv[2]),"127.0.0.1")\n`);
+  prepareBlindReview({ gradingRoom: scopedRoom, out: scopedPacket });
+  const scopedReviewFile = join(root, "scoped-review.json");
+  writeFileSync(scopedReviewFile, JSON.stringify({ ...apiReview,
+    answer: "REQUEST: pukuhuone 8 | Tuesday | 17:00",
+    packet_sha256: JSON.parse(readFileSync(join(scopedPacket,
+      "response-template.json"))).packet_sha256 }));
+  const scopedRequest = parseBlindAgentAnswer("REQUEST: pukuhuone 8 | Tuesday | 17:00",
+    "Request pukuhuone 8 on Tuesday at 17:00 instead.").request;
+  const scopedProbe = await probeBlindAnswer({ packetDir: scopedPacket,
+    reviewFile: scopedReviewFile, gradingRoom: scopedRoom,
+    request: scopedRequest, out: join(root, "scoped-probe") });
+  assert.equal(scopedProbe.http_status, 200);
+  assert.equal(scopedProbe.request.resolved_path, "/api/houses/demo/bookings");
   review.packet_sha256 = "0".repeat(64);
   writeFileSync(reviewFile, JSON.stringify(review));
   assert.throws(() => validateBlindReview({ packetDir, reviewFile, gradingRoom: room }), /unbound/);
