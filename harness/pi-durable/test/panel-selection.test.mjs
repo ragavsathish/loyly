@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { validatePanelSelection } from '../panel-selection.mjs';
+import { validatePanelSelection } from '../panel-selection.ts';
 import { treeDigest } from '../grading-room.ts';
 import { fileURLToPath } from 'node:url';
 

@@ -10,7 +10,7 @@ import { runPanelVms, verifyPanelVmRun } from './panel-vm-run.mjs';
 import { compilePanel, verifyCompiledPanel } from './panel-compile.mjs';
 import { candidateDigest } from './grading-room.ts';
 import { scoreCycleFor, verifyScoredCycle } from './score-receipt.ts';
-import { readAuditRows } from './audit-rows.mjs';
+import { readAuditRows } from './audit-rows.ts';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');

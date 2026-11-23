@@ -2,7 +2,7 @@
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
-import { readAuditRows } from "./audit-rows.mjs";
+import { readAuditRows } from "./audit-rows.ts";
 import { projectReplayEvidence } from "./replay-evidence.mjs";
 
 const dirs = process.argv.slice(2).map((p) => resolve(p));

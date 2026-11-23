@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { readAuditRows } from "./audit-rows.mjs";
+import { readAuditRows } from "./audit-rows.ts";
 import { parseBlindAgentAnswer } from "./blind-agent-adapter.mjs";
 import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.mjs";
 import { candidateDigest } from "./grading-room.ts";

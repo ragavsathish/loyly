@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Ajv2020 } from 'ajv/dist/2020.js';
-import { validatePanelSelection } from './panel-selection.mjs';
+import { validatePanelSelection } from './panel-selection.ts';
 import { specialistWorkers } from './panel-vm-run.mjs';
 
 interface AgentConfig {

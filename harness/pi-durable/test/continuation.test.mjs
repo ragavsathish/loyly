@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect, Layer } from 'effect';
-import { readAuditRows } from "../audit-rows.mjs";
+import { readAuditRows } from "../audit-rows.ts";
 import { continuationPrompt, selectedUncarried, selectedUncarriedEffect } from "../continuation.ts";
 import { WorkspaceFiles } from '../workspace-effects.ts';
 

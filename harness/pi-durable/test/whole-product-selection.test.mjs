@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { validatePanelSelection } from '../panel-selection.mjs';
+import { validatePanelSelection } from '../panel-selection.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const plan = JSON.parse(readFileSync(new URL('../whole-product.panel.json', import.meta.url)));

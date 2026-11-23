@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { readAllureResults } from "./allure-results.mjs";
-import { readAuditRows } from "./audit-rows.mjs";
+import { readAuditRows } from "./audit-rows.ts";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
 import { candidateDigest } from "./grading-room.ts";
 import { evaluatePanel } from "./panel-policy.ts";

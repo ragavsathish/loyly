@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readAuditRows } from "./audit-rows.mjs";
+import { readAuditRows } from "./audit-rows.ts";
 import { readAllureResults } from "./allure-results.mjs";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
 import { candidateDigest } from "./grading-room.ts";
