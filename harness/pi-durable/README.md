@@ -158,6 +158,13 @@ cc_max, cloned_pct, graph_dependency_entropy, mean_func_loc, …).
 Digest-stable `.mjs` shims and dynamically loaded panel workers are ignored
 in Knip so they are not reported as unused files.
 
+Agent-guiding lint lives in local
+[`eslint-plugin-loyly/`](eslint-plugin-loyly/) (inspired by Factory’s
+approach of encoding conventions as ESLint rules, not importing a foreign
+preset). `loyly/no-product-literals` keeps product IDs and blind pending
+strings in `project/loyly/`; `loyly/no-deep-project-imports` steers callers
+at the barrel. Each rule ships a short `rules/<name>.md` for the fix message.
+
 ## Panel-only reassessment
 
 If a score has been filed but the panel instrument fails, use

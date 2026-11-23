@@ -1,6 +1,12 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import loyly from './eslint-plugin-loyly/index.mjs';
+
+const loylyRules = {
+  'loyly/no-product-literals': 'error',
+  'loyly/no-deep-project-imports': 'error',
+};
 
 export default [
   {
@@ -29,8 +35,10 @@ export default [
   {
     files: ['**/*.mjs'],
     languageOptions: { globals: globals.node },
+    plugins: { loyly },
     rules: {
       ...js.configs.recommended.rules,
+      ...loylyRules,
       // Remaining .mjs adapters still catch-and-rethrow without cause;
       // convert them before tightening this rule.
       'preserve-caught-error': 'off',
@@ -43,11 +51,12 @@ export default [
       parserOptions: { projectService: true },
       globals: globals.node,
     },
-    plugins: { '@typescript-eslint': tseslint.plugin },
+    plugins: { '@typescript-eslint': tseslint.plugin, loyly },
     rules: {
       ...js.configs.recommended.rules,
       ...tseslint.configs.recommendedTypeChecked[1].rules,
       ...tseslint.configs.recommendedTypeChecked[2].rules,
+      ...loylyRules,
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',

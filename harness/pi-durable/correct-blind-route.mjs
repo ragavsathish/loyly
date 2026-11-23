@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { readAuditRows } from "./audit-rows.ts";
-import { parseBlindAgentAnswer } from "./project/loyly/blind-answer.ts";
+import { BLIND_ITEM_ID, parseBlindAgentAnswer } from "./project/loyly/index.ts";
 import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.ts";
 import { candidateDigest } from "./grading-room.ts";
 import { bindScoreInput, verifyScoredCycle } from "./score-receipt.ts";
@@ -49,7 +49,7 @@ if (head(source) !== cut.approved_commit || candidate !== gate.candidate_digest
     || filed.score_file_sha256 !== priorScore.scoreSha256
     || JSON.parse(readFileSync(join(prior, "score-input.json"), "utf8")).candidate_sha256 !== candidate
     || fileHash(join(prior, `gate-${gate.attempt}-evidence`, "gate.log")) !== gate.gate_log_sha256
-    || priorScore.items.filter((item) => item.verdict === "fail").map((item) => item.id).join() !== "01-011")
+    || priorScore.items.filter((item) => item.verdict === "fail").map((item) => item.id).join() !== BLIND_ITEM_ID)
   throw new Error("prior source, gate, candidate or sole failed item differs from the correction scope");
 const review = JSON.parse(readFileSync(reviewFile, "utf8"));
 if (review.verdict !== "pass" || review.launch_receipt_sha256 !== blind.agent_launch_receipt_sha256

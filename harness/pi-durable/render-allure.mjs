@@ -9,6 +9,7 @@ import { readAuditRows } from "./audit-rows.ts";
 import { readAllureResults } from "./allure-results.ts";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.ts";
 import { candidateDigest } from "./grading-room.ts";
+import { BLIND_ITEM_ID } from "./project/loyly/index.ts";
 import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -87,7 +88,7 @@ export async function renderScoredAllure(scratch) {
     ...(blindRequired ? { blind_review_sha256: projected.reviewSha256 } : {}),
     report_html_sha256: fileHash(report), result_count: expected.total,
     note: blindRequired
-      ? "One raw pending 01-011 result plus one separate blind subagent result; the score has one final verdict per checklist item."
+      ? `One raw pending ${BLIND_ITEM_ID} result plus one separate blind subagent result; the score has one final verdict per checklist item.`
       : "One direct grader result and one filed verdict per selected checklist item." };
   writeFileSync(join(out, "loyly-report-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
   return { out, report, manifest, stats: summary.stats };

@@ -1,0 +1,6 @@
+{
+  "name": "eslint-plugin-loyly",
+  "private": true,
+  "type": "module",
+  "main": "index.mjs"
+}
