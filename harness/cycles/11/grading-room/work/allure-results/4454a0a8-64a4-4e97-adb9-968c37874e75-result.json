@@ -1,0 +1,89 @@
+{
+  "uuid": "4454a0a8-64a4-4e97-adb9-968c37874e75",
+  "historyId": "loyly.booking-core.01-004",
+  "testCaseId": "loyly.booking-core.01-004",
+  "fullName": "loyly.booking-core.01-004",
+  "name": "A held slot cannot be confirmed for another household",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Request: POST /api/standing-slot/request apartment 3 Tuesday 17:00 pukuhuone 8 after apartment 12 held it. Observed 409 {\"ok\":false,\"reason\":\"held\",\"message\":\"Refused: the slot on Tuesday at 17:00 in pukuhuone 8 is already held by apartment 12.\",\"holder\":\"12\"}. Re-read holders=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]. Consequence: refused because held=True; apartment 12 still the only holder=True."
+  },
+  "start": 1795423374064,
+  "stop": 1795423374127,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given the household in apartment 12 holds the Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Setup response ok=True; re-read holds=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]."
+      },
+      "start": 1795423374064,
+      "stop": 1795423374127
+    },
+    {
+      "name": "When the household in apartment 3 requests a standing slot on Tuesday at 17:00 in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST /api/standing-slot/request apartment 3 -> 409 {\"ok\":false,\"reason\":\"held\",\"message\":\"Refused: the slot on Tuesday at 17:00 in pukuhuone 8 is already held by apartment 12.\",\"holder\":\"12\"}"
+      },
+      "start": 1795423374064,
+      "stop": 1795423374127
+    },
+    {
+      "name": "Then the request is refused because the slot is held",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "reason=held message=Refused: the slot on Tuesday at 17:00 in pukuhuone 8 is already held by apartment 12."
+      },
+      "start": 1795423374064,
+      "stop": 1795423374127
+    },
+    {
+      "name": "And the household in apartment 12 still holds the slot",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Re-read Tuesday 17:00 pukuhuone 8 holders=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]."
+      },
+      "start": 1795423374064,
+      "stop": 1795423374127
+    }
+  ],
+  "attachments": [
+    {
+      "name": "01-004 observation",
+      "source": "b0d4ec14-1b80-4c4b-aca6-19f2ecad7df2-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

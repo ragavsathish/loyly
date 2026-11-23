@@ -1,0 +1,4 @@
+command: ./start.sh 19104
+Löyly booking listening on http://127.0.0.1:19104/
+ready: GET /api/schedule 200
+stopped

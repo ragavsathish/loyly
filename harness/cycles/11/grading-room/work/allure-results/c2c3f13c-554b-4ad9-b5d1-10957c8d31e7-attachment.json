@@ -1,0 +1,83 @@
+{
+  "free_before_second": [
+    {
+      "dressingRoom": "pukuhuone 8",
+      "weekday": "Thursday",
+      "startTime": "17:00",
+      "endTime": "18:30"
+    },
+    {
+      "dressingRoom": "pukuhuone 9",
+      "weekday": "Thursday",
+      "startTime": "17:00",
+      "endTime": "18:30"
+    },
+    {
+      "dressingRoom": "pukuhuone 9",
+      "weekday": "Friday",
+      "startTime": "17:00",
+      "endTime": "18:30"
+    },
+    {
+      "dressingRoom": "pukuhuone 9",
+      "weekday": "Saturday",
+      "startTime": "17:00",
+      "endTime": "18:30"
+    }
+  ],
+  "second_request": {
+    "apartment": "12",
+    "weekday": "Thursday",
+    "startTime": "17:00",
+    "dressingRoom": "pukuhuone 8"
+  },
+  "second_status": 200,
+  "second_response": {
+    "ok": true,
+    "booking": {
+      "id": "12-pukuhuone 8-Thursday-17:00",
+      "apartment": "12",
+      "dressingRoom": "pukuhuone 8",
+      "weekday": "Thursday",
+      "startTime": "17:00",
+      "endTime": "18:30",
+      "standing": true
+    },
+    "message": "Standing slot confirmed for 17:00 to 18:30 every Thursday.",
+    "repeats": "every coming Thursday"
+  },
+  "holds_after": [
+    {
+      "dressingRoom": "pukuhuone 8",
+      "weekday": "Tuesday",
+      "startTime": "17:00",
+      "endTime": "18:30",
+      "heldBy": "12",
+      "bookable": false
+    },
+    {
+      "dressingRoom": "pukuhuone 8",
+      "weekday": "Thursday",
+      "startTime": "17:00",
+      "endTime": "18:30",
+      "heldBy": "12",
+      "bookable": false
+    }
+  ],
+  "posted_list": {
+    "slots": [
+      {
+        "apartment": "12",
+        "dressingRoom": "pukuhuone 8",
+        "weekday": "Tuesday",
+        "time": "17:00-18:30"
+      },
+      {
+        "apartment": "12",
+        "dressingRoom": "pukuhuone 8",
+        "weekday": "Thursday",
+        "time": "17:00-18:30"
+      }
+    ]
+  }
+}

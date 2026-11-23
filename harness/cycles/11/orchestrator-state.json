@@ -1,0 +1,20 @@
+{
+  "phase": "score",
+  "attempt": 1,
+  "builderModel": "composer-2.5",
+  "graderModel": "grok-4.7-high",
+  "blindModel": "composer-2.5",
+  "room": "/tmp/loyly-cursor-cycle-11/builder-room",
+  "contract": "/tmp/loyly-cursor-cycle-11/run-contract.json",
+  "builderAgentId": "bc-70a6c2de-e179-5fe9-9b9c-0b71d2915026",
+  "candidateSha256": "4982f455df7039018d79bbd3f86140c765a923733760e0cfde67ac59910c9eca",
+  "gate": "passed",
+  "graderNote": "used completed evidence from bc-631b019b; retry abandoned after evidence sealed",
+  "priorGraderAgentId": "bc-631b019b-125d-55ff-b37f-cf96e5119992",
+  "graderAgentId": "bc-631b019b-125d-55ff-b37f-cf96e5119992",
+  "graderRetryAgentId": "bc-cd2ef953-dc32-540c-895b-0df6770f4c4f",
+  "blindAgentId": "bc-08e02616-06f6-579b-b47a-6ecbb5405d10",
+  "score": "11/11",
+  "failedIds": [],
+  "accepted": false
+}

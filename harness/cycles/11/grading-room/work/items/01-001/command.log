@@ -1,0 +1,127 @@
+probe item 01-001 port 19101
+
+--- GET / -> 200
+<!DOCTYPE html>
+<html lang="en">
+<head><title>Löyly — sauna F</title></head>
+<body>
+<h1>Löyly sauna booking</h1>
+<p>Weekly schedule for <strong>sauna F</strong> (sauna).</p>
+<pre id="schedule">{
+  "sauna": "sauna F",
+  "dressingRooms": {
+    "pukuhuone 8": {
+      "saunaDays": [
+        "Tuesday",
+        "Thursday"
+      ],
+      "days": {
+        "Monday": {
+          "noSlots": true,
+          "slots": []
+        },
+        "Tuesday": {
+          "noSlots": false,
+          "slots": [
+            {
+              "startTime": "17:00",
+              "endTime": "18:30",
+              "bookable": true,
+              "heldBy": null
+            }
+          ]
+        },
+        "Wednesday": {
+          "noSlots": true,
+          "slots": []
+        },
+        "Thursday": {
+          "noSlots": false,
+          "slots": [
+            {
+              "startTime": "17:00",
+              "endTime": "18:30",
+              "bookable": true,
+              "heldBy": null
+            }
+          ]
+        },
+        "Friday": {
+          "noSlots": true,
+          "slots": []
+        },
+        "Saturday": {
+          "noSlots": true,
+          "slots": []
+        },
+        "Sunday": {
+          "noSlots": true,
+          "slots": []
+        }
+      }
+    },
+    "pukuhuone 9": {
+      "saunaDays": [
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "days": {
+        "Monday": {
+          "noSlots": true,
+          "slots": []
+        },
+        "Tuesday": {
+          "noSlots": true,
+          "slots": []
+        },
+        "Wednesday": {
+          "noSlots": true,
+          "slots": []
+        },
+        "Thursday": {
+          "noSlots": false,
+          "slots": [
+            {
+              "startTime": "17:00",
+              "endTime": "18:30",
+              "bookable": true,
+              "heldBy": null
+            }
+          ]
+        },
+        "Friday": {
+          "noSlots": false,
+          "slots": [
+            {
+              "startTime": "17:00",
+              "endTime": "18:30",
+              "bookable": true,
+              "heldBy": null
+            }
+          ]
+        },
+        "Saturday": {
+          "noSlots": false,
+          "slots": [
+            {
+              "startTime": "17:00",
+              "endTime": "18:30",
+              "bookable": true,
+              "heldBy": null
+            }
+          ]
+        },
+        "Sunday": {
+          "noSlots": true,
+          "slots": []
+        }
+      }
+    }
+  }
+}</pre>
+</body>
+</html>
+
+--- GET /api/schedule -> 200
+{"sauna":"sauna F","dressingRooms":{"pukuhuone 8":{"saunaDays":["Tuesday","Thursday"],"days":{"Monday":{"noSlots":true,"slots":[]},"Tuesday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Wednesday":{"noSlots":true,"slots":[]},"Thursday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Friday":{"noSlots":true,"slots":[]},"Saturday":{"noSlots":true,"slots":[]},"Sunday":{"noSlots":true,"slots":[]}}},"pukuhuone 9":{"saunaDays":["Thursday","Friday","Saturday"],"days":{"Monday":{"noSlots":true,"slots":[]},"Tuesday":{"noSlots":true,"slots":[]},"Wednesday":{"noSlots":true,"slots":[]},"Thursday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Friday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Saturday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Sunday":{"noSlots":true,"slots":[]}}}}}

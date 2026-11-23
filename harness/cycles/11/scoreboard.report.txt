@@ -1,0 +1,7 @@
+cycle 11: 11/11 checklist items pass
+
+  against cycle 10, counting only the 11 items both cycles carried:
+    cycle 10    10/11 =  90.9%
+    cycle 11    11/11 = 100.0%   <- these two are the fair comparison
+    now passing     1   <- repaired since then
+    now failing     0   <- broken since then

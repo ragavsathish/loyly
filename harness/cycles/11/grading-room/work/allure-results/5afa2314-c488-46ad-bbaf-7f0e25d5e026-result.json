@@ -1,0 +1,129 @@
+{
+  "uuid": "5afa2314-c488-46ad-bbaf-7f0e25d5e026",
+  "historyId": "loyly.booking-core.01-009",
+  "testCaseId": "loyly.booking-core.01-009",
+  "fullName": "loyly.booking-core.01-009",
+  "name": "Two households request the same free slot with neither request answered",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Request: concurrent POST /api/standing-slot/request from apartments 12 and 3 for Tuesday 17:00 pukuhuone 8, with both requests sent before either response was read. Observed {\"12\": {\"status\": 200, \"body\": {\"ok\": true, \"booking\": {\"id\": \"12-pukuhuone 8-Tuesday-17:00\", \"apartment\": \"12\", \"dressingRoom\": \"pukuhuone 8\", \"weekday\": \"Tuesday\", \"startTime\": \"17:00\", \"endTime\": \"18:30\", \"standing\": true}, \"message\": \"Standing slot confirmed for 17:00 to 18:30 every Tuesday.\", \"repeats\": \"every coming Tuesday\"}, \"error\": null}, \"3\": {\"status\": 409, \"body\": {\"ok\": false, \"reason\": \"held\", \"message\": \"Refused: the slot on Tuesday at 17:00 in pukuhuone 8 is already held by apartment 12.\", \"holder\": \"12\"}, \"error\": null}}. Schedule holds=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]. Derived views list=[{'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'time': '17:00-18:30'}] heater=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'heatFrom': '17:00', 'heatTo': '18:30'}] billing=[{'payer': '12', 'basis': 'standing_slot', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00'}]. Consequence: exactly one holder and the other refused because held=True."
+  },
+  "start": 1795423374389,
+  "stop": 1795423374454,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Two households requesting one free slot leave exactly one holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Tuesday at 17:00 in pukuhuone 8 is free",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Tuesday slots=[{'startTime': '17:00', 'endTime': '18:30', 'bookable': True, 'heldBy': None}]."
+      },
+      "start": 1795423374389,
+      "stop": 1795423374454
+    },
+    {
+      "name": "And neither the household in apartment 12 nor the household in apartment 3 holds it",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "holds 12=[] holds 3=[]."
+      },
+      "start": 1795423374389,
+      "stop": 1795423374454
+    },
+    {
+      "name": "When both households request a standing slot on Tuesday at 17:00 in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Concurrent POST responses: {\"12\": {\"status\": 200, \"body\": {\"ok\": true, \"booking\": {\"id\": \"12-pukuhuone 8-Tuesday-17:00\", \"apartment\": \"12\", \"dressingRoom\": \"pukuhuone 8\", \"weekday\": \"Tuesday\", \"startTime\": \"17:00\", \"endTime\": \"18:30\", \"standing\": true}, \"message\": \"Standing slot confirmed for 17:00 to 18:30 every Tuesday.\", \"repeats\": \"every coming Tuesday\"}, \"error\": null}, \"3\": {\"status\": 409, \"body\": {\"ok\": false, \"reason\": \"held\", \"message\": \"Refused: the slot on Tuesday at 17:00 in pukuhuone 8 is already held by apartment 12.\", \"holder\": \"12\"}, \"error\": null}}"
+      },
+      "start": 1795423374389,
+      "stop": 1795423374454
+    },
+    {
+      "name": "And the second request is made before the first has been answered",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Both request bodies were sent before either response was read. overlap=True timings 12=(8529.293224941,8529.293233841) 3=(8529.293044465,8529.293406766)."
+      },
+      "start": 1795423374389,
+      "stop": 1795423374454
+    },
+    {
+      "name": "Then exactly one of the two requests is confirmed",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "classification={'bucket': 'one_confirmed', 'confirmed_apartments': ['12'], 'refused_apartments': ['3'], 'loser_refused_because_held': True, 'winner': '12', 'clean_exactly_one': True}."
+      },
+      "start": 1795423374389,
+      "stop": 1795423374454
+    },
+    {
+      "name": "And the other is refused because the slot is held",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "loser_refused_because_held=True."
+      },
+      "start": 1795423374389,
+      "stop": 1795423374454
+    },
+    {
+      "name": "And exactly one household holds the Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "schedule holds=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]."
+      },
+      "start": 1795423374389,
+      "stop": 1795423374454
+    },
+    {
+      "name": "And no derived view shows two holders for it",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "list=[{'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'time': '17:00-18:30'}] heater=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'heatFrom': '17:00', 'heatTo': '18:30'}] billing=[{'payer': '12', 'basis': 'standing_slot', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00'}]."
+      },
+      "start": 1795423374389,
+      "stop": 1795423374454
+    }
+  ],
+  "attachments": [
+    {
+      "name": "01-009 observation",
+      "source": "5cd677af-fe0b-4d73-a0f3-a63ce22c4ada-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

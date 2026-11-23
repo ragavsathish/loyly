@@ -1,0 +1,92 @@
+{
+ "items": [
+  {
+   "id": "01-001",
+   "name": "The weekly schedule shows each dressing room's own sauna days",
+   "rule": "Availability is per dressing room, per weekday",
+   "source": "docs/plan/01-booking-core/spec.feature:13",
+   "verdict": "pass",
+   "evidence": "Request: GET / (weekly schedule for sauna F) and GET /api/schedule. Observed pukuhuone 9 sauna days ['Thursday', 'Friday', 'Saturday']; pukuhuone 8 sauna days ['Tuesday', 'Thursday']. Tuesday pukuhuone 8 bookable slots=[{'startTime': '17:00', 'endTime': '18:30', 'bookable': True, 'heldBy': None}]; Tuesday pukuhuone 9 slots=[] noSlots=True. Page and API schedules agree=True. Consequence: resident schedule matches both Tuesday assertions."
+  },
+  {
+   "id": "01-002",
+   "name": "A standing slot cannot be requested on a closed day",
+   "rule": "Availability is per dressing room, per weekday",
+   "source": "docs/plan/01-booking-core/spec.feature:21",
+   "verdict": "pass",
+   "evidence": "Request: POST /api/standing-slot/request apartment 12, Tuesday 17:00, pukuhuone 9. Observed status 409 body {\"ok\":false,\"reason\":\"closed_day\",\"message\":\"Refused: pukuhuone 9 has no sauna day on Tuesday. pukuhuone 9 is open on Thursday, Friday, Saturday. You may request a standing slot on Tuesday at 17:00 in pukuhuone 8.\",\"openDays\":[\"Thursday\",\"Friday\",\"Saturday\"]}. Exact refusal text: Refused: pukuhuone 9 has no sauna day on Tuesday. pukuhuone 9 is open on Thursday, Friday, Saturday. You may request a standing slot on Tuesday at 17:00 in pukuhuone 8.. Offered open days: ['Thursday', 'Friday', 'Saturday']. Consequence: refusal names the closed Tuesday and the open days=True; no hold was stored for apartment 12 ([])."
+  },
+  {
+   "id": "01-003",
+   "name": "A requested slot on an open day is confirmed",
+   "rule": "A slot is confirmed against availability and held by one household",
+   "source": "docs/plan/01-booking-core/spec.feature:30",
+   "verdict": "pass",
+   "evidence": "Request: POST /api/standing-slot/request apartment 12 Tuesday 17:00 pukuhuone 8. Observed 200 {\"ok\":true,\"booking\":{\"id\":\"12-pukuhuone 8-Tuesday-17:00\",\"apartment\":\"12\",\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"standing\":true},\"message\":\"Standing slot confirmed for 17:00 to 18:30 every Tuesday.\",\"repeats\":\"every coming Tuesday\"}. Re-read schedule hold=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}] and posted list=[{'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'time': '17:00-18:30'}]. Consequence: confirmed 17:00 to 18:30 and persisted as the Tuesday standing hold=True."
+  },
+  {
+   "id": "01-004",
+   "name": "A held slot cannot be confirmed for another household",
+   "rule": "A slot is confirmed against availability and held by one household",
+   "source": "docs/plan/01-booking-core/spec.feature:37",
+   "verdict": "pass",
+   "evidence": "Request: POST /api/standing-slot/request apartment 3 Tuesday 17:00 pukuhuone 8 after apartment 12 held it. Observed 409 {\"ok\":false,\"reason\":\"held\",\"message\":\"Refused: the slot on Tuesday at 17:00 in pukuhuone 8 is already held by apartment 12.\",\"holder\":\"12\"}. Re-read holders=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]. Consequence: refused because held=True; apartment 12 still the only holder=True."
+  },
+  {
+   "id": "01-005",
+   "name": "A second standing slot is granted while there is room",
+   "rule": "A household may hold a second standing slot when there is room",
+   "source": "docs/plan/01-booking-core/spec.feature:46",
+   "verdict": "pass",
+   "evidence": "Request: POST /api/standing-slot/request apartment 12 {'dressingRoom': 'pukuhuone 8', 'weekday': 'Thursday', 'startTime': '17:00', 'endTime': '18:30'}. Observed 200 {\"ok\":true,\"booking\":{\"id\":\"12-pukuhuone 8-Thursday-17:00\",\"apartment\":\"12\",\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Thursday\",\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"standing\":true},\"message\":\"Standing slot confirmed for 17:00 to 18:30 every Thursday.\",\"repeats\":\"every coming Thursday\"}. Re-read holds=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}, {'dressingRoom': 'pukuhuone 8', 'weekday': 'Thursday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]; posted list count for apartment 12=2. Consequence: second slot persisted and household holds two=True."
+  },
+  {
+   "id": "01-006",
+   "name": "A second standing slot is refused when the schedule is full",
+   "rule": "A household may hold a second standing slot when there is room",
+   "source": "docs/plan/01-booking-core/spec.feature:54",
+   "verdict": "pass",
+   "evidence": "Request: POST /api/standing-slot/request apartment 12 Saturday 17:00 pukuhuone 9 while every standing slot was held. Observed 409 {\"ok\":false,\"reason\":\"schedule_full\",\"message\":\"Refused: the weekly schedule has no free standing slot. There is no bookable position left in the standing schedule.\",\"suggestChoosing\":false}. Re-read apartment 12 holds=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]. Consequence: full-schedule refusal without a choice suggestion=True; still exactly one hold=True."
+  },
+  {
+   "id": "01-007",
+   "name": "Confirming a booking updates all three derived views together",
+   "rule": "One booking is the single source of truth for the list, the timer and the billing",
+   "source": "docs/plan/01-booking-core/spec.feature:64",
+   "verdict": "pass",
+   "evidence": "Request: POST /api/standing-slot/request apartment 12 Tuesday 17:00 pukuhuone 8, then re-read the three views. Observed confirmation 200 {\"ok\":true,\"booking\":{\"id\":\"12-pukuhuone 8-Tuesday-17:00\",\"apartment\":\"12\",\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"standing\":true},\"message\":\"Standing slot confirmed for 17:00 to 18:30 every Tuesday.\",\"repeats\":\"every coming Tuesday\"}. Posted list=[{'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'time': '17:00-18:30'}]; heater=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'heatFrom': '17:00', 'heatTo': '18:30'}]; billing charge=[{'payer': '12', 'basis': 'standing_slot', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00'}] ledger=[{'type': 'standing_slot_charge', 'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'action': 'raised'}]; schedule hold=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]. Consequence: all three views match that same booking record=True."
+  },
+  {
+   "id": "01-008",
+   "name": "Giving up a slot leaves no derived view still claiming it",
+   "rule": "One booking is the single source of truth for the list, the timer and the billing",
+   "source": "docs/plan/01-booking-core/spec.feature:72",
+   "verdict": "pass",
+   "evidence": "Request: POST /api/standing-slot/give-up apartment 12 Tuesday 17:00 pukuhuone 8. Observed 200 {\"ok\":true}. Afterward schedule hold=[], slot-list=[], heater=[], activeCharges=[], ledger=[{'type': 'standing_slot_charge', 'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'action': 'raised'}, {'type': 'standing_slot_charge', 'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'action': 'stopped'}]. Consequence: no view still claims the slot=True."
+  },
+  {
+   "id": "01-009",
+   "name": "Two households request the same free slot with neither request answered",
+   "rule": "Two households requesting one free slot leave exactly one holder",
+   "source": "docs/plan/01-booking-core/spec.feature:108",
+   "verdict": "pass",
+   "evidence": "Request: concurrent POST /api/standing-slot/request from apartments 12 and 3 for Tuesday 17:00 pukuhuone 8, with both requests sent before either response was read. Observed {\"12\": {\"status\": 200, \"body\": {\"ok\": true, \"booking\": {\"id\": \"12-pukuhuone 8-Tuesday-17:00\", \"apartment\": \"12\", \"dressingRoom\": \"pukuhuone 8\", \"weekday\": \"Tuesday\", \"startTime\": \"17:00\", \"endTime\": \"18:30\", \"standing\": true}, \"message\": \"Standing slot confirmed for 17:00 to 18:30 every Tuesday.\", \"repeats\": \"every coming Tuesday\"}, \"error\": null}, \"3\": {\"status\": 409, \"body\": {\"ok\": false, \"reason\": \"held\", \"message\": \"Refused: the slot on Tuesday at 17:00 in pukuhuone 8 is already held by apartment 12.\", \"holder\": \"12\"}, \"error\": null}}. Schedule holds=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]. Derived views list=[{'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'time': '17:00-18:30'}] heater=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'heatFrom': '17:00', 'heatTo': '18:30'}] billing=[{'payer': '12', 'basis': 'standing_slot', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00'}]. Consequence: exactly one holder and the other refused because held=True."
+  },
+  {
+   "id": "01-010",
+   "name": "The race is run one hundred times and never confirms twice",
+   "rule": "Two households requesting one free slot leave exactly one holder",
+   "source": "docs/plan/01-booking-core/spec.feature:125",
+   "verdict": "pass",
+   "evidence": "Request: 100 in-flight races, apartments 12 and 3, POST /api/standing-slot/request Tuesday 17:00 pukuhuone 8, slot freed and re-read before every run, both requests sent before either response was read. Observed one_confirmed=100, both_confirmed=0, neither_confirmed=0. Violations=0. Consequence: every run confirmed exactly one household=True."
+  },
+  {
+   "id": "01-011",
+   "name": "The refusal for a closed day is judged usable",
+   "rule": "A refusal is judged by whether a resident can act on it without asking again",
+   "source": "docs/plan/01-booking-core/spec.feature:156",
+   "verdict": "pass",
+   "evidence": "Blind REQUEST: pukuhuone 8 | Tuesday | 17:00 confirmed over HTTP with standing slot confirmation."
+  }
+ ]
+}
