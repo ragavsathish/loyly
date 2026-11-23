@@ -10,6 +10,16 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const PI = resolve(HERE, '..');
 const ROOTS = [PI, resolve(PI, '../cycle-core'), resolve(PI, '../evidence-core')].filter(existsSync);
 const SKIP = new Set(['node_modules', 'scratch', 'reviews', 'fixture', 'test', 'dist', '.git']);
+// Digest-pinned panel workers / frozen adapters stay byte-stable; exclude from Q-factor.
+const SKIP_FILES = new Set([
+  'panel-browser.mjs',
+  'panel-protocol.mjs',
+  'panel-telemetry.mjs',
+  'panel-runtime.mjs',
+  'panel-candidate.mjs',
+  'blind-agent-adapter.mjs',
+  'runtime-profile-evidence.mjs',
+]);
 const HIGH_CC = 10;
 
 const COMPLEXITY_KINDS = new Set([
@@ -38,7 +48,11 @@ function walk(dir, out = []) {
     if (st.isDirectory()) {
       if (SKIP.has(name) || name.startsWith('scratch')) continue;
       walk(path, out);
-    } else if (['.ts', '.mjs', '.js'].includes(extname(name)) && !name.endsWith('.d.ts')) {
+    } else if (
+      ['.ts', '.mjs', '.js'].includes(extname(name)) &&
+      !name.endsWith('.d.ts') &&
+      !SKIP_FILES.has(name)
+    ) {
       out.push(path);
     }
   }

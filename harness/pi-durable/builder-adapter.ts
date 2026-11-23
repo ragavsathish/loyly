@@ -1,6 +1,6 @@
 // A process boundary for the provided Pi builder host. The durable cycle gives
 // each attempt a stable session ID; builder.sh writes its own launch receipt.
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { closeSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, isAbsolute, join } from 'node:path';
@@ -178,28 +178,22 @@ function stopGroup(pid: number | undefined, expectedCommand: string): void {
   }, 5000).unref();
 }
 
-async function runBuilder({
-  command,
-  room,
-  instruction,
-  image,
-  evidenceDir,
-  sessionId,
-  requestId = sessionId,
-  model,
-  stateRoot,
-  timeoutMs = 14_400_000,
-  signal,
-  prompt,
-  roomLabel,
-  piSettings,
-  imageAdditionsPath,
-  readonlyInputs = false,
-  bashTimeoutFloorSeconds,
-  bashTimeoutCeilingSeconds,
-  storePath,
-  parentConversationReceipt,
-}: RunBuilderArgs): Promise<BuilderRunResult> {
+function assertBuilderArgs(args: RunBuilderArgs): void {
+  const {
+    command,
+    room,
+    instruction,
+    image,
+    evidenceDir,
+    stateRoot,
+    sessionId,
+    requestId = sessionId,
+    bashTimeoutFloorSeconds,
+    bashTimeoutCeilingSeconds,
+    storePath,
+    parentConversationReceipt,
+    signal,
+  } = args;
   for (const path of [command, room, instruction, image, evidenceDir, stateRoot])
     if (!isAbsolute(path)) throw new Error(`builder path must be absolute: ${path}`);
   if (!/^[A-Za-z0-9._-]+$/.test(sessionId)) throw new Error('unsafe builder session ID');
@@ -226,23 +220,47 @@ async function runBuilder({
   )
     throw new Error('prior Pi conversation receipt missing');
   if (signal?.aborted) throw new Error('builder launch already aborted');
-  const instructionSha256 = sha256(readFileSync(instruction));
-  mkdirSync(evidenceDir, { recursive: true });
-  let found = await readyLaunch(evidenceDir, sessionId, requestId);
+}
+
+type ReceiptContext = {
+  instructionSha256: string;
+  model: string;
+  room: string;
+  image: string;
+  readonlyInputs: boolean;
+  sessionId: string;
+  requestId: string;
+  bashTimeoutFloorSeconds: number | undefined;
+  bashTimeoutCeilingSeconds: number | undefined;
+  storePath: string | undefined;
+  parentConversationReceipt: string | undefined;
+};
+
+function checkReceipt(found: FoundLaunch | null | undefined, ctx: ReceiptContext): void {
   validateReceipt(
     found,
-    instructionSha256,
-    model,
-    room,
-    image,
-    readonlyInputs,
-    sessionId,
-    requestId,
-    bashTimeoutFloorSeconds,
-    bashTimeoutCeilingSeconds,
-    storePath,
-    parentConversationReceipt,
+    ctx.instructionSha256,
+    ctx.model,
+    ctx.room,
+    ctx.image,
+    ctx.readonlyInputs,
+    ctx.sessionId,
+    ctx.requestId,
+    ctx.bashTimeoutFloorSeconds,
+    ctx.bashTimeoutCeilingSeconds,
+    ctx.storePath,
+    ctx.parentConversationReceipt,
   );
+}
+
+async function awaitExistingBuilder(
+  command: string,
+  evidenceDir: string,
+  ctx: ReceiptContext,
+  timeoutMs: number,
+): Promise<BuilderRunResult | FoundLaunch | null> {
+  let found = await readyLaunch(evidenceDir, ctx.sessionId, ctx.requestId);
+  checkReceipt(found, ctx);
   if (found?.receipt.exit !== undefined)
     return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
 
@@ -265,26 +283,35 @@ async function runBuilder({
       throw new Error('existing builder host exceeded deadline');
     }
     await pause(1000);
-    found = await readyLaunch(evidenceDir, sessionId, requestId);
-    validateReceipt(
-      found,
-      instructionSha256,
-      model,
-      room,
-      image,
-      readonlyInputs,
-      sessionId,
-      requestId,
-      bashTimeoutFloorSeconds,
-      bashTimeoutCeilingSeconds,
-      storePath,
-      parentConversationReceipt,
-    );
+    found = await readyLaunch(evidenceDir, ctx.sessionId, ctx.requestId);
+    checkReceipt(found, ctx);
     if (found?.receipt.exit !== undefined)
       return { exit: Number(found.receipt.exit), reconciled: true, receipt: found.path };
   }
-  // A dead wrapper with no exit receipt can be relaunched with the same session
-  // and request ID; pi-durable resumes that submission instead of duplicating it.
+  return found;
+}
+
+function spawnBuilderChild(args: RunBuilderArgs): ChildProcess {
+  const {
+    command,
+    room,
+    instruction,
+    image,
+    evidenceDir,
+    sessionId,
+    requestId = sessionId,
+    model,
+    stateRoot,
+    prompt,
+    roomLabel,
+    piSettings,
+    imageAdditionsPath,
+    readonlyInputs = false,
+    bashTimeoutFloorSeconds,
+    bashTimeoutCeilingSeconds,
+    storePath,
+    parentConversationReceipt,
+  } = args;
   const out = openSync(join(evidenceDir, 'controller.stdout'), 'a');
   const err = openSync(join(evidenceDir, 'controller.stderr'), 'a');
   const child = spawn(command, [room, instruction, image], {
@@ -315,6 +342,17 @@ async function runBuilder({
   });
   closeSync(out);
   closeSync(err);
+  return child;
+}
+
+async function awaitSpawnedBuilder(
+  child: ChildProcess,
+  command: string,
+  evidenceDir: string,
+  ctx: ReceiptContext,
+  timeoutMs: number,
+  signal: AbortSignal | undefined,
+): Promise<BuilderRunResult> {
   let timedOut = false;
   const timer = setTimeout(() => {
     timedOut = true;
@@ -327,21 +365,8 @@ async function runBuilder({
       child.once('error', reject);
       child.once('exit', (code, sig) => resolve(code ?? (sig ? 128 : 1)));
     });
-    found = await readyLaunch(evidenceDir, sessionId, requestId);
-    validateReceipt(
-      found,
-      instructionSha256,
-      model,
-      room,
-      image,
-      readonlyInputs,
-      sessionId,
-      requestId,
-      bashTimeoutFloorSeconds,
-      bashTimeoutCeilingSeconds,
-      storePath,
-      parentConversationReceipt,
-    );
+    const found = await readyLaunch(evidenceDir, ctx.sessionId, ctx.requestId);
+    checkReceipt(found, ctx);
     if (timedOut) throw new Error('builder host exceeded deadline');
     if (!found || found.receipt.exit === undefined)
       throw new Error('builder host exited without a completed launch receipt');
@@ -352,6 +377,48 @@ async function runBuilder({
     clearTimeout(timer);
     signal?.removeEventListener('abort', onAbort);
   }
+}
+
+async function runBuilder(args: RunBuilderArgs): Promise<BuilderRunResult> {
+  assertBuilderArgs(args);
+  const {
+    command,
+    room,
+    instruction,
+    image,
+    evidenceDir,
+    sessionId,
+    requestId = sessionId,
+    model,
+    timeoutMs = 14_400_000,
+    signal,
+    readonlyInputs = false,
+    bashTimeoutFloorSeconds,
+    bashTimeoutCeilingSeconds,
+    storePath,
+    parentConversationReceipt,
+  } = args;
+  const instructionSha256 = sha256(readFileSync(instruction));
+  mkdirSync(evidenceDir, { recursive: true });
+  const ctx: ReceiptContext = {
+    instructionSha256,
+    model,
+    room,
+    image,
+    readonlyInputs,
+    sessionId,
+    requestId,
+    bashTimeoutFloorSeconds,
+    bashTimeoutCeilingSeconds,
+    storePath,
+    parentConversationReceipt,
+  };
+  const existing = await awaitExistingBuilder(command, evidenceDir, ctx, timeoutMs);
+  if (existing && 'reconciled' in existing) return existing;
+  // A dead wrapper with no exit receipt can be relaunched with the same session
+  // and request ID; pi-durable resumes that submission instead of duplicating it.
+  const child = spawnBuilderChild(args);
+  return awaitSpawnedBuilder(child, command, evidenceDir, ctx, timeoutMs, signal);
 }
 
 export type { RunBuilderArgs, BuilderRunResult, LaunchReceipt };

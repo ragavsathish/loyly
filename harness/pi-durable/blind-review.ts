@@ -233,6 +233,46 @@ function writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verificatio
   return { result, packetSha256, reviewSha256 };
 }
 
+function assertBlindAllureIdentity(result, resultFile, item, fullName, packet, expectedStatus) {
+  if (resultFile !== `${result.uuid}-result.json`
+      || result.name !== item?.name || result.fullName !== fullName
+      || result.testCaseId !== fullName || result.historyId !== fullName
+      || result.status !== expectedStatus || result.stage !== "finished"
+      || result.labels?.filter((label) => label.name === "tag" && label.value === `@item-${REVIEW_ID}`).length !== 1
+      || result.parameters?.find((p) => p.name === "candidate_sha256")?.value !== packet.candidate_sha256
+      || result.parameters?.find((p) => p.name === "grader_allure_sha256")?.value !== packet.allure_results_sha256)
+    throw new Error("blind subagent Allure result differs from the bound review");
+}
+
+function assertBlindAllureAttachments(result, names, out) {
+  const attachmentNames = result.attachments.map((a) => a.source);
+  if (new Set(attachmentNames).size !== attachmentNames.length
+      || names.length !== attachmentNames.length + 1
+      || attachmentNames.some((name) => !names.includes(name) || !lstatSync(join(out, name)).isFile()))
+    throw new Error("blind subagent Allure attachments are incomplete");
+}
+
+function assertBlindAllureEvidence({
+  result, out, packetSha256, reviewSha256, review, verification, verificationDir,
+}) {
+  const evidence = JSON.parse(readFileSync(join(out, result.attachments[0].source), "utf8"));
+  if (evidence.packet_sha256 !== packetSha256 || evidence.review_sha256 !== reviewSha256
+      || JSON.stringify(evidence.review) !== JSON.stringify(review))
+    throw new Error("blind subagent Allure evidence differs from the bound review");
+  if (review.verdict === "pass") {
+    if (result.attachments.length !== 2 || evidence.verification?.review_sha256 !== reviewSha256
+        || JSON.stringify(evidence.verification) !== JSON.stringify(verification)
+        || verification.packet_sha256 !== packetSha256
+        || verification.accepted !== (verification.http_status >= 200 && verification.http_status < 300)
+        || verification.response_sha256 !== fileHash(join(verificationDir, "response.txt"))
+        || !readFileSync(join(out, result.attachments[1].source)).equals(
+          readFileSync(join(verificationDir, "response.txt"))))
+      throw new Error("blind subagent Allure probe differs from the bound HTTP response");
+  } else if (result.attachments.length !== 1 || evidence.verification !== undefined) {
+    throw new Error("failed blind review must not claim an HTTP confirmation");
+  }
+}
+
 function readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verificationDir, out }) {
   const { packet, review, packetSha256, reviewSha256 } = validateBlindReview({ packetDir, reviewFile, gradingRoom });
   const names = readdirSync(out).sort();
@@ -250,35 +290,11 @@ function readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verification
   compileAllureSchema(
     JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8")),
   )(result, resultFiles[0]);
-  if (resultFiles[0] !== `${result.uuid}-result.json`
-      || result.name !== item?.name || result.fullName !== fullName
-      || result.testCaseId !== fullName || result.historyId !== fullName
-      || result.status !== expectedStatus || result.stage !== "finished"
-      || result.labels?.filter((label) => label.name === "tag" && label.value === `@item-${REVIEW_ID}`).length !== 1
-      || result.parameters?.find((p) => p.name === "candidate_sha256")?.value !== packet.candidate_sha256
-      || result.parameters?.find((p) => p.name === "grader_allure_sha256")?.value !== packet.allure_results_sha256)
-    throw new Error("blind subagent Allure result differs from the bound review");
-  const attachmentNames = result.attachments.map((a) => a.source);
-  if (new Set(attachmentNames).size !== attachmentNames.length
-      || names.length !== attachmentNames.length + 1
-      || attachmentNames.some((name) => !names.includes(name) || !lstatSync(join(out, name)).isFile()))
-    throw new Error("blind subagent Allure attachments are incomplete");
-  const evidence = JSON.parse(readFileSync(join(out, result.attachments[0].source), "utf8"));
-  if (evidence.packet_sha256 !== packetSha256 || evidence.review_sha256 !== reviewSha256
-      || JSON.stringify(evidence.review) !== JSON.stringify(review))
-    throw new Error("blind subagent Allure evidence differs from the bound review");
-  if (review.verdict === "pass") {
-    if (result.attachments.length !== 2 || evidence.verification?.review_sha256 !== reviewSha256
-        || JSON.stringify(evidence.verification) !== JSON.stringify(verification)
-        || verification.packet_sha256 !== packetSha256
-        || verification.accepted !== (verification.http_status >= 200 && verification.http_status < 300)
-        || verification.response_sha256 !== fileHash(join(verificationDir, "response.txt"))
-        || !readFileSync(join(out, result.attachments[1].source)).equals(
-          readFileSync(join(verificationDir, "response.txt"))))
-      throw new Error("blind subagent Allure probe differs from the bound HTTP response");
-  } else if (result.attachments.length !== 1 || evidence.verification !== undefined) {
-    throw new Error("failed blind review must not claim an HTTP confirmation");
-  }
+  assertBlindAllureIdentity(result, resultFiles[0], item, fullName, packet, expectedStatus);
+  assertBlindAllureAttachments(result, names, out);
+  assertBlindAllureEvidence({
+    result, out, packetSha256, reviewSha256, review, verification, verificationDir,
+  });
   return { result, packetSha256, reviewSha256 };
 }
 

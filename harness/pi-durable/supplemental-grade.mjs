@@ -17,6 +17,112 @@ const PRODUCERS = [
   { id: "telemetry", tool: "OpenTelemetry" },
 ];
 
+function loadProducerResult(dir, producer, validate) {
+  const resultFiles = readdirSync(dir).filter((name) => /^[0-9a-f-]{36}-result\.json$/.test(name));
+  if (resultFiles.length !== 1) throw new Error(`${producer.id}: need one Allure result`);
+  const file = resultFiles[0];
+  const result = JSON.parse(readFileSync(join(dir, file), "utf8"));
+  try {
+    validate(result, `${producer.id}/${file}`);
+  } catch (cause) {
+    throw new Error(`${producer.id}: ${cause instanceof Error ? cause.message : String(cause)}`);
+  }
+  return { file, result };
+}
+
+function assertProducerShape(producer, result, file, candidateSha256) {
+  const hasTool = result.labels?.some((label) => label.name === "tool" && label.value === producer.tool);
+  const hasItem = result.labels?.some((label) => label.name === "tag" && /^@item-01-0\d\d$/.test(label.value));
+  const hasCandidate = result.parameters?.some((parameter) =>
+    parameter.name === "candidate_sha256" && parameter.value === candidateSha256);
+  const hasReceipt = result.attachments?.some((attachment) =>
+    /execution receipt/i.test(attachment.name) && attachment.type === "application/json");
+  if (file !== `${result.uuid}-result.json`)
+    throw new Error(`${producer.id}: result lacks bound identity, observation or evidence`);
+  if (!["passed", "failed", "skipped", "broken"].includes(result.status))
+    throw new Error(`${producer.id}: result lacks bound identity, observation or evidence`);
+  if (result.stage !== "finished")
+    throw new Error(`${producer.id}: result lacks bound identity, observation or evidence`);
+  if (!Number.isInteger(result.start) || !Number.isInteger(result.stop) || result.stop < result.start)
+    throw new Error(`${producer.id}: result lacks bound identity, observation or evidence`);
+  if (!hasTool || !hasItem || !hasCandidate)
+    throw new Error(`${producer.id}: result lacks bound identity, observation or evidence`);
+  if (!result.statusDetails?.message || !result.steps?.length || !result.attachments?.length || !hasReceipt)
+    throw new Error(`${producer.id}: result lacks bound identity, observation or evidence`);
+}
+
+function assertProducerReceipt(producer, result, dir, candidateSha256) {
+  const receiptAttachment = result.attachments.find((attachment) =>
+    /execution receipt/i.test(attachment.name) && attachment.type === "application/json");
+  const receipt = JSON.parse(readFileSync(join(dir, receiptAttachment.source), "utf8"));
+  const receiptCandidate = receipt.candidate_sha256 ?? receipt.candidateSha
+    ?? receipt.result?.candidateSha256;
+  const imageDigest = receipt.imageDigest ?? receipt.image_oci_digest;
+  if (receiptCandidate !== candidateSha256 || !/^sha256:[0-9a-f]{64}$/.test(imageDigest ?? ""))
+    throw new Error(`${producer.id}: VM receipt is not bound to the candidate and image`);
+  if (producer.id === "browser") {
+    if (receipt.exitCode !== 0 || receipt.candidateMount?.RW !== false
+        || receipt.readOnlyRootFilesystem !== true || receipt.networkMode !== "none")
+      throw new Error("browser VM receipt lacks read-only, no-network execution proof");
+  }
+  if (producer.id === "protocol" && receipt.vm_exit_code !== 0)
+    throw new Error("protocol Gondolin VM did not exit successfully");
+  if (producer.id === "telemetry") {
+    if (!receipt.containerId || !String(receipt.isolation).includes("Docker Desktop Linux VM"))
+      throw new Error("telemetry Linux VM receipt is incomplete");
+  }
+  return { receiptAttachment, imageDigest };
+}
+
+function copyProducerEvidence(producer, result, file, dir, results, names) {
+  const files = [file, ...result.attachments.map((attachment) => attachment.source)];
+  if (new Set(files).size !== files.length) throw new Error(`${producer.id}: duplicate attachment name`);
+  const hashes = {};
+  for (const name of files) {
+    if (!/^[A-Za-z0-9._-]+$/.test(name) || names.has(name)
+        || !lstatSync(join(dir, name)).isFile())
+      throw new Error(`${producer.id}: missing, unsafe or colliding evidence file ${name}`);
+    names.add(name);
+    hashes[name] = fileSha(join(dir, name));
+    cpSync(join(dir, name), join(results, name));
+  }
+  return hashes;
+}
+
+function collectProducer(producer, probes, validate, candidateSha256, results, names) {
+  const dir = join(probes, producer.id);
+  const { file, result } = loadProducerResult(dir, producer, validate);
+  assertProducerShape(producer, result, file, candidateSha256);
+  const { receiptAttachment, imageDigest } = assertProducerReceipt(
+    producer, result, dir, candidateSha256);
+  const hashes = copyProducerEvidence(producer, result, file, dir, results, names);
+  return {
+    id: producer.id,
+    tool: producer.tool,
+    result: file,
+    item: result.labels.find((label) => label.name === "tag").value,
+    status: result.status,
+    start: result.start,
+    stop: result.stop,
+    image_digest: imageDigest,
+    execution_receipt_sha256: hashes[receiptAttachment.source],
+    files: hashes,
+  };
+}
+
+function renderSupplementalReport(out, results) {
+  const cli = join(HERE, "node_modules", ".bin", "allure");
+  const report = join(out, "allure-report");
+  const rendered = spawnSync(cli, ["generate", results, "--config", join(HERE, "allurerc.mjs"),
+    "--output", report, "--clean"], { cwd: HERE, encoding: "utf8" });
+  if (rendered.error || rendered.status !== 0)
+    throw new Error(`Allure render failed: ${rendered.error ?? rendered.stderr}`);
+  const summary = JSON.parse(readFileSync(join(report, "summary.json"), "utf8"));
+  if (summary.stats.total !== PRODUCERS.length)
+    throw new Error("Allure report omitted a specialist probe");
+  return { report, summary };
+}
+
 export function collectSupplementalGrade(original, probes) {
   original = resolve(original);
   probes = resolve(probes);
@@ -39,73 +145,15 @@ export function collectSupplementalGrade(original, probes) {
     producers: [] };
   const names = new Set();
   for (const producer of PRODUCERS) {
-    const dir = join(probes, producer.id);
-    const resultFiles = readdirSync(dir).filter((name) => /^[0-9a-f-]{36}-result\.json$/.test(name));
-    if (resultFiles.length !== 1) throw new Error(`${producer.id}: need one Allure result`);
-    const file = resultFiles[0];
-    const result = JSON.parse(readFileSync(join(dir, file), "utf8"));
-    try {
-      validate(result, `${producer.id}/${file}`);
-    } catch (cause) {
-      throw new Error(`${producer.id}: ${cause instanceof Error ? cause.message : String(cause)}`);
-    }
-    if (file !== `${result.uuid}-result.json` || !["passed", "failed", "skipped", "broken"].includes(result.status)
-        || result.stage !== "finished" || !Number.isInteger(result.start)
-        || !Number.isInteger(result.stop) || result.stop < result.start
-        || !result.labels?.some((label) => label.name === "tool" && label.value === producer.tool)
-        || !result.labels?.some((label) => label.name === "tag" && /^@item-01-0\d\d$/.test(label.value))
-        || !result.parameters?.some((parameter) => parameter.name === "candidate_sha256"
-          && parameter.value === candidateSha256)
-        || !result.statusDetails?.message || !result.steps?.length || !result.attachments?.length
-        || !result.attachments.some((attachment) => /execution receipt/i.test(attachment.name)
-          && attachment.type === "application/json"))
-      throw new Error(`${producer.id}: result lacks bound identity, observation or evidence`);
-    const receiptAttachment = result.attachments.find((attachment) =>
-      /execution receipt/i.test(attachment.name) && attachment.type === "application/json");
-    const receipt = JSON.parse(readFileSync(join(dir, receiptAttachment.source), "utf8"));
-    const receiptCandidate = receipt.candidate_sha256 ?? receipt.candidateSha
-      ?? receipt.result?.candidateSha256;
-    const imageDigest = receipt.imageDigest ?? receipt.image_oci_digest;
-    if (receiptCandidate !== candidateSha256 || !/^sha256:[0-9a-f]{64}$/.test(imageDigest ?? ""))
-      throw new Error(`${producer.id}: VM receipt is not bound to the candidate and image`);
-    if (producer.id === "browser" && (receipt.exitCode !== 0 || receipt.candidateMount?.RW !== false
-        || receipt.readOnlyRootFilesystem !== true || receipt.networkMode !== "none"))
-      throw new Error("browser VM receipt lacks read-only, no-network execution proof");
-    if (producer.id === "protocol" && receipt.vm_exit_code !== 0)
-      throw new Error("protocol Gondolin VM did not exit successfully");
-    if (producer.id === "telemetry" && (!receipt.containerId
-        || !String(receipt.isolation).includes("Docker Desktop Linux VM")))
-      throw new Error("telemetry Linux VM receipt is incomplete");
-    const files = [file, ...result.attachments.map((attachment) => attachment.source)];
-    if (new Set(files).size !== files.length) throw new Error(`${producer.id}: duplicate attachment name`);
-    const hashes = {};
-    for (const name of files) {
-      if (!/^[A-Za-z0-9._-]+$/.test(name) || names.has(name)
-          || !lstatSync(join(dir, name)).isFile())
-        throw new Error(`${producer.id}: missing, unsafe or colliding evidence file ${name}`);
-      names.add(name);
-      hashes[name] = fileSha(join(dir, name));
-      cpSync(join(dir, name), join(results, name));
-    }
-    manifest.producers.push({ id: producer.id, tool: producer.tool,
-      result: file, item: result.labels.find((label) => label.name === "tag").value,
-      status: result.status, start: result.start, stop: result.stop,
-      image_digest: imageDigest, execution_receipt_sha256: hashes[receiptAttachment.source], files: hashes });
+    manifest.producers.push(
+      collectProducer(producer, probes, validate, candidateSha256, results, names));
   }
   const overlapStart = Math.max(...manifest.producers.map((producer) => producer.start));
   const overlapStop = Math.min(...manifest.producers.map((producer) => producer.stop));
   manifest.parallel_overlap_ms = overlapStop - overlapStart;
   if (manifest.parallel_overlap_ms <= 0)
     throw new Error("specialist VM probes did not overlap in time");
-  const cli = join(HERE, "node_modules", ".bin", "allure");
-  const report = join(out, "allure-report");
-  const rendered = spawnSync(cli, ["generate", results, "--config", join(HERE, "allurerc.mjs"),
-    "--output", report, "--clean"], { cwd: HERE, encoding: "utf8" });
-  if (rendered.error || rendered.status !== 0)
-    throw new Error(`Allure render failed: ${rendered.error ?? rendered.stderr}`);
-  const summary = JSON.parse(readFileSync(join(report, "summary.json"), "utf8"));
-  if (summary.stats.total !== PRODUCERS.length)
-    throw new Error("Allure report omitted a specialist probe");
+  const { report, summary } = renderSupplementalReport(out, results);
   manifest.report_html_sha256 = fileSha(join(report, "index.html"));
   manifest.original_score_unchanged = fileSha(scoreFile) === scoreBefore;
   if (!manifest.original_score_unchanged) throw new Error("original score changed during supplemental grading");

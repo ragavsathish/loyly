@@ -118,24 +118,16 @@ export function verifySelectedSpecs(repo: string, source: SourceConfig, checklis
   }
   return selected;
 }
-export function checkLiveRun(
-  input: unknown,
-  { makeChecklist = true }: { makeChecklist?: boolean } = {},
-): ValidatedRun {
-  const validate = new Ajv2020({ strict: false }).compile(
-    JSON.parse(readFileSync(join(HERE, 'live-run.schema.json'), 'utf8')),
-  );
-  if (!validate(input)) throw Error(`live run schema: ${JSON.stringify(validate.errors)}`);
-  const config = input as LiveRunConfig;
+function assertJavaRuntime(config: LiveRunConfig) {
+  if (config.schema !== 'loyly.pi-live-run.v1' && !config.runtime?.java21) return;
   const javaHome = process.env.JAVA_HOME;
-  if (config.schema === 'loyly.pi-live-run.v1' || config.runtime?.java21) {
-    if (!javaHome) throw Error('JAVA_HOME must point to Java 21');
-    const java = spawnSync(join(javaHome, 'bin', 'java'), ['-version'], { encoding: 'utf8' });
-    if (java.status !== 0 || !/version "21(?:[.]|")/.test(`${java.stdout}${java.stderr}`))
-      throw Error('live run requires Java 21');
-  }
-  const source = resolve(config.source.repo),
-    scratch = resolve(config.scratch);
+  if (!javaHome) throw Error('JAVA_HOME must point to Java 21');
+  const java = spawnSync(join(javaHome, 'bin', 'java'), ['-version'], { encoding: 'utf8' });
+  if (java.status !== 0 || !/version "21(?:[.]|")/.test(`${java.stdout}${java.stderr}`))
+    throw Error('live run requires Java 21');
+}
+
+function assertCleanPins(config: LiveRunConfig, source: string, scratch: string) {
   if (source === ROOT || scratch === source || scratch.startsWith(`${source}/`))
     throw Error('source, controller and output must be separate');
   if (
@@ -150,7 +142,9 @@ export function checkLiveRun(
     git(source, 'status', '--porcelain')
   )
     throw Error('controller or source is dirty or differs from the approved commit');
-  verifySelectedSpecs(source, config.source);
+}
+
+function verifyPinnedAgents(config: LiveRunConfig) {
   if (
     config.schema === 'loyly.pi-live-run.v1' &&
     (config.builder.instruction_file || config.blind?.instruction_file)
@@ -168,7 +162,7 @@ export function checkLiveRun(
         ]
       : []),
   ];
-  const checkedImages = new Set();
+  const checkedImages = new Set<string>();
   for (const [agent, instruction] of agents) {
     requireHash(agent.command, agent.command_sha256);
     const imageKey = `${resolve(agent.image)}:${agent.image_sha256}`;
@@ -189,7 +183,9 @@ export function checkLiveRun(
     requireHash(join(HERE, config.panel.plan_file ?? DEFAULT_PANEL_PLAN), config.panel.plan_sha256);
     verifyImage(config.panel.image, config.panel.image_sha256);
   }
-  if (!makeChecklist) return { source, scratch, config };
+}
+
+function deriveApprovedChecklist(config: LiveRunConfig, source: string, scratch: string) {
   mkdirSync(scratch, { recursive: true });
   const checklist = join(scratch, 'approved-checklist.json');
   if (!existsSync(checklist)) {
@@ -221,5 +217,24 @@ export function checkLiveRun(
     validatePanelSelection(panelPlan, selectedChecklist);
     specialistWorkers(panelPlan); // Verify the approved project's worker bundle before building.
   }
+}
+
+export function checkLiveRun(
+  input: unknown,
+  { makeChecklist = true }: { makeChecklist?: boolean } = {},
+): ValidatedRun {
+  const validate = new Ajv2020({ strict: false }).compile(
+    JSON.parse(readFileSync(join(HERE, 'live-run.schema.json'), 'utf8')),
+  );
+  if (!validate(input)) throw Error(`live run schema: ${JSON.stringify(validate.errors)}`);
+  const config = input as LiveRunConfig;
+  assertJavaRuntime(config);
+  const source = resolve(config.source.repo),
+    scratch = resolve(config.scratch);
+  assertCleanPins(config, source, scratch);
+  verifySelectedSpecs(source, config.source);
+  verifyPinnedAgents(config);
+  if (!makeChecklist) return { source, scratch, config };
+  deriveApprovedChecklist(config, source, scratch);
   return { source, scratch, config };
 }

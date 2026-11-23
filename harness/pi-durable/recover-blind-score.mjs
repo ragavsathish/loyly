@@ -25,11 +25,7 @@ function head(path) {
   return r.stdout.trim();
 }
 
-export async function recoverBlindScore(priorArg, outArg, panelArg) {
-  const prior = resolve(priorArg), out = resolve(outArg);
-  if (!out.startsWith(`${prior}/`) || existsSync(out))
-    throw Error("new recovery output must be inside the original scratch");
-  const rows = await readAuditRows(prior);
+function assertRecoverablePrior(prior, rows) {
   const stage = (name, outcome) => rows.findLast((row) => row.stage === name && row.outcome === outcome);
   const cut = stage("cut", "pinned"), gate = stage("gate", "passed");
   const grade = stage("grade", "completed"), blind = stage("blind-review", "failed");
@@ -50,6 +46,10 @@ export async function recoverBlindScore(priorArg, outArg, panelArg) {
       || raw.results.filter((result) => result.status === "passed").length !== 46
       || raw.results.filter((result) => result.status === "skipped").length !== 1)
     throw Error("raw independent grade changed");
+  return { cut, gate, grade, blind, source, room, candidate };
+}
+
+function assertBlindAgentReceipts(prior, blind) {
   const reviewFile = join(prior, "blind-agent-review.json");
   const review = JSON.parse(readFileSync(reviewFile, "utf8"));
   if (review.verdict !== "pass" || review.launch_receipt_sha256 !== blind.agent_launch_receipt_sha256
@@ -59,7 +59,10 @@ export async function recoverBlindScore(priorArg, outArg, panelArg) {
         !== review.agent_output_sha256
       || readdirSync(join(prior, "blind-agent-room")).sort().join() !== "question.txt,refusal.txt")
     throw Error("blind agent receipt or isolation changed");
-  mkdirSync(out);
+  return reviewFile;
+}
+
+async function probeAndProjectBlind(prior, out, room, grade, reviewFile) {
   const packetDir = join(prior, "blind-agent-packet"), verificationDir = join(out, "probe");
   const request = JSON.parse(readFileSync(join(prior, "blind-agent-request.json"), "utf8"));
   const verification = await probeBlindAnswer({ packetDir, reviewFile, gradingRoom: room,
@@ -73,6 +76,10 @@ export async function recoverBlindScore(priorArg, outArg, panelArg) {
       || projected.verdicts.length !== 47
       || projected.verdicts.some((item) => item.verdict !== "pass"))
     throw Error("recovered verdicts differ from the independent grade");
+  return { verification, verificationDir, allureDir, projected };
+}
+
+function fileSupplementalScore(prior, out, source, candidate, projected) {
   const verdictsFile = join(out, "final-verdicts.json");
   writeFileSync(verdictsFile, JSON.stringify(projected.verdicts));
   cpSync(join(prior, "checklist.json"), join(out, "checklist.json"));
@@ -92,24 +99,41 @@ export async function recoverBlindScore(priorArg, outArg, panelArg) {
   const score = verifyScoredCycle({ scratch: out, instrument, verdictsFile, cycle });
   if (score.score !== "47/47") throw Error("recovery did not score every selected item");
   command("bb", ["harness/scoreboard.clj", cycle], instrument, join(out, "scoreboard.log"));
-  let panel;
-  if (panelArg) {
-    const panelDir = resolve(panelArg), config = JSON.parse(readFileSync(join(prior, "live-run.json")));
-    const planFile = resolve(import.meta.dirname, config.panel.plan_file);
-    panel = verifyPanelVmRun({ original: prior, out: panelDir,
-      imageDigest: `sha256:${config.panel.image_sha256}`, planFile }).manifest;
-    if (panel.plan_sha256 !== config.panel.plan_sha256 || panel.score_state !== "pre-score")
-      throw Error("exploratory panel differs from the approved plan or pre-score state");
-    const reportDir = join(out, "allure-report");
-    command(join(import.meta.dirname, "node_modules", ".bin", "allure"),
-      ["generate", join(room, "work", "allure-results"), allureDir,
-        ...panel.producers.map((producer) => join(panelDir, producer.id)),
-        "--config", join(import.meta.dirname, "allurerc.mjs"), "--output", reportDir, "--clean"],
-      import.meta.dirname, join(out, "allure-render.log"));
-    const stats = JSON.parse(readFileSync(join(reportDir, "summary.json"))).stats;
-    if (stats.total !== 51 || stats.passed !== 47 || stats.skipped !== 1 || stats.failed !== 3)
-      throw Error("Allure report omitted or changed raw, blind or panel results");
-  }
+  return { score, verdictsFile };
+}
+
+function maybeVerifyExploratoryPanel(prior, out, panelArg, room, allureDir) {
+  if (!panelArg) return undefined;
+  const panelDir = resolve(panelArg), config = JSON.parse(readFileSync(join(prior, "live-run.json")));
+  const planFile = resolve(import.meta.dirname, config.panel.plan_file);
+  const panel = verifyPanelVmRun({ original: prior, out: panelDir,
+    imageDigest: `sha256:${config.panel.image_sha256}`, planFile }).manifest;
+  if (panel.plan_sha256 !== config.panel.plan_sha256 || panel.score_state !== "pre-score")
+    throw Error("exploratory panel differs from the approved plan or pre-score state");
+  const reportDir = join(out, "allure-report");
+  command(join(import.meta.dirname, "node_modules", ".bin", "allure"),
+    ["generate", join(room, "work", "allure-results"), allureDir,
+      ...panel.producers.map((producer) => join(panelDir, producer.id)),
+      "--config", join(import.meta.dirname, "allurerc.mjs"), "--output", reportDir, "--clean"],
+    import.meta.dirname, join(out, "allure-render.log"));
+  const stats = JSON.parse(readFileSync(join(reportDir, "summary.json"))).stats;
+  if (stats.total !== 51 || stats.passed !== 47 || stats.skipped !== 1 || stats.failed !== 3)
+    throw Error("Allure report omitted or changed raw, blind or panel results");
+  return panel;
+}
+
+export async function recoverBlindScore(priorArg, outArg, panelArg) {
+  const prior = resolve(priorArg), out = resolve(outArg);
+  if (!out.startsWith(`${prior}/`) || existsSync(out))
+    throw Error("new recovery output must be inside the original scratch");
+  const rows = await readAuditRows(prior);
+  const { cut, grade, blind, source, room, candidate } = assertRecoverablePrior(prior, rows);
+  const reviewFile = assertBlindAgentReceipts(prior, blind);
+  mkdirSync(out);
+  const { verification, verificationDir, allureDir, projected } =
+    await probeAndProjectBlind(prior, out, room, grade, reviewFile);
+  const { score, verdictsFile } = fileSupplementalScore(prior, out, source, candidate, projected);
+  const panel = maybeVerifyExploratoryPanel(prior, out, panelArg, room, allureDir);
   const receipt = { schema: "loyly.supplemental-blind-recovery.v1",
     kind: "same-candidate-supplemental-legacy-score",
     original_run_id: rows[0].run_id, original_pi_outcome: "failed-blind-review",

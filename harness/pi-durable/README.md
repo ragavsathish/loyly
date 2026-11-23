@@ -156,7 +156,9 @@ Individual tools: `analyze:dead` (Knip), `analyze:deps` (Madge),
 `analyze:dupes` (jscpd), `analyze:metrics` (Q-factor static metrics:
 cc_max, cloned_pct, graph_dependency_entropy, mean_func_loc, …).
 Digest-stable `.mjs` shims and dynamically loaded panel workers are ignored
-in Knip so they are not reported as unused files.
+in Knip so they are not reported as unused files. `analyze:metrics` also
+skips digest-pinned panel workers and the frozen blind adapter so Q-factor
+scores track code that agents are allowed to change.
 
 Agent-guiding lint lives in local
 [`eslint-plugin-loyly/`](eslint-plugin-loyly/) (inspired by Factory’s

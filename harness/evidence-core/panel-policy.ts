@@ -8,11 +8,7 @@ import type {
   ScoredItem,
 } from "./types.ts";
 
-export function evaluatePanel(
-  plan: PanelPlan,
-  scoredItems: ScoredItem[],
-  observations: PanelObservation[],
-): PanelEvaluation {
+function indexPanelExpectations(plan: PanelPlan, scoredItems: ScoredItem[]) {
   if (
     !Array.isArray(plan.checks) ||
     !Array.isArray(scoredItems) ||
@@ -37,6 +33,13 @@ export function evaluatePanel(
       expected.set(key, check);
     }
   }
+  return expected;
+}
+
+function collectObservedChecks(
+  expected: Map<string, PanelPlan["checks"][number]>,
+  observations: PanelObservation[],
+) {
   const observed = new Map<string, PanelCheckResult>();
   for (const row of observations) {
     const key = `${row.id}/${row.item}`;
@@ -73,8 +76,14 @@ export function evaluatePanel(
     if (!result) throw new Error(`missing panel result ${key}`);
     checks.push(result);
   }
-  const gaps: string[] = [];
-  const items: PanelEvaluation["items"] = scoredItems.map((item) => {
+  return checks;
+}
+
+function evaluatePanelItems(
+  scoredItems: ScoredItem[],
+  checks: PanelCheckResult[],
+): PanelEvaluation["items"] {
+  return scoredItems.map((item) => {
     const selected = checks.filter((check) => check.item === item.id);
     const decisive = selected.filter((check) => check.role === "scored");
     if (decisive.length !== 1 || !decisive[0])
@@ -85,18 +94,26 @@ export function evaluatePanel(
     const contradiction = selected.some(
       (check) => check.role === "corroborating" && check.status !== "passed",
     );
+    const panel_status = contradiction
+      ? ("conflicted" as const)
+      : item.verdict === "pass"
+        ? ("supported" as const)
+        : ("failed" as const);
     return {
       id: item.id,
       rule: item.rule,
       filed_verdict: item.verdict,
       check_ids: selected.map((check) => check.id),
-      panel_status: contradiction
-        ? "conflicted"
-        : item.verdict === "pass"
-          ? "supported"
-          : "failed",
+      panel_status,
     };
   });
+}
+
+function collectPanelGaps(
+  checks: PanelCheckResult[],
+  items: PanelEvaluation["items"],
+) {
+  const gaps: string[] = [];
   for (const check of checks) {
     if (check.runtime !== check.target_runtime)
       gaps.push(
@@ -111,6 +128,18 @@ export function evaluatePanel(
     gaps.push(
       `${item.id}: filed ${item.filed_verdict}; panel ${item.panel_status}`,
     );
+  return gaps;
+}
+
+export function evaluatePanel(
+  plan: PanelPlan,
+  scoredItems: ScoredItem[],
+  observations: PanelObservation[],
+): PanelEvaluation {
+  const expected = indexPanelExpectations(plan, scoredItems);
+  const checks = collectObservedChecks(expected, observations);
+  const items = evaluatePanelItems(scoredItems, checks);
+  const gaps = collectPanelGaps(checks, items);
   return {
     checks,
     items,

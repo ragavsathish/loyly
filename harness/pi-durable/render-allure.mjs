@@ -16,37 +16,29 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const fileHash = (path) => hash(readFileSync(path));
 
-export async function renderScoredAllure(scratch) {
-  scratch = resolve(scratch);
-  const instrument = join(scratch, "instrument");
-  const gradingRoom = join(scratch, "grading-room");
-  const receipt = JSON.parse(readFileSync(join(gradingRoom, '.grading-room.json'), 'utf8'));
-  const blindRequired = receipt.blindReview ?? true;
-  const verdictsFile = join(scratch, blindRequired ? "final-verdicts.json" : "verdicts.json");
-  const scoreInput = JSON.parse(readFileSync(join(scratch, "score-input.json"), "utf8"));
-  if (candidateDigest(join(scratch, "fenced-room")) !== scoreInput.candidate_sha256)
-    throw new Error("current candidate differs from the scored candidate");
-  const score = verifyScoredCycle({ scratch, instrument, verdictsFile,
-    cycle: scoreCycleFor(scratch) });
-  const raw = readAllureResults(gradingRoom);
-  let projected = { verdicts: raw.verdicts, rawAllureSha256: raw.allureSha256 };
-  let supplemental;
-  if (blindRequired) {
-    const reviewFile = join(scratch, "blind-agent-review.json");
-    const review = JSON.parse(readFileSync(reviewFile, "utf8"));
-    projected = finalVerdictsFromBlindReview({ packetDir: join(scratch, "blind-agent-packet"),
-      reviewFile, gradingRoom,
-      verificationDir: review.verdict === "pass" ? join(scratch, "blind-agent-verification") : undefined,
-      out: join(scratch, "blind-agent-allure") });
-    supplemental = readBlindAgentAllure({ packetDir: join(scratch, "blind-agent-packet"),
-      reviewFile, gradingRoom,
-      verificationDir: review.verdict === "pass" ? join(scratch, "blind-agent-verification") : undefined,
-      out: join(scratch, "blind-agent-allure") });
-    if (raw.allureSha256 !== projected.rawAllureSha256)
-      throw new Error("raw grader Allure changed after blind review");
+function projectScoredVerdicts(scratch, gradingRoom, raw, blindRequired) {
+  if (!blindRequired) {
+    return { projected: { verdicts: raw.verdicts, rawAllureSha256: raw.allureSha256 }, supplemental: undefined };
   }
-  if (readFileSync(verdictsFile, "utf8") !== JSON.stringify(projected.verdicts))
-    throw new Error("scored verdicts differ from the bound Allure projection");
+  const reviewFile = join(scratch, "blind-agent-review.json");
+  const review = JSON.parse(readFileSync(reviewFile, "utf8"));
+  const blindArgs = {
+    packetDir: join(scratch, "blind-agent-packet"),
+    reviewFile,
+    gradingRoom,
+    verificationDir: review.verdict === "pass" ? join(scratch, "blind-agent-verification") : undefined,
+    out: join(scratch, "blind-agent-allure"),
+  };
+  const projected = finalVerdictsFromBlindReview(blindArgs);
+  const supplemental = readBlindAgentAllure(blindArgs);
+  if (raw.allureSha256 !== projected.rawAllureSha256)
+    throw new Error("raw grader Allure changed after blind review");
+  return { projected, supplemental };
+}
+
+async function assertScoredAllureAudit({
+  scratch, scoreInput, projected, score, blindRequired,
+}) {
   const rows = await readAuditRows(scratch);
   const stage = (name, outcome) => rows.findLast((row) => row.stage === name && row.outcome === outcome);
   const cut = stage("cut", "pinned"), grade = stage("grade", "completed");
@@ -59,8 +51,12 @@ export async function renderScoredAllure(scratch) {
       || filed?.score_input_sha256 !== fileHash(join(scratch, "score-input.json"))
       || !stage("cycle", "measured"))
     throw new Error("scored Allure evidence differs from committed Pi audit entries");
-  const fixture = rows.some((row) => row.fixture === true || row.fixture_grader === true);
+  return rows;
+}
 
+function renderAndCheckAllure({
+  scratch, gradingRoom, blindRequired, raw, supplemental, score,
+}) {
   const out = join(scratch, "allure-report");
   const cli = join(HERE, "node_modules", ".bin", "allure");
   if (!existsSync(cli)) throw new Error("Allure CLI missing; run npm ci in the prototype");
@@ -77,6 +73,32 @@ export async function renderScoredAllure(scratch) {
     if ((summary.stats[key] ?? 0) !== (expected[key] ?? 0))
       throw new Error(`Allure report ${key} count differs from scored evidence`);
   }
+  return { out, summary, expected };
+}
+
+export async function renderScoredAllure(scratch) {
+  scratch = resolve(scratch);
+  const instrument = join(scratch, "instrument");
+  const gradingRoom = join(scratch, "grading-room");
+  const receipt = JSON.parse(readFileSync(join(gradingRoom, '.grading-room.json'), 'utf8'));
+  const blindRequired = receipt.blindReview ?? true;
+  const verdictsFile = join(scratch, blindRequired ? "final-verdicts.json" : "verdicts.json");
+  const scoreInput = JSON.parse(readFileSync(join(scratch, "score-input.json"), "utf8"));
+  if (candidateDigest(join(scratch, "fenced-room")) !== scoreInput.candidate_sha256)
+    throw new Error("current candidate differs from the scored candidate");
+  const score = verifyScoredCycle({ scratch, instrument, verdictsFile,
+    cycle: scoreCycleFor(scratch) });
+  const raw = readAllureResults(gradingRoom);
+  const { projected, supplemental } = projectScoredVerdicts(scratch, gradingRoom, raw, blindRequired);
+  if (readFileSync(verdictsFile, "utf8") !== JSON.stringify(projected.verdicts))
+    throw new Error("scored verdicts differ from the bound Allure projection");
+  const rows = await assertScoredAllureAudit({
+    scratch, scoreInput, projected, score, blindRequired,
+  });
+  const fixture = rows.some((row) => row.fixture === true || row.fixture_grader === true);
+  const { out, summary, expected } = renderAndCheckAllure({
+    scratch, gradingRoom, blindRequired, raw, supplemental, score,
+  });
   const report = join(out, "index.html");
   const manifest = { schema: "loyly.allure-report.v1",
     evidence_kind: fixture ? "fixture" : "live measurement, not accepted",
