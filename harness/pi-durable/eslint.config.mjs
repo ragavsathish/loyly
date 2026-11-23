@@ -67,7 +67,14 @@ export default [
   },
   {
     // Lifted adapters preserve durable shapes; phase generics / null narrowing follow.
-    files: ['tasks/cycle.ts', 'blind-review.ts', 'panel-compile.ts', 'panel-vm-run.ts'],
+    files: [
+      'tasks/cycle.ts',
+      'tasks/cycle-phases.ts',
+      'tasks/cycle-types.ts',
+      'blind-review.ts',
+      'panel-compile.ts',
+      'panel-vm-run.ts',
+    ],
     rules: {
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -80,6 +87,7 @@ export default [
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/only-throw-error': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
       'preserve-caught-error': 'off',
     },
   },

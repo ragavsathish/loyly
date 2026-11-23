@@ -141,8 +141,8 @@ defines the gate service and its candidate-bound observation. The Pi worker
 supplies the live gate adapter and runs each Effect inside its existing task
 phase. Pi still owns durable checkpoints, retries, and audit commits. Effect
 captures local I/O requirements and typed failures within a phase.
-Prettier is available for explicit files: `npm run format:check -- lifecycle.ts`
-checks one file, and `npm run format -- lifecycle.ts` formats it. Keep the
+Prettier is available for explicit files: `npm run format:check -- worker-config.ts`
+checks one file, and `npm run format -- worker-config.ts` formats it. Keep the
 file list explicit when editing a pinned grader instruction, panel worker, or
 schema; formatting those files changes their approved digest.
 

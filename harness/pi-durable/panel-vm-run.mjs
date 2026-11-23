@@ -1,1 +1,1 @@
-export { workerBundle, specialistWorkers, runPanelVms, verifyPanelVmRun } from './panel-vm-run.ts';
+export { specialistWorkers, runPanelVms, verifyPanelVmRun } from './panel-vm-run.ts';

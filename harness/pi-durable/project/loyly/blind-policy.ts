@@ -1,5 +1,5 @@
 // Löyly v1 blind-handoff policy for item 01-011.
-import { BLIND_ITEM_ID, isDefaultProject } from './identity.ts';
+import { BLIND_ITEM_ID, PROJECT_ID } from './identity.ts';
 
 /** Historical person-worded booking-core cut; cannot be scored by a blind subagent. */
 const PERSON_SPEC_SHA256 = 'b28ee83dfaada8df0ed99b90121a50f3c55885ade4db323b68e03c4d5f15005e';
@@ -11,12 +11,8 @@ const BLIND_QUESTION =
 const PENDING_HUMAN = 'not reached: blind human review required';
 const PENDING_SUBAGENT = 'not reached: blind subagent review required';
 
-function selectsBlindItem(items: { id: string }[]): boolean {
-  return items.some((item) => item.id === BLIND_ITEM_ID);
-}
-
 function requiresBlindHandoff(project: string, items: { id: string }[]): boolean {
-  return isDefaultProject(project) && selectsBlindItem(items);
+  return project === PROJECT_ID && items.some((item) => item.id === BLIND_ITEM_ID);
 }
 
 function pendingEvidencePrefix(specSha256: string | null): string {
@@ -53,11 +49,7 @@ function assertBlindVerdictHandoff(
 }
 
 export {
-  PERSON_SPEC_SHA256,
   BLIND_QUESTION,
-  PENDING_HUMAN,
-  PENDING_SUBAGENT,
-  selectsBlindItem,
   requiresBlindHandoff,
   pendingEvidencePrefix,
   isHistoricalPersonCut,

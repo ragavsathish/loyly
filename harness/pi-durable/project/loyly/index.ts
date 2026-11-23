@@ -1,3 +1,6 @@
+// Public Löyly project surface used by Pi adapters.
+// Keep this barrel limited to symbols that have external importers.
+
 export {
   PROJECT_ID,
   BLIND_ITEM_ID,
@@ -5,18 +8,12 @@ export {
   DEFAULT_PANEL_PLAN,
   BLIND_REFUSAL_FILE,
   BLIND_SPEC_RELATIVE,
-  isDefaultProject,
   defaultsBlindReview,
   blindAllureFullName,
-  itemAllureFullName,
 } from './identity.ts';
 
 export {
-  PERSON_SPEC_SHA256,
   BLIND_QUESTION,
-  PENDING_HUMAN,
-  PENDING_SUBAGENT,
-  selectsBlindItem,
   requiresBlindHandoff,
   pendingEvidencePrefix,
   isHistoricalPersonCut,

@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer, validateBlindReview,
   verifyBlindReviewPacket,
   writeBlindAgentAllure } from "../blind-review.ts";
-import { parseBlindAgentAnswer } from "../blind-agent-adapter.mjs";
+import { parseBlindAgentAnswer } from "../project/loyly/blind-answer.ts";
 
 const schema = new URL("../allure-lifecycle-result.schema.json", import.meta.url).pathname;
 test("blind request needs only the room, weekday and start given by the refusal", () => {
