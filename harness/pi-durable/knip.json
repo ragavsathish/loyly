@@ -11,6 +11,7 @@
     "recover-blind-score.mjs!",
     "render-allure.mjs!",
     "supplemental-grade.mjs!",
+    "measure/cli.mjs!",
     "tasks/*.ts!",
     "test/**/*.test.mjs!"
   ],

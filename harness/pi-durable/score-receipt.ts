@@ -1,5 +1,5 @@
-// Reconcile a legacy score only when its cut, checklist, candidate and verdicts
-// are the same inputs that produced it. The legacy scorer remains unchanged.
+// Reconcile a filed score only when its cut, checklist, candidate and verdicts
+// are the same inputs that produced it. Scoring itself lives in measure/score.ts.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';

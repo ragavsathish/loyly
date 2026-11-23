@@ -98,15 +98,21 @@ project-specific file names. The blind handoff is absent in v2; a direct grader
 result decides every selected item. A panel is optional. Java 21 is required
 only if `runtime.java21` is true or the project's own gate needs it.
 
-The source adapter supplies `harness/check.sh`, `harness/fence.sh`,
-`harness/gen_checklist.clj`, `harness/verify.sh`, `harness/score.clj`, and
-`harness/scoreboard.clj` under
-the same command and file contracts used by this driver. Selected Gherkin
-files follow `docs/plan/NN-name/spec.feature`; checklist items carry stamped
-`NN-NNN` IDs and source line references. The controller keeps these source
-scripts outside its reusable lifecycle module so an existing legacy scorer
-can remain authoritative. The adapter also supplies the app in `impl/` with a
-launch path its grader instruction explains.
+The source adapter supplies `harness/check.sh`, `harness/fence.sh`, and
+`harness/verify.sh` under the same command contracts used by this driver.
+Checklist derivation, scoring and the scoreboard are TypeScript modules in
+[`measure/`](measure/) (byte-compatible with the shared `harness/*.clj` tools
+kept for the three-repository oracle). Invoke them in-process or via:
+
+```sh
+node harness/pi-durable/measure/cli.mjs gen-checklist --root . --out checklist.json
+node harness/pi-durable/measure/cli.mjs score --root . 02 --verdicts verdicts.json
+node harness/pi-durable/measure/cli.mjs scoreboard --root . 02
+```
+
+Selected Gherkin files follow `docs/plan/NN-name/spec.feature`; checklist
+items carry stamped `NN-NNN` IDs and source line references. The adapter also
+supplies the app in `impl/` with a launch path its grader instruction explains.
 
 For a v2 specialist panel, use `harness.grading-panel-plan.v2`. Every selected
 item appears once in a `raw-grader` check with `scored` role. Specialists use
