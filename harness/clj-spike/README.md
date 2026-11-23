@@ -39,7 +39,7 @@ Prefer Babashka / CLJ libs over hand-rolled plumbing:
 | Builder adapter | `builder-adapter.ts` | ✅ partial | launch lookup / validate; spawn deferred |
 | Launch / worker config | `launch-config.ts`, `worker-config.ts` | ✅ | env mapping + parse |
 | Cycle orchestration | `tasks/*`, effects | ⏳ | Pi Effect / defineTask |
-| Panel compile / Allure report | `panel-compile.ts` | ⏳ | |
+| Panel compile | `panel-compile.ts` | ✅ partial | manifest bind / runtime / overlap; Allure report deferred |
 | Pi audit | `audit-rows.ts` | ⏳ | sqlite runtime |
 
 ## Layout

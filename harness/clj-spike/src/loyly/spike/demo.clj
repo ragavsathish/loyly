@@ -15,6 +15,8 @@
             [loyly.spike.builder-adapter :as builder]
             [loyly.spike.gate-adapter :as gate]
             [loyly.spike.launch-config :as launch]
+            [loyly.spike.panel-compile :as compile]
+            [loyly.spike.panel-policy :as panel-policy]
             [loyly.spike.panel-selection :as panel]
             [loyly.spike.panel-vm :as panel-vm]
             [loyly.spike.project.loyly.blind-answer :as answer]
@@ -162,6 +164,12 @@
             _ (let [prompt (cont/continuation-prompt ["01-001" "01-002"])]
                 (when-not (str/includes? prompt "@item-01-001")
                   (die "continuation prompt missing item")))
+            _ (let [runtime (compile/specialist-runtime
+                             {"id" "protocol"}
+                             {"vm_exit_code" 0}
+                             {"schema" schemas/PANEL_VM_RUN})]
+                (when-not (= "gondolin-qemu-vm" runtime)
+                  (die "panel-compile specialist-runtime failed")))
             verdicts (mapv (fn [item]
                              (if (= (get item "id") id/BLIND_ITEM_ID)
                                (array-map "id" id/BLIND_ITEM_ID
