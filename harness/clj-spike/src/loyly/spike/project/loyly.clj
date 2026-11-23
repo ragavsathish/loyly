@@ -2,6 +2,7 @@
   "Barrel matching harness/pi-durable/project/loyly/index.ts"
   (:require [loyly.spike.project.loyly.blind-answer :as answer]
             [loyly.spike.project.loyly.blind-policy :as policy]
+            [loyly.spike.project.loyly.blind-probe :as probe]
             [loyly.spike.project.loyly.identity :as id]
             [loyly.spike.project.loyly.schemas :as schemas]))
 
@@ -22,6 +23,8 @@
 (def assert-blind-verdict-handoff policy/assert-blind-verdict-handoff)
 
 (def parse-blind-agent-answer answer/parse-blind-agent-answer)
+(def booking-form-action probe/booking-form-action)
+(def resolve-room-in-public-form probe/resolve-room-in-public-form)
 
 (def GRADING_ROOM schemas/GRADING_ROOM)
 (def BLIND_PACKET schemas/BLIND_PACKET)

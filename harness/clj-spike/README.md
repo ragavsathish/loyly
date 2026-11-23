@@ -38,9 +38,16 @@ Prefer Babashka / CLJ libs over hand-rolled plumbing:
 | Gate adapter | `gate-adapter.ts` | ✅ partial | receipt reconcile; spawn deferred |
 | Builder adapter | `builder-adapter.ts` | ✅ partial | launch lookup / validate; spawn deferred |
 | Launch / worker config | `launch-config.ts`, `worker-config.ts` | ✅ | env mapping + parse |
-| Cycle orchestration | `tasks/*`, effects | ⏳ | Pi Effect / defineTask |
-| Panel compile | `panel-compile.ts` | ✅ partial | manifest bind / runtime / overlap; Allure report deferred |
+| Blind probe | `project/loyly/blind-probe.ts` | ✅ partial | form action + resolve; HTTP JSON booking deferred |
+| Cycle effects | `cycle-effects.ts` | ✅ | command / fence / cut / measure-log |
+| Gate / workspace effects | `gate-effects.ts`, `workspace-effects.ts` | ✅ | without Effect-TS runtime |
+| Panel adapter | `panel-adapter.ts` | ✅ partial | selectPanelAttempt; VM launch deferred |
+| Replay evidence | `replay-evidence.ts` | ✅ partial | summary projection |
+| Contracts | `contracts.ts` | ✅ | selected-checklist? |
+| Cycle orchestration | `tasks/cycle*.ts` | ⏳ | Pi defineTask / Effect phases |
+| Panel Allure report I/O | compile report / QEMU | ⏳ | |
 | Pi audit | `audit-rows.ts` | ⏳ | sqlite runtime |
+| Ajv schemas | live-run / panel-plan / allure | ⏳ | structural checks used instead |
 
 ## Layout
 

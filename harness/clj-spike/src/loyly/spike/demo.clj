@@ -5,6 +5,7 @@
             [clojure.string :as str]
             [loyly.spike.blind-review :as blind]
             [loyly.spike.continuation :as cont]
+            [loyly.spike.cycle-effects :as effects]
             [loyly.spike.digest :as d]
             [loyly.spike.evidence.validate-identity :as ident]
             [loyly.spike.gen-checklist :as checklist]
@@ -15,15 +16,17 @@
             [loyly.spike.builder-adapter :as builder]
             [loyly.spike.gate-adapter :as gate]
             [loyly.spike.launch-config :as launch]
+            [loyly.spike.panel-adapter :as panel-ad]
             [loyly.spike.panel-compile :as compile]
-            [loyly.spike.panel-policy :as panel-policy]
             [loyly.spike.panel-selection :as panel]
             [loyly.spike.panel-vm :as panel-vm]
             [loyly.spike.project.loyly.blind-answer :as answer]
             [loyly.spike.project.loyly.blind-policy :as policy]
+            [loyly.spike.project.loyly.blind-probe :as probe]
             [loyly.spike.project.loyly.identity :as id]
             [loyly.spike.project.loyly.schemas :as schemas]
             [loyly.spike.receipt-fields :as fields]
+            [loyly.spike.replay-evidence :as replay]
             [loyly.spike.score :as score]
             [loyly.spike.score-receipt :as receipt]
             [loyly.spike.scoreboard :as board]
@@ -170,6 +173,50 @@
                              {"schema" schemas/PANEL_VM_RUN})]
                 (when-not (= "gondolin-qemu-vm" runtime)
                   (die "panel-compile specialist-runtime failed")))
+            _ (let [html (str "<form method=\"post\" action=\"/book\">"
+                              "<input name=\"household\"/>"
+                              "<select name=\"resource\">"
+                              "<option value=\"r9\">pukuhuone 9</option>"
+                              "</select>"
+                              "<input name=\"weekday\"/><input name=\"start\"/>"
+                              "</form>")
+                    action (probe/booking-form-action html)
+                    resolved (probe/resolve-room-in-public-form
+                              html "household=12&resource=%40room%3A9&weekday=Thursday&start=17%3A00"
+                              "REQUEST: pukuhuone 9 | Thursday | 17:00")]
+                (when-not (= "/book" action)
+                  (die "blind-probe booking-form-action failed"))
+                (when-not (str/includes? resolved "resource=r9")
+                  (die "blind-probe resolve-room failed")))
+            _ (let [fx (effects/create-cycle-effects
+                        {:root (str repo) :scratch (str scratch)
+                         :room (str instrument) :cut (str (fs/path scratch "cut"))
+                         :source-root (str instrument)
+                         :approved-source-repo (str repo)
+                         :digest-candidate #(room/candidate-digest %)})
+                    logged ((:measure-log fx) "spike-measure"
+                            (fn [] {:stdout "ok\n"}))]
+                (when-not (and (zero? (:code logged))
+                               (= (effects/hash-value "ok\n") (:sha256 logged)))
+                  (die "cycle-effects measure-log failed")))
+            _ (let [panel-root (fs/file scratch "panel-attempts")
+                    selected
+                    (panel-ad/select-panel-attempt
+                     {:root (str panel-root)
+                      :launch (fn [out]
+                                (fs/create-dirs out)
+                                (hjson/spit-utf8 (fs/file out "manifest.json") "{}\n")
+                                {:ok true})
+                      :verify (fn [_] {:ok true})})]
+                (when-not (and (= 1 (:attempt selected)) (false? (:reconciled selected)))
+                  (die "panel-adapter select-panel-attempt failed")))
+            _ (let [ev (replay/summary
+                        {"name" "n" "status" "passed" "stage" "finished"
+                         "statusDetails" {"message" "ok"} "steps" [] "attachments" []}
+                        "01-001" 1 "grade" (apply str (repeat 64 "d"))
+                        (str scratch))]
+                (when-not (= "loyly.replay-evidence.v1" (get ev "schema"))
+                  (die "replay-evidence summary failed")))
             verdicts (mapv (fn [item]
                              (if (= (get item "id") id/BLIND_ITEM_ID)
                                (array-map "id" id/BLIND_ITEM_ID
