@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Wrapper: harness/clj-spike/bin/spike <task> [args...]
+# Uses -m so flags like --out are not swallowed by babashka's task runner.
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+SRC="$ROOT/harness/clj-spike/src"
+if [[ $# -lt 1 ]]; then
+  echo "usage: harness/clj-spike/bin/spike <gen-checklist|score|scoreboard|stamp> [args...]" >&2
+  exit 2
+fi
+task="$1"; shift
+case "$task" in
+  gen-checklist|gen_checklist) ns=loyly.spike.gen-checklist ;;
+  score) ns=loyly.spike.score ;;
+  scoreboard) ns=loyly.spike.scoreboard ;;
+  stamp) ns=loyly.spike.stamp-item-ids ;;
+  *)
+    echo "unknown task: $task" >&2
+    exit 2
+    ;;
+esac
+exec bb -cp "$SRC" -m "$ns" "$@"

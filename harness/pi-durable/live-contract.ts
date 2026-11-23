@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Ajv2020 } from 'ajv/dist/2020.js';
+import { genChecklist, MeasureRefuse } from './measure/index.ts';
 import { validatePanelSelection } from './panel-selection.ts';
 import { specialistWorkers } from './panel-vm-run.ts';
 import {
@@ -189,11 +190,14 @@ function deriveApprovedChecklist(config: LiveRunConfig, source: string, scratch:
   mkdirSync(scratch, { recursive: true });
   const checklist = join(scratch, 'approved-checklist.json');
   if (!existsSync(checklist)) {
-    const result = spawnSync('bb', ['harness/gen_checklist.clj', '--out', checklist], {
-      cwd: source,
-      encoding: 'utf8',
-    });
-    if (result.status !== 0) throw Error(`checklist derivation failed: ${result.stderr}`);
+    try {
+      genChecklist({ root: source, out: checklist });
+    } catch (cause) {
+      const detail = cause instanceof MeasureRefuse || cause instanceof Error
+        ? cause.message
+        : String(cause);
+      throw new Error(`checklist derivation failed: ${detail}`, { cause });
+    }
   }
   requireHash(checklist, config.source.checklist_sha256);
   const selectedChecklist = JSON.parse(readFileSync(checklist, 'utf8')) as Checklist;

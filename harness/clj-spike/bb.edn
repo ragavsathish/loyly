@@ -1,0 +1,23 @@
+{:paths ["src"]
+ :tasks
+ {;; Prefer: harness/clj-spike/bin/spike <task> --root … 
+  ;; Tasks forward argv after the task name into each -main.
+  gen-checklist
+  {:doc "Derive checklist (TS measure/gen-checklist)"
+   :requires ([loyly.spike.gen-checklist :as g])
+   :task (apply g/-main *command-line-args*)}
+
+  score
+  {:doc "File verdicts (TS measure/score)"
+   :requires ([loyly.spike.score :as s])
+   :task (apply s/-main *command-line-args*)}
+
+  scoreboard
+  {:doc "Pass-rate report (TS measure/scoreboard)"
+   :requires ([loyly.spike.scoreboard :as b])
+   :task (apply b/-main *command-line-args*)}
+
+  stamp
+  {:doc "Stamp @item tags (stamp parity)"
+   :requires ([loyly.spike.stamp-item-ids :as t])
+   :task (apply t/-main *command-line-args*)}}}
