@@ -43,9 +43,9 @@ function checkedAllure(validate, value, name) {
   }
 }
 
-function specialistResults({ specialists, plan, planSha256, manifest, candidateSha256, schemaSha256,
-  scoreSha256, sourceCommit, validate }) {
-  const specs = plan.checks.filter((check) => check.source === "specialist");
+function assertSpecialistManifestBound({
+  plan, planSha256, manifest, candidateSha256, schemaSha256, scoreSha256, sourceCommit, specs,
+}) {
   if (!["loyly.supplemental-grade.v1", PANEL_VM_RUN].includes(manifest.schema)
       || manifest.source_commit !== sourceCommit
       || manifest.candidate_sha256 !== candidateSha256
@@ -60,67 +60,97 @@ function specialistResults({ specialists, plan, planSha256, manifest, candidateS
       || (manifest.schema === PANEL_VM_RUN && manifest.plan_sha256 !== planSha256)
       || manifest.producers.length !== specs.length)
     throw new Error("specialist manifest is not bound to this scored candidate and plan");
-  const directories = [], observations = [];
-  for (const spec of specs) {
-    const producer = manifest.producers.find((entry) => entry.id === spec.id);
-    if (!producer || producer.tool !== spec.tool || spec.items.length !== 1
-        || producer.item !== `@item-${spec.items[0]}`)
-      throw new Error(`${spec.id}: missing or incorrect specialist producer`);
-    const dir = join(specialists, spec.id);
-    const resultFiles = readdirSync(dir).filter((name) => /^[0-9a-f-]{36}-result\.json$/.test(name));
-    if (resultFiles.length !== 1 || resultFiles[0] !== producer.result)
-      throw new Error(`${spec.id}: expected exactly one result`);
-    const result = json(join(dir, producer.result));
-    checkedAllure(validate, result, `${spec.id} Allure result`);
-    if (producer.result !== `${result.uuid}-result.json` || result.status !== producer.status
-        || result.stage !== "finished" || label(result, "tag") !== producer.item
-        || label(result, "tool") !== spec.tool || label(result, "technique") !== spec.technique
-        || label(result, "feature") !== (spec.feature ?? plan.feature)
-        || result.parameters?.find((entry) => entry.name === "candidate_sha256")?.value !== candidateSha256
-        || !result.statusDetails?.message || !result.steps?.length)
-      throw new Error(`${spec.id}: specialist identity or observation differs from the plan`);
-    const receiptFile = result.attachments?.find((attachment) =>
-      /execution receipt/i.test(attachment.name) && attachment.type === "application/json")?.source;
-    if (!receiptFile) throw new Error(`${spec.id}: missing execution receipt`);
-    const files = [producer.result, ...result.attachments.map((attachment) => attachment.source)];
-    if (new Set(files).size !== files.length || Object.keys(producer.files).length !== files.length
-        || files.some((name) => !/^[A-Za-z0-9._-]+$/.test(name)
-          || !existsSync(join(dir, name)) || !lstatSync(join(dir, name)).isFile()
-          || producer.files[name] !== fileSha(join(dir, name))))
-      throw new Error(`${spec.id}: result or attachment bytes differ from the manifest`);
-    const receipt = json(join(dir, receiptFile));
-    const imageDigest = receipt.imageDigest ?? receipt.image_oci_digest;
-    if ((receipt.candidate_sha256 ?? receipt.candidateSha ?? receipt.result?.candidateSha256) !== candidateSha256
-        || imageDigest !== producer.image_digest
-      || !/^sha256:[0-9a-f]{64}$/.test(imageDigest ?? "")
-      || producer.execution_receipt_sha256 !== fileSha(join(dir, receiptFile)))
-      throw new Error(`${spec.id}: execution receipt is not candidate and image bound`);
-    let runtime;
-    if (manifest.schema === PANEL_VM_RUN && Number.isInteger(receipt.vm_exit_code)
-        && receipt.isolation === "gondolin-qemu-vm"
-        && receipt.mounts?.candidate === "read-only"
-        && receipt.mounts?.worker === "read-only")
-      runtime = "gondolin-qemu-vm";
-    if (spec.id === "protocol" && receipt.vm_exit_code === 0) runtime = "gondolin-qemu-vm";
-    if (!runtime && spec.id === "browser" && receipt.exitCode === 0 && receipt.candidateMount?.RW === false
-        && receipt.readOnlyRootFilesystem === true && receipt.networkMode === "none")
-      runtime = "docker-shared-linux-vm";
-    if (!runtime && spec.id === "telemetry" && receipt.containerId
-        && String(receipt.isolation).includes("Docker Desktop Linux VM"))
-      runtime = "docker-shared-linux-vm";
-    if (!runtime) throw new Error(`${spec.id}: runtime receipt is incomplete`);
-    directories.push(dir);
-    observations.push({ id: spec.id, item: spec.items[0], tool: spec.tool,
+}
+
+function specialistRuntime(spec, receipt, manifest) {
+  if (manifest.schema === PANEL_VM_RUN && Number.isInteger(receipt.vm_exit_code)
+      && receipt.isolation === "gondolin-qemu-vm"
+      && receipt.mounts?.candidate === "read-only"
+      && receipt.mounts?.worker === "read-only")
+    return "gondolin-qemu-vm";
+  if (spec.id === "protocol" && receipt.vm_exit_code === 0) return "gondolin-qemu-vm";
+  if (spec.id === "browser" && receipt.exitCode === 0 && receipt.candidateMount?.RW === false
+      && receipt.readOnlyRootFilesystem === true && receipt.networkMode === "none")
+    return "docker-shared-linux-vm";
+  if (spec.id === "telemetry" && receipt.containerId
+      && String(receipt.isolation).includes("Docker Desktop Linux VM"))
+    return "docker-shared-linux-vm";
+  return null;
+}
+
+function collectSpecialistObservation({
+  specialists, plan, manifest, candidateSha256, validate, spec,
+}) {
+  const producer = manifest.producers.find((entry) => entry.id === spec.id);
+  if (!producer || producer.tool !== spec.tool || spec.items.length !== 1
+      || producer.item !== `@item-${spec.items[0]}`)
+    throw new Error(`${spec.id}: missing or incorrect specialist producer`);
+  const dir = join(specialists, spec.id);
+  const resultFiles = readdirSync(dir).filter((name) => /^[0-9a-f-]{36}-result\.json$/.test(name));
+  if (resultFiles.length !== 1 || resultFiles[0] !== producer.result)
+    throw new Error(`${spec.id}: expected exactly one result`);
+  const result = json(join(dir, producer.result));
+  checkedAllure(validate, result, `${spec.id} Allure result`);
+  if (producer.result !== `${result.uuid}-result.json` || result.status !== producer.status
+      || result.stage !== "finished" || label(result, "tag") !== producer.item
+      || label(result, "tool") !== spec.tool || label(result, "technique") !== spec.technique
+      || label(result, "feature") !== (spec.feature ?? plan.feature)
+      || result.parameters?.find((entry) => entry.name === "candidate_sha256")?.value !== candidateSha256
+      || !result.statusDetails?.message || !result.steps?.length)
+    throw new Error(`${spec.id}: specialist identity or observation differs from the plan`);
+  const receiptFile = result.attachments?.find((attachment) =>
+    /execution receipt/i.test(attachment.name) && attachment.type === "application/json")?.source;
+  if (!receiptFile) throw new Error(`${spec.id}: missing execution receipt`);
+  const files = [producer.result, ...result.attachments.map((attachment) => attachment.source)];
+  if (new Set(files).size !== files.length || Object.keys(producer.files).length !== files.length
+      || files.some((name) => !/^[A-Za-z0-9._-]+$/.test(name)
+        || !existsSync(join(dir, name)) || !lstatSync(join(dir, name)).isFile()
+        || producer.files[name] !== fileSha(join(dir, name))))
+    throw new Error(`${spec.id}: result or attachment bytes differ from the manifest`);
+  const receipt = json(join(dir, receiptFile));
+  const imageDigest = receipt.imageDigest ?? receipt.image_oci_digest;
+  if ((receipt.candidate_sha256 ?? receipt.candidateSha ?? receipt.result?.candidateSha256) !== candidateSha256
+      || imageDigest !== producer.image_digest
+    || !/^sha256:[0-9a-f]{64}$/.test(imageDigest ?? "")
+    || producer.execution_receipt_sha256 !== fileSha(join(dir, receiptFile)))
+    throw new Error(`${spec.id}: execution receipt is not candidate and image bound`);
+  const runtime = specialistRuntime(spec, receipt, manifest);
+  if (!runtime) throw new Error(`${spec.id}: runtime receipt is incomplete`);
+  return {
+    dir,
+    observation: {
+      id: spec.id, item: spec.items[0], tool: spec.tool,
       technique: spec.technique, status: result.status, runtime,
       result_sha256: fileSha(join(dir, producer.result)), message: result.statusDetails.message,
-      start: result.start, stop: result.stop });
-  }
+      start: result.start, stop: result.stop,
+    },
+  };
+}
+
+function assertSpecialistOverlap(manifest, observations) {
   const intervals = manifest.schema === PANEL_VM_RUN
     ? manifest.producers.map((row) => ({ start: row.started, stop: row.stopped })) : observations;
   const overlap = Math.min(...intervals.map((row) => row.stop))
     - Math.max(...intervals.map((row) => row.start));
   if (overlap <= 0 || overlap !== manifest.parallel_overlap_ms)
     throw new Error("the recorded specialist execution overlap is false");
+}
+
+function specialistResults({ specialists, plan, planSha256, manifest, candidateSha256, schemaSha256,
+  scoreSha256, sourceCommit, validate }) {
+  const specs = plan.checks.filter((check) => check.source === "specialist");
+  assertSpecialistManifestBound({
+    plan, planSha256, manifest, candidateSha256, schemaSha256, scoreSha256, sourceCommit, specs,
+  });
+  const directories = [], observations = [];
+  for (const spec of specs) {
+    const row = collectSpecialistObservation({
+      specialists, plan, manifest, candidateSha256, validate, spec,
+    });
+    directories.push(row.dir);
+    observations.push(row.observation);
+  }
+  assertSpecialistOverlap(manifest, observations);
   return { directories, observations };
 }
 

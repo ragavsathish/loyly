@@ -68,16 +68,6 @@ function complexityOf(node) {
 function nestingDepth(node) {
   let max = 0;
   const visit = (n, depth) => {
-    const nest =
-      ts.isIfStatement(n) ||
-      ts.isForStatement(n) ||
-      ts.isForInStatement(n) ||
-      ts.isForOfStatement(n) ||
-      ts.isWhileStatement(n) ||
-      ts.isDoStatement(n) ||
-      ts.isTryStatement(n) ||
-      ts.isSwitchStatement(n) ||
-      ts.isBlock(n);
     // Only count control structures, not every block, to match typical nesting metrics.
     const bump =
       ts.isIfStatement(n) ||
@@ -263,7 +253,7 @@ const maxNestingDepth = nestings.length ? Math.max(...nestings) : 0;
 // cloned_pct via jscpd JSON if present / fresh run
 const jscpdOut = join(PI, 'scratch-jscpd');
 mkdirSync(jscpdOut, { recursive: true });
-const jscpd = spawnSync(
+spawnSync(
   join(PI, 'node_modules/.bin/jscpd'),
   [
     '--config',
@@ -290,13 +280,13 @@ const eslint = spawnSync(
   ['.', '--format', 'json', '--no-error-on-unmatched-pattern'],
   { cwd: PI, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 },
 );
-let violationPct = null;
-let eslintFiles = 0;
-let eslintViolating = 0;
+let violationPct;
 try {
   const results = JSON.parse(eslint.stdout || '[]');
-  eslintFiles = results.length;
-  eslintViolating = results.filter((r) => (r.errorCount ?? 0) + (r.warningCount ?? 0) > 0).length;
+  const eslintFiles = results.length;
+  const eslintViolating = results.filter(
+    (r) => (r.errorCount ?? 0) + (r.warningCount ?? 0) > 0,
+  ).length;
   violationPct = eslintFiles ? (100 * eslintViolating) / eslintFiles : 0;
 } catch {
   violationPct = null;

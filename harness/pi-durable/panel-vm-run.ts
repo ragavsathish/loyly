@@ -204,6 +204,76 @@ async function runPanelVms({
 
 // Reopen a completed panel after a controller restart without launching VMs
 // again. A partial output is not a receipt and must be kept as failed evidence.
+function assertPanelVmManifest({
+  manifest, scoreInput, candidateSha256, scoreSha256, planSha256, bundle, workers, schemaFile, imageDigest,
+}) {
+  if (manifest.schema !== PANEL_VM_RUN
+      || manifest.source_commit !== scoreInput.source_commit
+      || manifest.candidate_sha256 !== candidateSha256
+      || ((manifest.score_state ?? 'filed') === 'filed' && manifest.original_score_sha256 !== scoreSha256)
+      || (manifest.score_state === 'pre-score' && manifest.original_score_sha256 !== null)
+      || manifest.plan_sha256 !== planSha256
+      || (bundle.sha256 && manifest.worker_bundle_sha256 !== bundle.sha256)
+      || manifest.allure_schema_sha256 !== fileSha(schemaFile)
+      || manifest.original_score_unchanged !== true
+      || (imageDigest && manifest.image_digest !== imageDigest)
+      || manifest.producers?.length !== workers.length)
+    throw new Error('panel VM manifest differs from the scored cut, plan, schema or image');
+}
+
+function verifyPanelVmProducer({
+  worker, manifest, out, candidateSha256, bundle, validate,
+}) {
+  const producer = manifest.producers.find((row) => row.id === worker.id);
+  if (!producer || producer.tool !== worker.tool || producer.item !== `@item-${worker.item}`
+      || producer.image_digest !== manifest.image_digest
+      || !Number.isInteger(producer.started) || !Number.isInteger(producer.stopped)
+      || producer.stopped < producer.started)
+    throw new Error(`${worker.id}: panel producer receipt differs`);
+  const dir = join(out, worker.id);
+  const results = readdirSync(dir).filter((name) => /^[0-9a-f-]{36}-result\.json$/.test(name));
+  if (results.length !== 1 || results[0] !== producer.result)
+    throw new Error(`${worker.id}: expected one result`);
+  const result = JSON.parse(readFileSync(join(dir, producer.result), 'utf8'));
+  if (worker.script === 'panel-runtime.mjs')
+    verifyRuntimeProfileEvidence({ dir, result, candidateSha256, probe: worker.probe });
+  const receiptFile = result.attachments?.find((attachment) =>
+    attachment.name === 'Gondolin VM execution receipt')?.source;
+  const files = [producer.result, ...(result.attachments ?? []).map((attachment) => attachment.source)];
+  try {
+    validate(result, producer.result);
+  } catch (cause) {
+    throw new Error(`${worker.id}: Allure result or attachment changed: ${cause instanceof Error ? cause.message : String(cause)}`);
+  }
+  if (result.uuid + '-result.json' !== producer.result
+      || result.status !== producer.status || result.stage !== 'finished'
+      || label(result, 'tool') !== worker.tool || label(result, 'tag') !== producer.item
+      || label(result, 'feature') !== worker.feature
+      || label(result, 'technique') !== worker.technique
+      || result.parameters?.find((entry) => entry.name === 'candidate_sha256')?.value !== candidateSha256
+      || !receiptFile || new Set(files).size !== files.length
+      || files.length !== Object.keys(producer.files).length
+      || files.some((name) => !existsSync(join(dir, name))
+        || producer.files[name] !== fileSha(join(dir, name)))
+      || producer.execution_receipt_sha256 !== fileSha(join(dir, receiptFile)))
+    throw new Error(`${worker.id}: Allure result or attachment changed`);
+  const receipt = JSON.parse(readFileSync(join(dir, receiptFile), 'utf8'));
+  if (receipt.worker !== worker.id || receipt.candidate_sha256 !== candidateSha256
+      || receipt.imageDigest !== manifest.image_digest
+      || receipt.worker_script_sha256 !== fileSha(join(bundle.root, worker.script))
+      || (bundle.sha256 && receipt.worker_bundle_sha256 !== bundle.sha256)
+      || (!bundle.sha256 && worker.script === 'panel-runtime.mjs'
+        && (receipt.profile_validator_sha256 !== fileSha(join(HERE, 'runtime-profile-evidence.mjs'))
+          || receipt.profile_otel_schema_sha256 !== fileSha(join(HERE, 'panel-otel-metrics.schema.json'))))
+      || (manifest.worker_support_sha256
+        && receipt.worker_support_sha256 !== manifest.worker_support_sha256)
+      || receipt.isolation !== 'gondolin-qemu-vm'
+      || receipt.mounts?.candidate !== 'read-only'
+      || receipt.mounts?.worker !== 'read-only'
+      || (receipt.vm_exit_code === 0) !== (result.status === 'passed'))
+    throw new Error(`${worker.id}: Gondolin execution receipt changed`);
+}
+
 function verifyPanelVmRun({
   original,
   out,
@@ -226,67 +296,11 @@ function verifyPanelVmRun({
   const workers = specialistWorkers(plan);
   const schemaFile = join(HERE, '../evidence-core/allure-lifecycle-result.schema.json');
   const validate = compileAllureSchema(JSON.parse(readFileSync(schemaFile, 'utf8')));
-  if (manifest.schema !== PANEL_VM_RUN
-      || manifest.source_commit !== scoreInput.source_commit
-      || manifest.candidate_sha256 !== candidateSha256
-      || ((manifest.score_state ?? 'filed') === 'filed' && manifest.original_score_sha256 !== scoreSha256)
-      || (manifest.score_state === 'pre-score' && manifest.original_score_sha256 !== null)
-      || manifest.plan_sha256 !== planSha256
-      || (bundle.sha256 && manifest.worker_bundle_sha256 !== bundle.sha256)
-      || manifest.allure_schema_sha256 !== fileSha(schemaFile)
-      || manifest.original_score_unchanged !== true
-      || (imageDigest && manifest.image_digest !== imageDigest)
-      || manifest.producers?.length !== workers.length)
-    throw new Error('panel VM manifest differs from the scored cut, plan, schema or image');
+  assertPanelVmManifest({
+    manifest, scoreInput, candidateSha256, scoreSha256, planSha256, bundle, workers, schemaFile, imageDigest,
+  });
   for (const worker of workers) {
-    const producer = manifest.producers.find((row) => row.id === worker.id);
-    if (!producer || producer.tool !== worker.tool || producer.item !== `@item-${worker.item}`
-        || producer.image_digest !== manifest.image_digest
-        || !Number.isInteger(producer.started) || !Number.isInteger(producer.stopped)
-        || producer.stopped < producer.started)
-      throw new Error(`${worker.id}: panel producer receipt differs`);
-    const dir = join(out, worker.id);
-    const results = readdirSync(dir).filter((name) => /^[0-9a-f-]{36}-result\.json$/.test(name));
-    if (results.length !== 1 || results[0] !== producer.result)
-      throw new Error(`${worker.id}: expected one result`);
-    const result = JSON.parse(readFileSync(join(dir, producer.result), 'utf8'));
-    if (worker.script === 'panel-runtime.mjs')
-      verifyRuntimeProfileEvidence({ dir, result, candidateSha256, probe: worker.probe });
-    const receiptFile = result.attachments?.find((attachment) =>
-      attachment.name === 'Gondolin VM execution receipt')?.source;
-    const files = [producer.result, ...(result.attachments ?? []).map((attachment) => attachment.source)];
-    try {
-      validate(result, producer.result);
-    } catch (cause) {
-      throw new Error(`${worker.id}: Allure result or attachment changed: ${cause instanceof Error ? cause.message : String(cause)}`);
-    }
-    if (result.uuid + '-result.json' !== producer.result
-        || result.status !== producer.status || result.stage !== 'finished'
-        || label(result, 'tool') !== worker.tool || label(result, 'tag') !== producer.item
-        || label(result, 'feature') !== worker.feature
-        || label(result, 'technique') !== worker.technique
-        || result.parameters?.find((entry) => entry.name === 'candidate_sha256')?.value !== candidateSha256
-        || !receiptFile || new Set(files).size !== files.length
-        || files.length !== Object.keys(producer.files).length
-        || files.some((name) => !existsSync(join(dir, name))
-          || producer.files[name] !== fileSha(join(dir, name)))
-        || producer.execution_receipt_sha256 !== fileSha(join(dir, receiptFile)))
-      throw new Error(`${worker.id}: Allure result or attachment changed`);
-    const receipt = JSON.parse(readFileSync(join(dir, receiptFile), 'utf8'));
-    if (receipt.worker !== worker.id || receipt.candidate_sha256 !== candidateSha256
-        || receipt.imageDigest !== manifest.image_digest
-        || receipt.worker_script_sha256 !== fileSha(join(bundle.root, worker.script))
-        || (bundle.sha256 && receipt.worker_bundle_sha256 !== bundle.sha256)
-        || (!bundle.sha256 && worker.script === 'panel-runtime.mjs'
-          && (receipt.profile_validator_sha256 !== fileSha(join(HERE, 'runtime-profile-evidence.mjs'))
-            || receipt.profile_otel_schema_sha256 !== fileSha(join(HERE, 'panel-otel-metrics.schema.json'))))
-        || (manifest.worker_support_sha256
-          && receipt.worker_support_sha256 !== manifest.worker_support_sha256)
-        || receipt.isolation !== 'gondolin-qemu-vm'
-        || receipt.mounts?.candidate !== 'read-only'
-        || receipt.mounts?.worker !== 'read-only'
-        || (receipt.vm_exit_code === 0) !== (result.status === 'passed'))
-      throw new Error(`${worker.id}: Gondolin execution receipt changed`);
+    verifyPanelVmProducer({ worker, manifest, out, candidateSha256, bundle, validate });
   }
   const overlap = Math.min(...manifest.producers.map((row) => row.stopped))
     - Math.max(...manifest.producers.map((row) => row.started));
@@ -294,6 +308,7 @@ function verifyPanelVmRun({
     throw new Error('panel VM overlap receipt changed');
   return { out, manifest };
 }
+
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   if (process.argv.length !== 5)
