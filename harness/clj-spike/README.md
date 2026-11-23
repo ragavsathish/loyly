@@ -17,8 +17,10 @@ Shared oracle tools in `harness/*.clj` are untouched.
 | Live contract | `live-contract.ts` | ✅ partial | specs, image, derive checklist; Ajv + panel VM deferred |
 | Grading room | `grading-room.ts` | ✅ | digests, prepare, verify |
 | Blind review | `blind-review.ts` | ✅ partial | shape/packet file checks + answer parse; Allure/HTTP probe deferred |
+| Panel selection | `panel-selection.ts` + evidence-core | ✅ | coverage; Ajv schema deferred |
+| Panel policy | `panel-policy.ts` + evidence-core | ✅ | `evaluate-panel` |
 | Cycle phases / adapters | `tasks/*`, `*-adapter.ts` | ⏳ | orchestration + Pi |
-| Panel VM / Allure | `panel-*`, `allure-*` | ⏳ | heavy I/O |
+| Panel VM / Allure | `panel-vm-*`, `allure-*` | ⏳ | heavy I/O |
 
 ## Layout
 

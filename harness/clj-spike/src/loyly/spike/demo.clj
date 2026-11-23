@@ -9,6 +9,7 @@
             [loyly.spike.grading-room :as room]
             [loyly.spike.hjson :as hjson]
             [loyly.spike.live-contract :as live]
+            [loyly.spike.panel-selection :as panel]
             [loyly.spike.project.loyly.blind-answer :as answer]
             [loyly.spike.project.loyly.blind-policy :as policy]
             [loyly.spike.project.loyly.identity :as id]
@@ -75,6 +76,13 @@
             _ (live/verify-selected-specs (str instrument)
                                           (array-map "specs" specs)
                                           checklist)
+            panel-plan (hjson/read-json
+                        (slurp (io/file instrument "harness" "pi-durable"
+                                        id/DEFAULT_PANEL_PLAN)
+                               :encoding "UTF-8"))
+            panel-sel (panel/validate-panel-selection panel-plan checklist)
+            _ (when-not (seq (:specialists panel-sel))
+                (die "expected specialist checks on booking-core panel plan"))
             verdicts (mapv (fn [item]
                              (if (= (get item "id") id/BLIND_ITEM_ID)
                                (array-map "id" id/BLIND_ITEM_ID
@@ -144,6 +152,7 @@
          (str "clj-spike demo OK: " (:score verified)
               " pass=" (:pass judged)
               " plans=" (count (get receipt-map "sourcePlans"))
+              " panel-specialists=" (count (:specialists panel-sel))
               " blind-item=" id/BLIND_ITEM_ID "\n"
               (str/trim-newline (:text board)) "\n"
               "scratch=" scratch "\n")))))
