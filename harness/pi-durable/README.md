@@ -153,8 +153,10 @@ npm run analyze
 ```
 
 Individual tools: `analyze:dead` (Knip), `analyze:deps` (Madge),
-`analyze:dupes` (jscpd). Digest-stable `.mjs` shims and dynamically loaded
-panel workers are ignored in Knip so they are not reported as unused files.
+`analyze:dupes` (jscpd), `analyze:metrics` (Q-factor static metrics:
+cc_max, cloned_pct, graph_dependency_entropy, mean_func_loc, …).
+Digest-stable `.mjs` shims and dynamically loaded panel workers are ignored
+in Knip so they are not reported as unused files.
 
 ## Panel-only reassessment
 

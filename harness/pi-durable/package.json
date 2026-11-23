@@ -15,10 +15,11 @@
     "format": "prettier --write",
     "format:check": "prettier --check",
     "test": "node --test --test-concurrency=1 test/*.test.mjs ../cycle-core/test/*.test.mjs ../evidence-core/test/*.test.mjs",
-    "analyze": "npm run analyze:dead && npm run analyze:deps && npm run analyze:dupes",
+    "analyze": "npm run analyze:dead && npm run analyze:deps && npm run analyze:dupes && npm run analyze:metrics",
     "analyze:dead": "knip",
     "analyze:deps": "madge --circular --extensions ts,mjs,js --ts-config tsconfig.json .",
-    "analyze:dupes": "jscpd --config .jscpd.json --output ./scratch-jscpd --silent . ../cycle-core ../evidence-core"
+    "analyze:dupes": "jscpd --config .jscpd.json --output ./scratch-jscpd --silent . ../cycle-core ../evidence-core",
+    "analyze:metrics": "node scripts/metrics.mjs"
   },
   "dependencies": {
     "@earendil-works/chord": "1.5.1",
