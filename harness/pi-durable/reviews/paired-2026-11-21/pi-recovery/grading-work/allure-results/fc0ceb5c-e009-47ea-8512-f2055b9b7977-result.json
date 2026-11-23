@@ -1,0 +1,64 @@
+{
+  "uuid": "fc0ceb5c-e009-47ea-8512-f2055b9b7977",
+  "name": "A completed family-time occurrence no longer uses the allowance",
+  "fullName": "loyly.time-classes.05-005",
+  "testCaseId": "loyly.time-classes.05-005",
+  "historyId": "loyly.time-classes.05-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Second dated request returned HTTP 201: {\"booking\": {\"id\": \"booking-3\", \"house\": \"house-a\", \"household\": \"12\", \"kind\": \"occurrence\", \"resource\": \"room\", \"resourceName\": \"Room\", \"sauna\": \"Sauna A\", \"group\": \"A\", \"weekday\": \"Saturday\", \"start\": \"17:40\", \"end\": \"17:41\", \"class\": \"family\", \"date\": \"2026-11-21\", \"confirmedAt\": \"2026-11-21T17:39:00.001Z\", \"policyVersion\": \"v1\", \"priceReference\": \"standing-price\", \"history\": [{\"id\": \"event-4\", \"booking\": \"booking-3\", \"type\": \"confirmed\", \"at\": \"2026-11-21T17:39:00.001Z\", \"policyVersion\": \"v1\"}]}}; booking and views reread."
+  },
+  "start": 1795282565129,
+  "stop": 1795282740984,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given apartment 12's only confirmed family-time occurrence has ended",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 12 requests a free upcoming family-time window",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the completed occurrence does not trigger the active-or-upcoming cap",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "c6a42e58-4274-4d71-983b-f8ff93fa0ec7-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "uuid": "01ee4ab3-aa1b-44e4-a812-c44830602bd3",
+  "name": "Taking a sale occurrence raises a distinct resale signal",
+  "fullName": "loyly.occurrence-release.02-005",
+  "testCaseId": "loyly.occurrence-release.02-005",
+  "historyId": "loyly.occurrence-release.02-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST sale release and take succeeded; dated views show apartment 3, resale signal offer-3, v1 and house-resale-tariff, plus apartment 12 standing fee and later holding."
+  },
+  "start": 1795281258611,
+  "stop": 1795281258611,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12 has released one Tuesday occurrence for sale",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST sale release and take succeeded; dated views show apartment 3, resale signal offer-3, v1 and house-resale-tariff, plus apartment 12 standing fee and later holding."
+      }
+    },
+    {
+      "name": "When: apartment 3 buys that occurrence under the house's sale policy",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST sale release and take succeeded; dated views show apartment 3, resale signal offer-3, v1 and house-resale-tariff, plus apartment 12 standing fee and later holding."
+      }
+    },
+    {
+      "name": "Then: apartment 3 is the taker for that one Tuesday occurrence; a resale billing signal identifies apartment 3, that occurrence, the charge kind, the governing policy version and the house price reference; apartment 12's normal standing-slot fee remains due; apartment 12 still holds the standing slot on later Tuesdays",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST sale release and take succeeded; dated views show apartment 3, resale signal offer-3, v1 and house-resale-tariff, plus apartment 12 standing fee and later holding."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "observations.json",
+      "source": "0d3774da-1cbb-4737-bd5a-7f0d8ee4ba6b-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "vm-final.log",
+      "source": "af273556-fc15-4713-93e8-8a382540df8e-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "command.txt",
+      "source": "7fcbb335-2cef-4ccf-9476-a245b237ef8a-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "exit-final.txt",
+      "source": "d5a4d6c5-7969-40f2-b2c4-f5f44aaa34ca-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

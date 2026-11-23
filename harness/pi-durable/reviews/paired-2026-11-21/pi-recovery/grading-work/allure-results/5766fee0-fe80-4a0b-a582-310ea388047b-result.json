@@ -1,0 +1,69 @@
+{
+  "uuid": "5766fee0-fe80-4a0b-a582-310ea388047b",
+  "name": "A free release offers only the selected occurrence",
+  "fullName": "loyly.occurrence-release.02-001",
+  "testCaseId": "loyly.occurrence-release.02-001",
+  "historyId": "loyly.occurrence-release.02-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST FREE release and POST take returned 201 and 200; selected date is held by apartment 3, following Tuesday by apartment 12; FREE billing remains with 12 and heater follows taker."
+  },
+  "start": 1795282479009,
+  "stop": 1795282484009,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Releasing one week preserves the standing holding"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given apartment 12 holds a Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 12 releases the occurrence for one named Tuesday for free",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then that week's occurrence is available for another household to take",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12 still holds the standing slot for later Tuesdays",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "86d45848-96cc-44e9-bf7a-dac16a24f682-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

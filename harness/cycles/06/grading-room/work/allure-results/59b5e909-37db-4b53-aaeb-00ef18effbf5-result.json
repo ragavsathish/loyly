@@ -1,0 +1,64 @@
+{
+  "uuid": "59b5e909-37db-4b53-aaeb-00ef18effbf5",
+  "name": "A completed family-time occurrence no longer uses the allowance",
+  "fullName": "loyly.time-classes.05-005",
+  "testCaseId": "loyly.time-classes.05-005",
+  "historyId": "loyly.time-classes.05-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Confirmed family occurrence ending 2026-11-21T18:30Z; set guest clock to 19:00Z and GET state confirmed time. Next family occurrence was confirmed."
+  },
+  "start": 1795281239897,
+  "stop": 1795281242479,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given apartment 12's only confirmed family-time occurrence has ended",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 12 requests a free upcoming family-time window",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the completed occurrence does not trigger the active-or-upcoming cap",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "fa9daa41-5719-49db-8029-18ba61ec0138-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

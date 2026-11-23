@@ -33,17 +33,37 @@ function worker(scratch, env) {
 }
 
 function liveEnv(scratch) {
+  // This test exercises the historical eleven-item blind handoff. Keep its
+  // source cut explicit now that the main checkout selects the whole product.
+  const source = join(scratch, "booking-core-source");
+  const cloned = spawnSync("git", ["clone", "-q", `file://${root}`, source], { encoding: "utf8" });
+  assert.equal(cloned.status, 0, cloned.stderr);
+  for (const slice of ["02-occurrence-release", "03-scarcity-forfeit",
+    "04-house-policy", "05-time-classes"]) {
+    const plan = join(source, "docs", "plan", slice, "plan.md");
+    writeFileSync(plan, readFileSync(plan, "utf8")
+      .replace("status: ready-for-development", "status: planned"));
+  }
+  const recorded = spawnSync("bash", ["harness/oracle.sh", "record"],
+    { cwd: source, encoding: "utf8" });
+  assert.equal(recorded.status, 0, recorded.stderr);
+  const committed = spawnSync("git", ["-c", "user.name=Pi test", "-c",
+    "user.email=pi-test@example.invalid", "commit", "-qam", "Pin booking-core fixture cut"],
+  { cwd: source, encoding: "utf8" });
+  assert.equal(committed.status, 0, committed.stderr);
   const checklist = join(scratch, "approved-checklist.json");
   const generated = spawnSync("bb", ["harness/gen_checklist.clj", "--out", checklist],
-    { cwd: root, encoding: "utf8" });
+    { cwd: source, encoding: "utf8" });
   assert.equal(generated.status, 0, generated.stderr);
-  const commit = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
+  const commit = spawnSync("git", ["rev-parse", "HEAD"], { cwd: source, encoding: "utf8" });
   assert.equal(commit.status, 0, commit.stderr);
   const image = join(root, ".pi/harness/.state/assets/builder-clojure");
   const builderCommand = join(here, "test/stub-green-builder.sh");
   const graderCommand = join(here, "test/stub-grader.sh");
   const settings = join(root, ".pi/harness/config/pi.grader.settings.json");
   return { ...process.env,
+    LOYLY_SCORE_CYCLE: "03",
+    LOYLY_SOURCE_REPO: source,
     LOYLY_APPROVED_COMMIT: commit.stdout.trim(),
     LOYLY_APPROVED_CHECKLIST_SHA256: sha(checklist),
     LOYLY_BUILDER_COMMAND: builderCommand, LOYLY_BUILDER_IMAGE: image,
@@ -72,7 +92,7 @@ test("live stub cycle waits across a controller kill, then scores the separate b
     await until(() => existsSync(join(packetDir, "response-template.json"))
       || first.output().includes("FINAL"));
     assert.ok(existsSync(join(packetDir, "response-template.json")), first.output());
-    assert.ok(!existsSync(join(scratch, "instrument", "harness", "cycles", "02", "scores.json")));
+    assert.ok(!existsSync(join(scratch, "instrument", "harness", "cycles", "03", "scores.json")));
     first.child.kill("SIGKILL");
     assert.equal((await first.closed).signal, "SIGKILL");
     resumed = worker(scratch, env);
@@ -92,7 +112,7 @@ test("live stub cycle waits across a controller kill, then scores the separate b
     assert.equal(done.code, 1, done.output); // live measurement is not automatic acceptance
     assert.match(done.output, /blind-review completed/);
     assert.match(done.output, /score filed/);
-    const scores = JSON.parse(readFileSync(join(scratch, "instrument", "harness", "cycles", "02", "scores.json")));
+    const scores = JSON.parse(readFileSync(join(scratch, "instrument", "harness", "cycles", "03", "scores.json")));
     assert.equal(scores.items.filter((item) => item.verdict === "pass").length, 10);
     assert.equal(scores.items.find((item) => item.id === "01-011").verdict, "fail");
     assert.equal(JSON.parse(readFileSync(join(scratch, "final-verdicts.json"))).length, 11);
@@ -130,7 +150,7 @@ test("live stub cycle launches a separate blind process and scores its HTTP-conf
     assert.equal(done.code, 1, done.output); // live measurement still needs acceptance
     assert.match(done.output, /blind-review completed/);
     assert.match(done.output, /score filed/);
-    const scores = JSON.parse(readFileSync(join(scratch, "instrument", "harness", "cycles", "02", "scores.json")));
+    const scores = JSON.parse(readFileSync(join(scratch, "instrument", "harness", "cycles", "03", "scores.json")));
     assert.equal(scores.items.filter((item) => item.verdict === "pass").length, 11);
     const agentRoom = join(scratch, "blind-agent-room");
     assert.deepEqual(readdirSync(agentRoom).sort(), ["question.txt", "refusal.txt"]);
@@ -178,7 +198,7 @@ test("controller restart joins the still-running blind process without launching
     assert.equal(done.code, 1, done.output);
     assert.match(done.output, /blind-review completed/);
     assert.deepEqual(readdirSync(evidence).filter((name) => name.startsWith("launch-")), ["launch-1"]);
-    const scores = JSON.parse(readFileSync(join(scratch, "instrument", "harness", "cycles", "02", "scores.json")));
+    const scores = JSON.parse(readFileSync(join(scratch, "instrument", "harness", "cycles", "03", "scores.json")));
     assert.equal(scores.items.filter((item) => item.verdict === "pass").length, 11);
   } finally {
     if (first?.child.exitCode === null) first.child.kill("SIGTERM");

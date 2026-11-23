@@ -1,0 +1,73 @@
+{
+  "uuid": "68576286-67db-4677-97e2-2c5159be76a3",
+  "name": "The refusal for a closed day is judged usable",
+  "fullName": "loyly.booking-core.01-011",
+  "testCaseId": "loyly.booking-core.01-011",
+  "historyId": "loyly.booking-core.01-011",
+  "status": "skipped",
+  "stage": "pending",
+  "statusDetails": {
+    "message": "not reached: blind subagent review required; no independent judgment or suggested request observed."
+  },
+  "start": 1795347917934,
+  "stop": 1795347917943,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "usability"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A refusal is judged by whether a resident can act on it without asking again"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-011"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Refused apartment 12 Tuesday 17:00 in room 9; refusal text captured.",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Refused apartment 12 Tuesday 17:00 in room 9; refusal text captured."
+      }
+    },
+    {
+      "name": "When: fresh independent subagent reads only the refusal",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: blind subagent review required"
+      }
+    },
+    {
+      "name": "Then: A refusal is judged by whether a resident can act on it without asking again",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: blind subagent review required; no independent judgment or suggested request observed."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Exact refusal for blind review",
+      "source": "c8c3100a-18b6-4942-95bb-50bf06fdd44e-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

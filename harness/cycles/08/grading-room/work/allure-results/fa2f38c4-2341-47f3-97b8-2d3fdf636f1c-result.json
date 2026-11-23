@@ -1,0 +1,81 @@
+{
+  "uuid": "fa2f38c4-2341-47f3-97b8-2d3fdf636f1c",
+  "name": "Two households try to take the same released occurrence",
+  "fullName": "loyly.occurrence-release.02-010",
+  "testCaseId": "loyly.occurrence-release.02-010",
+  "historyId": "loyly.occurrence-release.02-010",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Concurrent taker requests yielded one taken and one refusal; posted and heater show apartment 3, billing shows holder 12 standing fee, next Tuesday remains 12."
+  },
+  "start": 1795305924806,
+  "stop": 1795306044806,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "The three derived views describe one occurrence holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-010"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given apartment 12 has released one named Tuesday occurrence",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Concurrent taker requests yielded one taken and one refusal; posted and heater show apartment 3, billing shows holder 12 standing fee, next Tuesday remains 12."
+      }
+    },
+    {
+      "name": "When: When apartments 3 and 4 each try to take it before either request is answered",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Concurrent taker requests yielded one taken and one refusal; posted and heater show apartment 3, billing shows holder 12 standing fee, next Tuesday remains 12."
+      }
+    },
+    {
+      "name": "Then: Then exactly one request succeeds",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Concurrent taker requests yielded one taken and one refusal; posted and heater show apartment 3, billing shows holder 12 standing fee, next Tuesday remains 12."
+      }
+    },
+    {
+      "name": "Then: And the posted list, heater schedule and billing signal agree on that one outcome",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Concurrent taker requests yielded one taken and one refusal; posted and heater show apartment 3, billing shows holder 12 standing fee, next Tuesday remains 12."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "55950356-d19d-47c5-b2d2-4e47a6b9ece8-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

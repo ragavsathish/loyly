@@ -7,6 +7,12 @@ import { join } from "node:path";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const fileHash = (path) => hash(readFileSync(path));
+export function scoreCycleFor(scratch) {
+  const input = JSON.parse(readFileSync(join(scratch, "score-input.json"), "utf8"));
+  const cycle = input.score_cycle ?? "02";
+  if (!/^\d\d$/.test(cycle)) throw new Error("bound score cycle is invalid");
+  return cycle;
+}
 function head(path) {
   const result = spawnSync("git", ["-C", path, "rev-parse", "HEAD"], { encoding: "utf8" });
   if (result.status !== 0) throw new Error(`cannot read instrument cut at ${path}`);
@@ -24,13 +30,16 @@ function panelManifestHash(scratch) {
   return digest;
 }
 
-export function bindScoreInput({ scratch, sourceRoot, instrument, candidateSha256, verdictsFile }) {
+export function bindScoreInput({ scratch, sourceRoot, instrument, candidateSha256, verdictsFile,
+  scoreCycle = "02" }) {
   if (head(instrument) !== head(sourceRoot)) throw new Error("instrument clone is from another source cut");
+  if (!/^\d\d$/.test(scoreCycle)) throw new Error("score cycle must be two digits");
   const checklistFile = join(scratch, "checklist.json");
   const panelSha256 = panelManifestHash(scratch);
   const input = { schema: "loyly.score-input.v1", source_commit: head(sourceRoot),
     candidate_sha256: candidateSha256, checklist_sha256: fileHash(checklistFile),
     verdicts_sha256: fileHash(verdictsFile),
+    ...(scoreCycle !== "02" ? { score_cycle: scoreCycle } : {}),
     ...(panelSha256 ? { panel_manifest_sha256: panelSha256 } : {}) };
   const receipt = join(scratch, "score-input.json");
   const bytes = `${JSON.stringify(input)}\n`;
@@ -46,6 +55,7 @@ export function verifyScoredCycle({ scratch, instrument, verdictsFile, cycle = "
   const cycleDir = join(instrument, "harness", "cycles", cycle);
   const instrumentChecklist = join(cycleDir, "checklist.json");
   if (input.schema !== "loyly.score-input.v1" || head(instrument) !== input.source_commit
+      || (input.score_cycle ?? "02") !== cycle
       || fileHash(checklistFile) !== input.checklist_sha256
       || fileHash(instrumentChecklist) !== input.checklist_sha256
       || fileHash(verdictsFile) !== input.verdicts_sha256

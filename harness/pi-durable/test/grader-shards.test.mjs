@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
-import { cpSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { createHash, randomUUID } from "node:crypto";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { candidateDigest, prepareGradingRoom } from "../grading-room.mjs";
@@ -22,10 +22,10 @@ test("rule scopes merge exactly once into the attached Allure contract", () => {
   writeFileSync(join(source, "docs", "plan", "01-booking-core", "spec.feature"), "Feature: Booking core\n");
   writeFileSync(join(candidate, "impl", "start.sh"), "#!/bin/sh\n");
   const items = [
-    { id: "01-001", name: "Schedule", rule: "Availability" },
-    { id: "01-002", name: "Closed day", rule: "Availability" },
-    { id: "01-003", name: "Holder", rule: "Booking" },
-    { id: "01-011", name: "Usable refusal", rule: "Blind review" },
+    { id: "01-001", name: "Schedule", rule: "Availability", source: "docs/plan/01-booking-core/spec.feature:2" },
+    { id: "01-002", name: "Closed day", rule: "Availability", source: "docs/plan/01-booking-core/spec.feature:3" },
+    { id: "01-003", name: "Holder", rule: "Booking", source: "docs/plan/01-booking-core/spec.feature:4" },
+    { id: "01-011", name: "Usable refusal", rule: "Blind review", source: "docs/plan/01-booking-core/spec.feature:5" },
   ];
   writeFileSync(checklistFile, JSON.stringify({ items }));
   const candidateSha256 = candidateDigest(candidate), checklistSha256 = sha(readFileSync(checklistFile));
@@ -58,4 +58,69 @@ test("rule scopes merge exactly once into the attached Allure contract", () => {
   rmSync(join(shards[0].out, "work", "allure-results", resultFile));
   assert.throws(() => combineShards({ gradingRoom: full, shards, candidateSha256, schemaSha256 }),
     /one Allure result/);
+});
+
+test("identical rule names in different product slices stay separate scopes", () => {
+  const groups = partitionByRule([
+    { id: "01-001", rule: "Availability", source: "docs/plan/01-booking-core/spec.feature:2" },
+    { id: "02-001", rule: "Availability", source: "docs/plan/02-release/spec.feature:2" },
+  ], 2);
+  assert.equal(groups.length, 2);
+  assert.ok(groups.every((group) => group.items.length === 1));
+});
+
+test("parallel result directories combine across two product slices", () => {
+  const root = mkdtempSync(join(tmpdir(), "loyly-multi-slice-shards-"));
+  try {
+    const source = join(root, "source"), candidate = join(root, "candidate");
+    const full = join(root, "full"), checklistFile = join(root, "checklist.json");
+    const plans = [["01-booking-core", "Booking core"],
+      ["02-occurrence-release", "Occurrence release"]];
+    for (const [name, feature] of plans) {
+      const dir = join(source, "docs", "plan", name);
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(join(dir, "spec.feature"), `Feature: ${feature}\n`);
+    }
+    mkdirSync(join(candidate, "impl"), { recursive: true });
+    writeFileSync(join(candidate, "impl", "start.sh"), "#!/bin/sh\n");
+    const items = [
+      { id: "01-001", name: "Book", rule: "Availability",
+        source: "docs/plan/01-booking-core/spec.feature:2" },
+      { id: "02-001", name: "Release", rule: "Availability",
+        source: "docs/plan/02-occurrence-release/spec.feature:2" },
+    ];
+    writeFileSync(checklistFile, JSON.stringify({ items }));
+    const candidateSha256 = candidateDigest(candidate), schemaSha256 = sha(readFileSync(schema));
+    prepareGradingRoom({ sourceRoom: source, candidateRoom: candidate, checklistFile,
+      schemaFile: schema, out: full, candidateSha256,
+      checklistSha256: sha(readFileSync(checklistFile)), schemaSha256 });
+    const shards = prepareShards({ gradingRoom: full, sourceRoom: source, scratch: root,
+      schemaFile: schema, candidateSha256, schemaSha256, count: 2 });
+    for (const shard of shards) {
+      const item = items.find((selected) => selected.id === shard.items[0]);
+      const feature = item.id.startsWith("01-") ? "Booking core" : "Occurrence release";
+      const slug = item.id.startsWith("01-") ? "booking-core" : "occurrence-release";
+      const dir = join(shard.out, "work", "allure-results");
+      mkdirSync(dir);
+      writeFileSync(join(shard.out, "work", "surprises.json"), "[]");
+      const uuid = randomUUID(), attachment = `${randomUUID()}-attachment.txt`;
+      writeFileSync(join(dir, attachment), `${item.name} observed over HTTP\n`);
+      const fullName = `loyly.${slug}.${item.id}`;
+      writeFileSync(join(dir, `${uuid}-result.json`), JSON.stringify({
+        uuid, name: item.name, fullName, testCaseId: fullName, historyId: fullName,
+        status: "passed", stage: "finished", start: 1, stop: 2,
+        statusDetails: { message: `${item.name} observed over HTTP` },
+        labels: [{ name: "lifecycle", value: "pre-production" },
+          { name: "technique", value: "acceptance" }, { name: "tool", value: "Pi grader" },
+          { name: "feature", value: feature }, { name: "story", value: item.rule },
+          { name: "tag", value: `@item-${item.id}` }],
+        steps: [{ name: "Observe public behavior", status: "passed", stage: "finished" }],
+        attachments: [{ name: "HTTP observation", source: attachment, type: "text/plain" }],
+      }));
+    }
+    const merged = combineShards({ gradingRoom: full, shards, candidateSha256, schemaSha256 });
+    assert.deepEqual(merged.verdicts.map((item) => [item.id, item.verdict]),
+      [["01-001", "pass"], ["02-001", "pass"]]);
+    assert.equal(readdirSync(join(full, "work", "allure-results")).length, 4);
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

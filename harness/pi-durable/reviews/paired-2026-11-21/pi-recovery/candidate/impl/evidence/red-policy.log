@@ -1,0 +1,106 @@
+✔ @item-01-001 per-dressing-room weekly days (133.100916ms)
+✔ @item-01-002 closed day names opening days (92.677501ms)
+✔ @item-01-003 confirmation recurs with configured duration (88.624041ms)
+✔ @item-01-004 held slot is refused without revealing holder (89.428958ms)
+✔ @item-01-005 second slot while room remains (87.868208ms)
+✔ @item-01-006 full schedule refusal does not suggest unavailable choices (108.986167ms)
+✔ @item-01-007 three views derive confirmation (89.433708ms)
+✔ @item-01-008 give up removes every current derived claim (92.691542ms)
+✔ @item-01-009 overlapping requests have one winner (88.436292ms)
+✔ @item-01-010 one hundred two-household races (1014.387625ms)
+✔ @item-01-011 actionable refusal HTTP replay (independent judging outstanding) (170.519333ms)
+✔ @item-02-001 FREE offers only one occurrence (133.955583ms)
+✔ @item-02-002 next Tuesday remains assigned (92.146292ms)
+✔ @item-02-003 unused offer preserves normal fee and holding (92.812ms)
+✔ @item-02-004 free taker owes no charge, holder owes normal fee (93.575375ms)
+✔ @item-02-005 sale emits distinct priced policy-bound charge (117.657166ms)
+✔ @item-02-006 untaken withdrawal restores holder and prevents taking (112.445208ms)
+✔ @item-02-007 taken transfer cannot be withdrawn (104.159542ms)
+✔ @item-02-008 offer expires precisely at occurrence start (101.108292ms)
+✔ @item-02-009 one taker across all views (91.998542ms)
+✔ @item-02-010 concurrent takers have one winner (100.760875ms)
+✔ @item-03-001 free eligible capacity prevents notice (163.052958ms)
+✔ @item-03-002 full capacity alone is not scarcity (105.737292ms)
+✔ @item-03-003 release is not free standing capacity (108.87225ms)
+✔ @item-03-004 other resource group queue does not trigger notice (103.733125ms)
+✔ @item-03-005 accepted sequence gives scoped FIFO head (111.655209ms)
+✔ @item-03-014 repeated evaluation issues one active notice for three holdings (115.395875ms)
+✔ @item-03-006 holder chooses before shorter deadline but keeps using both (114.548834ms)
+✔ @item-03-007 choice right passes to queue-head at deadline (115.429625ms)
+✔ @item-03-008 choose deadline leaves loss deadline and holdings unchanged (104.404042ms)
+✔ @item-03-009 lapse removes only selected holding with consistent history (114.655708ms)
+✔ @item-03-010 confirmed claim is pending until lapse (113.503751ms)
+✔ @item-03-011 decline offers next eligible entry without early loss (109.219542ms)
+✔ @item-03-012 all declines return selected slot to pool at lapse (126.773042ms)
+✔ @item-03-013 queue withdrawal does not erase notice deadlines or rule (133.231791ms)
+✔ @item-04-001 calendars belong to their own house (193.958958ms)
+✔ @item-04-002 booker roles are checked per house (146.622542ms)
+✔ @item-04-003 manager route does not expose or accept self-service queue (120.32675ms)
+✖ @item-04-004 effective-dated rules record authorized governance (108.902833ms)
+✖ @item-04-005 configured dispute role reconstructs booking history (107.155916ms)
+✔ @item-04-006 later revision cannot rewrite refusal evidence (97.676292ms)
+✖ @item-04-007 revisions affect new notice clocks only (145.252876ms)
+ℹ tests 42
+ℹ suites 0
+ℹ pass 39
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5866.980795
+
+✖ failing tests:
+
+test at tests/04-policy.test.mjs:8:1
+✖ @item-04-004 effective-dated rules record authorized governance (108.902833ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 403
+  
+      at TestContext.<anonymous> (file:///workspace/impl/tests/04-policy.test.mjs:8:294)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 403,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/04-policy.test.mjs:9:1
+✖ @item-04-005 configured dispute role reconstructs booking history (107.155916ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 403
+  
+      at TestContext.<anonymous> (file:///workspace/impl/tests/04-policy.test.mjs:9:404)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 403,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/04-policy.test.mjs:11:1
+✖ @item-04-007 revisions affect new notice clocks only (145.252876ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'v1' !== 'v2'
+  
+      at TestContext.<anonymous> (file:///workspace/impl/tests/04-policy.test.mjs:11:1063)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'v1',
+    expected: 'v2',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

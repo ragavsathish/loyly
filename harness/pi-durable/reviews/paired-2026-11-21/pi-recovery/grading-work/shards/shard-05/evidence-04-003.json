@@ -1,0 +1,604 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/houses",
+    "status": 200,
+    "response": {
+      "houses": [
+        {
+          "id": "soukanvuori",
+          "name": "As Oy Soukanvuori",
+          "resources": [
+            {
+              "id": "ph8",
+              "name": "pukuhuone 8",
+              "sauna": "sauna F",
+              "group": "ph8",
+              "duration": 90,
+              "days": {
+                "Tuesday": [
+                  {
+                    "start": "17:00",
+                    "class": "ordinary"
+                  },
+                  {
+                    "start": "18:30",
+                    "class": "ordinary"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "ph9",
+              "name": "pukuhuone 9",
+              "sauna": "sauna F",
+              "group": "ph9",
+              "duration": 90,
+              "days": {
+                "Thursday": [
+                  {
+                    "start": "17:00",
+                    "class": "ordinary"
+                  },
+                  {
+                    "start": "18:30",
+                    "class": "ordinary"
+                  }
+                ],
+                "Friday": [
+                  {
+                    "start": "17:00",
+                    "class": "ordinary"
+                  },
+                  {
+                    "start": "18:30",
+                    "class": "ordinary"
+                  }
+                ],
+                "Saturday": [
+                  {
+                    "start": "17:00",
+                    "class": "ordinary"
+                  },
+                  {
+                    "start": "18:30",
+                    "class": "ordinary"
+                  }
+                ]
+              }
+            }
+          ],
+          "policies": [
+            {
+              "version": "v1",
+              "authority": "board",
+              "effective": "2020-01-01T00:00:00.000Z",
+              "bookerRoles": [
+                "shareholder"
+              ],
+              "route": "manager",
+              "bookingRole": "manager",
+              "operationsRole": "maintenance",
+              "billingRole": "vastikekirjanpitaja",
+              "disputeRole": "manager",
+              "chooseDays": 14,
+              "noticeDays": 30,
+              "caps": {},
+              "priceReference": "standing-fee",
+              "salePriceReference": "resale-fee"
+            }
+          ],
+          "currentPolicy": {
+            "version": "v1",
+            "authority": "board",
+            "effective": "2020-01-01T00:00:00.000Z",
+            "bookerRoles": [
+              "shareholder"
+            ],
+            "route": "manager",
+            "bookingRole": "manager",
+            "operationsRole": "maintenance",
+            "billingRole": "vastikekirjanpitaja",
+            "disputeRole": "manager",
+            "chooseDays": 14,
+            "noticeDays": 30,
+            "caps": {},
+            "priceReference": "standing-fee",
+            "salePriceReference": "resale-fee"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/houses",
+    "body": {
+      "id": "house-a",
+      "name": "House house-a",
+      "resources": [
+        {
+          "id": "room",
+          "name": "Room",
+          "sauna": "Sauna",
+          "group": "A",
+          "duration": 90,
+          "days": {
+            "Tuesday": [
+              {
+                "start": "17:00",
+                "class": "regular"
+              }
+            ]
+          }
+        }
+      ],
+      "policy": {
+        "version": "v1",
+        "authority": "board",
+        "effective": "2020-01-01T00:00:00Z",
+        "bookerRoles": [
+          "shareholder"
+        ],
+        "route": "manager",
+        "bookingRole": "manager",
+        "operationsRole": "caretaker",
+        "billingRole": "billing",
+        "disputeRole": "caretaker",
+        "chooseDays": 14,
+        "noticeDays": 30,
+        "caps": {},
+        "priceReference": "standing-price",
+        "salePriceReference": "resale-price"
+      }
+    },
+    "status": 201,
+    "response": {
+      "house": {
+        "id": "house-a",
+        "name": "House house-a",
+        "resources": [
+          {
+            "id": "room",
+            "name": "Room",
+            "sauna": "Sauna",
+            "group": "A",
+            "duration": 90,
+            "days": {
+              "Tuesday": [
+                {
+                  "start": "17:00",
+                  "class": "regular"
+                }
+              ]
+            }
+          }
+        ],
+        "policies": [
+          {
+            "version": "v1",
+            "authority": "board",
+            "effective": "2020-01-01T00:00:00.000Z",
+            "bookerRoles": [
+              "shareholder"
+            ],
+            "route": "manager",
+            "bookingRole": "manager",
+            "operationsRole": "caretaker",
+            "billingRole": "billing",
+            "disputeRole": "caretaker",
+            "chooseDays": 14,
+            "noticeDays": 30,
+            "caps": {},
+            "priceReference": "standing-price",
+            "salePriceReference": "resale-price"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/houses",
+    "body": {
+      "id": "house-b",
+      "name": "House house-b",
+      "resources": [
+        {
+          "id": "room",
+          "name": "Room",
+          "sauna": "Sauna",
+          "group": "A",
+          "duration": 90,
+          "days": {
+            "Saturday": [
+              {
+                "start": "17:00",
+                "class": "regular"
+              }
+            ]
+          }
+        }
+      ],
+      "policy": {
+        "version": "v1",
+        "authority": "board",
+        "effective": "2020-01-01T00:00:00Z",
+        "bookerRoles": [
+          "tenant"
+        ],
+        "route": "self-service",
+        "bookingRole": "manager",
+        "operationsRole": "caretaker",
+        "billingRole": "billing",
+        "disputeRole": "caretaker",
+        "chooseDays": 14,
+        "noticeDays": 30,
+        "caps": {},
+        "priceReference": "standing-price",
+        "salePriceReference": "resale-price"
+      }
+    },
+    "status": 201,
+    "response": {
+      "house": {
+        "id": "house-b",
+        "name": "House house-b",
+        "resources": [
+          {
+            "id": "room",
+            "name": "Room",
+            "sauna": "Sauna",
+            "group": "A",
+            "duration": 90,
+            "days": {
+              "Saturday": [
+                {
+                  "start": "17:00",
+                  "class": "regular"
+                }
+              ]
+            }
+          }
+        ],
+        "policies": [
+          {
+            "version": "v1",
+            "authority": "board",
+            "effective": "2020-01-01T00:00:00.000Z",
+            "bookerRoles": [
+              "tenant"
+            ],
+            "route": "self-service",
+            "bookingRole": "manager",
+            "operationsRole": "caretaker",
+            "billingRole": "billing",
+            "disputeRole": "caretaker",
+            "chooseDays": 14,
+            "noticeDays": 30,
+            "caps": {},
+            "priceReference": "standing-price",
+            "salePriceReference": "resale-price"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/api/houses",
+    "status": 200,
+    "response": {
+      "houses": [
+        {
+          "id": "soukanvuori",
+          "name": "As Oy Soukanvuori",
+          "resources": [
+            {
+              "id": "ph8",
+              "name": "pukuhuone 8",
+              "sauna": "sauna F",
+              "group": "ph8",
+              "duration": 90,
+              "days": {
+                "Tuesday": [
+                  {
+                    "start": "17:00",
+                    "class": "ordinary"
+                  },
+                  {
+                    "start": "18:30",
+                    "class": "ordinary"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "ph9",
+              "name": "pukuhuone 9",
+              "sauna": "sauna F",
+              "group": "ph9",
+              "duration": 90,
+              "days": {
+                "Thursday": [
+                  {
+                    "start": "17:00",
+                    "class": "ordinary"
+                  },
+                  {
+                    "start": "18:30",
+                    "class": "ordinary"
+                  }
+                ],
+                "Friday": [
+                  {
+                    "start": "17:00",
+                    "class": "ordinary"
+                  },
+                  {
+                    "start": "18:30",
+                    "class": "ordinary"
+                  }
+                ],
+                "Saturday": [
+                  {
+                    "start": "17:00",
+                    "class": "ordinary"
+                  },
+                  {
+                    "start": "18:30",
+                    "class": "ordinary"
+                  }
+                ]
+              }
+            }
+          ],
+          "policies": [
+            {
+              "version": "v1",
+              "authority": "board",
+              "effective": "2020-01-01T00:00:00.000Z",
+              "bookerRoles": [
+                "shareholder"
+              ],
+              "route": "manager",
+              "bookingRole": "manager",
+              "operationsRole": "maintenance",
+              "billingRole": "vastikekirjanpitaja",
+              "disputeRole": "manager",
+              "chooseDays": 14,
+              "noticeDays": 30,
+              "caps": {},
+              "priceReference": "standing-fee",
+              "salePriceReference": "resale-fee"
+            }
+          ],
+          "currentPolicy": {
+            "version": "v1",
+            "authority": "board",
+            "effective": "2020-01-01T00:00:00.000Z",
+            "bookerRoles": [
+              "shareholder"
+            ],
+            "route": "manager",
+            "bookingRole": "manager",
+            "operationsRole": "maintenance",
+            "billingRole": "vastikekirjanpitaja",
+            "disputeRole": "manager",
+            "chooseDays": 14,
+            "noticeDays": 30,
+            "caps": {},
+            "priceReference": "standing-fee",
+            "salePriceReference": "resale-fee"
+          }
+        },
+        {
+          "id": "house-a",
+          "name": "House house-a",
+          "resources": [
+            {
+              "id": "room",
+              "name": "Room",
+              "sauna": "Sauna",
+              "group": "A",
+              "duration": 90,
+              "days": {
+                "Tuesday": [
+                  {
+                    "start": "17:00",
+                    "class": "regular"
+                  }
+                ]
+              }
+            }
+          ],
+          "policies": [
+            {
+              "version": "v1",
+              "authority": "board",
+              "effective": "2020-01-01T00:00:00.000Z",
+              "bookerRoles": [
+                "shareholder"
+              ],
+              "route": "manager",
+              "bookingRole": "manager",
+              "operationsRole": "caretaker",
+              "billingRole": "billing",
+              "disputeRole": "caretaker",
+              "chooseDays": 14,
+              "noticeDays": 30,
+              "caps": {},
+              "priceReference": "standing-price",
+              "salePriceReference": "resale-price"
+            }
+          ],
+          "currentPolicy": {
+            "version": "v1",
+            "authority": "board",
+            "effective": "2020-01-01T00:00:00.000Z",
+            "bookerRoles": [
+              "shareholder"
+            ],
+            "route": "manager",
+            "bookingRole": "manager",
+            "operationsRole": "caretaker",
+            "billingRole": "billing",
+            "disputeRole": "caretaker",
+            "chooseDays": 14,
+            "noticeDays": 30,
+            "caps": {},
+            "priceReference": "standing-price",
+            "salePriceReference": "resale-price"
+          }
+        },
+        {
+          "id": "house-b",
+          "name": "House house-b",
+          "resources": [
+            {
+              "id": "room",
+              "name": "Room",
+              "sauna": "Sauna",
+              "group": "A",
+              "duration": 90,
+              "days": {
+                "Saturday": [
+                  {
+                    "start": "17:00",
+                    "class": "regular"
+                  }
+                ]
+              }
+            }
+          ],
+          "policies": [
+            {
+              "version": "v1",
+              "authority": "board",
+              "effective": "2020-01-01T00:00:00.000Z",
+              "bookerRoles": [
+                "tenant"
+              ],
+              "route": "self-service",
+              "bookingRole": "manager",
+              "operationsRole": "caretaker",
+              "billingRole": "billing",
+              "disputeRole": "caretaker",
+              "chooseDays": 14,
+              "noticeDays": 30,
+              "caps": {},
+              "priceReference": "standing-price",
+              "salePriceReference": "resale-price"
+            }
+          ],
+          "currentPolicy": {
+            "version": "v1",
+            "authority": "board",
+            "effective": "2020-01-01T00:00:00.000Z",
+            "bookerRoles": [
+              "tenant"
+            ],
+            "route": "self-service",
+            "bookingRole": "manager",
+            "operationsRole": "caretaker",
+            "billingRole": "billing",
+            "disputeRole": "caretaker",
+            "chooseDays": 14,
+            "noticeDays": 30,
+            "caps": {},
+            "priceReference": "standing-price",
+            "salePriceReference": "resale-price"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/api/queue?house=house-a&group=A",
+    "status": 200,
+    "response": {
+      "entries": [],
+      "head": null
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/api/queue?house=house-b&group=A",
+    "status": 200,
+    "response": {
+      "entries": [],
+      "head": null
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/households",
+    "body": {
+      "house": "house-a",
+      "id": "resident",
+      "role": "shareholder"
+    },
+    "status": 201,
+    "response": {
+      "household": {
+        "house": "house-a",
+        "id": "resident",
+        "role": "shareholder"
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/households",
+    "body": {
+      "house": "house-b",
+      "id": "resident",
+      "role": "tenant"
+    },
+    "status": 201,
+    "response": {
+      "household": {
+        "house": "house-b",
+        "id": "resident",
+        "role": "tenant"
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/queue",
+    "body": {
+      "house": "house-a",
+      "group": "A",
+      "household": "resident"
+    },
+    "status": 403,
+    "response": {
+      "code": "manager-route",
+      "reason": "Contact manager; this house does not offer a resident queue."
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/queue",
+    "body": {
+      "house": "house-b",
+      "group": "A",
+      "household": "resident"
+    },
+    "status": 200,
+    "response": {
+      "entry": {
+        "id": "queue-1",
+        "house": "house-b",
+        "group": "A",
+        "household": "resident",
+        "acceptedAt": "2026-11-21T17:41:44.580Z",
+        "sequence": 1,
+        "status": "waiting",
+        "policyVersion": "v1"
+      }
+    }
+  }
+]

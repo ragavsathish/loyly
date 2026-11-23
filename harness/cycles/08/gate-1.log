@@ -1,0 +1,264 @@
+=== harness/check.sh --local (the instrument, before it is used to grade) ===
+
+=== the oracle: harness/oracle.sh bb ===
+harness oracle: bb, in gate-room-1
+
+CHECK 1  checklist, byte for byte
+  ok    gen_checklist exits 0
+  ok    identical to harness/oracle/checklist.golden.json
+  note  THE ITEM SET MOVED SINCE THE CUT: the spec now yields 47 items,
+  note  the committed harness/cycles/01/checklist.json carries 0.
+  note  That is the spec having grown, not an implementation defect. The golden is the judge here.
+  ok    the counts line on stderr
+
+CHECK 2  checklist from a fixture (ordering, null rule, the two warts)
+  ok    exits 0
+  ok    items in file order, rule null under no Rule, pending tag survives, nameless scenario dropped
+  ok    counts on stderr
+  ok    a whitespace-only title is an item named " "
+  ok    a spec with no scenarios exits 0
+  ok    a spec with no scenarios yields a zero-item checklist
+  ok    --out exits 0
+  ok    --out prints nothing to stdout
+  ok    --out creates missing parent directories
+  ok    --out ends the file with exactly one newline
+  ok    a planned slice is skipped, out loud, on stderr
+  ok    with --out, stdout carries nothing
+  ok    a planned slice stays out of the checklist
+
+CHECK 3  the stamper is a no-op on an already-stamped spec
+  ok    stamp exits 0
+  ok    stamp reports nothing stamped
+  ok    docs/plan/ is byte identical after stamping
+
+CHECK 4  the stamper stamps (numbering, indentation, idempotence)
+  ok    exits 0
+  ok    the report names each changed file and the total
+  ok    numbering runs past the highest tag in the file, indentation is copied
+  ok    a second slice numbers from 001 on its own
+  ok    a second run reports nothing
+  ok    a second run changes nothing (03)
+  ok    a second run changes nothing (07)
+
+CHECK 5  scoring round trip against the committed record
+  SKIP  no committed harness/cycles/01/scores.json in this repository: THE SCORER IS NOT EXERCISED HERE.
+  note  run this check in a repository that has a scored cycle before trusting a candidate scorer.
+  ok    exits 0
+  ok    unreached items are counted out loud in the report
+  ok    the record carries all 10 items, so the denominator did not shrink
+  ok    an unreached item is filed as a fail with the reason
+
+CHECK 6  scoreboard, against the recorded golden
+  SKIP  no committed harness/cycles/01/scores.json in this repository: NO GOLDEN TO COMPARE.
+
+CHECK 7  scoreboard comparison, denominators, and the rounding of a tie
+  ok    exits 0
+  ok    both directions, the restated rates, and the moved denominator
+  ok    a zero denominator renders as n/a, and the block still prints
+  ok    a cycle with no predecessor takes the baseline branch
+
+CHECK 8  refusals, exit code and message
+  ok    unstamped scenario: exit 1
+  ok    unstamped scenario: message
+  ok    unstamped scenario: nothing on stdout
+  ok    unstamped scenario: no checklist is written
+  ok    no feature files: exit 1
+  ok    no feature files: message
+  ok    no spec to stamp: exit 0
+  ok    no spec to stamp: message
+  ok    no checklist: exit 1
+  ok    no checklist: message
+  ok    an empty verdicts list: exit 1
+  ok    an empty verdicts list: message
+  ok    an empty verdicts list: nothing is written
+  ok    an empty verdicts file: exit 1
+  ok    an empty verdicts file: message
+  ok    an empty verdicts file: nothing is written
+  ok    a verdicts file that is not JSON: exit 1
+  ok    a verdicts file that is not JSON: message
+  ok    a verdicts file that is not JSON: nothing is written
+  ok    a verdicts file holding an object: exit 1
+  ok    a verdicts file holding an object: message
+  ok    a verdicts file holding an object: nothing is written
+  ok    a verdict for an unknown id: exit 1
+  ok    a verdict for an unknown id: message
+  ok    a verdict for an unknown id: nothing is written
+  ok    a verdict that is neither pass nor fail: exit 1
+  ok    a verdict that is neither pass nor fail: message
+  ok    a verdict that is neither pass nor fail: nothing is written
+  ok    a verdict with no verdict key: exit 1
+  ok    a verdict with no verdict key: message
+  ok    a verdict with no verdict key: nothing is written
+  ok    no scores: exit 1
+  ok    no scores: message
+  ok    every slice filtered out: exit 1
+  ok    every slice filtered out: the empty-spec message
+
+CHECK 9  the adoption check, against fixture repositories
+  ok    --list-shared: exit 0
+  ok    the shared list names harness/check.sh, so the entry point cannot fork
+  ok    the shared list names harness/modules.sh, so the check checks itself
+  ok    two identical repositories: exit 0
+  ok    a shared file identical in both is reported as identical
+  ok    the closing line claims no fork
+  ok    @harness-050 a forked sibling: exit 1
+  ok    @harness-050 the line reads FAIL and names the sibling
+  ok    @harness-050 a file missing in a sibling: exit 1
+  ok    @harness-050 a missing file says missing, not forked
+  ok    @harness-051 a variable declared alone: exit 1
+  ok    @harness-051 the line reads FAIL and names the sibling that lacks it
+  ok    @harness-052 an empty APP_DIR: exit 1
+  ok    @harness-052 the line reads FAIL and names that repository
+  ok    @harness-052 an empty APP_MARKER is the exception: exit 0
+  ok    @harness-052 nothing is said about APP_MARKER being empty
+  ok    @harness-053 three different probes: exit 0
+  ok    @harness-053 the probe line reads ok
+  ok    @harness-053 no comparison of the probe's content is reported
+  ok    @harness-053 a probe that is not executable: exit 1
+  ok    @harness-053 the gate cannot run it, and the check says which repository
+  ok    @harness-054 PLAN_DIR disagreeing with the tools: exit 1
+  ok    @harness-054 the line reads FAIL and shows both values
+  ok    @harness-055 three different APP_DIR values: exit 0
+  ok    @harness-055 the table has one column per repository
+  ok    @harness-055 the row whose values differ is marked
+  ok    @harness-055 a row whose values are all equal is not marked
+  ok    a missing checklist golden: exit 1
+  ok    a missing checklist golden names the repository and what it blinds
+  ok    a scored cycle with no scoreboard golden: exit 1
+  ok    a scored cycle with no scoreboard golden says what is unjudged
+  ok    the scoreboard golden recorded: exit 0
+  ok    the golden and the cycle it records are reported together
+  ok    an undeclared file in harness/: exit 1
+  ok    an undeclared file names itself and the three lists it could join
+  ok    a declared local file present in one repository only: exit 0
+  ok    a declared local file passes the completeness check
+  ok    a fenced shared file absent in a sibling: exit 0
+  ok    the absence is reported as a fenced one, not as a fork
+  ok    an unfenced shared file absent in a sibling is still a failure: exit 1
+  ok    an absence nobody declared is still missing
+  ok    no sibling named: exit 0, because the local checks did run
+  ok    no file is reported identical to itself
+  ok    the uncompared files are skips
+  ok    the closing line does not claim no fork
+
+114 ok, 0 failed, 2 skipped
+green, with 2 check(s) this repository cannot make. Read the SKIP lines: they are
+not passes. A scorer is only proven where a scored cycle exists to round-trip.
+green.
+the oracle is green.
+
+=== the adoption check, this repository alone: harness/modules.sh ===
+repositories: gate-room-1 
+
+== the shared module files: one text, or a fork
+  SKIP  harness/stamp_item_ids.clj present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/gen_checklist.clj present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/score.clj present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/scoreboard.clj present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/hjson.clj present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/spec.feature present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/oracle.sh present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/fence.sh present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/verify.sh present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/check.sh present here, and compared with nothing: name a sibling to compare it
+  SKIP  harness/modules.sh present here, and compared with nothing: name a sibling to compare it
+
+== the per-repository files: present, and never compared
+  ok    harness/config.sh present in all, content is each repository's own by design
+  ok    harness/probe.sh present in all, content is each repository's own by design
+  ok    harness/README.md present in all, content is each repository's own by design
+
+== the recorded goldens: present where the oracle needs them
+  ok    harness/oracle/checklist.golden.json present in all, content is each repository's own recording
+  ok    gate-room-1: no harness/cycles/01/scores.json, so no harness/oracle/scoreboard-01.golden is expected
+
+== every file in harness/ is in one of the lists above
+  ok    gate-room-1: every file directly in harness/ is declared
+
+== the configuration: complete, or a variable one repository has alone
+  ok    APP_DIR declared in every repository
+  ok    APP_MARKER declared in every repository
+  ok    APP_PROBE declared in every repository
+  ok    FENCED_PATHS declared in every repository
+  ok    PLAN_DIR declared in every repository
+  ok    PORT declared in every repository
+  ok    SIBLING_REPOS declared in every repository
+
+== PLAN_DIR against the path the tools resolve for themselves
+  ok    gate-room-1: PLAN_DIR 'docs/plan' agrees with the tools
+
+== the configuration values, reported and not judged
+  variable      gate-room-1             
+  APP_DIR       impl                    
+  APP_MARKER    sauna                   
+  APP_PROBE     harness/probe.sh        
+  FENCED_PATHS  impl harness/cycles     
+  PLAN_DIR      docs/plan               
+  PORT          8901                    
+  SIBLING_REPOS
+      gate-room-1       ../saunavuoro ../kalibra ../chartroom
+
+no sibling was named, so the shared module files were compared with nothing.
+11 check(s) not made, and a skip is not a pass. Name the siblings to make them.
+
+harness OK: the oracle is green and this repository's configuration is complete.
+=== impl/test.sh (the whole suite; the gate trusts its exit code, not its prose) ===
+✔ @item-01-001 calendar per room (66.654542ms)
+✔ @item-01-002 closed reason names open days (2.9345ms)
+✔ @item-01-003 confirmation and duration (3.539041ms)
+✔ @item-01-004 held refusal (3.972667ms)
+✔ @item-01-005 second while room (3.396917ms)
+✔ @item-01-006 full second reason (11.046083ms)
+✔ @item-01-007 three views (2.358916ms)
+✔ @item-01-008 give up clears views (2.757542ms)
+✔ @item-01-009 simultaneous standing requests (2.702708ms)
+✔ @item-01-010 100 simultaneous races (173.408875ms)
+✔ @item-01-011 refusal contains replayable alternative (1.961292ms)
+✔ @item-02-001 one free release retains holding (2.067959ms)
+✔ @item-02-002 following week stays holder (2.923958ms)
+✔ @item-02-003 untaken unused fee stays (3.02275ms)
+✔ @item-02-004 free taker owes no occurrence fee (2.378125ms)
+✔ @item-02-005 sale distinct signal (2.495541ms)
+✔ @item-02-006 withdraw untaken (2.898416ms)
+✔ @item-02-007 accepted transfer cannot withdraw (2.851792ms)
+✔ @item-02-008 expiry at start (2.830125ms)
+✔ @item-02-009 single taker all views (3.067208ms)
+✔ @item-02-010 concurrent takes (2.487708ms)
+✔ @item-03-001 spare capacity prevents notice (3.688333ms)
+✔ @item-03-002 no queue no notice (3.727583ms)
+✔ @item-03-003 release is not standing capacity (3.686708ms)
+✔ @item-03-004 queue in other group (3.542125ms)
+✔ @item-03-005 FIFO scoped queue (3.843333ms)
+✔ @item-03-014 repeated evaluation one notice (4.311792ms)
+✔ @item-03-006 holder chooses and keeps use (3.674167ms)
+✔ @item-03-007 right passes at choose (6.216083ms)
+✔ @item-03-008 later deadline unchanged (3.730375ms)
+✔ @item-03-009 only selected lapses (4.464125ms)
+✔ @item-03-010 claim remains pending (3.653625ms)
+✔ @item-03-011 decline next eligible (4.848292ms)
+✔ @item-03-012 all decline pool (4.591917ms)
+✔ @item-03-013 withdrawal preserves notice (4.340417ms)
+✔ @item-04-001 independent calendars (1.688292ms)
+✔ @item-04-002 own house roles (2.39275ms)
+✔ @item-04-003 manager route no queue (3.638833ms)
+✔ @item-04-004 effective policy authority (8.716916ms)
+✔ @item-04-005 dispute full history (2.176708ms)
+✔ @item-04-006 refusal immutable version (2.062833ms)
+✔ @item-04-007 existing notice policy pinned (6.093375ms)
+✔ @item-05-001 family cap reason and existing (2.094875ms)
+✔ @item-05-002 unrelated does not consume (1.789834ms)
+✔ @item-05-003 family does not block other (3.971333ms)
+✔ @item-05-004 caps house scoped (2.162333ms)
+✔ @item-05-005 completed no longer counts (2.199083ms)
+ℹ tests 47
+ℹ suites 0
+ℹ pass 47
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 461.353209
+=== impl/start.sh 8901, then probe the real surface within 10s ===
+    boot margin: answered on poll 2 of 20, so 18 polls of the 10s budget were unused.
+=== verify OK: suite green, http://127.0.0.1:8901 serves this application ===
+    the served page carries the name 'sauna', which is all this repository's probe can say

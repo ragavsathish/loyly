@@ -1,0 +1,64 @@
+{
+  "uuid": "d628434f-7675-46fe-b7e1-3a4c9e3ec9a5",
+  "name": "Different houses can open different resources and days",
+  "fullName": "loyly.house-policy.04-001",
+  "testCaseId": "loyly.house-policy.04-001",
+  "historyId": "loyly.house-policy.04-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST two houses with distinct calendars, then GET each schedule: A shows Tuesday resource r; B shows only Thursday."
+  },
+  "start": 1795347947168,
+  "stop": 1795347950168,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "A house owns its calendars and eligible booker roles"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given house A has a Tuesday resource and house B has none",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When both houses show their weekly schedules",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then A offers Tuesday and B does not",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "1d1fb147-f379-448b-8fea-be7dc37fcd8a-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "uuid": "6981a7af-9493-402d-b552-aade14c24e59",
+  "name": "A household with one family-time booking cannot take another",
+  "fullName": "loyly.time-classes.05-001",
+  "testCaseId": "loyly.time-classes.05-001",
+  "historyId": "loyly.time-classes.05-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "An upcoming family occurrence for 12 was confirmed; a second request was refused with family cap and existing occurrence-1 identified."
+  },
+  "start": 1795281237229,
+  "stop": 1795281239896,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given a house caps family time at one active or upcoming booking per household",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12 already has an upcoming family-time booking",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 12 requests another family-time window",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the request is refused with the family-time cap as its reason",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And the existing family-time booking is identified",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "bc8e2379-dfee-4bba-a08a-c940a088b880-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

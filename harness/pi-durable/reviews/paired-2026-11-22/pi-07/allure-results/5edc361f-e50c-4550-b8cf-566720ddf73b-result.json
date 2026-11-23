@@ -1,0 +1,81 @@
+{
+  "uuid": "5edc361f-e50c-4550-b8cf-566720ddf73b",
+  "name": "A queue-head decline offers the holding to the next eligible entry",
+  "fullName": "loyly.scarcity-forfeit.03-011",
+  "testCaseId": "loyly.scarcity-forfeit.03-011",
+  "historyId": "loyly.scarcity-forfeit.03-011",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST claim decline by 3 returned offeredTo 4; GET views showed 4 offered the selected claim and booking-2 still held and posted for 12 before lapse."
+  },
+  "start": 1795262400473,
+  "stop": 1795262400473,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-011"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a selected holding is under notice and two eligible households wait in order",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "When: When the queue-head declines that holding",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: Then the next eligible household is offered the pending claim",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: And the original holder keeps using the holding until its recorded notice deadline",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP observations and clock commands",
+      "source": "26737ecd-98e0-42e7-89c3-33af031d6342-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

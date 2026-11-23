@@ -19,9 +19,12 @@ export function partitionByRule(items, count) {
   if (!Array.isArray(items) || !items.length) throw new Error("empty grader checklist");
   const groups = new Map();
   for (const item of items) {
-    if (!item.id || !item.rule) throw new Error("grading scope needs item ID and rule");
-    if (!groups.has(item.rule)) groups.set(item.rule, []);
-    groups.get(item.rule).push(item);
+    const source = /^docs\/plan\/(\d\d-[a-z][a-z0-9-]*)\/spec\.feature:\d+$/.exec(item.source ?? "");
+    if (!item.id || !item.rule || !source || source[1].slice(0, 2) !== item.id.slice(0, 2))
+      throw new Error("grading scope needs item ID, numbered plan source and rule");
+    const key = `${source[1]}\0${item.rule}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
   }
   const shards = Array.from({ length: Math.min(count, groups.size) }, () => []);
   for (const group of groups.values()) {
@@ -32,7 +35,7 @@ export function partitionByRule(items, count) {
 }
 
 export function prepareShards({ gradingRoom, sourceRoom, scratch, schemaFile, candidateSha256,
-  schemaSha256, count }) {
+  schemaSha256, count, project = 'loyly', blindReview = project === 'loyly' }) {
   const full = JSON.parse(readFileSync(join(gradingRoom, "checklist.json"), "utf8"));
   const partitions = partitionByRule(full.items, count);
   return partitions.map(({ id, items }) => {
@@ -46,7 +49,7 @@ export function prepareShards({ gradingRoom, sourceRoom, scratch, schemaFile, ca
     writeFileSync(checklistFile, bytes);
     const checklistSha256 = hash(bytes);
     const args = { sourceRoom, candidateRoom: gradingRoom, checklistFile, schemaFile, out,
-      candidateSha256, checklistSha256, schemaSha256 };
+      candidateSha256, checklistSha256, schemaSha256, project, blindReview };
     if (existsSync(out)) verifyGradingRoom(args);
     else prepareGradingRoom(args);
     return { id, items: items.map((item) => item.id), out, checklistSha256, args };
@@ -70,7 +73,9 @@ export function combineShards({ gradingRoom, shards, candidateSha256, schemaSha2
   const surprises = [];
   for (const shard of shards) {
     verifyGradingRoom({ out: shard.out, candidateSha256,
-      checklistSha256: shard.checklistSha256, schemaSha256 });
+      checklistSha256: shard.checklistSha256, schemaSha256,
+      project: JSON.parse(readFileSync(join(gradingRoom, '.grading-room.json'))).project ?? 'loyly',
+      blindReview: JSON.parse(readFileSync(join(gradingRoom, '.grading-room.json'))).blindReview ?? true });
     const judged = readAllureResults(shard.out);
     if (judged.verdicts.length !== shard.items.length) throw new Error(`incomplete ${shard.id}`);
     const source = join(shard.out, "work", "allure-results");

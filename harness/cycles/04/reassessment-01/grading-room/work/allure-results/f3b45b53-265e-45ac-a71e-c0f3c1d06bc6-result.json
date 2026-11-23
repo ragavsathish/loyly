@@ -1,0 +1,67 @@
+{
+  "uuid": "f3b45b53-265e-45ac-a71e-c0f3c1d06bc6",
+  "name": "The choice right passes after the shorter clock",
+  "fullName": "loyly.scarcity-forfeit.03-007",
+  "testCaseId": "loyly.scarcity-forfeit.03-007",
+  "historyId": "loyly.scarcity-forfeit.03-007",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After chooseAt the queue-head became chooser and both holdings remained."
+  },
+  "start": 1795274254723,
+  "stop": 1795274305720,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: establish scenario from fresh state",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: perform action and cross applicable boundary",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: inspect public HTTP observations",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "After chooseAt the queue-head became chooser and both holdings remained."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command, package installation, clock and HTTP receipt",
+      "source": "61d4ab00-1431-4735-92d4-68d01fc8fb87-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

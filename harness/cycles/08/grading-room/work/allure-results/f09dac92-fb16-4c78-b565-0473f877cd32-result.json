@@ -1,0 +1,69 @@
+{
+  "uuid": "f09dac92-fb16-4c78-b565-0473f877cd32",
+  "name": "A dispute can reconstruct one booking's decision",
+  "fullName": "loyly.house-policy.04-005",
+  "testCaseId": "loyly.house-policy.04-005",
+  "historyId": "loyly.house-policy.04-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Dispute d2 returns b1 confirmation and give-up history, both with v1 and policy evidence."
+  },
+  "start": 1795306092397,
+  "stop": 1795306092397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a household has a confirmed booking that was later changed",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When the configured first-stop role opens a dispute about that booking",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then the confirmation and change history identify that booking",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And the governing policy version is visible with each decision",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "5f3442ae-8bde-4b09-82d8-c4f780faf402-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import { spawn } from "node:child_process";
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
 import { join } from "node:path";
-import Ajv2020 from "ajv/dist/2020.js";
+import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { readAllureResults } from "./allure-results.mjs";
 import { candidateDigest } from "./grading-room.mjs";
 
@@ -101,11 +101,55 @@ function bookingFormAction(html) {
     attribute(tag, "method")?.toLowerCase() === "post"
     && ["household", "resource", "weekday", "start"].every((name) =>
       new RegExp(`<(?:input|select)\\b[^>]*\\bname\\s*=\\s*["']${name}["']`, "i").test(body)));
-  if (forms.length !== 1) throw new Error("expected exactly one public booking form");
+  if (forms.length > 1) throw new Error("expected at most one public booking form");
+  if (!forms.length) return null;
   const path = attribute(forms[0][1], "action");
   if (!/^\/[A-Za-z0-9/?=&%._-]*$/.test(path ?? "") || path.startsWith("//"))
     throw new Error("booking form action must be a same-origin path");
   return path;
+}
+async function publicJsonBooking(base, body, answer) {
+  const params = new URLSearchParams(body);
+  const room = /^@room:(\d+)$/.exec(params.get("resource") ?? "")?.[1];
+  if (!room || !new RegExp(`^REQUEST:\\s*pukuhuone\\s+${room}\\s*\\|`, "i").test(answer))
+    throw new Error("blind answer and requested room differ");
+  const housesResponse = await fetch(`${base}/api/houses`, { signal: AbortSignal.timeout(1000) });
+  if (!housesResponse.ok) throw new Error("no public booking form or house API");
+  const houseListing = await housesResponse.json();
+  const houses = Array.isArray(houseListing) ? houseListing : houseListing.houses;
+  if (!Array.isArray(houses)) throw new Error("public house API has no houses");
+  const matches = [];
+  for (const house of houses) {
+    if (typeof house.id !== "string" || !/^[A-Za-z0-9_-]+$/.test(house.id)) continue;
+    let policy = house.policy, resources = policy?.resources;
+    let route = policy?.route ?? policy?.bookingMode;
+    const modernRoles = typeof policy?.bookingMode === "string";
+    const houseScoped = Array.isArray(houseListing) || modernRoles;
+    let path = houseScoped ? `/api/houses/${house.id}/bookings` : "/api/bookings";
+    if (!Array.isArray(resources)) {
+      const stateResponse = await fetch(`${base}/api/houses/${house.id}/state`,
+        { signal: AbortSignal.timeout(1000) });
+      if (!stateResponse.ok) continue;
+      const state = await stateResponse.json();
+      policy = state.policy;
+      resources = state.resources;
+      route = state.route?.kind;
+      path = `/api/houses/${house.id}/bookings`;
+    }
+    const named = resources?.filter((resource) =>
+      resource.name?.trim().toLowerCase() === `pukuhuone ${room}`) ?? [];
+    if (route === "self-service" && named.length === 1)
+      matches.push({ house: house.id, resource: named[0].id,
+        role: policy?.eligibleRoles?.[0] ?? policy?.bookerRoles?.[0], path, modernRoles });
+  }
+  if (matches.length !== 1) throw new Error("blind room is not unique in the public self-service API");
+  const match = matches[0];
+  const payload = { house: match.house, household: params.get("household"), resource: match.resource,
+    weekday: params.get("weekday"), start: params.get("start"), kind: "standing",
+    ...(match.modernRoles ? { bookerRole: match.role, actorRole: match.role } : { role: match.role }) };
+  if (!Object.values(payload).every((value) => typeof value === "string" && value.trim()))
+    throw new Error("public booking request is incomplete");
+  return { path: match.path, body: JSON.stringify(payload), contentType: "application/json" };
 }
 function resolveRoomInPublicForm(html, body, answer) {
   const params = new URLSearchParams(body);
@@ -164,11 +208,15 @@ export async function probeBlindAnswer({ packetDir, reviewFile, gradingRoom, req
       await pause(100);
     }
     if (!ready) throw new Error("review probe app did not start within ten seconds");
-    const resolvedPath = request.path === "@booking-form" ? bookingFormAction(homepage) : request.path;
-    const resolvedBody = request.path === "@booking-form"
-      ? resolveRoomInPublicForm(homepage, request.body, review.answer) : request.body;
+    const formPath = request.path === "@booking-form" ? bookingFormAction(homepage) : null;
+    const jsonBooking = request.path === "@booking-form" && !formPath
+      ? await publicJsonBooking(`http://127.0.0.1:${port}`, request.body, review.answer) : null;
+    const resolvedPath = jsonBooking?.path ?? formPath ?? request.path;
+    const resolvedBody = jsonBooking?.body ?? (formPath
+      ? resolveRoomInPublicForm(homepage, request.body, review.answer) : request.body);
     const http = await fetch(`http://127.0.0.1:${port}${resolvedPath}`, {
-      method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" },
+      method: "POST", headers: { "content-type": jsonBooking?.contentType
+        ?? "application/x-www-form-urlencoded" },
       body: resolvedBody, signal: AbortSignal.timeout(10_000) });
     response = { status: http.status, body: await http.text(), resolvedPath, resolvedBody };
   } finally {
@@ -231,9 +279,9 @@ export function writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom, veri
     parameters: [{ name: "candidate_sha256", value: packet.candidate_sha256 },
       { name: "grader_allure_sha256", value: packet.allure_results_sha256 }],
   };
-  const schema = JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8"));
-  const validate = new Ajv2020({ strict: false }).compile(schema);
-  if (!validate(result)) throw new Error(`blind subagent Allure schema rejected result: ${JSON.stringify(validate.errors)}`);
+  compileAllureSchema(
+    JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8")),
+  )(result, "blind-result");
   mkdirSync(out, { recursive: true });
   writeFileSync(join(out, attachment), JSON.stringify({ packet_sha256: packetSha256,
     review_sha256: reviewSha256, review, verification }));
@@ -257,9 +305,10 @@ export function readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verif
   const verification = review.verdict === "pass"
     ? JSON.parse(readFileSync(join(verificationDir, "verification.json"), "utf8")) : null;
   const expectedStatus = review.verdict === "pass" && verification?.accepted === true ? "passed" : "failed";
-  const schema = JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8"));
-  const validate = new Ajv2020({ strict: false }).compile(schema);
-  if (!validate(result) || resultFiles[0] !== `${result.uuid}-result.json`
+  compileAllureSchema(
+    JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8")),
+  )(result, resultFiles[0]);
+  if (resultFiles[0] !== `${result.uuid}-result.json`
       || result.name !== item?.name || result.fullName !== fullName
       || result.testCaseId !== fullName || result.historyId !== fullName
       || result.status !== expectedStatus || result.stage !== "finished"

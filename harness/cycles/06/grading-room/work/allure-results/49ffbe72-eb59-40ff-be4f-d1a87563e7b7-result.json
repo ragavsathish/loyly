@@ -1,0 +1,88 @@
+{
+  "uuid": "49ffbe72-eb59-40ff-be4f-d1a87563e7b7",
+  "name": "The weekly schedule shows each dressing room's own sauna days",
+  "fullName": "loyly.booking-core.01-001",
+  "testCaseId": "loyly.booking-core.01-001",
+  "historyId": "loyly.booking-core.01-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET state: room 8 lists Tuesday 17:00 and 18:30; room 9 lists Thursday, Friday, Saturday and no Tuesday."
+  },
+  "start": 1795281258552,
+  "stop": 1795281258552,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Availability is per dressing room, per weekday"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: pukuhuone 9's sauna days are Thursday, Friday and Saturday; pukuhuone 8's sauna days include Tuesday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "GET state: room 8 lists Tuesday 17:00 and 18:30; room 9 lists Thursday, Friday, Saturday and no Tuesday."
+      }
+    },
+    {
+      "name": "When: a resident views the weekly schedule for sauna F",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "GET state: room 8 lists Tuesday 17:00 and 18:30; room 9 lists Thursday, Friday, Saturday and no Tuesday."
+      }
+    },
+    {
+      "name": "Then: Tuesday shows bookable slots for pukuhuone 8; Tuesday shows no slots for pukuhuone 9",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "GET state: room 8 lists Tuesday 17:00 and 18:30; room 9 lists Thursday, Friday, Saturday and no Tuesday."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "observations.json",
+      "source": "1eace3ab-efb7-4537-9502-8db4ebdade95-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "vm-final.log",
+      "source": "6822355a-c40b-4f37-8f0d-0042aef59e89-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "command.txt",
+      "source": "61e8dac5-4280-4ed3-bf0e-fc692921ae1e-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "exit-final.txt",
+      "source": "6cf8aa0b-732d-4257-b158-a1d33cf79edd-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

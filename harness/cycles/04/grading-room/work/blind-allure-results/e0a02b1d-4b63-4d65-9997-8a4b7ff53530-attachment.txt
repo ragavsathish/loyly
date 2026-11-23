@@ -1,0 +1,10 @@
+(1/6) Installing icu-data-full (78.1-r0)
+(2/6) Installing ada-libs (4.0.0-r0)
+(3/6) Installing icu-libs (78.1-r0)
+(4/6) Installing simdjson (4.2.4-r0)
+(5/6) Installing simdutf (9.0.0-r0)
+(6/6) Installing nodejs (24.22.3-r0)
+Executing busybox-1.37.0-r31.trigger
+OK: 159.2 MiB in 100 packages
+v24.22.3
+{"blindReply":"REQUEST: pukuhuone 8 | Tuesday | 17:00","request":{"resource":"pukuhuone-8","weekday":"Tuesday","start":"17:00","role":"shareholder","household":"blind-011"},"status":201,"response":{"booking":{"resource":"pukuhuone-8","room":"pukuhuone 8","sauna":"Sauna F","group":"A","weekday":"Tuesday","start":"17:00","minutes":90,"timeClass":"general","end":"18:30","id":"bb89917a-8b32-4fcb-85fc-61fd311557c3","house":"soukanvuori","household":"blind-011","role":"shareholder","kind":"standing","confirmedAt":"2026-11-21T10:27:55.793Z","policyVersion":"v1","priceReference":"standing-tariff","billingRole":"billing"}},"posted":[{"bookingId":"bb89917a-8b32-4fcb-85fc-61fd311557c3","household":"blind-011","resource":"pukuhuone-8","room":"pukuhuone 8","sauna":"Sauna F","weekday":"Tuesday","start":"17:00","end":"18:30","date":null,"occurrenceId":null,"timeClass":"general"}],"heater":[{"bookingId":"bb89917a-8b32-4fcb-85fc-61fd311557c3","household":"blind-011","resource":"pukuhuone-8","room":"pukuhuone 8","sauna":"Sauna F","weekday":"Tuesday","date":null,"start":"17:00","end":"18:30","occurrenceId":null}],"billing":[{"bookingId":"bb89917a-8b32-4fcb-85fc-61fd311557c3","payer":"blind-011","kind":"standing","resource":"pukuhuone-8","weekday":"Tuesday","start":"17:00","date":null,"occurrenceId":null,"policyVersion":"v1","priceReference":"standing-tariff","billingRole":"billing"}]}

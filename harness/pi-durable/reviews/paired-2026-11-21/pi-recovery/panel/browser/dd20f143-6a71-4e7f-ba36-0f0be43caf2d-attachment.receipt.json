@@ -1,0 +1,26 @@
+{
+  "schema": "loyly.panel-vm-execution.v1",
+  "worker": "browser",
+  "candidate_sha256": "8ffe62eb046ae03e5b1907b06f7341cb1c8301e9ccc9f5eb7a94f62330e89dfc",
+  "imageDigest": "sha256:a108174548363cb832a7da6a4411d380d2d90cebb1b07181fc4a40632c7e21a1",
+  "image_manifest_sha256": "a108174548363cb832a7da6a4411d380d2d90cebb1b07181fc4a40632c7e21a1",
+  "worker_script_sha256": "71ae6164c20406e8d27d854474843b33ae30b05f746e17ae5951086ad652a6f9",
+  "worker_support_sha256": "48fb54cbaf5c39b7cc41a423abeb9216b6a923dd06271a576000bc10cd47b8d0",
+  "package_lock_sha256": "03aa7552eaf39cc96902bae5750571222f4fe8f86d8fb0172131abb4e99dd051",
+  "vm_exit_code": 1,
+  "isolation": "gondolin-qemu-vm",
+  "mounts": {
+    "candidate": "read-only",
+    "worker": "read-only",
+    "output": "read-write"
+  },
+  "egress": [
+    "egress-blocked.invalid"
+  ],
+  "started": 1795283232727,
+  "stopped": 1795283265950,
+  "command": [
+    "node",
+    "/worker/panel-browser.mjs"
+  ]
+}

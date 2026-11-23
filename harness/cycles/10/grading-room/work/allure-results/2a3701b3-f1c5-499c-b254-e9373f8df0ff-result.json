@@ -1,0 +1,89 @@
+{
+  "uuid": "2a3701b3-f1c5-499c-b254-e9373f8df0ff",
+  "historyId": "loyly.booking-core.01-011",
+  "testCaseId": "loyly.booking-core.01-011",
+  "fullName": "loyly.booking-core.01-011",
+  "name": "The refusal for a closed day is judged usable",
+  "status": "skipped",
+  "stage": "pending",
+  "statusDetails": {
+    "message": "not reached: blind subagent review required. POST /api/standing-slots/request {\"apartment\":12,\"dressingRoom\":\"pukuhuone 9\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"} returned HTTP 409 and the response body was written to work/blind-review-011.txt. A fresh subagent did not read that refusal, so no usability verdict was made."
+  },
+  "start": 1795357302666,
+  "stop": 1795357305843,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "usability"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A refusal is judged by whether a resident can act on it without asking again"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-011"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given the household in apartment 12 has been refused a standing slot on Tuesday at 17:00 in pukuhuone 9",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357302666,
+      "stop": 1795357305843,
+      "statusDetails": {
+        "message": "HTTP 409 closed_day refusal collected."
+      }
+    },
+    {
+      "name": "When a fresh independent subagent with no prior context or configuration reads only the refusal",
+      "status": "skipped",
+      "stage": "pending",
+      "start": 1795357302666,
+      "stop": 1795357305843,
+      "statusDetails": {
+        "message": "not reached: blind subagent review required"
+      }
+    },
+    {
+      "name": "Then it can name a dressing room, weekday and start time for a standing-slot request that the app confirms from fresh state, using nothing but the refusal",
+      "status": "skipped",
+      "stage": "pending",
+      "start": 1795357302666,
+      "stop": 1795357305843,
+      "statusDetails": {
+        "message": "not reached: blind subagent review required"
+      }
+    },
+    {
+      "name": "And a refusal it cannot act on fails this budget, and its wording is changed before the slice is called done",
+      "status": "skipped",
+      "stage": "pending",
+      "start": 1795357302666,
+      "stop": 1795357305843,
+      "statusDetails": {
+        "message": "not reached: blind subagent review required"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Closed-day refusal for blind review",
+      "source": "ac092bc4-73e4-4386-9755-a327f9fe0404-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

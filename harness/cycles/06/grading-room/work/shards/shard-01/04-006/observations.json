@@ -1,0 +1,700 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/state?house=soukanvuori",
+    "status": 200,
+    "response": {
+      "id": "soukanvuori",
+      "name": "Soukanvuori",
+      "now": "2026-11-21T12:00:01.147Z",
+      "date": null,
+      "resources": [
+        {
+          "id": "8",
+          "name": "pukuhuone 8",
+          "sauna": "F",
+          "group": "8",
+          "days": [
+            "Tuesday"
+          ],
+          "starts": [
+            "17:00",
+            "18:30"
+          ],
+          "duration": 90,
+          "timeClass": "general"
+        },
+        {
+          "id": "9",
+          "name": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "days": [
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          "starts": [
+            "17:00",
+            "18:30"
+          ],
+          "duration": 90,
+          "timeClass": "general"
+        }
+      ],
+      "policy": {
+        "version": "v1",
+        "effectiveAt": "2000-01-01T00:00:00.000Z",
+        "authority": "board",
+        "authorityRole": "board",
+        "bookerRoles": [
+          "shareholder"
+        ],
+        "route": "manager",
+        "bookingOperator": "manager",
+        "billingRole": "vastikekirjanpitäjä",
+        "disputeRole": "manager",
+        "chooseDays": 14,
+        "noticeDays": 30,
+        "standingPriceReference": "house-standing-tariff",
+        "salePriceReference": "house-resale-tariff",
+        "classCaps": {}
+      },
+      "policies": [
+        {
+          "version": "v1",
+          "effectiveAt": "2000-01-01T00:00:00.000Z",
+          "authority": "board",
+          "authorityRole": "board",
+          "bookerRoles": [
+            "shareholder"
+          ],
+          "route": "manager",
+          "bookingOperator": "manager",
+          "billingRole": "vastikekirjanpitäjä",
+          "disputeRole": "manager",
+          "chooseDays": 14,
+          "noticeDays": 30,
+          "standingPriceReference": "house-standing-tariff",
+          "salePriceReference": "house-resale-tariff",
+          "classCaps": {}
+        }
+      ],
+      "route": {
+        "mode": "manager",
+        "operator": "manager",
+        "queueEnabled": false,
+        "message": "Request through manager; no resident waiting queue."
+      },
+      "schedule": [
+        {
+          "resource": "8",
+          "resourceName": "pukuhuone 8",
+          "sauna": "F",
+          "group": "8",
+          "weekday": "Tuesday",
+          "start": "17:00",
+          "end": "18:30",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "8",
+          "resourceName": "pukuhuone 8",
+          "sauna": "F",
+          "group": "8",
+          "weekday": "Tuesday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Thursday",
+          "start": "17:00",
+          "end": "18:30",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Thursday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Friday",
+          "start": "17:00",
+          "end": "18:30",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Friday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Saturday",
+          "start": "17:00",
+          "end": "18:30",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Saturday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        }
+      ],
+      "holdings": [],
+      "bookings": [],
+      "offers": [],
+      "queue": [],
+      "queueHistory": [],
+      "notices": [],
+      "postedList": [],
+      "heaterSchedule": [],
+      "billingSignals": [],
+      "history": [],
+      "disputes": []
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/actions",
+    "body": {
+      "action": "book",
+      "house": "soukanvuori",
+      "household": "12",
+      "role": "shareholder",
+      "resource": "9",
+      "weekday": "Tuesday",
+      "start": "17:00",
+      "operatorRole": "manager"
+    },
+    "status": 409,
+    "response": {
+      "ok": false,
+      "status": "refused",
+      "reason": "pukuhuone 9 has no sauna day on Tuesday. It opens Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 instead.",
+      "policyVersion": "v1",
+      "decision": {
+        "id": "decision-1",
+        "at": "2026-11-21T12:00:01.161Z",
+        "type": "refused",
+        "policyVersion": "v1",
+        "household": "12",
+        "resource": "9",
+        "weekday": "Tuesday",
+        "start": "17:00",
+        "reason": "pukuhuone 9 has no sauna day on Tuesday. It opens Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 instead."
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/actions",
+    "body": {
+      "action": "revisePolicy",
+      "house": "soukanvuori",
+      "household": "12",
+      "role": "shareholder",
+      "actorRole": "board",
+      "authority": "Board decision 42",
+      "version": "v2",
+      "effectiveAt": "2026-11-22T00:00:00Z",
+      "changes": {
+        "bookerRoles": [
+          "tenant"
+        ]
+      }
+    },
+    "status": 200,
+    "response": {
+      "ok": true,
+      "policy": {
+        "version": "v2",
+        "effectiveAt": "2026-11-22T00:00:00.000Z",
+        "authority": "Board decision 42",
+        "authorityRole": "board",
+        "bookerRoles": [
+          "tenant"
+        ],
+        "route": "manager",
+        "bookingOperator": "manager",
+        "billingRole": "vastikekirjanpitäjä",
+        "disputeRole": "manager",
+        "chooseDays": 14,
+        "noticeDays": 30,
+        "standingPriceReference": "house-standing-tariff",
+        "salePriceReference": "house-resale-tariff",
+        "classCaps": {},
+        "recordedAt": "2026-11-21T12:00:01.164Z",
+        "recordedBy": "board"
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/api/actions",
+    "body": {
+      "action": "book",
+      "house": "soukanvuori",
+      "household": "12",
+      "role": "shareholder",
+      "resource": "8",
+      "weekday": "Tuesday",
+      "start": "18:30",
+      "operatorRole": "manager"
+    },
+    "status": 200,
+    "response": {
+      "ok": true,
+      "status": "confirmed",
+      "booking": {
+        "id": "holding-3",
+        "house": "soukanvuori",
+        "household": "12",
+        "bookerRole": "shareholder",
+        "resource": "8",
+        "resourceName": "pukuhuone 8",
+        "sauna": "F",
+        "group": "8",
+        "weekday": "Tuesday",
+        "start": "18:30",
+        "end": "20:00",
+        "duration": 90,
+        "timeClass": "general",
+        "kind": "standing",
+        "status": "CONFIRMED",
+        "policyVersion": "v1",
+        "confirmedAt": "2026-11-21T12:00:01.174Z",
+        "operatorRole": "manager"
+      },
+      "decision": {
+        "id": "decision-4",
+        "at": "2026-11-21T12:00:01.174Z",
+        "type": "confirmed",
+        "policyVersion": "v1",
+        "booking": "holding-3",
+        "household": "12",
+        "slot": {
+          "resource": "8",
+          "weekday": "Tuesday",
+          "start": "18:30"
+        },
+        "operatorRole": "manager"
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/api/state?house=soukanvuori",
+    "status": 200,
+    "response": {
+      "id": "soukanvuori",
+      "name": "Soukanvuori",
+      "now": "2026-11-21T12:00:01.176Z",
+      "date": null,
+      "resources": [
+        {
+          "id": "8",
+          "name": "pukuhuone 8",
+          "sauna": "F",
+          "group": "8",
+          "days": [
+            "Tuesday"
+          ],
+          "starts": [
+            "17:00",
+            "18:30"
+          ],
+          "duration": 90,
+          "timeClass": "general"
+        },
+        {
+          "id": "9",
+          "name": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "days": [
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          "starts": [
+            "17:00",
+            "18:30"
+          ],
+          "duration": 90,
+          "timeClass": "general"
+        }
+      ],
+      "policy": {
+        "version": "v1",
+        "effectiveAt": "2000-01-01T00:00:00.000Z",
+        "authority": "board",
+        "authorityRole": "board",
+        "bookerRoles": [
+          "shareholder"
+        ],
+        "route": "manager",
+        "bookingOperator": "manager",
+        "billingRole": "vastikekirjanpitäjä",
+        "disputeRole": "manager",
+        "chooseDays": 14,
+        "noticeDays": 30,
+        "standingPriceReference": "house-standing-tariff",
+        "salePriceReference": "house-resale-tariff",
+        "classCaps": {}
+      },
+      "policies": [
+        {
+          "version": "v1",
+          "effectiveAt": "2000-01-01T00:00:00.000Z",
+          "authority": "board",
+          "authorityRole": "board",
+          "bookerRoles": [
+            "shareholder"
+          ],
+          "route": "manager",
+          "bookingOperator": "manager",
+          "billingRole": "vastikekirjanpitäjä",
+          "disputeRole": "manager",
+          "chooseDays": 14,
+          "noticeDays": 30,
+          "standingPriceReference": "house-standing-tariff",
+          "salePriceReference": "house-resale-tariff",
+          "classCaps": {}
+        },
+        {
+          "version": "v2",
+          "effectiveAt": "2026-11-22T00:00:00.000Z",
+          "authority": "Board decision 42",
+          "authorityRole": "board",
+          "bookerRoles": [
+            "tenant"
+          ],
+          "route": "manager",
+          "bookingOperator": "manager",
+          "billingRole": "vastikekirjanpitäjä",
+          "disputeRole": "manager",
+          "chooseDays": 14,
+          "noticeDays": 30,
+          "standingPriceReference": "house-standing-tariff",
+          "salePriceReference": "house-resale-tariff",
+          "classCaps": {},
+          "recordedAt": "2026-11-21T12:00:01.164Z",
+          "recordedBy": "board"
+        }
+      ],
+      "route": {
+        "mode": "manager",
+        "operator": "manager",
+        "queueEnabled": false,
+        "message": "Request through manager; no resident waiting queue."
+      },
+      "schedule": [
+        {
+          "resource": "8",
+          "resourceName": "pukuhuone 8",
+          "sauna": "F",
+          "group": "8",
+          "weekday": "Tuesday",
+          "start": "17:00",
+          "end": "18:30",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "8",
+          "resourceName": "pukuhuone 8",
+          "sauna": "F",
+          "group": "8",
+          "weekday": "Tuesday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "held",
+          "household": "12",
+          "holding": "holding-3"
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Thursday",
+          "start": "17:00",
+          "end": "18:30",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Thursday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Friday",
+          "start": "17:00",
+          "end": "18:30",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Friday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Saturday",
+          "start": "17:00",
+          "end": "18:30",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        },
+        {
+          "resource": "9",
+          "resourceName": "pukuhuone 9",
+          "sauna": "F",
+          "group": "9",
+          "weekday": "Saturday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "status": "free",
+          "household": null,
+          "holding": null
+        }
+      ],
+      "holdings": [
+        {
+          "id": "holding-3",
+          "house": "soukanvuori",
+          "household": "12",
+          "bookerRole": "shareholder",
+          "resource": "8",
+          "resourceName": "pukuhuone 8",
+          "sauna": "F",
+          "group": "8",
+          "weekday": "Tuesday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "kind": "standing",
+          "status": "CONFIRMED",
+          "policyVersion": "v1",
+          "confirmedAt": "2026-11-21T12:00:01.174Z",
+          "operatorRole": "manager"
+        }
+      ],
+      "bookings": [
+        {
+          "id": "holding-3",
+          "house": "soukanvuori",
+          "household": "12",
+          "bookerRole": "shareholder",
+          "resource": "8",
+          "resourceName": "pukuhuone 8",
+          "sauna": "F",
+          "group": "8",
+          "weekday": "Tuesday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "kind": "standing",
+          "status": "CONFIRMED",
+          "policyVersion": "v1",
+          "confirmedAt": "2026-11-21T12:00:01.174Z",
+          "operatorRole": "manager"
+        }
+      ],
+      "offers": [],
+      "queue": [],
+      "queueHistory": [],
+      "notices": [],
+      "postedList": [
+        {
+          "id": "holding-3",
+          "house": "soukanvuori",
+          "household": "12",
+          "bookerRole": "shareholder",
+          "resource": "8",
+          "resourceName": "pukuhuone 8",
+          "sauna": "F",
+          "group": "8",
+          "weekday": "Tuesday",
+          "start": "18:30",
+          "end": "20:00",
+          "duration": 90,
+          "timeClass": "general",
+          "kind": "standing",
+          "status": "CONFIRMED",
+          "policyVersion": "v1",
+          "confirmedAt": "2026-11-21T12:00:01.174Z",
+          "operatorRole": "manager"
+        }
+      ],
+      "heaterSchedule": [
+        {
+          "booking": "holding-3",
+          "occurrence": null,
+          "household": "12",
+          "resource": "8",
+          "sauna": "F",
+          "weekday": "Tuesday",
+          "date": null,
+          "start": "18:30",
+          "end": "20:00"
+        }
+      ],
+      "billingSignals": [
+        {
+          "payer": "12",
+          "holding": "holding-3",
+          "resource": "8",
+          "weekday": "Tuesday",
+          "start": "18:30",
+          "kind": "standing",
+          "policyVersion": "v1",
+          "priceReference": "house-standing-tariff",
+          "billingRole": "vastikekirjanpitäjä"
+        }
+      ],
+      "history": [
+        {
+          "id": "decision-1",
+          "at": "2026-11-21T12:00:01.161Z",
+          "type": "refused",
+          "policyVersion": "v1",
+          "household": "12",
+          "resource": "9",
+          "weekday": "Tuesday",
+          "start": "17:00",
+          "reason": "pukuhuone 9 has no sauna day on Tuesday. It opens Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 instead."
+        },
+        {
+          "id": "decision-2",
+          "at": "2026-11-21T12:00:01.171Z",
+          "type": "policy-revised",
+          "policyVersion": "v1",
+          "version": "v2",
+          "authority": "Board decision 42",
+          "effectiveAt": "2026-11-22T00:00:00.000Z"
+        },
+        {
+          "id": "decision-4",
+          "at": "2026-11-21T12:00:01.174Z",
+          "type": "confirmed",
+          "policyVersion": "v1",
+          "booking": "holding-3",
+          "household": "12",
+          "slot": {
+            "resource": "8",
+            "weekday": "Tuesday",
+            "start": "18:30"
+          },
+          "operatorRole": "manager"
+        }
+      ],
+      "disputes": []
+    }
+  }
+]

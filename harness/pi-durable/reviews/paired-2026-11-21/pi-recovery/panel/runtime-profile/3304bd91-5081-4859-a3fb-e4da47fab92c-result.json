@@ -1,0 +1,91 @@
+{
+  "uuid": "3304bd91-5081-4859-a3fb-e4da47fab92c",
+  "name": "Candidate runtime profile around a public request",
+  "fullName": "loyly.panel.runtime.01-003",
+  "historyId": "loyly.panel.runtime.01-003",
+  "testCaseId": "loyly.panel.runtime.01-003",
+  "status": "failed",
+  "stage": "finished",
+  "start": 1795283235049,
+  "stop": 1795283263092,
+  "statusDetails": {
+    "message": "Error: HTTP 404, expected 201: {\"code\":\"not-found\",\"reason\":\"House not found\"}\n    at file:///worker/panel-runtime.mjs:143:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async step (file:///worker/panel-runtime.mjs:27:16)\n    at async file:///worker/panel-runtime.mjs:134:25"
+  },
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "profiling"
+    },
+    {
+      "name": "tool",
+      "value": "procfs/JFR"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Runtime profile for one public request"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-003"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "candidate_sha256",
+      "value": "8ffe62eb046ae03e5b1907b06f7341cb1c8301e9ccc9f5eb7a94f62330e89dfc"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Verify the read-only candidate digest",
+      "stage": "finished",
+      "status": "passed",
+      "start": 1795283235049,
+      "stop": 1795283242648
+    },
+    {
+      "name": "Start a private candidate copy and observe HTTP readiness",
+      "stage": "finished",
+      "status": "passed",
+      "start": 1795283262716,
+      "stop": 1795283263029
+    },
+    {
+      "name": "Capture candidate process tree before workload",
+      "stage": "finished",
+      "status": "passed",
+      "start": 1795283263029,
+      "stop": 1795283263032
+    },
+    {
+      "name": "Issue the pinned public HTTP request",
+      "stage": "finished",
+      "status": "failed",
+      "start": 1795283263032,
+      "statusDetails": {
+        "message": "Error: HTTP 404, expected 201: {\"code\":\"not-found\",\"reason\":\"House not found\"}"
+      },
+      "stop": 1795283263045
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM process and HTTP observations",
+      "source": "eebbe00f-e014-499f-8954-2eab792bfca7-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "Gondolin VM execution receipt",
+      "source": "4b82dc5e-d7c8-4eb4-9f28-17e9abc25e87-attachment.receipt.json",
+      "type": "application/json"
+    }
+  ]
+}

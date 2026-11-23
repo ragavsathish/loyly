@@ -1,0 +1,1 @@
+Without reading the sauna-day configuration or another project file, read only refusal.txt. Name a request you expect to be accepted using that refusal alone.

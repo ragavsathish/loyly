@@ -1,0 +1,89 @@
+{
+  "uuid": "f21e479f-d9d6-4fc0-ad6d-d5cba8eaee75",
+  "name": "Confirming a booking updates all three derived views together",
+  "fullName": "loyly.booking-core.01-007",
+  "testCaseId": "loyly.booking-core.01-007",
+  "historyId": "loyly.booking-core.01-007",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST demo/bookings confirmed booking-2 for apartment 12 Tuesday 17:00\u201318:30 in ph8. GET views showed that same booking in the posted list, heater schedule and billing signal naming payer 12. Follow-up POST give-up and GET views showed all three cleared for the same booking."
+  },
+  "start": 1795305176868,
+  "stop": 1795305192668,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "One booking is the single source of truth for the list, the timer and the billing"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given Tuesday at 17:00 in pukuhuone 8 is free",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "When: When the household in apartment 12's standing slot request for Tuesday at 17:00 in pukuhuone 8 is confirmed",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: Then the posted slot list shows the slot for apartment 12",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: And the heater schedule heats pukuhuone 8's sauna for Tuesday 17:00 to 18:30",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    },
+    {
+      "name": "Then: And an invoicing signal is raised naming apartment 12 as payer for the standing slot",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP evidence."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP observations and clock commands",
+      "source": "7e253aab-45db-470f-ae7b-6723b5b174a3-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

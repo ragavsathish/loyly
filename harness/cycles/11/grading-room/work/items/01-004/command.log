@@ -1,0 +1,15 @@
+probe item 01-004 port 19104
+
+--- POST /api/standing-slot/request -> 200
+request: {"apartment": "12", "weekday": "Tuesday", "startTime": "17:00", "dressingRoom": "pukuhuone 8"}
+{"ok":true,"booking":{"id":"12-pukuhuone 8-Tuesday-17:00","apartment":"12","dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30","standing":true},"message":"Standing slot confirmed for 17:00 to 18:30 every Tuesday.","repeats":"every coming Tuesday"}
+
+--- GET /api/schedule -> 200
+{"sauna":"sauna F","dressingRooms":{"pukuhuone 8":{"saunaDays":["Tuesday","Thursday"],"days":{"Monday":{"noSlots":true,"slots":[]},"Tuesday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":false,"heldBy":"12"}]},"Wednesday":{"noSlots":true,"slots":[]},"Thursday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Friday":{"noSlots":true,"slots":[]},"Saturday":{"noSlots":true,"slots":[]},"Sunday":{"noSlots":true,"slots":[]}}},"pukuhuone 9":{"saunaDays":["Thursday","Friday","Saturday"],"days":{"Monday":{"noSlots":true,"slots":[]},"Tuesday":{"noSlots":true,"slots":[]},"Wednesday":{"noSlots":true,"slots":[]},"Thursday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Friday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Saturday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Sunday":{"noSlots":true,"slots":[]}}}}}
+
+--- POST /api/standing-slot/request -> 409
+request: {"apartment": "3", "weekday": "Tuesday", "startTime": "17:00", "dressingRoom": "pukuhuone 8"}
+{"ok":false,"reason":"held","message":"Refused: the slot on Tuesday at 17:00 in pukuhuone 8 is already held by apartment 12.","holder":"12"}
+
+--- GET /api/schedule -> 200
+{"sauna":"sauna F","dressingRooms":{"pukuhuone 8":{"saunaDays":["Tuesday","Thursday"],"days":{"Monday":{"noSlots":true,"slots":[]},"Tuesday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":false,"heldBy":"12"}]},"Wednesday":{"noSlots":true,"slots":[]},"Thursday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Friday":{"noSlots":true,"slots":[]},"Saturday":{"noSlots":true,"slots":[]},"Sunday":{"noSlots":true,"slots":[]}}},"pukuhuone 9":{"saunaDays":["Thursday","Friday","Saturday"],"days":{"Monday":{"noSlots":true,"slots":[]},"Tuesday":{"noSlots":true,"slots":[]},"Wednesday":{"noSlots":true,"slots":[]},"Thursday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Friday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Saturday":{"noSlots":false,"slots":[{"startTime":"17:00","endTime":"18:30","bookable":true,"heldBy":null}]},"Sunday":{"noSlots":true,"slots":[]}}}}}

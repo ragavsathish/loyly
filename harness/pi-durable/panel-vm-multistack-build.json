@@ -1,0 +1,18 @@
+{
+  "arch": "aarch64",
+  "distro": "alpine",
+  "env": { "JAVA_TOOL_OPTIONS": "-Dlmdbjava.native.lib=/usr/lib/liblmdb.so.0" },
+  "alpine": {
+    "version": "3.23.7",
+    "kernelPackage": "linux-virt",
+    "kernelImage": "vmlinuz-virt",
+    "krunfwVersion": "v5.2.1"
+  },
+  "oci": {
+    "image": "loyly/panel-multistack:oci",
+    "runtime": "docker",
+    "platform": "linux/arm64",
+    "pullPolicy": "never"
+  },
+  "rootfs": { "label": "loyly-panel-multistack" }
+}

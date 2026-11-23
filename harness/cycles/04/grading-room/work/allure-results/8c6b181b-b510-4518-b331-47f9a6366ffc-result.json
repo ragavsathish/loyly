@@ -1,0 +1,73 @@
+{
+  "uuid": "8c6b181b-b510-4518-b331-47f9a6366ffc",
+  "name": "A completed family-time occurrence no longer uses the allowance",
+  "fullName": "loyly.time-classes.05-005",
+  "testCaseId": "loyly.time-classes.05-005",
+  "historyId": "loyly.time-classes.05-005",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "not reached: a completed earlier occurrence was not established; the served interface did not expose a clock control"
+  },
+  "start": 1795256664466,
+  "stop": 1795256667167,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12's only confirmed family-time occurrence has ended",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: a completed earlier occurrence was not established; the served interface did not expose a clock control"
+      }
+    },
+    {
+      "name": "When: apartment 12 requests a free upcoming family-time window",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: a completed earlier occurrence was not established; the served interface did not expose a clock control"
+      }
+    },
+    {
+      "name": "Then: the completed occurrence does not trigger the active-or-upcoming cap",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: a completed earlier occurrence was not established; the served interface did not expose a clock control"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "826d1119-336f-4263-b08f-5e919c777329-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

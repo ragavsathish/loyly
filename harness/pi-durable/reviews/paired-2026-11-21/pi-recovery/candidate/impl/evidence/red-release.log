@@ -1,0 +1,221 @@
+✔ @item-01-001 per-dressing-room weekly days (135.08ms)
+✔ @item-01-002 closed day names opening days (91.913666ms)
+✔ @item-01-003 confirmation recurs with configured duration (92.737125ms)
+✔ @item-01-004 held slot is refused without revealing holder (95.162959ms)
+✔ @item-01-005 second slot while room remains (88.478459ms)
+✔ @item-01-006 full schedule refusal does not suggest unavailable choices (124.625125ms)
+✔ @item-01-007 three views derive confirmation (100.344167ms)
+✔ @item-01-008 give up removes every current derived claim (95.342084ms)
+✔ @item-01-009 overlapping requests have one winner (97.95425ms)
+✔ @item-01-010 one hundred two-household races (1051.664584ms)
+✔ @item-01-011 actionable refusal HTTP replay (independent judging outstanding) (172.843125ms)
+✖ @item-02-001 FREE offers only one occurrence (143.501166ms)
+✖ @item-02-002 next Tuesday remains assigned (89.806667ms)
+✖ @item-02-003 unused offer preserves normal fee and holding (90.599875ms)
+✖ @item-02-004 free taker owes no charge, holder owes normal fee (90.205583ms)
+✖ @item-02-005 sale emits distinct priced policy-bound charge (91.599959ms)
+✖ @item-02-006 untaken withdrawal restores holder and prevents taking (89.750042ms)
+✖ @item-02-007 taken transfer cannot be withdrawn (99.320208ms)
+✖ @item-02-008 offer expires precisely at occurrence start (101.838625ms)
+✖ @item-02-009 one taker across all views (102.6925ms)
+✖ @item-02-010 concurrent takers have one winner (90.952916ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 11
+ℹ fail 10
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3256.286377
+
+✖ failing tests:
+
+test at tests/02-release.test.mjs:8:1
+✖ @item-02-001 FREE offers only one occurrence (143.501166ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:8:94)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/02-release.test.mjs:9:1
+✖ @item-02-002 next Tuesday remains assigned (89.806667ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:9:92)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/02-release.test.mjs:10:1
+✖ @item-02-003 unused offer preserves normal fee and holding (90.599875ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:10:98)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/02-release.test.mjs:11:1
+✖ @item-02-004 free taker owes no charge, holder owes normal fee (90.205583ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:11:112)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/02-release.test.mjs:12:1
+✖ @item-02-005 sale emits distinct priced policy-bound charge (91.599959ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:12:109)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/02-release.test.mjs:13:1
+✖ @item-02-006 untaken withdrawal restores holder and prevents taking (89.750042ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:13:117)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/02-release.test.mjs:14:1
+✖ @item-02-007 taken transfer cannot be withdrawn (99.320208ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:14:97)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/02-release.test.mjs:15:1
+✖ @item-02-008 offer expires precisely at occurrence start (101.838625ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:15:106)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/02-release.test.mjs:16:1
+✖ @item-02-009 one taker across all views (102.6925ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:16:89)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/02-release.test.mjs:17:1
+✖ @item-02-010 concurrent takers have one winner (90.952916ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 201
+  
+      at release (file:///workspace/impl/tests/02-release.test.mjs:5:149)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///workspace/impl/tests/02-release.test.mjs:17:96)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

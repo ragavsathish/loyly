@@ -1,0 +1,81 @@
+{
+  "uuid": "b1a1d21d-032a-4d1e-a4f3-af3e25708667",
+  "name": "A held slot cannot be confirmed for another household",
+  "fullName": "loyly.booking-core.01-004",
+  "testCaseId": "loyly.booking-core.01-004",
+  "historyId": "loyly.booking-core.01-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Apartment 3 refused: This slot is held. State retains apartment 12 as confirmed."
+  },
+  "start": 1795305924806,
+  "stop": 1795306044806,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given the household in apartment 12 holds the Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Apartment 3 refused: This slot is held. State retains apartment 12 as confirmed."
+      }
+    },
+    {
+      "name": "When: When the household in apartment 3 requests a standing slot on Tuesday at 17:00 in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Apartment 3 refused: This slot is held. State retains apartment 12 as confirmed."
+      }
+    },
+    {
+      "name": "Then: Then the request is refused because the slot is held",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Apartment 3 refused: This slot is held. State retains apartment 12 as confirmed."
+      }
+    },
+    {
+      "name": "Then: And the household in apartment 12 still holds the slot",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Apartment 3 refused: This slot is held. State retains apartment 12 as confirmed."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "702962a8-57b4-491f-862c-3ffc7a2e500f-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

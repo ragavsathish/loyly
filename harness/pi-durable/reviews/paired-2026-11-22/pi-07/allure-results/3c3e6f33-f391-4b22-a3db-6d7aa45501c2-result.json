@@ -1,0 +1,64 @@
+{
+  "uuid": "3c3e6f33-f391-4b22-a3db-6d7aa45501c2",
+  "name": "Waiting in another resource group does not trigger notice here",
+  "fullName": "loyly.scarcity-forfeit.03-004",
+  "testCaseId": "loyly.scarcity-forfeit.03-004",
+  "historyId": "loyly.scarcity-forfeit.03-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST /queue for 4 in B then /scarcity/evaluate A returned no notices; GET /views showed both A slots held by 12, B-only queue, and no notice."
+  },
+  "start": 1795305094490,
+  "stop": 1795305095079,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given all standing slots in resource group A are held by households including one with two holdings; And resource group B has a waiting household but group A has none",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When scarcity is evaluated for group A",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then no group A holding is put under notice",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "718bded3-ea26-44f0-9ec2-4af8ba87e976-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

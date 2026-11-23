@@ -1,0 +1,74 @@
+{
+  "uuid": "de445389-0b54-4a42-81fb-2d871020a3c8",
+  "name": "Different houses can open different resources and days",
+  "fullName": "loyly.house-policy.04-001",
+  "testCaseId": "loyly.house-policy.04-001",
+  "historyId": "loyly.house-policy.04-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET schedules: Soukanvuori has Tuesday room 8; configured house B offers Saturday only."
+  },
+  "start": 1795306092397,
+  "stop": 1795306092397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "A house owns its calendars and eligible booker roles"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given house A has a Tuesday bookable resource",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Given: And house B has no Tuesday bookable resource",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When both houses show their weekly schedules",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then house A shows its Tuesday resource",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And house B does not offer a Tuesday booking",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "3e05cc6d-66f3-477b-895b-8e018cd6d11e-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

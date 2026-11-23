@@ -1,0 +1,74 @@
+{
+  "uuid": "d1ff729c-4ab0-4cde-8af6-9a2ededaa390",
+  "name": "Taking a free occurrence charges no fee to the taker",
+  "fullName": "loyly.occurrence-release.02-004",
+  "testCaseId": "loyly.occurrence-release.02-004",
+  "historyId": "loyly.occurrence-release.02-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "FREE offer o2 taken by 3; posted and heater name 3, billing contains only standing payer 12; following Tuesday remains held by 12."
+  },
+  "start": 1795306092397,
+  "stop": 1795306092397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given apartment 12 has released one Tuesday occurrence for free",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When apartment 3 takes that occurrence",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then apartment 3 may use that one Tuesday occurrence without an occurrence charge",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And apartment 12 remains responsible for its normal standing-slot fee",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And apartment 12 holds the standing slot on later Tuesdays",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "b9612302-af9d-454f-bf87-b2818df9cb40-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

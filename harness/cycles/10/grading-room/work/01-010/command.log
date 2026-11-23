@@ -1,0 +1,1216 @@
+$ cp -a /tmp/loyly-cursor-cycle-10/grading-room/impl/. /tmp/loyly-cursor-cycle-10/grading-room/work/01-010/runtime/
+$ cd /tmp/loyly-cursor-cycle-10/grading-room/work/01-010/runtime && ./start.sh 18110
+start_pid=27770
+GET /api/health -> 200 {"ok":true,"sauna":"sauna-F"}
+listeners=[27770]
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 10/100 counts={'one-confirmed': 10, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 20/100 counts={'one-confirmed': 20, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 30/100 counts={'one-confirmed': 30, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 40/100 counts={'one-confirmed': 40, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 50/100 counts={'one-confirmed': 50, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 60/100 counts={'one-confirmed': 60, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 70/100 counts={'one-confirmed': 70, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 80/100 counts={'one-confirmed': 80, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 90/100 counts={'one-confirmed': 90, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 3, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":12}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":12,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+$ POST /api/standing-slots/give-up {"apartment": 12, "dressingRoom": "pukuhuone 8", "weekday": "Tuesday", "startTime": "17:00"}
+-> 200 {"ok":true}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"held","holder":3}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+$ GET /api/views/posted-list
+-> 200 {"slots":[{"apartment":3,"dressingRoom":"pukuhuone 8","weekday":"Tuesday","startTime":"17:00","endTime":"18:30"}]}
+race progress 100/100 counts={'one-confirmed': 100, 'both-confirmed': 0, 'neither-confirmed': 0} violations=0
+100-run counts={"one-confirmed": 100, "both-confirmed": 0, "neither-confirmed": 0} violations=0
+reap pids=[27770]
+stopped listeners=[] exit=-15

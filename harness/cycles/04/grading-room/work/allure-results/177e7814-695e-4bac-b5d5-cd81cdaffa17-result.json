@@ -1,0 +1,81 @@
+{
+  "uuid": "177e7814-695e-4bac-b5d5-cd81cdaffa17",
+  "name": "A rule change records its authority and effective date",
+  "fullName": "loyly.house-policy.04-004",
+  "testCaseId": "loyly.house-policy.04-004",
+  "historyId": "loyly.house-policy.04-004",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "not reached: the future revision was recorded, but a decision after its effective date was not observed"
+  },
+  "start": 1795256706596,
+  "stop": 1795256710622,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a house has a current booking rule",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the authorized party records a revised rule with a future effective date",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the future revision was recorded, but a decision after its effective date was not observed"
+      }
+    },
+    {
+      "name": "Then: decisions before that date identify the earlier rule",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the future revision was recorded, but a decision after its effective date was not observed"
+      }
+    },
+    {
+      "name": "Then: decisions after that date identify the revised rule",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the future revision was recorded, but a decision after its effective date was not observed"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "99c57718-a60f-4a87-b78c-357940c351f9-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

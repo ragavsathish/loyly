@@ -1,0 +1,7 @@
+{
+  "version": "1.7.15",
+  "dist.unpackedSize": 19711193,
+  "dist.tarball": "https://registry.npmjs.org/@fugood/node-llama-wasm/-/node-llama-wasm-1.7.15.tgz",
+  "description": "WebAssembly package for llama.node browser inference",
+  "readme": ""
+}

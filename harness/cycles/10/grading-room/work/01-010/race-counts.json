@@ -1,0 +1,9 @@
+{
+  "counts": {
+    "one-confirmed": 100,
+    "both-confirmed": 0,
+    "neither-confirmed": 0
+  },
+  "violationCount": 0,
+  "violations": []
+}

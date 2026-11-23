@@ -1,0 +1,12 @@
+{
+  "path": "/",
+  "status": 200,
+  "headers": {
+    "Content-Type": "text/html; charset=utf-8",
+    "Date": "Mon, 23 Nov 2026 08:43:28 GMT",
+    "Connection": "close",
+    "Transfer-Encoding": "chunked"
+  },
+  "len": 2516,
+  "ctype": "text/html; charset=utf-8"
+}

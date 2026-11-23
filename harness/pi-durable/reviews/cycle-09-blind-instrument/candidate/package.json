@@ -1,0 +1,1 @@
+{"name":"loyly","private":true,"version":"1.0.0","type":"module","scripts":{"test":"node --test --test-concurrency=1 test/*.test.mjs","start":"node server.mjs"},"engines":{"node":">=18"}}

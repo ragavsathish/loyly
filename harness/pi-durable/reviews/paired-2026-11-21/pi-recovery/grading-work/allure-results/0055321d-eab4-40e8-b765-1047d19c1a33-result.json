@@ -1,0 +1,73 @@
+{
+  "uuid": "0055321d-eab4-40e8-b765-1047d19c1a33",
+  "name": "A queue-head decline offers the holding to the next eligible entry",
+  "fullName": "loyly.scarcity-forfeit.03-011",
+  "testCaseId": "loyly.scarcity-forfeit.03-011",
+  "historyId": "loyly.scarcity-forfeit.03-011",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST /api/notices/notice-7/claim with household 3 and decline returned 200; GET /api/notices offered the selected holding to 4 and GET /api/views still showed booking-1 held and heated for 12 before lapse."
+  },
+  "start": 1795282801148,
+  "stop": 1795282801148,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-011"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a selected holding is under notice and two eligible households wait in order",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP and clock transcript."
+      }
+    },
+    {
+      "name": "When: When the queue-head declines that holding",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP and clock transcript."
+      }
+    },
+    {
+      "name": "Then: Then the next eligible household is offered the pending claim / And the original holder keeps using the holding until its recorded notice deadline",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST /api/notices/notice-7/claim with household 3 and decline returned 200; GET /api/notices offered the selected holding to 4 and GET /api/views still showed booking-1 held and heated for 12 before lapse."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock transcript",
+      "source": "48a4163c-4cd4-481a-8562-7e2f06801736-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

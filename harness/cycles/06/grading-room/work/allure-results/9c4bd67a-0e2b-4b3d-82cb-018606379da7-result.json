@@ -1,0 +1,64 @@
+{
+  "uuid": "9c4bd67a-0e2b-4b3d-82cb-018606379da7",
+  "name": "The choice right passes after the shorter clock",
+  "fullName": "loyly.scarcity-forfeit.03-007",
+  "historyId": "loyly.scarcity-forfeit.03-007",
+  "testCaseId": "loyly.scarcity-forfeit.03-007",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After guest clock passed recorded choose deadline, notice choiceRight became 3 and household 12 still held both slots."
+  },
+  "start": 1795281230581,
+  "stop": 1795281231581,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given a scarcity notice has started a 14-day choose clock and 30-day notice clock",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When the choose deadline passes without the holder choosing",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the queue-head gains the right to choose which holding will lapse And the original holder has not yet lost a holding",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "b6788e3e-aac6-484c-baf4-a36a7cfc1cb7-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

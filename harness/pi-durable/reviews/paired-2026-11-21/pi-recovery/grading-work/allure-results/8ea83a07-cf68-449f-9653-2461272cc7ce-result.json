@@ -1,0 +1,73 @@
+{
+  "uuid": "8ea83a07-cf68-449f-9653-2461272cc7ce",
+  "name": "If all claimants decline, the selected holding returns to the pool at lapse",
+  "fullName": "loyly.scarcity-forfeit.03-012",
+  "testCaseId": "loyly.scarcity-forfeit.03-012",
+  "historyId": "loyly.scarcity-forfeit.03-012",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After the only claimant 3 declined, advanced the guest clock past served lapseAt. GET /api/views showed only booking-3 held and billed to 12, and GET /api/schedule showed the selected 17:00 slot free."
+  },
+  "start": 1795282801037,
+  "stop": 1795282801341,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-012"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given a selected holding is under notice and every eligible claimant has declined",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP and clock transcript."
+      }
+    },
+    {
+      "name": "When: When its recorded notice deadline passes",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP and clock transcript."
+      }
+    },
+    {
+      "name": "Then: Then the original household loses only that holding / And the holding becomes available in its eligible group",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "After the only claimant 3 declined, advanced the guest clock past served lapseAt. GET /api/views showed only booking-3 held and billed to 12, and GET /api/schedule showed the selected 17:00 slot free."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock transcript",
+      "source": "45f8afba-aeb3-462f-ad91-6a97dd51f696-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

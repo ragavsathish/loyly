@@ -1,0 +1,74 @@
+{
+  "uuid": "9efc7f6e-3616-47bb-bc22-5b1526be2bc2",
+  "name": "Confirming a booking updates all three derived views together",
+  "fullName": "loyly.booking-core.01-007",
+  "testCaseId": "loyly.booking-core.01-007",
+  "historyId": "loyly.booking-core.01-007",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST booking b1 confirmed; dated views show apartment 12 on posted list, heat 17:00\u201318:30, and standing billing payer 12 for b1."
+  },
+  "start": 1795306092397,
+  "stop": 1795306092397,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "One booking is the single source of truth for the list, the timer and the billing"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given Tuesday at 17:00 in pukuhuone 8 is free",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: When the household in apartment 12's standing slot request for Tuesday at 17:00 in pukuhuone 8 is confirmed",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Then the posted slot list shows the slot for apartment 12",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And the heater schedule heats pukuhuone 8's sauna for Tuesday 17:00 to 18:30",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: And an invoicing signal is raised naming apartment 12 as payer for the standing slot",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "17204494-bd8b-40e5-b0d0-510afcf95e47-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

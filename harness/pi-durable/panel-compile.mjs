@@ -6,12 +6,13 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileS
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
+import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { readAllureResults } from "./allure-results.mjs";
 import { readAuditRows } from "./audit-rows.mjs";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
 import { candidateDigest } from "./grading-room.mjs";
-import { evaluatePanel } from "./panel-policy.mjs";
-import { verifyScoredCycle } from "./score-receipt.mjs";
+import { evaluatePanel } from "./panel-policy.ts";
+import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -24,6 +25,13 @@ function schemaValidator(path) {
 function checked(validate, value, name) {
   if (!validate(value)) throw new Error(`${name}: ${JSON.stringify(validate.errors)}`);
 }
+function checkedAllure(validate, value, name) {
+  try {
+    validate(value, name);
+  } catch (cause) {
+    throw new Error(`${name}: ${cause instanceof Error ? cause.message : String(cause)}`);
+  }
+}
 
 function specialistResults({ specialists, plan, planSha256, manifest, candidateSha256, schemaSha256,
   scoreSha256, sourceCommit, validate }) {
@@ -31,6 +39,8 @@ function specialistResults({ specialists, plan, planSha256, manifest, candidateS
   if (!["loyly.supplemental-grade.v1", "loyly.panel-vm-run.v1"].includes(manifest.schema)
       || manifest.source_commit !== sourceCommit
       || manifest.candidate_sha256 !== candidateSha256
+      || (plan.schema === 'harness.grading-panel-plan.v2'
+        && manifest.worker_bundle_sha256 !== plan.bundle?.sha256)
       || manifest.allure_schema_sha256 !== schemaSha256
       || (manifest.schema === "loyly.supplemental-grade.v1" && manifest.original_score_sha256 !== scoreSha256)
       || (manifest.schema === "loyly.panel-vm-run.v1"
@@ -51,11 +61,11 @@ function specialistResults({ specialists, plan, planSha256, manifest, candidateS
     if (resultFiles.length !== 1 || resultFiles[0] !== producer.result)
       throw new Error(`${spec.id}: expected exactly one result`);
     const result = json(join(dir, producer.result));
-    checked(validate, result, `${spec.id} Allure result`);
+    checkedAllure(validate, result, `${spec.id} Allure result`);
     if (producer.result !== `${result.uuid}-result.json` || result.status !== producer.status
         || result.stage !== "finished" || label(result, "tag") !== producer.item
         || label(result, "tool") !== spec.tool || label(result, "technique") !== spec.technique
-        || label(result, "feature") !== plan.feature
+        || label(result, "feature") !== (spec.feature ?? plan.feature)
         || result.parameters?.find((entry) => entry.name === "candidate_sha256")?.value !== candidateSha256
         || !result.statusDetails?.message || !result.steps?.length)
       throw new Error(`${spec.id}: specialist identity or observation differs from the plan`);
@@ -111,35 +121,44 @@ export async function compilePanel({ original, specialists, out,
   const plan = json(planFile);
   checked(schemaValidator(join(HERE, "panel-plan.schema.json")), plan, "panel plan");
   const scoreInput = json(join(original, "score-input.json"));
+  const legacy = plan.schema === 'loyly.grading-panel-plan.v1';
+  const verdictsFile = join(original, legacy ? 'final-verdicts.json' : 'verdicts.json');
   const candidateSha256 = candidateDigest(join(original, "fenced-room"));
   if (candidateSha256 !== scoreInput.candidate_sha256) throw new Error("candidate changed after scoring");
   const scored = verifyScoredCycle({ scratch: original, instrument: join(original, "instrument"),
-    verdictsFile: join(original, "final-verdicts.json") });
+    verdictsFile, cycle: scoreCycleFor(original) });
   const room = join(original, "grading-room"), raw = readAllureResults(room);
-  const reviewFile = join(original, "blind-agent-review.json"), review = json(reviewFile);
-  const blindArgs = { packetDir: join(original, "blind-agent-packet"), reviewFile,
-    gradingRoom: room, out: join(original, "blind-agent-allure"),
-    verificationDir: review.verdict === "pass" ? join(original, "blind-agent-verification") : undefined };
-  const blind = readBlindAgentAllure(blindArgs);
-  if (JSON.stringify(finalVerdictsFromBlindReview(blindArgs).verdicts)
-      !== readFileSync(join(original, "final-verdicts.json"), "utf8"))
-    throw new Error("blind result differs from scored verdicts");
+  if (!legacy && json(join(room, '.grading-room.json')).project !== plan.project)
+    throw new Error('grading room project differs from the panel plan');
+  let blind;
+  if (legacy) {
+    const reviewFile = join(original, "blind-agent-review.json"), review = json(reviewFile);
+    const blindArgs = { packetDir: join(original, "blind-agent-packet"), reviewFile,
+      gradingRoom: room, out: join(original, "blind-agent-allure"),
+      verificationDir: review.verdict === "pass" ? join(original, "blind-agent-verification") : undefined };
+    blind = readBlindAgentAllure(blindArgs);
+    if (JSON.stringify(finalVerdictsFromBlindReview(blindArgs).verdicts)
+        !== readFileSync(verdictsFile, "utf8"))
+      throw new Error("blind result differs from scored verdicts");
+  } else if (JSON.stringify(raw.verdicts) !== readFileSync(verdictsFile, 'utf8')) {
+    throw new Error('raw grader result differs from scored verdicts');
+  }
   const rows = await readAuditRows(original);
   const stage = (name, outcome) => rows.findLast((row) => row.stage === name && row.outcome === outcome);
   if (stage("cut", "pinned")?.approved_commit !== scoreInput.source_commit
       || stage("grade", "completed")?.allure_results_sha256 !== raw.allureSha256
-      || stage("blind-review", "completed")?.raw_allure_sha256 !== raw.allureSha256
-      || stage("blind-review", "completed")?.review_sha256 !== blind.reviewSha256
+      || (legacy && stage("blind-review", "completed")?.raw_allure_sha256 !== raw.allureSha256)
+      || (legacy && stage("blind-review", "completed")?.review_sha256 !== blind.reviewSha256)
       || stage("score", "filed")?.score_file_sha256 !== scored.scoreSha256
       || stage("score", "filed")?.score_input_sha256 !== fileSha(join(original, "score-input.json")))
     throw new Error("scored evidence differs from committed Pi audit entries");
-  const schemaFile = join(HERE, "allure-lifecycle-result.schema.json");
+  const schemaFile = join(HERE, "../evidence-core/allure-lifecycle-result.schema.json");
   const schemaSha256 = fileSha(schemaFile);
   if (fileSha(join(room, "allure-lifecycle-result.schema.json")) !== schemaSha256)
     throw new Error("original room uses a different Allure schema");
-  const validate = schemaValidator(schemaFile), observations = [];
+  const validate = compileAllureSchema(json(schemaFile)), observations = [];
   for (const result of raw.results) {
-    checked(validate, result, "raw grader result");
+    checkedAllure(validate, result, "raw grader result");
     const item = label(result, "tag")?.slice(6);
     const spec = plan.checks.find((check) => check.source === "raw-grader" && check.items.includes(item));
     if (!spec || label(result, "tool") !== spec.tool || label(result, "technique") !== spec.technique)
@@ -149,15 +168,17 @@ export async function compilePanel({ original, specialists, out,
       result_sha256: fileSha(join(room, "work", "allure-results", `${result.uuid}-result.json`)),
       message: result.statusDetails.message });
   }
-  checked(validate, blind.result, "blind review Allure result");
-  const blindSpec = plan.checks.find((check) => check.source === "blind-review");
-  if (!blindSpec || label(blind.result, "tool") !== blindSpec.tool
-      || label(blind.result, "technique") !== blindSpec.technique)
-    throw new Error("blind review differs from panel plan");
-  observations.push({ id: blindSpec.id, item: "01-011", tool: blindSpec.tool,
-    technique: blindSpec.technique, status: blind.result.status, runtime: "gondolin-qemu-vm",
-    result_sha256: fileSha(join(original, "blind-agent-allure", `${blind.result.uuid}-result.json`)),
-    message: blind.result.statusDetails.message });
+  if (legacy) {
+    checkedAllure(validate, blind.result, "blind review Allure result");
+    const blindSpec = plan.checks.find((check) => check.source === "blind-review");
+    if (!blindSpec || label(blind.result, "tool") !== blindSpec.tool
+        || label(blind.result, "technique") !== blindSpec.technique)
+      throw new Error("blind review differs from panel plan");
+    observations.push({ id: blindSpec.id, item: "01-011", tool: blindSpec.tool,
+      technique: blindSpec.technique, status: blind.result.status, runtime: "gondolin-qemu-vm",
+      result_sha256: fileSha(join(original, "blind-agent-allure", `${blind.result.uuid}-result.json`)),
+      message: blind.result.statusDetails.message });
+  }
   const specialistManifestFile = existsSync(join(specialists, "manifest.json"))
     ? join(specialists, "manifest.json") : join(specialists, "combined", "manifest.json");
   const specialistManifest = json(specialistManifestFile);
@@ -175,8 +196,8 @@ export async function compilePanel({ original, specialists, out,
   checked(schemaValidator(join(HERE, "panel-summary.schema.json")), summary, "panel summary");
   mkdirSync(out, { recursive: true });
   const report = join(out, "allure-report");
-  const directories = [join(room, "work", "allure-results"), join(original, "blind-agent-allure"),
-    ...extra.directories];
+  const directories = [join(room, "work", "allure-results"),
+    ...(legacy ? [join(original, "blind-agent-allure")] : []), ...extra.directories];
   const rendered = spawnSync(join(HERE, "node_modules", ".bin", "allure"),
     ["generate", ...directories, "--config", join(HERE, "allurerc.mjs"), "--output", report, "--clean"],
     { cwd: HERE, encoding: "utf8" });
@@ -187,7 +208,7 @@ export async function compilePanel({ original, specialists, out,
       || ["passed", "failed", "broken", "skipped"].some((status) =>
         (stats[status] ?? 0) !== observations.filter((row) => row.status === status).length))
     throw new Error("Allure omitted or changed a panel result");
-  if (fileSha(join(original, "instrument", "harness", "cycles", "02", "scores.json")) !== scored.scoreSha256)
+  if (fileSha(join(original, "instrument", "harness", "cycles", scoreCycleFor(original), "scores.json")) !== scored.scoreSha256)
     throw new Error("original score changed during panel compilation");
   writeFileSync(join(out, "panel-summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
   const manifest = { schema: "loyly.grading-panel-report.v1",
@@ -200,13 +221,16 @@ export async function compilePanel({ original, specialists, out,
   return { out, summary, manifest, stats };
 }
 
-export function verifyCompiledPanel({ original, out }) {
+export function verifyCompiledPanel({ original, out,
+  planFile = join(HERE, "booking-core.panel.json") }) {
   original = resolve(original); out = resolve(out);
   const summary = json(join(out, "panel-summary.json"));
   checked(schemaValidator(join(HERE, "panel-summary.schema.json")), summary, "panel summary");
   const manifest = json(join(out, "panel-manifest.json"));
+  const plan = json(planFile);
   const score = verifyScoredCycle({ scratch: original, instrument: join(original, "instrument"),
-    verdictsFile: join(original, "final-verdicts.json") });
+    verdictsFile: join(original, plan.schema === 'loyly.grading-panel-plan.v1'
+      ? 'final-verdicts.json' : 'verdicts.json'), cycle: scoreCycleFor(original) });
   if (manifest.schema !== "loyly.grading-panel-report.v1"
       || manifest.panel_summary_sha256 !== fileSha(join(out, "panel-summary.json"))
       || manifest.report_html_sha256 !== fileSha(join(out, "allure-report", "index.html"))
@@ -214,7 +238,7 @@ export function verifyCompiledPanel({ original, out }) {
       || manifest.original_score_unchanged !== true
       || summary.original_score_sha256 !== score.scoreSha256
       || summary.candidate_sha256 !== candidateDigest(join(original, "fenced-room"))
-      || summary.plan_sha256 !== fileSha(join(HERE, "booking-core.panel.json")))
+      || summary.plan_sha256 !== fileSha(planFile))
     throw new Error("compiled panel report changed after filing");
   return { out, summary, manifest, stats: json(join(out, "allure-report", "summary.json")).stats };
 }

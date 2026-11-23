@@ -1,0 +1,64 @@
+{
+  "uuid": "f40bca30-1857-47e1-ab2d-95157bb56506",
+  "name": "A free eligible slot does not put a multi-slot household under notice",
+  "fullName": "loyly.scarcity-forfeit.03-001",
+  "testCaseId": "loyly.scarcity-forfeit.03-001",
+  "historyId": "loyly.scarcity-forfeit.03-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST scarcity evaluate group A: 200 notices empty; GET notices empty."
+  },
+  "start": 1795282410608,
+  "stop": 1795282410886,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Self-service group A: 12 holds two of three; 3 is waiting, third slot free",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST scarcity evaluate group A",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then 200 notices empty; GET notices empty",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "588efe02-e617-4138-89d9-e2c79a5a556b-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

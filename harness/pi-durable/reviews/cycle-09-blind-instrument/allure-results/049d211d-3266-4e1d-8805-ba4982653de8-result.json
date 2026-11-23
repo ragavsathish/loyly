@@ -1,0 +1,64 @@
+{
+  "uuid": "049d211d-3266-4e1d-8805-ba4982653de8",
+  "name": "A second standing slot is refused when the schedule is full",
+  "fullName": "loyly.booking-core.01-006",
+  "testCaseId": "loyly.booking-core.01-006",
+  "historyId": "loyly.booking-core.01-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Trial schedule had two slots held by 12 and 3; POST bookings for 12 at 18:30 returned refused: The weekly schedule has no free standing slot.; GET bookings and schedule still show exactly one holding for 12 and the other for 3; no alternative suggested"
+  },
+  "start": 1795347928648,
+  "stop": 1795347943648,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A household may hold a second standing slot when there is room"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Trial schedule had two slots held by 12 and 3",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST bookings for 12 at 18:30 returned refused: The weekly schedule has no free standing slot.",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then GET bookings and schedule still show exactly one holding for 12 and the other for 3; no alternative suggested",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "9f798717-23f8-443a-b429-fb70216397d8-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

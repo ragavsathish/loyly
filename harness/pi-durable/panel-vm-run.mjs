@@ -2,20 +2,54 @@
 // Every VM sees the same read-only candidate and writes one Allure directory.
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
-import { candidateDigest } from './grading-room.mjs';
+import { compileAllureSchema } from '../evidence-core/validate-schema.ts';
+import { candidateDigest, treeDigest } from './grading-room.mjs';
+import { scoreCycleFor } from './score-receipt.mjs';
+import { verifyRuntimeProfileEvidence } from './runtime-profile-evidence.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const fileSha = (path) => sha(readFileSync(path));
-const WORKERS = [
+const LEGACY_WORKERS = [
   { id: 'browser', script: 'panel-browser.mjs', tool: 'Playwright', item: '01-003' },
   { id: 'protocol', script: 'panel-protocol.mjs', tool: 'Node.js', item: '01-010' },
   { id: 'telemetry', script: 'panel-telemetry.mjs', tool: 'OpenTelemetry', item: '01-003' },
 ];
+export function workerBundle(plan) {
+  if (plan.schema === 'loyly.grading-panel-plan.v1') return { root: HERE, sha256: null };
+  if (plan.schema !== 'harness.grading-panel-plan.v2'
+      || !/^[a-z][a-z0-9/-]*$/.test(plan.bundle?.path ?? '')
+      || !/^[0-9a-f]{64}$/.test(plan.bundle?.sha256 ?? ''))
+    throw new Error('panel needs a pinned project worker bundle');
+  const root = join(HERE, plan.bundle.path);
+  if (treeDigest(root, 'bundle') !== plan.bundle.sha256)
+    throw new Error('project worker bundle differs from the panel plan');
+  return { root, sha256: plan.bundle.sha256 };
+}
+export function specialistWorkers(plan) {
+  const { root } = workerBundle(plan);
+  const checks = plan.checks?.filter((check) => check.source === 'specialist') ?? [];
+  if (!checks.length || new Set(checks.map((check) => check.id)).size !== checks.length)
+    throw new Error('panel needs unique specialist checks');
+  return checks.map((check) => {
+    const legacy = plan.schema === 'loyly.grading-panel-plan.v1'
+      ? LEGACY_WORKERS.find((row) => row.id === check.id) : null;
+    const script = check.script ?? legacy?.script;
+    if (!script || !/^[a-z][a-z0-9-]*\.mjs$/.test(script)
+        || !existsSync(join(root, script)) || !lstatSync(join(root, script)).isFile()
+        || check.items?.length !== 1
+        || (!check.script && (!legacy || legacy.tool !== check.tool
+          || legacy.item !== check.items[0])))
+      throw new Error(`${check.id}: specialist script or item differs from the panel plan`);
+    return { id: check.id, script, tool: check.tool, item: check.items[0],
+      technique: check.technique, feature: check.feature ?? plan.feature,
+      probe: check.probe };
+  });
+}
 const label = (result, name) => result.labels?.find((entry) => entry.name === name)?.value;
 function runBinding(original) {
   const input = join(original, 'score-input.json');
@@ -27,19 +61,24 @@ function runBinding(original) {
   return { source_commit: git.stdout.trim(), candidate_sha256: candidateDigest(join(original, 'fenced-room')) };
 }
 function scoreDigest(original) {
-  const score = join(original, 'instrument', 'harness', 'cycles', '02', 'scores.json');
+  const input = join(original, 'score-input.json');
+  if (!existsSync(input)) return null;
+  const score = join(original, 'instrument', 'harness', 'cycles', scoreCycleFor(original), 'scores.json');
   return existsSync(score) ? fileSha(score) : null;
 }
 
-async function runWorker(worker, image, candidate, out, candidateSha256, sourceFilesSha256,
+async function runWorker(worker, bundle, image, candidate, out, candidateSha256, sourceFilesSha256,
   imageDigest, validate) {
   const dir = join(out, worker.id);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'config.json'), JSON.stringify({ candidate_sha256: candidateSha256,
-    source_files_sha256: sourceFilesSha256 }));
+    source_files_sha256: sourceFilesSha256, item: worker.item,
+    feature: worker.feature, tool: worker.tool, technique: worker.technique,
+    ...(worker.probe ? { probe: worker.probe } : {}) }));
   const args = ['exec', '--image', image,
     '--mount-hostfs', `${candidate}:/candidate:ro`,
-    '--mount-hostfs', `${HERE}:/worker:ro`,
+    ...(bundle.sha256 ? ['--mount-hostfs', `${HERE}:/harness:ro`] : []),
+    '--mount-hostfs', `${bundle.root}:/worker:ro`,
     '--mount-hostfs', `${dir}:/out`,
     '--allow-host', 'egress-blocked.invalid', '--', 'node', `/worker/${worker.script}`];
   const started = Date.now();
@@ -63,11 +102,16 @@ async function runWorker(worker, image, candidate, out, candidateSha256, sourceF
   const receipt = { schema: 'loyly.panel-vm-execution.v1',
     worker: worker.id, candidate_sha256: candidateSha256,
     imageDigest, image_manifest_sha256: imageDigest.slice(7),
-    worker_script_sha256: fileSha(join(HERE, worker.script)),
+    worker_script_sha256: fileSha(join(bundle.root, worker.script)),
+    ...(bundle.sha256 ? { worker_bundle_sha256: bundle.sha256 } : {}),
     worker_support_sha256: fileSha(join(HERE, 'panel-candidate.mjs')),
     package_lock_sha256: fileSha(join(HERE, 'package-lock.json')),
     ...(worker.id === 'telemetry' ? {
       instrumentation_sha256: fileSha(join(HERE, 'panel-otel-instrumentation.mjs')),
+    } : {}),
+    ...(!bundle.sha256 && worker.script === 'panel-runtime.mjs' ? {
+      profile_validator_sha256: fileSha(join(HERE, 'runtime-profile-evidence.mjs')),
+      profile_otel_schema_sha256: fileSha(join(HERE, 'panel-otel-metrics.schema.json')),
     } : {}),
     vm_exit_code: exitCode, isolation: 'gondolin-qemu-vm',
     mounts: { candidate: 'read-only', worker: 'read-only', output: 'read-write' },
@@ -78,11 +122,20 @@ async function runWorker(worker, image, candidate, out, candidateSha256, sourceF
   result.attachments.push({ name: 'Gondolin VM execution receipt',
     source: receiptName, type: 'application/json' });
   writeFileSync(join(dir, resultFile), JSON.stringify(result, null, 2));
-  if (!validate(result) || resultFile !== `${result.uuid}-result.json`
+  try {
+    validate(result, resultFile);
+  } catch (cause) {
+    throw new Error(`${worker.id}: VM result is invalid: ${cause instanceof Error ? cause.message : String(cause)}`);
+  }
+  if (resultFile !== `${result.uuid}-result.json`
       || label(result, 'tool') !== worker.tool || label(result, 'tag') !== `@item-${worker.item}`
+      || label(result, 'feature') !== worker.feature
+      || label(result, 'technique') !== worker.technique
       || result.parameters?.find((entry) => entry.name === 'candidate_sha256')?.value !== candidateSha256
       || result.stage !== 'finished' || (exitCode === 0) !== (result.status === 'passed'))
-    throw new Error(`${worker.id}: VM result is invalid: ${JSON.stringify(validate.errors)}`);
+    throw new Error(`${worker.id}: VM result is invalid`);
+  if (!bundle.sha256 && worker.script === 'panel-runtime.mjs')
+    verifyRuntimeProfileEvidence({ dir, result, candidateSha256, probe: worker.probe });
   const files = [resultFile, ...result.attachments.map((attachment) => attachment.source)];
   const hashes = Object.fromEntries(files.map((name) => [name, fileSha(join(dir, name))]));
   return { id: worker.id, tool: worker.tool, item: `@item-${worker.item}`,
@@ -91,7 +144,8 @@ async function runWorker(worker, image, candidate, out, candidateSha256, sourceF
     execution_receipt_sha256: hashes[receiptName], files: hashes };
 }
 
-export async function runPanelVms({ original, image, out }) {
+export async function runPanelVms({ original, image, out,
+  planFile = join(HERE, 'booking-core.panel.json') }) {
   original = resolve(original); image = resolve(image); out = resolve(out);
   if (existsSync(out)) throw new Error('panel VM output already exists');
   const scoreInput = runBinding(original);
@@ -104,17 +158,15 @@ export async function runPanelVms({ original, image, out }) {
   const verify = spawnSync('gondolin', ['build', '--verify', image], { encoding: 'utf8' });
   if (verify.status !== 0) throw new Error(`Gondolin image verification failed: ${verify.stderr}`);
   const imageDigest = `sha256:${fileSha(join(image, 'manifest.json'))}`;
-  const schemaFile = join(HERE, 'allure-lifecycle-result.schema.json');
-  const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, 'utf8')));
-  const planFile = join(HERE, 'booking-core.panel.json');
+  const schemaFile = join(HERE, '../evidence-core/allure-lifecycle-result.schema.json');
+  const validate = compileAllureSchema(JSON.parse(readFileSync(schemaFile, 'utf8')));
   const plan = JSON.parse(readFileSync(planFile, 'utf8'));
   const validatePlan = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(join(HERE, 'panel-plan.schema.json'), 'utf8')));
-  if (!validatePlan(plan) || WORKERS.some((worker) => !plan.checks.some((check) =>
-    check.id === worker.id && check.source === 'specialist' && check.tool === worker.tool
-    && check.items.join() === worker.item)))
-    throw new Error('specialist workers differ from the panel plan');
+  if (!validatePlan(plan)) throw new Error(`invalid panel plan: ${JSON.stringify(validatePlan.errors)}`);
+  const bundle = workerBundle(plan);
+  const workers = specialistWorkers(plan);
   mkdirSync(out, { recursive: true });
-  const settled = await Promise.allSettled(WORKERS.map((worker) => runWorker(worker, image,
+  const settled = await Promise.allSettled(workers.map((worker) => runWorker(worker, bundle, image,
     candidate, out, candidateSha256, sourceFilesSha256, imageDigest, validate)));
   const failures = settled.filter((row) => row.status === 'rejected').map((row) => String(row.reason));
   if (failures.length) throw new Error(`panel VM worker failed: ${failures.join('; ')}`);
@@ -127,35 +179,41 @@ export async function runPanelVms({ original, image, out }) {
     candidate_sha256: candidateSha256, original_score_sha256: scoreSha256,
     allure_schema_sha256: fileSha(schemaFile), plan_sha256: fileSha(planFile), image_digest: imageDigest,
     worker_support_sha256: fileSha(join(HERE, 'panel-candidate.mjs')),
+    ...(bundle.sha256 ? { worker_bundle_sha256: bundle.sha256 } : {}),
     parallel_overlap_ms: overlap, original_score_unchanged: true,
     score_state: scoreSha256 ? 'filed' : 'pre-score', producers };
   writeFileSync(join(out, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-  return verifyPanelVmRun({ original, out, imageDigest });
+  return verifyPanelVmRun({ original, out, imageDigest, planFile });
 }
 
 // Reopen a completed panel after a controller restart without launching VMs
 // again. A partial output is not a receipt and must be kept as failed evidence.
-export function verifyPanelVmRun({ original, out, imageDigest }) {
+export function verifyPanelVmRun({ original, out, imageDigest,
+  planFile = join(HERE, 'booking-core.panel.json') }) {
   original = resolve(original); out = resolve(out);
   const manifest = JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8'));
   const scoreInput = runBinding(original);
   const candidateSha256 = candidateDigest(join(original, 'fenced-room'));
   const scoreSha256 = scoreDigest(original);
-  const planSha256 = fileSha(join(HERE, 'booking-core.panel.json'));
-  const schemaFile = join(HERE, 'allure-lifecycle-result.schema.json');
-  const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, 'utf8')));
+  const planSha256 = fileSha(planFile);
+  const plan = JSON.parse(readFileSync(planFile, 'utf8'));
+  const bundle = workerBundle(plan);
+  const workers = specialistWorkers(plan);
+  const schemaFile = join(HERE, '../evidence-core/allure-lifecycle-result.schema.json');
+  const validate = compileAllureSchema(JSON.parse(readFileSync(schemaFile, 'utf8')));
   if (manifest.schema !== 'loyly.panel-vm-run.v1'
       || manifest.source_commit !== scoreInput.source_commit
       || manifest.candidate_sha256 !== candidateSha256
       || ((manifest.score_state ?? 'filed') === 'filed' && manifest.original_score_sha256 !== scoreSha256)
       || (manifest.score_state === 'pre-score' && manifest.original_score_sha256 !== null)
       || manifest.plan_sha256 !== planSha256
+      || (bundle.sha256 && manifest.worker_bundle_sha256 !== bundle.sha256)
       || manifest.allure_schema_sha256 !== fileSha(schemaFile)
       || manifest.original_score_unchanged !== true
       || (imageDigest && manifest.image_digest !== imageDigest)
-      || manifest.producers?.length !== WORKERS.length)
+      || manifest.producers?.length !== workers.length)
     throw new Error('panel VM manifest differs from the scored cut, plan, schema or image');
-  for (const worker of WORKERS) {
+  for (const worker of workers) {
     const producer = manifest.producers.find((row) => row.id === worker.id);
     if (!producer || producer.tool !== worker.tool || producer.item !== `@item-${worker.item}`
         || producer.image_digest !== manifest.image_digest
@@ -167,12 +225,21 @@ export function verifyPanelVmRun({ original, out, imageDigest }) {
     if (results.length !== 1 || results[0] !== producer.result)
       throw new Error(`${worker.id}: expected one result`);
     const result = JSON.parse(readFileSync(join(dir, producer.result), 'utf8'));
+    if (worker.script === 'panel-runtime.mjs')
+      verifyRuntimeProfileEvidence({ dir, result, candidateSha256, probe: worker.probe });
     const receiptFile = result.attachments?.find((attachment) =>
       attachment.name === 'Gondolin VM execution receipt')?.source;
     const files = [producer.result, ...(result.attachments ?? []).map((attachment) => attachment.source)];
-    if (!validate(result) || result.uuid + '-result.json' !== producer.result
+    try {
+      validate(result, producer.result);
+    } catch (cause) {
+      throw new Error(`${worker.id}: Allure result or attachment changed: ${cause instanceof Error ? cause.message : String(cause)}`);
+    }
+    if (result.uuid + '-result.json' !== producer.result
         || result.status !== producer.status || result.stage !== 'finished'
         || label(result, 'tool') !== worker.tool || label(result, 'tag') !== producer.item
+        || label(result, 'feature') !== worker.feature
+        || label(result, 'technique') !== worker.technique
         || result.parameters?.find((entry) => entry.name === 'candidate_sha256')?.value !== candidateSha256
         || !receiptFile || new Set(files).size !== files.length
         || files.length !== Object.keys(producer.files).length
@@ -183,6 +250,11 @@ export function verifyPanelVmRun({ original, out, imageDigest }) {
     const receipt = JSON.parse(readFileSync(join(dir, receiptFile), 'utf8'));
     if (receipt.worker !== worker.id || receipt.candidate_sha256 !== candidateSha256
         || receipt.imageDigest !== manifest.image_digest
+        || receipt.worker_script_sha256 !== fileSha(join(bundle.root, worker.script))
+        || (bundle.sha256 && receipt.worker_bundle_sha256 !== bundle.sha256)
+        || (!bundle.sha256 && worker.script === 'panel-runtime.mjs'
+          && (receipt.profile_validator_sha256 !== fileSha(join(HERE, 'runtime-profile-evidence.mjs'))
+            || receipt.profile_otel_schema_sha256 !== fileSha(join(HERE, 'panel-otel-metrics.schema.json'))))
         || (manifest.worker_support_sha256
           && receipt.worker_support_sha256 !== manifest.worker_support_sha256)
         || receipt.isolation !== 'gondolin-qemu-vm'

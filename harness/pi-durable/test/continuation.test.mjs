@@ -6,8 +6,10 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { Effect, Layer } from 'effect';
 import { readAuditRows } from "../audit-rows.mjs";
-import { continuationPrompt, selectedUncarried } from "../continuation.mjs";
+import { continuationPrompt, selectedUncarried, selectedUncarriedEffect } from "../continuation.ts";
+import { WorkspaceFiles } from '../workspace-effects.ts';
 
 const here = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const root = resolve(here, "../..");
@@ -30,6 +32,49 @@ test("uncarried selection names only approved item lines", () => {
   } finally { rmSync(scratch, { recursive: true, force: true }); }
 });
 
+test("whole-product continuation carries selected items beyond booking core", () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-whole-uncarried-"));
+  try {
+    const room = join(scratch, "room");
+    assert.equal(spawnSync("mkdir", ["-p", join(room, "impl")]).status, 0);
+    const checklist = join(scratch, "checklist.json");
+    writeFileSync(checklist, JSON.stringify({ items: [
+      { id: "01-011" }, { id: "02-005" }, { id: "03-014" },
+    ] }));
+    writeFileSync(join(room, "impl", "UNCARRIED.md"),
+      "- @item-02-005: resale\n* `@item-03-014`: notice\n- @item-04-001: unselected\n- @item-01-0110: malformed\n");
+    const ids = selectedUncarried(room, checklist);
+    assert.deepEqual(ids, ["02-005", "03-014"]);
+    assert.match(continuationPrompt(ids), /@item-02-005, @item-03-014/);
+    assert.throws(() => continuationPrompt(["06-1"]), /selected product item IDs/);
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
+});
+
+test('continuation file effects are lazy and injectable', () => {
+  const reads = [];
+  const layer = Layer.succeed(WorkspaceFiles, {
+    exists: (path) => Effect.succeed(path === '/room/impl/UNCARRIED.md'),
+    readText: (path) => Effect.sync(() => {
+      reads.push(path);
+      return path === '/checklist'
+        ? JSON.stringify({ items: [{ id: '02-005' }] })
+        : '- @item-02-005: pending\n- @item-02-999: unrelated\n';
+    }),
+  });
+  const selection = selectedUncarriedEffect('/room', '/checklist').pipe(Effect.provide(layer));
+  assert.deepEqual(reads, []);
+  assert.deepEqual(Effect.runSync(selection), ['02-005']);
+  assert.deepEqual(reads, ['/checklist', '/room/impl/UNCARRIED.md']);
+  const invalid = Layer.succeed(WorkspaceFiles, {
+    exists: () => Effect.succeed(true),
+    readText: () => Effect.succeed('{broken'),
+  });
+  const error = Effect.runSync(Effect.flip(
+    selectedUncarriedEffect('/room', '/checklist').pipe(Effect.provide(invalid))));
+  assert.equal(error._tag, 'InvalidWorkspaceData');
+  assert.equal(error.path, '/checklist');
+});
+
 function fixtureEnv(scratch, mode = "carry", builderCommand) {
     const checklist = join(scratch, "approved-checklist.json");
     const generated = spawnSync("bb", ["harness/gen_checklist.clj", "--out", checklist],
@@ -40,6 +85,7 @@ function fixtureEnv(scratch, mode = "carry", builderCommand) {
     const image = join(root, ".pi/harness/.state/assets/builder-clojure");
     const command = builderCommand ?? join(here, "test/stub-continuation-builder.sh");
     return { ...process.env,
+      LOYLY_SOURCE_REPO: root,
       LOYLY_APPROVED_COMMIT: head.stdout.trim(), LOYLY_APPROVED_CHECKLIST_SHA256: sha(checklist),
       LOYLY_BUILDER_COMMAND: command, LOYLY_BUILDER_IMAGE: image,
       LOYLY_BUILDER_MODEL: "test/continuing-builder",
@@ -95,6 +141,23 @@ test("live cycle continues one Pi session on its own uncarried list before gate"
   assert.ok(turns.every((row) => row.session_id === "prototype-cycle-1-attempt-1" && row.changed));
   assert.deepEqual(rows.findLast((row) => row.stage === "builder-continuation").remaining_uncarried, []);
   assert.ok(rows.find((row) => row.stage === "gate" && row.outcome === "passed").seq > turns[1].seq);
+});
+
+test("pinned cut clones the approved source checkout instead of the controller checkout", async () => {
+  const scratch = mkdtempSync(join(tmpdir(), "loyly-external-source-"));
+  try {
+    const sourceRepo = join(scratch, "source");
+    const cloned = spawnSync("git", ["clone", "-q", "--shared", root, sourceRepo], { encoding: "utf8" });
+    assert.equal(cloned.status, 0, cloned.stderr);
+    const env = { ...fixtureEnv(scratch, "unchanged"), LOYLY_SOURCE_REPO: sourceRepo };
+    await finish(startWorker(scratch, env));
+    const receipt = JSON.parse(readFileSync(join(scratch, "cut", "cut.json"), "utf8"));
+    assert.equal(receipt.source_repo, sourceRepo);
+    assert.equal(receipt.commit, env.LOYLY_APPROVED_COMMIT);
+    const cutHead = spawnSync("git", ["rev-parse", "HEAD"],
+      { cwd: join(scratch, "cut", "project"), encoding: "utf8" });
+    assert.equal(cutHead.stdout.trim(), env.LOYLY_APPROVED_COMMIT);
+  } finally { rmSync(scratch, { recursive: true, force: true }); }
 });
 
 test("unchanged continuation stops before a second turn", async () => {

@@ -1,0 +1,64 @@
+{
+  "uuid": "b0ba561d-73f3-4032-a9a2-e9be63585764",
+  "name": "If all claimants decline, the selected holding returns to the pool at lapse",
+  "fullName": "loyly.scarcity-forfeit.03-012",
+  "historyId": "loyly.scarcity-forfeit.03-012",
+  "testCaseId": "loyly.scarcity-forfeit.03-012",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Both claimants declined; after lapse selected holding left 12 and its schedule slot became free; other holding remains."
+  },
+  "start": 1795281234768,
+  "stop": 1795281235768,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-012"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given a selected holding is under notice and every eligible claimant has declined",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When its recorded notice deadline passes",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the original household loses only that holding And the holding becomes available in its eligible group",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "50d83813-2c7e-46d0-bb01-46baa3dbf056-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

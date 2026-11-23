@@ -1,0 +1,95 @@
+(1/6) Installing icu-data-full (78.1-r0)
+(2/6) Installing ada-libs (4.0.0-r0)
+(3/6) Installing icu-libs (78.1-r0)
+(4/6) Installing simdjson (4.2.4-r0)
+(5/6) Installing simdutf (9.0.0-r0)
+(6/6) Installing nodejs (24.22.3-r0)
+Executing busybox-1.37.0-r31.trigger
+OK: 159.2 MiB in 100 packages
+v24.22.3
+Tue Jan  1 08:00:00 UTC 2030
+
+GET / 200 <!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Löyly · Sauna bookings</title>
+<link rel="stylesheet" href="/style.css">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<header>
+  <div><h1>Löyly</h1><p>Sauna bookings</p></div>
+  <label>House <select id="house"></select></label>
+</header>
+<main>
+  <section aria-labelledby="schedule-title">
+    <h2 id="schedule-title">Weekly schedule</h2>
+    <p id="route"></p>
+    <div id="schedule"></div>
+  </section>
+  <section aria-labelledby="book-title">
+    <h2 id="book-title">Request a sauna slot</h2>
+    <form id="book">
+      <label>Apartment <input name="household" required maxlength="40"></label>
+      <label>Booker role <select name="role"></select></label>
+      <label>Booking <select name="kind"><option value="standing">Standing weekly slot</option><option value="occurrences">Single occurrence</option></select></label>
+      <label>Dressing room <select name="resource"></select></label>
+      <label id="weekday-field">Weekday <select name="weekday"></select></label>
+      <label id="date-field" hidden>Date <input name="date" type="date"></label>
+      <label>Start time <input name="start" type="time" value="17:00" required></label>
+      <button>Request slot</button>
+    </form>
+  </section>
+  <section aria-labelledby="record-title">
+    <h2 id="record-title">Booking record</h2>
+    <p id="status" role="status" aria-live="polite"></p>
+    <form id="date-view">
+      <label>Occurrence date <input type="date" name="date" required></label>
+      <button>View date</button>
+      <button type="button" id="weekly">View weekly holdings</button>
+    </form>
+    <div id="views"></div>
+  </section>
+  <section aria-labelledby="management-title">
+    <h2 id="management-title">Manage a booking</h2>
+    <form id="manage">
+      <label>Action <select name="action"></select></label>
+      <div class="fields" id="manage-fields"></div>
+      <button>Submit</button>
+    </form>
+    <div id="outcome"></div>
+  </section>
+  <section aria-labelledby="operations-title">
+    <h2 id="operations-title">House rules and operations</h2>
+    <div id="operations"></div>
+  </section>
+</main>
+</body>
+</html>
+
+
+GET /api 200 {"houses":[{"id":"soukanvuori","name":"Soukanvuori","zone":"Europe/Helsinki"},{"id":"masthugget","name":"Masthugget","zone":"Europe/Stockholm"},{"id":"self-service","name":"Self-service example","zone":"Europe/Stockholm"}],"now":"2030-01-01T08:00:03.128Z"}
+
+GET /api/a/route 404 {"reason":"not_found","message":"House or action was not found."}
+
+GET /api/a/schedule 404 {"reason":"not_found","message":"House or action was not found."}
+
+GET /api/a/policies 404 {"reason":"not_found","message":"House or action was not found."}
+
+GET /api/b/policies 404 {"reason":"not_found","message":"House or action was not found."}
++ apk add 'nodejs=24.22.3-r0' 'icu-data-full=78.1-r0'
++ node --version
++ date -u -s 2030-01-01T08:00:00Z
++ cp -R /candidate /tmp/app
++ cd /tmp/app
++ p=635
++ trap 'kill "$p" 2>/dev/null; wait "$p" 2>/dev/null' EXIT
++ sleep 3
++ ./start.sh 3000
++ node /work/probe.js
++ kill 635
++ wait 635
+
+exit=0

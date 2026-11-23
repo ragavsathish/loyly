@@ -1,0 +1,73 @@
+{
+  "uuid": "1cd641ca-ae78-483d-90a6-f23a11c30d99",
+  "name": "Lapse changes only the selected standing holding",
+  "fullName": "loyly.scarcity-forfeit.03-009",
+  "testCaseId": "loyly.scarcity-forfeit.03-009",
+  "historyId": "loyly.scarcity-forfeit.03-009",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Chose booking-1, advanced the guest clock past served lapseAt, then GET /api/views showed only booking-3 in posted list and billing for 12; GET /api/bookings retained lapse history, and GET /api/schedule showed the selected slot free."
+  },
+  "start": 1795282801022,
+  "stop": 1795282801275,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given one of a household's two standing holdings was selected under notice",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP and clock transcript."
+      }
+    },
+    {
+      "name": "When: When the notice deadline passes",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Observed in attached HTTP and clock transcript."
+      }
+    },
+    {
+      "name": "Then: Then the household loses the selected standing holding / And its other standing holding remains held / And the posted list and billing signal reflect the same holding history",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Chose booking-1, advanced the guest clock past served lapseAt, then GET /api/views showed only booking-3 in posted list and billing for 12; GET /api/bookings retained lapse history, and GET /api/schedule showed the selected slot free."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock transcript",
+      "source": "f9e6465e-a9ef-43c4-9486-e45a9334b460-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

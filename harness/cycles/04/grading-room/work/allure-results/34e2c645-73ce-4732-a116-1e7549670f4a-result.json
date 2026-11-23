@@ -1,0 +1,89 @@
+{
+  "uuid": "34e2c645-73ce-4732-a116-1e7549670f4a",
+  "name": "Taking a free occurrence charges no fee to the taker",
+  "fullName": "loyly.occurrence-release.02-004",
+  "testCaseId": "loyly.occurrence-release.02-004",
+  "historyId": "loyly.occurrence-release.02-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET soukanvuori/views?date=2026-12-01 \u2192 200; GET soukanvuori/views?date=2026-12-08 \u2192 200; POST soukanvuori/take \u2192 200; GET soukanvuori/views?date=2026-12-01 \u2192 200; GET soukanvuori/views?date=2026-12-08 \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256639931,
+  "stop": 1795256643404,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12 has released one Tuesday occurrence for free",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: apartment 3 takes that occurrence",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: apartment 3 may use that one Tuesday occurrence without an occurrence charge",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: apartment 12 remains responsible for its normal standing-slot fee",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: apartment 12 holds the standing slot on later Tuesdays",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "3ecbd30f-dd5d-4402-a090-68e99623710b-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

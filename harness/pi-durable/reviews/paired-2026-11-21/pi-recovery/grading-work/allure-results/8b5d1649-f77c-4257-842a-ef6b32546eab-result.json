@@ -1,0 +1,69 @@
+{
+  "uuid": "8b5d1649-f77c-4257-842a-ef6b32546eab",
+  "name": "An unrelated class does not consume the family-time allowance",
+  "fullName": "loyly.time-classes.05-002",
+  "testCaseId": "loyly.time-classes.05-002",
+  "historyId": "loyly.time-classes.05-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Second dated request returned HTTP 201: {\"booking\": {\"id\": \"booking-3\", \"house\": \"house-a\", \"household\": \"12\", \"kind\": \"occurrence\", \"resource\": \"room\", \"resourceName\": \"Room\", \"sauna\": \"Sauna A\", \"group\": \"A\", \"weekday\": \"Saturday\", \"start\": \"17:00\", \"end\": \"18:30\", \"class\": \"family\", \"date\": \"2026-11-28\", \"confirmedAt\": \"2026-11-21T17:35:26.103Z\", \"policyVersion\": \"v1\", \"priceReference\": \"standing-price\", \"history\": [{\"id\": \"event-4\", \"booking\": \"booking-3\", \"type\": \"confirmed\", \"at\": \"2026-11-21T17:35:26.103Z\", \"policyVersion\": \"v1\"}]}}; booking and views reread."
+  },
+  "start": 1795282523111,
+  "stop": 1795282527363,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given a house caps family time at one active or upcoming booking per household",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And apartment 12 has an upcoming booking in a different time class",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 12 requests a free family-time window",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the unrelated booking does not trigger the family-time cap",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "15dc3da7-8f25-499f-b2c3-bb1eb6ef1370-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "uuid": "33f05e11-8345-4eea-bb0a-926dc5be5536",
+  "name": "A held slot cannot be confirmed for another household",
+  "fullName": "loyly.booking-core.01-004",
+  "testCaseId": "loyly.booking-core.01-004",
+  "historyId": "loyly.booking-core.01-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After booking for 12, apartment 3 requested the same slot; response refused: The slot is held. GET state retained 12 as holder."
+  },
+  "start": 1795281227371,
+  "stop": 1795281231526,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given the household in apartment 12 holds the Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When the household in apartment 3 requests a standing slot on Tuesday at 17:00 in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the request is refused because the slot is held",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And the household in apartment 12 still holds the slot",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "1eea6c85-18c2-4ba8-9ae4-a7b7af3d8da5-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

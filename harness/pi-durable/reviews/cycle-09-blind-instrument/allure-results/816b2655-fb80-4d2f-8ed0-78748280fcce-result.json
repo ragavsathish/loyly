@@ -1,0 +1,64 @@
+{
+  "uuid": "816b2655-fb80-4d2f-8ed0-78748280fcce",
+  "name": "A requested slot on an open day is confirmed",
+  "fullName": "loyly.booking-core.01-003",
+  "testCaseId": "loyly.booking-core.01-003",
+  "historyId": "loyly.booking-core.01-003",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST bookings apartment 12; Confirmed booking-4 17:00\u201318:30, standing Tuesday, reread bookings and schedule held by 12."
+  },
+  "start": 1795347949649,
+  "stop": 1795347949649,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-003"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given GET schedule showed room 8 Tuesday 17:00 free",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST bookings apartment 12",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then Confirmed booking-4 17:00\u201318:30, standing Tuesday, reread bookings and schedule held by 12.",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "1f89e902-88b3-4d45-8702-ac7c2ff47fa9-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

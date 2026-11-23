@@ -1,0 +1,9 @@
+{
+  "checklist": "harness/cycles/04/reassessment-01/checklist.json",
+  "verdicts": "harness/cycles/04/reassessment-01/verdicts.json",
+  "surprises": "harness/cycles/04/reassessment-01/grading-room/work/surprises.json",
+  "room": "harness/cycles/04/reassessment-01/grading-room",
+  "rawAllureDirs": [
+    "harness/cycles/04/reassessment-01/grading-room/work/allure-results"
+  ]
+}

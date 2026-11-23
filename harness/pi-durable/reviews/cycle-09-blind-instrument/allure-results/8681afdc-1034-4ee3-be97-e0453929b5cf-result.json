@@ -1,0 +1,64 @@
+{
+  "uuid": "8681afdc-1034-4ee3-be97-e0453929b5cf",
+  "name": "A taken occurrence has one taker in every view",
+  "fullName": "loyly.occurrence-release.02-009",
+  "testCaseId": "loyly.occurrence-release.02-009",
+  "historyId": "loyly.occurrence-release.02-009",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST offer-6/take by 3 and then 4; 3 took it; 4 refused. Dated list and heat name 3, billing has only standing payer 12. Following Tuesday list and heat name 12."
+  },
+  "start": 1795347950304,
+  "stop": 1795347950304,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "The three derived views describe one occurrence holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Apartment 12 confirmed booking-4 and offered 2026-12-01 FREE",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When POST offer-6/take by 3 and then 4",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then 3 took it; 4 refused. Dated list and heat name 3, billing has only standing payer 12. Following Tuesday list and heat name 12.",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "9ea7e3bc-ce23-4233-8b1e-eb25cb2eeef5-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

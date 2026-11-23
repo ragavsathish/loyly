@@ -1,0 +1,71 @@
+{
+  "schema": "loyly.pi-live-run.v1",
+  "run_id": "whole-product-durable-compare-02",
+  "score_cycle": "07",
+  "controller_commit": "4080780ba45d44082902a14dc850b7ff0e3ce9be",
+  "source": {
+    "repo": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-source",
+    "commit": "7e2fb1c0ba88c6b941a296a1298b89dd0bd5db5a",
+    "checklist_sha256": "06f0dba7ba9aa07152950cd0bc6c38560f6c6b95a3fa88354909a4561434dda2",
+    "specs": [
+      {
+        "file": "docs/plan/01-booking-core/spec.feature",
+        "sha256": "574366386208aada2436975c0397890bd6f9885b0483aea6bbf0beb579bdd21e"
+      },
+      {
+        "file": "docs/plan/02-occurrence-release/spec.feature",
+        "sha256": "041c53f7d6109b68814ebaa2547bd77b0b2e4e0dd50d3c8c51bf637be8fb9710"
+      },
+      {
+        "file": "docs/plan/03-scarcity-forfeit/spec.feature",
+        "sha256": "42c15ee5e43d538732d4acc50e022395340a590801405e45b3a2a889fd81ac87"
+      },
+      {
+        "file": "docs/plan/04-house-policy/spec.feature",
+        "sha256": "133040121a0bbcfd5f3d7e6fcf22867708315d7a1cd72cf8d40b488356b767bf"
+      },
+      {
+        "file": "docs/plan/05-time-classes/spec.feature",
+        "sha256": "1a837975f3fffe4ae503b03ff5158ab74cfc55c7216d3983704ee9b7b82a8e3e"
+      }
+    ]
+  },
+  "scratch": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/pi-durable/scratch-compare-pi-02",
+  "builder": {
+    "command": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/bin/builder.sh",
+    "command_sha256": "14a1992ff424a043e6cbd84efe2e6b34332844478da2f9babc120a8d5db8ee94",
+    "image": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/.state/assets/builder-clojure",
+    "image_sha256": "5eaa21b5f1e346086ba2e628d365a20222c1a72246ebaf7af82b75092c7b76b1",
+    "model": "openai-codex/gpt-6.1-sol",
+    "instruction_sha256": "7a19893b365a3750785a161f7453c50784a52ed5b1066eb19c7d905ff5b74265"
+  },
+  "grader": {
+    "command": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/bin/builder.sh",
+    "command_sha256": "14a1992ff424a043e6cbd84efe2e6b34332844478da2f9babc120a8d5db8ee94",
+    "image": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/.state/assets/builder-clojure",
+    "image_sha256": "5eaa21b5f1e346086ba2e628d365a20222c1a72246ebaf7af82b75092c7b76b1",
+    "model": "openai-codex/gpt-6.1-terra",
+    "instruction_file": "grader-instruction-product.md",
+    "instruction_sha256": "62e50ab6181e7be8e548649aeef8b3ae7823788c47ed7a2a9ac2082dff85cfc0",
+    "settings": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/config/pi.grader.settings.json",
+    "settings_sha256": "9d2c89c126f1e8faad1134f65131680c1ba33d6728236c310c1b0605492108b0",
+    "schema_sha256": "0eef607c5d9eef4a190ea0deb7c7a61228267d8ec556b722b37dd83ef253fee1",
+    "shards": 6
+  },
+  "blind": {
+    "command": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/bin/builder.sh",
+    "command_sha256": "14a1992ff424a043e6cbd84efe2e6b34332844478da2f9babc120a8d5db8ee94",
+    "image": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/.state/assets/builder-clojure",
+    "image_sha256": "5eaa21b5f1e346086ba2e628d365a20222c1a72246ebaf7af82b75092c7b76b1",
+    "model": "openai-codex/gpt-6.1-sol",
+    "instruction_sha256": "9f7c05a99deaf3a0653d02eb16ee34c146dcce8b9a21708a8cfc9b6d6afc87b9",
+    "settings": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/config/pi.blind-review.settings.json",
+    "settings_sha256": "bd90ab8d8562d5caff150ca9087920158852f4a2d7d2653f024835ca410ca14b"
+  },
+  "panel": {
+    "image": "/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/.state/assets/panel-multistack",
+    "image_sha256": "a108174548363cb832a7da6a4411d380d2d90cebb1b07181fc4a40632c7e21a1",
+    "plan_file": "whole-product.panel.json",
+    "plan_sha256": "ade653459abc93692136a9354363561c1d58ac2a2c9bc0a1710dd511fd7eaf32"
+  }
+}

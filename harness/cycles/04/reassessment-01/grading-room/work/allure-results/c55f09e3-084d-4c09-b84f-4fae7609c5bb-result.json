@@ -1,0 +1,67 @@
+{
+  "uuid": "c55f09e3-084d-4c09-b84f-4fae7609c5bb",
+  "name": "Passing the choose deadline does not pass the loss deadline",
+  "fullName": "loyly.scarcity-forfeit.03-008",
+  "testCaseId": "loyly.scarcity-forfeit.03-008",
+  "historyId": "loyly.scarcity-forfeit.03-008",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "After chooseAt the recorded lapseAt stayed unchanged and both holdings remained."
+  },
+  "start": 1795274254727,
+  "stop": 1795274305720,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-008"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: establish scenario from fresh state",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: perform action and cross applicable boundary",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: inspect public HTTP observations",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "After chooseAt the recorded lapseAt stayed unchanged and both holdings remained."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command, package installation, clock and HTTP receipt",
+      "source": "2a248999-6065-459b-9266-3c7454f11791-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

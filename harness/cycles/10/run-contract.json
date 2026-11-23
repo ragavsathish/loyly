@@ -1,0 +1,85 @@
+{
+  "schema": "loyly.cursor-subagent-cycle.v1",
+  "controllerCommit": "41c9b4f8e7884a70ff36639910b85467475c70a0",
+  "runId": "cursor-booking-01",
+  "scoreCycle": "10",
+  "scratch": "/tmp/loyly-cursor-cycle-10",
+  "source": {
+    "repo": "/workspace",
+    "commit": "41c9b4f8e7884a70ff36639910b85467475c70a0",
+    "checklist": {
+      "path": "/tmp/loyly-cursor-cycle-10/approved-checklist.json",
+      "sha256": "4acbadbce0e08cafd19ac89d2a0d909a564abd242ffecdb06b6184a1bbe631cc"
+    },
+    "itemIds": [
+      "01-001",
+      "01-002",
+      "01-003",
+      "01-004",
+      "01-005",
+      "01-006",
+      "01-007",
+      "01-008",
+      "01-009",
+      "01-010",
+      "01-011"
+    ],
+    "specs": [
+      {
+        "path": "/workspace/docs/plan/01-booking-core/spec.feature",
+        "sha256": "574366386208aada2436975c0397890bd6f9885b0483aea6bbf0beb579bdd21e"
+      }
+    ]
+  },
+  "agents": {
+    "builder": {
+      "model": "composer-2.5",
+      "instruction": {
+        "path": "/workspace/harness/cursor-cycle/builder-instruction.md",
+        "sha256": "6a18fe590d0fb0dc9f5e6cd1ab20a4436e46c02407cd8d84be69918d6bc4ea56"
+      },
+      "wrapper": {
+        "path": "/workspace/harness/cursor-cycle/builder-preamble.md",
+        "sha256": "82c5305008ace2a913f7f59747a94271799facb526b489d24ad180c3f4f0cfd4"
+      }
+    },
+    "grader": {
+      "model": "grok-4.7-high",
+      "instruction": {
+        "path": "/workspace/harness/cursor-cycle/grader-instruction.md",
+        "sha256": "cd07b7446a587634028ac8ec1e66d1edee51d992595211134661edf6643002cc"
+      },
+      "wrapper": {
+        "path": "/workspace/harness/cursor-cycle/grader-preamble.md",
+        "sha256": "816040137a78ef8494b05a385a291874a698508e277a891d8e7e2e406a90bea4"
+      }
+    },
+    "blind": {
+      "model": "composer-2.5",
+      "instruction": {
+        "path": "/workspace/harness/cursor-cycle/blind-instruction.md",
+        "sha256": "bdc3659d3a99b3f808faf9aca5acd4d2c79381be86d4aa62458605db5297e358"
+      },
+      "wrapper": {
+        "path": "/workspace/harness/cursor-cycle/blind-preamble.md",
+        "sha256": "2fbf6610b7c20f17d93cc8093f75177eabf90d8e852b3d6e90116afb07edf8d3"
+      }
+    }
+  },
+  "execution": {
+    "builderEngine": "cursor-cloud-agent",
+    "builderRuntime": "cursor-remote-session",
+    "graderEngine": "cursor-cloud-agent",
+    "graderRuntime": "cursor-remote-session",
+    "blindEngine": "cursor-cloud-agent",
+    "blindProbeRuntime": "cursor-remote-session",
+    "allureSchema": {
+      "path": "/workspace/harness/evidence-core/allure-lifecycle-result.schema.json",
+      "sha256": "0eef607c5d9eef4a190ea0deb7c7a61228267d8ec556b722b37dd83ef253fee1"
+    },
+    "panelPlan": {
+      "path": "/workspace/harness/cursor-cycle/booking-core.panel.json",
+      "sha256": "ef4fe81f02f2afbb4f567ea3e0b7761f49477e99438806367791e923d6a6c3e3"
+    }
+  }
+}

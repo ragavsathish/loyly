@@ -1,0 +1,380 @@
+{
+ "items": [
+  {
+   "id": "01-001",
+   "name": "The weekly schedule shows each dressing room's own sauna days",
+   "rule": "Availability is per dressing room, per weekday",
+   "source": "docs/plan/01-booking-core/spec.feature:13",
+   "verdict": "pass",
+   "evidence": "GET /api/houses/demo/views: schedule for ph8 is Tuesday at 17:00, 18:30, 20:00, all free; ph9 has Thursday, Friday, Saturday only, no Tuesday slots."
+  },
+  {
+   "id": "01-002",
+   "name": "A standing slot cannot be requested on a closed day",
+   "rule": "Availability is per dressing room, per weekday",
+   "source": "docs/plan/01-booking-core/spec.feature:21",
+   "verdict": "pass",
+   "evidence": "POST /api/houses/demo/bookings for apartment 12, ph9 Tuesday 17:00: HTTP 409 closed-day; exact reason: \"pukuhuone 9 has no sauna day on Tuesday. It opens on Thursday, Friday, Saturday. Request pukuhuone 8 on Tuesday at 17:00 (ph8) instead.\" openDays Thursday, Friday, Saturday; views still empty."
+  },
+  {
+   "id": "01-003",
+   "name": "A requested slot on an open day is confirmed",
+   "rule": "A slot is confirmed against availability and held by one household",
+   "source": "docs/plan/01-booking-core/spec.feature:30",
+   "verdict": "pass",
+   "evidence": "Booking confirmed 17:00–18:30 weekly and re-read as held by 12."
+  },
+  {
+   "id": "01-004",
+   "name": "A held slot cannot be confirmed for another household",
+   "rule": "A slot is confirmed against availability and held by one household",
+   "source": "docs/plan/01-booking-core/spec.feature:37",
+   "verdict": "pass",
+   "evidence": "Booking confirmed 17:00–18:30 weekly and re-read as held by 12. Apartment 3 refused as held; original holder unchanged."
+  },
+  {
+   "id": "01-005",
+   "name": "A second standing slot is granted while there is room",
+   "rule": "A household may hold a second standing slot when there is room",
+   "source": "docs/plan/01-booking-core/spec.feature:46",
+   "verdict": "pass",
+   "evidence": "POST /bookings for 12 at Tuesday 18:30 returned confirmed booking-4; GET /views re-read booking-2 and booking-4 held by 12."
+  },
+  {
+   "id": "01-006",
+   "name": "A second standing slot is refused when the schedule is full",
+   "rule": "A household may hold a second standing slot when there is room",
+   "source": "docs/plan/01-booking-core/spec.feature:54",
+   "verdict": "pass",
+   "evidence": "POST /bookings for 12 without coordinates returned 409 full: \"The weekly schedule has no free standing slot. No second standing slot can be confirmed.\" No alternative was suggested; GET /views retained exactly booking-2 for 12 and booking-4 for 3."
+  },
+  {
+   "id": "01-007",
+   "name": "Confirming a booking updates all three derived views together",
+   "rule": "One booking is the single source of truth for the list, the timer and the billing",
+   "source": "docs/plan/01-booking-core/spec.feature:64",
+   "verdict": "pass",
+   "evidence": "POST demo/bookings confirmed booking-2 for apartment 12 Tuesday 17:00–18:30 in ph8. GET views showed that same booking in the posted list, heater schedule and billing signal naming payer 12. Follow-up POST give-up and GET views showed all three cleared for the same booking."
+  },
+  {
+   "id": "01-008",
+   "name": "Giving up a slot leaves no derived view still claiming it",
+   "rule": "One booking is the single source of truth for the list, the timer and the billing",
+   "source": "docs/plan/01-booking-core/spec.feature:72",
+   "verdict": "pass",
+   "evidence": "POST demo/bookings confirmed booking-2 and GET views showed all three signals; POST booking-2/give-up succeeded. GET views showed the slot free and the posted list, heater schedule and billing signals empty."
+  },
+  {
+   "id": "01-009",
+   "name": "Two households request the same free slot with neither request answered",
+   "rule": "Two households requesting one free slot leave exactly one holder",
+   "source": "docs/plan/01-booking-core/spec.feature:108",
+   "verdict": "pass",
+   "evidence": "GET demo/views: ph8 Tuesday 17:00 free; two socket POSTs written before reading either response. Apartment 12 confirmed, 3 refused held; GET views shows one holding, posted entry, heater entry and standing billing signal, all booking-2 for 12."
+  },
+  {
+   "id": "01-010",
+   "name": "The race is run one hundred times and never confirms twice",
+   "rule": "Two households requesting one free slot leave exactly one holder",
+   "source": "docs/plan/01-booking-core/spec.feature:125",
+   "verdict": "pass",
+   "evidence": "100 races, each preceded by GET confirming ph8 Tuesday 17:00 free and followed by give-up of the confirmed booking: exactly one confirmed 100, both 0, neither 0. Both socket requests were written before either response was read."
+  },
+  {
+   "id": "01-011",
+   "name": "The refusal for a closed day is judged usable",
+   "rule": "A refusal is judged by whether a resident can act on it without asking again",
+   "source": "docs/plan/01-booking-core/spec.feature:156",
+   "verdict": "pass",
+   "evidence": "The fresh agent named a request from the refusal; HTTP confirmation follows. Answer: REQUEST: pukuhuone 8 | Tuesday | 17:00"
+  },
+  {
+   "id": "02-001",
+   "name": "A free release offers only the selected occurrence",
+   "rule": "Releasing one week preserves the standing holding",
+   "source": "docs/plan/02-occurrence-release/spec.feature:8",
+   "verdict": "pass",
+   "evidence": "POST booking-2/releases FREE 2026-06-02 offered occurrence-4; apartment 3 took it. Dated list and heat show 3, only 12 has standing fee; June 9 list and heat show 12."
+  },
+  {
+   "id": "02-002",
+   "name": "Releasing one week does not offer a different week",
+   "rule": "Releasing one week preserves the standing holding",
+   "source": "docs/plan/02-occurrence-release/spec.feature:15",
+   "verdict": "pass",
+   "evidence": "POST FREE release for June 2 returned offered; apartment 3 take returned taken. June 9 projection retains apartment 12 and normal standing charge."
+  },
+  {
+   "id": "02-003",
+   "name": "An untaken release does not cancel the holding or its normal fee",
+   "rule": "Releasing one week preserves the standing holding",
+   "source": "docs/plan/02-occurrence-release/spec.feature:22",
+   "verdict": "pass",
+   "evidence": "POST FREE release ends 2026-06-02T18:30Z; date -u -s 2026-06-02 18:31:00 succeeded, app now 18:31. Occurrence unclaimed, list household null, heat empty, standing held by 12 and fee due; next week list and heat show 12."
+  },
+  {
+   "id": "02-004",
+   "name": "Taking a free occurrence charges no fee to the taker",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:32",
+   "verdict": "pass",
+   "evidence": "POST FREE release and apartment 3 take: HTTP 200 taken; dated list and heater show apartment 3 on 2026-01-06; billing only standing-slot payer 12, no taker fee; 2026-01-13 shows 12, standing holding retained."
+  },
+  {
+   "id": "02-005",
+   "name": "Taking a sale occurrence raises a distinct resale signal",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:40",
+   "verdict": "pass",
+   "evidence": "POST SALE release and apartment 3 take: HTTP 200 taken; dated list and heater show 3; billing shows standing-slot payer 12 and resale payer 3, occurrence-4 on 2026-01-06, policy v1 and resale-fee reference; following Tuesday belongs to 12."
+  },
+  {
+   "id": "02-006",
+   "name": "Withdrawing an untaken offer before its occurrence begins",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:49",
+   "verdict": "pass",
+   "evidence": "POST FREE offer then holder withdraw: HTTP 200 withdrawn, dated list and heater restore 12; take by 3 refused HTTP 422 not-offered, standing fee and later Tuesday remain with 12."
+  },
+  {
+   "id": "02-007",
+   "name": "An accepted transfer cannot be withdrawn by the original holder",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:57",
+   "verdict": "pass",
+   "evidence": "POST FREE offer, apartment 3 take, then apartment 12 withdraw: HTTP 422 already-taken; dated list, heater and release remain with 3, standing fee and next Tuesday remain with 12."
+  },
+  {
+   "id": "02-008",
+   "name": "An untaken offer expires when its occurrence begins",
+   "rule": "Free and paid taking have different billing consequences",
+   "source": "docs/plan/02-occurrence-release/spec.feature:63",
+   "verdict": "pass",
+   "evidence": "Set baseline 2026-01-05 12:00 UTC before startup, offer beginsAt 2026-01-06T17:00:00Z; date -u -s 2026-01-06 17:00:01 succeeded; GET views now 17:00:01Z shows unclaimed, no household or heat, holder 12 and standing fee; take returned HTTP 422 not-offered; next Tuesday held by 12."
+  },
+  {
+   "id": "02-009",
+   "name": "A taken occurrence has one taker in every view",
+   "rule": "The three derived views describe one occurrence holder",
+   "source": "docs/plan/02-occurrence-release/spec.feature:72",
+   "verdict": "pass",
+   "evidence": "FREE release: 3 alone took; dated list, heat and standing-only billing checked; following Tuesday remains 12."
+  },
+  {
+   "id": "02-010",
+   "name": "Two households try to take the same released occurrence",
+   "rule": "The three derived views describe one occurrence holder",
+   "source": "docs/plan/02-occurrence-release/spec.feature:80",
+   "verdict": "pass",
+   "evidence": "FREE release: 3 alone took; dated list, heat and standing-only billing checked; following Tuesday remains 12."
+  },
+  {
+   "id": "03-001",
+   "name": "A free eligible slot does not put a multi-slot household under notice",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:7",
+   "verdict": "pass",
+   "evidence": "POST /scarcity/evaluate A with a third free slot and 3 waiting returned full=false, notices=[]; GET /views retained both 12 holdings without notices."
+  },
+  {
+   "id": "03-002",
+   "name": "An empty queue does not put a multi-slot household under notice",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:14",
+   "verdict": "pass",
+   "evidence": "POST /scarcity/evaluate A with both slots held by 12 and empty queue returned notices=[]; GET /views confirmed no notices."
+  },
+  {
+   "id": "03-003",
+   "name": "A released occurrence is not a free standing slot",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:21",
+   "verdict": "pass",
+   "evidence": "POST FREE release for booking-2 on 2026-11-24 returned offered with no taker. POST /scarcity/evaluate A returned full=true, waiting=true and one active notice offered to queue-head 4. GET dated views showed held standing slot, unclaimed occurrence with no heat, standing fee paid by 12 and next week list and heat restored for 12."
+  },
+  {
+   "id": "03-004",
+   "name": "Waiting in another resource group does not trigger notice here",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:29",
+   "verdict": "pass",
+   "evidence": "POST /queue for 4 in B then /scarcity/evaluate A returned no notices; GET /views showed both A slots held by 12, B-only queue, and no notice."
+  },
+  {
+   "id": "03-005",
+   "name": "The queue is ordered by accepted request within its eligible group",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:36",
+   "verdict": "pass",
+   "evidence": "POST /queue A accepted 4 as sequence 6 then 5 as sequence 8; GET /views showed only A entries, and POST /scarcity/evaluate A offered the notice to 4 (queue-6)."
+  },
+  {
+   "id": "03-014",
+   "name": "One multi-holding household receives only one active notice",
+   "rule": "Scarcity requires both full capacity and a waiting household",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:43",
+   "verdict": "pass",
+   "evidence": "POST /scarcity/evaluate A twice after three holdings for 12 and queue 4 returned the same active notice-10, selectedBookingId null; GET /views showed one active notice and all three holdings."
+  },
+  {
+   "id": "03-006",
+   "name": "The holder chooses before the choose deadline",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:53",
+   "verdict": "pass",
+   "evidence": "POST notice choose selected booking-2; GET views before deadlines showed booking-2 and booking-4 still held by 12, with only booking-2 selected for lapse on the recorded notice deadline."
+  },
+  {
+   "id": "03-007",
+   "name": "The choice right passes after the shorter clock",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:61",
+   "verdict": "pass",
+   "evidence": "After date -u -s advanced past recorded choose deadline, GET views reported now past it, chooseRight queue-head offered to 3, and both holdings still held by 12."
+  },
+  {
+   "id": "03-008",
+   "name": "Passing the choose deadline does not pass the loss deadline",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:68",
+   "verdict": "pass",
+   "evidence": "After advancing past recorded choose deadline GET views reported unchanged later noticeDeadline and both holdings still held by 12."
+  },
+  {
+   "id": "03-009",
+   "name": "Lapse changes only the selected standing holding",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:75",
+   "verdict": "pass",
+   "evidence": "After selecting booking-2 and advancing beyond notice deadline, GET views showed booking-2 lapsed, booking-4 held by 12, and posted list and standing billing contained only booking-4."
+  },
+  {
+   "id": "03-010",
+   "name": "A confirmed queue claim takes effect only at lapse",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:83",
+   "verdict": "pass",
+   "evidence": "POST claim confirm returned pending successor 3; GET views before notice deadline identified successor 3 while both bookings and the posted list remained held by 12."
+  },
+  {
+   "id": "03-011",
+   "name": "A queue-head decline offers the holding to the next eligible entry",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:90",
+   "verdict": "pass",
+   "evidence": "POST claim decline by 3 returned offeredTo 4; GET views showed 4 offered the selected claim and booking-2 still held and posted for 12 before lapse."
+  },
+  {
+   "id": "03-012",
+   "name": "If all claimants decline, the selected holding returns to the pool at lapse",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:97",
+   "verdict": "pass",
+   "evidence": "POST claims declined by 3 and 4, then advanced clock past noticeDeadline. GET views showed booking-2 lapsed and its slot free, while booking-4 remained held by 12."
+  },
+  {
+   "id": "03-013",
+   "name": "A pending notice retains its original deadlines after the queue empties",
+   "rule": "Choosing and losing a holding are different events",
+   "source": "docs/plan/03-scarcity-forfeit/spec.feature:104",
+   "verdict": "pass",
+   "evidence": "POST queue withdrawal, GET views showed active notice retaining chooseDeadline, noticeDeadline and policy v1. After advancing past the noticeDeadline, GET views showed selected booking-2 lapsed and its slot free."
+  },
+  {
+   "id": "04-001",
+   "name": "Different houses can open different resources and days",
+   "rule": "A house owns its calendars and eligible booker roles",
+   "source": "docs/plan/04-house-policy/spec.feature:7",
+   "verdict": "pass",
+   "evidence": "GET /api/houses/demo/views shows three free Tuesday ph8 windows; GET /api/houses/masthugget/views shows Saturday, Sunday and Friday windows, none Tuesday."
+  },
+  {
+   "id": "04-002",
+   "name": "Booker standing is checked within the household's house",
+   "rule": "A house owns its calendars and eligible booker roles",
+   "source": "docs/plan/04-house-policy/spec.feature:15",
+   "verdict": "pass",
+   "evidence": "GET house policies shows demo resident and soukanvuori shareholder roles. POST Tuesday ph8 17:00 confirms resident in demo and shareholder with manager actor in soukanvuori. Cross-role requests at 18:30 are refused booker-role in both houses; GET views retains each confirmed holding."
+  },
+  {
+   "id": "04-003",
+   "name": "A manager-mediated house does not expose a resident self-service queue",
+   "rule": "A house owns its calendars and eligible booker roles",
+   "source": "docs/plan/04-house-policy/spec.feature:23",
+   "verdict": "pass",
+   "evidence": "GET soukanvuori/views shows manager-mediated, operator manager, queueAvailable false; demo/views shows self-service, queueAvailable true. Resident queue POST in soukanvuori refused operator-required and directs to manager; demo queue POST returns queued."
+  },
+  {
+   "id": "04-004",
+   "name": "A rule change records its authority and effective date",
+   "rule": "Policy revisions and disputes preserve their evidence",
+   "source": "docs/plan/04-house-policy/spec.feature:33",
+   "verdict": "pass",
+   "evidence": "Recorded board authority and future v2; before effective booking v1, after clock boundary v2."
+  },
+  {
+   "id": "04-005",
+   "name": "A dispute can reconstruct one booking's decision",
+   "rule": "Policy revisions and disputes preserve their evidence",
+   "source": "docs/plan/04-house-policy/spec.feature:40",
+   "verdict": "pass",
+   "evidence": "Manager dispute evidence includes booking, confirmation and give-up history with policy versions."
+  },
+  {
+   "id": "04-006",
+   "name": "A policy revision does not rewrite an earlier refusal",
+   "rule": "Policy revisions and disputes preserve their evidence",
+   "source": "docs/plan/04-house-policy/spec.feature:47",
+   "verdict": "pass",
+   "evidence": "Closed-day refusal retained its original reason and policy version after board revision."
+  },
+  {
+   "id": "04-007",
+   "name": "A notice keeps the policy version that created its deadlines",
+   "rule": "Policy revisions and disputes preserve their evidence",
+   "source": "docs/plan/04-house-policy/spec.feature:53",
+   "verdict": "pass",
+   "evidence": "Existing notice retained 14/30-day instants; later notice under effective v2 used revised clocks."
+  },
+  {
+   "id": "05-001",
+   "name": "A household with one family-time booking cannot take another",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:7",
+   "verdict": "pass",
+   "evidence": "POST June 6 10:00 confirmed booking-2; POST 11:30 returned 409 class-cap with family-time cap 1 and existing booking-2 identified."
+  },
+  {
+   "id": "05-002",
+   "name": "An unrelated class does not consume the family-time allowance",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:15",
+   "verdict": "pass",
+   "evidence": "POST ordinary June 5 17:00 confirmed booking-2; POST family June 6 10:00 confirmed booking-4; reread lists both."
+  },
+  {
+   "id": "05-003",
+   "name": "Family-time allowance does not block a different class",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:22",
+   "verdict": "pass",
+   "evidence": "POST family June 6 10:00 confirmed booking-2; POST ordinary June 5 17:00 confirmed booking-4; reread lists both."
+  },
+  {
+   "id": "05-004",
+   "name": "A house without the family-time cap does not inherit it",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:29",
+   "verdict": "pass",
+   "evidence": "GET masthugget policy cap 1; POST house-b with no class cap; POST family 10:00 and 11:30 both confirmed for same eligible tenant, persisted in house-b view."
+  },
+  {
+   "id": "05-005",
+   "name": "A completed family-time occurrence no longer uses the allowance",
+   "rule": "A cap counts only bookings in its configured class",
+   "source": "docs/plan/05-time-classes/spec.feature:36",
+   "verdict": "pass",
+   "evidence": "POST family booking ends 2026-06-06T11:30Z; date -u -s 2026-06-06 11:31:00 succeeded and app now 11:31; POST 13:00 family confirmed booking-4."
+  }
+ ]
+}

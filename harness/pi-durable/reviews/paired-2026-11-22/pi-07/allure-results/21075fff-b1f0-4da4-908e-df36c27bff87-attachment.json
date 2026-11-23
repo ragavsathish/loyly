@@ -1,0 +1,1111 @@
+{
+  "started": 1795305108213,
+  "stop": 1795305108400,
+  "serverOutput": "LISTENING 18100\n",
+  "log": [
+    {
+      "method": "GET",
+      "path": "/api/houses",
+      "http": 200,
+      "response": {
+        "houses": [
+          {
+            "id": "demo",
+            "name": "Self-service demonstration",
+            "policy": {
+              "version": "v1",
+              "authority": "House board — initial configuration",
+              "effectiveAt": "2020-01-01T00:00:00.000Z",
+              "bookerRoles": [
+                "resident"
+              ],
+              "bookingMode": "self-service",
+              "bookingOperator": "manager",
+              "operationsRole": "caretaker",
+              "billingRole": "billing",
+              "disputeRole": "manager",
+              "scarcityEnabled": true,
+              "chooseDays": 14,
+              "noticeDays": 30,
+              "standingPriceReference": "standing-fee",
+              "salePriceReference": "resale-fee",
+              "classCaps": {},
+              "groups": {
+                "A": [
+                  "ph8"
+                ],
+                "B": [
+                  "ph9"
+                ]
+              },
+              "resources": [
+                {
+                  "id": "ph8",
+                  "name": "pukuhuone 8",
+                  "sauna": "sauna F",
+                  "days": [
+                    "Tuesday"
+                  ],
+                  "starts": [
+                    "17:00",
+                    "18:30",
+                    "20:00"
+                  ],
+                  "duration": 90
+                },
+                {
+                  "id": "ph9",
+                  "name": "pukuhuone 9",
+                  "sauna": "sauna F",
+                  "days": [
+                    "Thursday",
+                    "Friday",
+                    "Saturday"
+                  ],
+                  "starts": [
+                    "17:00",
+                    "18:30",
+                    "20:00"
+                  ],
+                  "duration": 90
+                }
+              ]
+            }
+          },
+          {
+            "id": "soukanvuori",
+            "name": "As Oy Soukanvuori — manager-mediated",
+            "policy": {
+              "version": "v1",
+              "authority": "House board — initial configuration",
+              "effectiveAt": "2020-01-01T00:00:00.000Z",
+              "bookerRoles": [
+                "shareholder"
+              ],
+              "bookingMode": "manager-mediated",
+              "bookingOperator": "manager",
+              "operationsRole": "maintenance",
+              "billingRole": "vastikekirjanpitaja",
+              "disputeRole": "manager",
+              "scarcityEnabled": false,
+              "chooseDays": 14,
+              "noticeDays": 30,
+              "standingPriceReference": "standing-fee",
+              "salePriceReference": "resale-fee",
+              "classCaps": {},
+              "groups": {
+                "F": [
+                  "ph8",
+                  "ph9"
+                ]
+              },
+              "resources": [
+                {
+                  "id": "ph8",
+                  "name": "pukuhuone 8",
+                  "sauna": "sauna F",
+                  "days": [
+                    "Tuesday"
+                  ],
+                  "starts": [
+                    "17:00",
+                    "18:30",
+                    "20:00"
+                  ],
+                  "duration": 90
+                },
+                {
+                  "id": "ph9",
+                  "name": "pukuhuone 9",
+                  "sauna": "sauna F",
+                  "days": [
+                    "Thursday",
+                    "Friday",
+                    "Saturday"
+                  ],
+                  "starts": [
+                    "17:00",
+                    "18:30",
+                    "20:00"
+                  ],
+                  "duration": 90
+                }
+              ]
+            }
+          },
+          {
+            "id": "masthugget",
+            "name": "Masthugget — family-time example",
+            "policy": {
+              "version": "v1",
+              "authority": "House board — initial configuration",
+              "effectiveAt": "2020-01-01T00:00:00.000Z",
+              "bookerRoles": [
+                "tenant"
+              ],
+              "bookingMode": "self-service",
+              "bookingOperator": "manager",
+              "operationsRole": "caretaker",
+              "billingRole": "billing",
+              "disputeRole": "manager",
+              "scarcityEnabled": false,
+              "chooseDays": 14,
+              "noticeDays": 30,
+              "standingPriceReference": "standing-fee",
+              "salePriceReference": "resale-fee",
+              "classCaps": {
+                "family-time": 1
+              },
+              "groups": {},
+              "resources": [
+                {
+                  "id": "family-sauna",
+                  "name": "Family sauna",
+                  "sauna": "Sauna",
+                  "days": [
+                    "Saturday",
+                    "Sunday"
+                  ],
+                  "starts": [
+                    "10:00",
+                    "11:30",
+                    "13:00"
+                  ],
+                  "duration": 90,
+                  "windows": [
+                    {
+                      "weekday": "Saturday",
+                      "start": "10:00",
+                      "class": "family-time"
+                    },
+                    {
+                      "weekday": "Saturday",
+                      "start": "11:30",
+                      "class": "family-time"
+                    },
+                    {
+                      "weekday": "Saturday",
+                      "start": "13:00",
+                      "class": "family-time"
+                    },
+                    {
+                      "weekday": "Sunday",
+                      "start": "10:00",
+                      "class": "family-time"
+                    },
+                    {
+                      "weekday": "Sunday",
+                      "start": "11:30",
+                      "class": "family-time"
+                    },
+                    {
+                      "weekday": "Sunday",
+                      "start": "13:00",
+                      "class": "family-time"
+                    },
+                    {
+                      "weekday": "Friday",
+                      "start": "17:00",
+                      "class": "ordinary"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/houses/demo/views",
+      "http": 200,
+      "response": {
+        "house": {
+          "id": "demo",
+          "name": "Self-service demonstration"
+        },
+        "now": "2026-11-21T23:51:48.381Z",
+        "bookingRoute": {
+          "mode": "self-service",
+          "operator": "manager",
+          "queueAvailable": true
+        },
+        "policy": {
+          "version": "v1",
+          "authority": "House board — initial configuration",
+          "effectiveAt": "2020-01-01T00:00:00.000Z",
+          "bookerRoles": [
+            "resident"
+          ],
+          "bookingMode": "self-service",
+          "bookingOperator": "manager",
+          "operationsRole": "caretaker",
+          "billingRole": "billing",
+          "disputeRole": "manager",
+          "scarcityEnabled": true,
+          "chooseDays": 14,
+          "noticeDays": 30,
+          "standingPriceReference": "standing-fee",
+          "salePriceReference": "resale-fee",
+          "classCaps": {},
+          "groups": {
+            "A": [
+              "ph8"
+            ],
+            "B": [
+              "ph9"
+            ]
+          },
+          "resources": [
+            {
+              "id": "ph8",
+              "name": "pukuhuone 8",
+              "sauna": "sauna F",
+              "days": [
+                "Tuesday"
+              ],
+              "starts": [
+                "17:00",
+                "18:30",
+                "20:00"
+              ],
+              "duration": 90
+            },
+            {
+              "id": "ph9",
+              "name": "pukuhuone 9",
+              "sauna": "sauna F",
+              "days": [
+                "Thursday",
+                "Friday",
+                "Saturday"
+              ],
+              "starts": [
+                "17:00",
+                "18:30",
+                "20:00"
+              ],
+              "duration": 90
+            }
+          ]
+        },
+        "policies": [
+          {
+            "version": "v1",
+            "authority": "House board — initial configuration",
+            "effectiveAt": "2020-01-01T00:00:00.000Z",
+            "bookerRoles": [
+              "resident"
+            ],
+            "bookingMode": "self-service",
+            "bookingOperator": "manager",
+            "operationsRole": "caretaker",
+            "billingRole": "billing",
+            "disputeRole": "manager",
+            "scarcityEnabled": true,
+            "chooseDays": 14,
+            "noticeDays": 30,
+            "standingPriceReference": "standing-fee",
+            "salePriceReference": "resale-fee",
+            "classCaps": {},
+            "groups": {
+              "A": [
+                "ph8"
+              ],
+              "B": [
+                "ph9"
+              ]
+            },
+            "resources": [
+              {
+                "id": "ph8",
+                "name": "pukuhuone 8",
+                "sauna": "sauna F",
+                "days": [
+                  "Tuesday"
+                ],
+                "starts": [
+                  "17:00",
+                  "18:30",
+                  "20:00"
+                ],
+                "duration": 90
+              },
+              {
+                "id": "ph9",
+                "name": "pukuhuone 9",
+                "sauna": "sauna F",
+                "days": [
+                  "Thursday",
+                  "Friday",
+                  "Saturday"
+                ],
+                "starts": [
+                  "17:00",
+                  "18:30",
+                  "20:00"
+                ],
+                "duration": 90
+              }
+            ]
+          }
+        ],
+        "schedule": [
+          {
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "18:30",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "20:00",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "20:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "21:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Thursday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Thursday",
+            "start": "18:30",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "20:00",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Thursday",
+            "start": "20:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "21:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Friday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Friday",
+            "start": "18:30",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "20:00",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Friday",
+            "start": "20:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "21:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Saturday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Saturday",
+            "start": "18:30",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "20:00",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Saturday",
+            "start": "20:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "21:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          }
+        ],
+        "holdings": [],
+        "bookings": [],
+        "postedList": [],
+        "heaterSchedule": [],
+        "billingSignals": [],
+        "occurrences": [],
+        "queue": [],
+        "notices": [],
+        "disputes": [],
+        "history": [
+          {
+            "id": "event-1",
+            "at": "2026-11-21T23:51:48.294Z",
+            "kind": "house-configured",
+            "policyVersion": "v1",
+            "authority": "House board — initial configuration"
+          }
+        ]
+      }
+    },
+    {
+      "run": 1,
+      "targetBefore": [
+        {
+          "resource": "ph8",
+          "resourceName": "pukuhuone 8",
+          "sauna": "sauna F",
+          "weekday": "Tuesday",
+          "start": "17:00",
+          "duration": 90,
+          "class": "ordinary",
+          "end": "18:30",
+          "status": "free",
+          "household": null,
+          "bookingId": null
+        }
+      ]
+    },
+    {
+      "race": [
+        {
+          "household": "12",
+          "sent": "145953904943",
+          "body": {
+            "household": "12",
+            "bookerRole": "resident",
+            "actorRole": "resident",
+            "resource": "ph8",
+            "weekday": "Tuesday",
+            "start": "17:00"
+          },
+          "raw": "HTTP/1.1 200 OK\r\ncontent-type: application/json; charset=utf-8\r\ncache-control: no-store\r\nx-content-type-options: nosniff\r\nDate: Sat, 21 Nov 2026 23:51:48 GMT\r\nConnection: close\r\nTransfer-Encoding: chunked\r\n\r\n19b\r\n{\"status\":\"confirmed\",\"booking\":{\"id\":\"booking-2\",\"type\":\"standing\",\"state\":\"held\",\"household\":\"12\",\"resource\":\"ph8\",\"resourceName\":\"pukuhuone 8\",\"sauna\":\"sauna F\",\"weekday\":\"Tuesday\",\"start\":\"17:00\",\"duration\":90,\"class\":\"ordinary\",\"end\":\"18:30\",\"recurrence\":\"weekly\",\"confirmedAt\":\"2026-11-21T23:51:48.385Z\",\"policyVersion\":\"v1\",\"priceReference\":\"standing-fee\",\"bookerRole\":\"resident\",\"actorRole\":\"resident\"}}\r\n0\r\n\r\n",
+          "http": 200,
+          "response": {
+            "status": "confirmed",
+            "booking": {
+              "id": "booking-2",
+              "type": "standing",
+              "state": "held",
+              "household": "12",
+              "resource": "ph8",
+              "resourceName": "pukuhuone 8",
+              "sauna": "sauna F",
+              "weekday": "Tuesday",
+              "start": "17:00",
+              "duration": 90,
+              "class": "ordinary",
+              "end": "18:30",
+              "recurrence": "weekly",
+              "confirmedAt": "2026-11-21T23:51:48.385Z",
+              "policyVersion": "v1",
+              "priceReference": "standing-fee",
+              "bookerRole": "resident",
+              "actorRole": "resident"
+            }
+          }
+        },
+        {
+          "household": "3",
+          "sent": "145953932277",
+          "body": {
+            "household": "3",
+            "bookerRole": "resident",
+            "actorRole": "resident",
+            "resource": "ph8",
+            "weekday": "Tuesday",
+            "start": "17:00"
+          },
+          "raw": "HTTP/1.1 409 Conflict\r\ncontent-type: application/json; charset=utf-8\r\ncache-control: no-store\r\nx-content-type-options: nosniff\r\nDate: Sat, 21 Nov 2026 23:51:48 GMT\r\nConnection: close\r\nTransfer-Encoding: chunked\r\n\r\n64\r\n{\"status\":\"refused\",\"code\":\"held\",\"reason\":\"This slot is held by a household.\",\"policyVersion\":\"v1\"}\r\n0\r\n\r\n",
+          "http": 409,
+          "response": {
+            "status": "refused",
+            "code": "held",
+            "reason": "This slot is held by a household.",
+            "policyVersion": "v1"
+          }
+        }
+      ],
+      "method": "two socket writes before reading either response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/houses/demo/views",
+      "http": 200,
+      "response": {
+        "house": {
+          "id": "demo",
+          "name": "Self-service demonstration"
+        },
+        "now": "2026-11-21T23:51:48.396Z",
+        "bookingRoute": {
+          "mode": "self-service",
+          "operator": "manager",
+          "queueAvailable": true
+        },
+        "policy": {
+          "version": "v1",
+          "authority": "House board — initial configuration",
+          "effectiveAt": "2020-01-01T00:00:00.000Z",
+          "bookerRoles": [
+            "resident"
+          ],
+          "bookingMode": "self-service",
+          "bookingOperator": "manager",
+          "operationsRole": "caretaker",
+          "billingRole": "billing",
+          "disputeRole": "manager",
+          "scarcityEnabled": true,
+          "chooseDays": 14,
+          "noticeDays": 30,
+          "standingPriceReference": "standing-fee",
+          "salePriceReference": "resale-fee",
+          "classCaps": {},
+          "groups": {
+            "A": [
+              "ph8"
+            ],
+            "B": [
+              "ph9"
+            ]
+          },
+          "resources": [
+            {
+              "id": "ph8",
+              "name": "pukuhuone 8",
+              "sauna": "sauna F",
+              "days": [
+                "Tuesday"
+              ],
+              "starts": [
+                "17:00",
+                "18:30",
+                "20:00"
+              ],
+              "duration": 90
+            },
+            {
+              "id": "ph9",
+              "name": "pukuhuone 9",
+              "sauna": "sauna F",
+              "days": [
+                "Thursday",
+                "Friday",
+                "Saturday"
+              ],
+              "starts": [
+                "17:00",
+                "18:30",
+                "20:00"
+              ],
+              "duration": 90
+            }
+          ]
+        },
+        "policies": [
+          {
+            "version": "v1",
+            "authority": "House board — initial configuration",
+            "effectiveAt": "2020-01-01T00:00:00.000Z",
+            "bookerRoles": [
+              "resident"
+            ],
+            "bookingMode": "self-service",
+            "bookingOperator": "manager",
+            "operationsRole": "caretaker",
+            "billingRole": "billing",
+            "disputeRole": "manager",
+            "scarcityEnabled": true,
+            "chooseDays": 14,
+            "noticeDays": 30,
+            "standingPriceReference": "standing-fee",
+            "salePriceReference": "resale-fee",
+            "classCaps": {},
+            "groups": {
+              "A": [
+                "ph8"
+              ],
+              "B": [
+                "ph9"
+              ]
+            },
+            "resources": [
+              {
+                "id": "ph8",
+                "name": "pukuhuone 8",
+                "sauna": "sauna F",
+                "days": [
+                  "Tuesday"
+                ],
+                "starts": [
+                  "17:00",
+                  "18:30",
+                  "20:00"
+                ],
+                "duration": 90
+              },
+              {
+                "id": "ph9",
+                "name": "pukuhuone 9",
+                "sauna": "sauna F",
+                "days": [
+                  "Thursday",
+                  "Friday",
+                  "Saturday"
+                ],
+                "starts": [
+                  "17:00",
+                  "18:30",
+                  "20:00"
+                ],
+                "duration": 90
+              }
+            ]
+          }
+        ],
+        "schedule": [
+          {
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "status": "held",
+            "household": "12",
+            "bookingId": "booking-2"
+          },
+          {
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "18:30",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "20:00",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "20:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "21:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Thursday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Thursday",
+            "start": "18:30",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "20:00",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Thursday",
+            "start": "20:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "21:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Friday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Friday",
+            "start": "18:30",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "20:00",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Friday",
+            "start": "20:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "21:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Saturday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Saturday",
+            "start": "18:30",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "20:00",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          },
+          {
+            "resource": "ph9",
+            "resourceName": "pukuhuone 9",
+            "sauna": "sauna F",
+            "weekday": "Saturday",
+            "start": "20:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "21:30",
+            "status": "free",
+            "household": null,
+            "bookingId": null
+          }
+        ],
+        "holdings": [
+          {
+            "id": "booking-2",
+            "type": "standing",
+            "state": "held",
+            "household": "12",
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "recurrence": "weekly",
+            "confirmedAt": "2026-11-21T23:51:48.385Z",
+            "policyVersion": "v1",
+            "priceReference": "standing-fee",
+            "bookerRole": "resident",
+            "actorRole": "resident"
+          }
+        ],
+        "bookings": [
+          {
+            "id": "booking-2",
+            "type": "standing",
+            "state": "held",
+            "household": "12",
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "recurrence": "weekly",
+            "confirmedAt": "2026-11-21T23:51:48.385Z",
+            "policyVersion": "v1",
+            "priceReference": "standing-fee",
+            "bookerRole": "resident",
+            "actorRole": "resident"
+          }
+        ],
+        "postedList": [
+          {
+            "id": "booking-2",
+            "type": "standing",
+            "state": "held",
+            "household": "12",
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "recurrence": "weekly",
+            "confirmedAt": "2026-11-21T23:51:48.385Z",
+            "policyVersion": "v1",
+            "priceReference": "standing-fee",
+            "bookerRole": "resident",
+            "actorRole": "resident",
+            "bookingId": "booking-2",
+            "occurrenceId": null,
+            "status": "held",
+            "standingHolder": "12"
+          }
+        ],
+        "heaterSchedule": [
+          {
+            "bookingId": "booking-2",
+            "occurrenceId": null,
+            "resource": "ph8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "17:00",
+            "end": "18:30",
+            "household": "12"
+          }
+        ],
+        "billingSignals": [
+          {
+            "bookingId": "booking-2",
+            "payer": "12",
+            "chargeKind": "standing-slot",
+            "policyVersion": "v1",
+            "priceReference": "standing-fee",
+            "billingRole": "billing"
+          }
+        ],
+        "occurrences": [],
+        "queue": [],
+        "notices": [],
+        "disputes": [],
+        "history": [
+          {
+            "id": "event-1",
+            "at": "2026-11-21T23:51:48.294Z",
+            "kind": "house-configured",
+            "policyVersion": "v1",
+            "authority": "House board — initial configuration"
+          },
+          {
+            "id": "event-3",
+            "at": "2026-11-21T23:51:48.385Z",
+            "kind": "confirmed",
+            "policyVersion": "v1",
+            "bookingId": "booking-2",
+            "household": "12"
+          },
+          {
+            "id": "event-4",
+            "at": "2026-11-21T23:51:48.390Z",
+            "kind": "refused",
+            "policyVersion": "v1",
+            "code": "held",
+            "reason": "This slot is held by a household."
+          }
+        ]
+      }
+    },
+    {
+      "derived": {
+        "holdings": [
+          {
+            "id": "booking-2",
+            "type": "standing",
+            "state": "held",
+            "household": "12",
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "recurrence": "weekly",
+            "confirmedAt": "2026-11-21T23:51:48.385Z",
+            "policyVersion": "v1",
+            "priceReference": "standing-fee",
+            "bookerRole": "resident",
+            "actorRole": "resident"
+          }
+        ],
+        "postedList": [
+          {
+            "id": "booking-2",
+            "type": "standing",
+            "state": "held",
+            "household": "12",
+            "resource": "ph8",
+            "resourceName": "pukuhuone 8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "17:00",
+            "duration": 90,
+            "class": "ordinary",
+            "end": "18:30",
+            "recurrence": "weekly",
+            "confirmedAt": "2026-11-21T23:51:48.385Z",
+            "policyVersion": "v1",
+            "priceReference": "standing-fee",
+            "bookerRole": "resident",
+            "actorRole": "resident",
+            "bookingId": "booking-2",
+            "occurrenceId": null,
+            "status": "held",
+            "standingHolder": "12"
+          }
+        ],
+        "heaterSchedule": [
+          {
+            "bookingId": "booking-2",
+            "occurrenceId": null,
+            "resource": "ph8",
+            "sauna": "sauna F",
+            "weekday": "Tuesday",
+            "start": "17:00",
+            "end": "18:30",
+            "household": "12"
+          }
+        ],
+        "billingSignals": [
+          {
+            "bookingId": "booking-2",
+            "payer": "12",
+            "chargeKind": "standing-slot",
+            "policyVersion": "v1",
+            "priceReference": "standing-fee",
+            "billingRole": "billing"
+          }
+        ]
+      }
+    },
+    {
+      "counts": {
+        "one": 1,
+        "both": 0,
+        "neither": 0,
+        "freeAtStart": 1
+      }
+    }
+  ]
+}

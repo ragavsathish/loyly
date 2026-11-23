@@ -1,0 +1,7 @@
+{
+  "version": "0.1.0-alpha.1",
+  "dist.unpackedSize": 80013360,
+  "dist.tarball": "https://registry.npmjs.org/tripilot-model-qwen-part-1/-/tripilot-model-qwen-part-1-0.1.0-alpha.1.tgz",
+  "description": "Verified byte fragment of the optional TriPilot Qwen model; npm payload, no external downloads.",
+  "readme": "# tripilot-model-qwen-part-1\n\nByte fragment 1/5 of Qwen3-0.6B Q4_K_M. Installed automatically by tripilot-model-qwen. Not executable independently; TriPilot validates all parts and reconstructs the original pinned GGUF locally. No lifecycle scripts or external artifact downloads. See LICENSE, NOTICE and provenance.json.\n"
+}

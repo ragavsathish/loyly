@@ -48,26 +48,26 @@ export async function selectPanelAttempt({ root, launch, verify, maxAttempts = 2
   throw new Error(`panel VM attempts exhausted: ${failures.join('; ')}`);
 }
 
-export async function runDurablePanel({ scratch, image, approvedPlanSha256,
+export async function runDurablePanel({ scratch, image, planFile, approvedPlanSha256,
   approvedImageSha256 }) {
   scratch = resolve(scratch); image = resolve(image);
   const here = new URL('.', import.meta.url);
-  const planFile = new URL('booking-core.panel.json', here);
+  planFile ??= new URL('booking-core.panel.json', here);
   if (!/^[0-9a-f]{64}$/.test(approvedPlanSha256 ?? '')
       || !/^[0-9a-f]{64}$/.test(approvedImageSha256 ?? '')
       || sha(readFileSync(planFile)) !== approvedPlanSha256
       || fileSha(join(image, 'manifest.json')) !== approvedImageSha256)
     throw new Error('panel plan or Gondolin image differs from approved digest');
   return selectPanelAttempt({ root: join(scratch, 'panel-vm'),
-    launch: (out) => runPanelVms({ original: scratch, image, out }),
+    launch: (out) => runPanelVms({ original: scratch, image, out, planFile }),
     verify: (out) => verifyPanelVmRun({ original: scratch, out,
-      imageDigest: `sha256:${approvedImageSha256}` }) });
+      imageDigest: `sha256:${approvedImageSha256}`, planFile }) });
 }
 
-export async function runDurablePanelReport({ scratch, specialists }) {
+export async function runDurablePanelReport({ scratch, specialists, planFile }) {
   scratch = resolve(scratch); specialists = resolve(specialists);
   return selectPanelAttempt({ root: join(scratch, 'panel-report'),
     manifestName: 'panel-manifest.json',
-    launch: (out) => compilePanel({ original: scratch, specialists, out }),
-    verify: (out) => verifyCompiledPanel({ original: scratch, out }) });
+    launch: (out) => compilePanel({ original: scratch, specialists, out, planFile }),
+    verify: (out) => verifyCompiledPanel({ original: scratch, out, planFile }) });
 }

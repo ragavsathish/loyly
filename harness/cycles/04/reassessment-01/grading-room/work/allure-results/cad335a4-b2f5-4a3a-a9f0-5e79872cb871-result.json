@@ -1,0 +1,67 @@
+{
+  "uuid": "cad335a4-b2f5-4a3a-a9f0-5e79872cb871",
+  "name": "A rule change records its authority and effective date",
+  "fullName": "loyly.house-policy.04-004",
+  "testCaseId": "loyly.house-policy.04-004",
+  "historyId": "loyly.house-policy.04-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "The authorized v2 revision had a future effectiveAt; decisions before and after named v1 and v2 respectively."
+  },
+  "start": 1795274254746,
+  "stop": 1795274305722,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: establish scenario from fresh state",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: perform action and cross applicable boundary",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: inspect public HTTP observations",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "The authorized v2 revision had a future effectiveAt; decisions before and after named v1 and v2 respectively."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command, package installation, clock and HTTP receipt",
+      "source": "90edac2d-5103-40a6-99b7-f2a02e857ed6-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

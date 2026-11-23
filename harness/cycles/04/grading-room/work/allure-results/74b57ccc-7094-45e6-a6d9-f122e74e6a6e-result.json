@@ -1,0 +1,73 @@
+{
+  "uuid": "74b57ccc-7094-45e6-a6d9-f122e74e6a6e",
+  "name": "A policy revision does not rewrite an earlier refusal",
+  "fullName": "loyly.house-policy.04-006",
+  "testCaseId": "loyly.house-policy.04-006",
+  "historyId": "loyly.house-policy.04-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET masthugget/policies \u2192 200; POST soukanvuori/standing \u2192 409; POST soukanvuori/policies \u2192 201; GET soukanvuori/policies \u2192 200; GET soukanvuori/history?decisionId=845f0ec1-acf0-4e7e-ab9b-a4feab7d8747 \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256706598,
+  "stop": 1795256710188,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a house refused a request under an identified policy version",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: an authorized party records a later policy revision",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the refusal still names the version and reason used at its decision time",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "7f716cc6-1a64-46f2-bae3-d78d06b7745f-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

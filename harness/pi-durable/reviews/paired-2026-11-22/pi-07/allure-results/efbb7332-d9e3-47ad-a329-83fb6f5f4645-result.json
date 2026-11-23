@@ -1,0 +1,64 @@
+{
+  "uuid": "efbb7332-d9e3-47ad-a329-83fb6f5f4645",
+  "name": "Two households request the same free slot with neither request answered",
+  "fullName": "loyly.booking-core.01-009",
+  "testCaseId": "loyly.booking-core.01-009",
+  "historyId": "loyly.booking-core.01-009",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET demo/views: ph8 Tuesday 17:00 free; two socket POSTs written before reading either response. Apartment 12 confirmed, 3 refused held; GET views shows one holding, posted entry, heater entry and standing billing signal, all booking-2 for 12."
+  },
+  "start": 1795305108213,
+  "stop": 1795305108400,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Two households requesting one free slot leave exactly one holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Tuesday 17:00 ph8 free, neither household holds it",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When both household POST requests are written before reading either response",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then one confirmation, one held refusal, one holding and no doubled derived view",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and measurements",
+      "source": "21075fff-b1f0-4da4-908e-df36c27bff87-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

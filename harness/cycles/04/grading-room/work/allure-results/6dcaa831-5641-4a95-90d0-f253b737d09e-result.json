@@ -1,0 +1,89 @@
+{
+  "uuid": "6dcaa831-5641-4a95-90d0-f253b737d09e",
+  "name": "Different houses can open different resources and days",
+  "fullName": "loyly.house-policy.04-001",
+  "testCaseId": "loyly.house-policy.04-001",
+  "historyId": "loyly.house-policy.04-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET soukanvuori/schedule \u2192 200; GET soukanvuori/policies \u2192 200; GET masthugget/route \u2192 200; GET masthugget/schedule \u2192 200; GET masthugget/policies \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256656693,
+  "stop": 1795256659856,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "A house owns its calendars and eligible booker roles"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: house A has a Tuesday bookable resource",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Given: house B has no Tuesday bookable resource",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: both houses show their weekly schedules",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: house A shows its Tuesday resource",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: house B does not offer a Tuesday booking",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "389157be-e429-45b4-a6e9-c360c0898396-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "uuid": "9dbee074-3ff6-44a4-b499-e4bc00baadbb",
+  "name": "A queue-head decline offers the holding to the next eligible entry",
+  "fullName": "loyly.scarcity-forfeit.03-011",
+  "historyId": "loyly.scarcity-forfeit.03-011",
+  "testCaseId": "loyly.scarcity-forfeit.03-011",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Queue-head 3 declined; notice offered claim to 4 while 12 still held the selected slot."
+  },
+  "start": 1795281234930,
+  "stop": 1795281235930,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-011"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given a selected holding is under notice and two eligible households wait in order",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When the queue-head declines that holding",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the next eligible household is offered the pending claim And the original holder keeps using the holding until its recorded notice deadline",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "ac8c6815-52ac-4671-9748-c9743591475b-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

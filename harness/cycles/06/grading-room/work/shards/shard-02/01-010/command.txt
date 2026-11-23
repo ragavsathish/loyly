@@ -1,0 +1,15 @@
+gondolin exec --image /Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/.pi/harness/.state/assets/builder-clojure --mount-hostfs /Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-compare-codex-01/grader-shards/shard-02/grading-shard-02/impl:/candidate:ro --mount-hostfs /Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/codex-cycle/scratch-compare-codex-01/grader-shards/shard-02/grading-shard-02/work/01-010:/result -- sh -c 'set -x
+cp -R /candidate /tmp/app || exit 10
+cd /tmp/app || exit 11
+command -v node || true
+./start.sh 18080 > /result/server.log 2>&1 & p=$!
+for i in $(seq 1 30); do
+ if curl -sS -D /result/headers.txt http://127.0.0.1:18080/ -o /result/root.txt; then break; fi
+ if ! kill -0 "$p" 2>/dev/null; then break; fi
+ sleep 1
+done
+cat /result/server.log
+if test -s /result/root.txt; then cat /result/headers.txt /result/root.txt; else echo '"'"'not reached: HTTP readiness'"'"'; fi
+kill "$p" 2>/dev/null || true
+wait "$p" 2>/dev/null || true
+'

@@ -46,7 +46,7 @@ if (crashed.killed) {
   const resumed = await run("scratch-crash", "three-red");
   assert.equal(resumed.code, 0, "resumed cycle process did not finish");
 }
-const exported = await new Promise((resolveExport, reject) => {
+await new Promise((resolveExport, reject) => {
   const child = spawn(process.execPath, ["export.mjs", "scratch", "scratch-three-red", "scratch-crash"], { stdio: "inherit" });
   child.on("error", reject); child.on("close", (code) => code === 0 ? resolveExport() : reject(new Error(`export exit ${code}`)));
 });

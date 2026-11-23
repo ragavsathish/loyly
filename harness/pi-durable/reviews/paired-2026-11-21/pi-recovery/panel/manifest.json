@@ -1,0 +1,70 @@
+{
+  "schema": "loyly.panel-vm-run.v1",
+  "source_commit": "7e2fb1c0ba88c6b941a296a1298b89dd0bd5db5a",
+  "candidate_sha256": "8ffe62eb046ae03e5b1907b06f7341cb1c8301e9ccc9f5eb7a94f62330e89dfc",
+  "original_score_sha256": null,
+  "allure_schema_sha256": "0eef607c5d9eef4a190ea0deb7c7a61228267d8ec556b722b37dd83ef253fee1",
+  "plan_sha256": "ade653459abc93692136a9354363561c1d58ac2a2c9bc0a1710dd511fd7eaf32",
+  "image_digest": "sha256:a108174548363cb832a7da6a4411d380d2d90cebb1b07181fc4a40632c7e21a1",
+  "worker_support_sha256": "48fb54cbaf5c39b7cc41a423abeb9216b6a923dd06271a576000bc10cd47b8d0",
+  "parallel_overlap_ms": 30465,
+  "original_score_unchanged": true,
+  "score_state": "pre-score",
+  "producers": [
+    {
+      "id": "browser",
+      "tool": "Playwright",
+      "item": "@item-01-003",
+      "status": "failed",
+      "result": "59501a95-2568-45ef-b778-504e3bd54d90-result.json",
+      "start": 1795283242295,
+      "stop": 1795283264456,
+      "started": 1795283232727,
+      "stopped": 1795283265950,
+      "image_digest": "sha256:a108174548363cb832a7da6a4411d380d2d90cebb1b07181fc4a40632c7e21a1",
+      "execution_receipt_sha256": "765a3c5d8916f971e10ff8bc054206926960eccad18b6f73a25270e3acbb5076",
+      "files": {
+        "59501a95-2568-45ef-b778-504e3bd54d90-result.json": "9a09043eab7430bd0457ab9b96d20152a347272bf8db5abcdfa590c7715354b5",
+        "62831334-1853-4707-ac51-427735db0f65-attachment.png": "235c99e5c12e5672561fb501f1606c213a7400c685f4e32f795c6b3a322db9d6",
+        "513d1e0b-9546-4dfb-b089-0171a5ab7eb9-attachment.zip": "9c9093448758a617a3fd02555ce0171879adcaf63191e940039ec26f46450156",
+        "dd20f143-6a71-4e7f-ba36-0f0be43caf2d-attachment.receipt.json": "765a3c5d8916f971e10ff8bc054206926960eccad18b6f73a25270e3acbb5076"
+      }
+    },
+    {
+      "id": "protocol",
+      "tool": "Node.js",
+      "item": "@item-01-010",
+      "status": "failed",
+      "result": "6763f597-2ff9-4092-83d1-b453b04fd5fe-result.json",
+      "start": 1795283234195,
+      "stop": 1795283261616,
+      "started": 1795283232731,
+      "stopped": 1795283263199,
+      "image_digest": "sha256:a108174548363cb832a7da6a4411d380d2d90cebb1b07181fc4a40632c7e21a1",
+      "execution_receipt_sha256": "b58b750f6a2512c210924e7d0cbbd63c88ff95c55038598c2ccb53b6582943cb",
+      "files": {
+        "6763f597-2ff9-4092-83d1-b453b04fd5fe-result.json": "e1bc4bec9f45009ecbc9d95e3c3ab2de278b892736ae92c2c430cf7b86ceddae",
+        "bf574fbc-9b0b-4d79-ba5a-11feea99f345-attachment.json": "d9dfbb3290fc24f45d200503287723e32f547b7cc3d1260cf6c7abfb77df77d1",
+        "ebbf4957-bd9d-4f90-835e-943b7336d867-attachment.receipt.json": "b58b750f6a2512c210924e7d0cbbd63c88ff95c55038598c2ccb53b6582943cb"
+      }
+    },
+    {
+      "id": "runtime-profile",
+      "tool": "procfs/JFR",
+      "item": "@item-01-003",
+      "status": "failed",
+      "result": "3304bd91-5081-4859-a3fb-e4da47fab92c-result.json",
+      "start": 1795283235049,
+      "stop": 1795283263092,
+      "started": 1795283232734,
+      "stopped": 1795283272657,
+      "image_digest": "sha256:a108174548363cb832a7da6a4411d380d2d90cebb1b07181fc4a40632c7e21a1",
+      "execution_receipt_sha256": "6f1fb7839fa43865d6d0b5fac4ebc8d533323b0c723452ded558ca4c942749a8",
+      "files": {
+        "3304bd91-5081-4859-a3fb-e4da47fab92c-result.json": "a3770cbde28722f8bc0b8bd91ae4729c445056e6235d90c93b9f6ec8ac1bc7db",
+        "eebbe00f-e014-499f-8954-2eab792bfca7-attachment.json": "de4c259497546e4d774664b9b79fcadfff241220fa6bb18fb732b7cd7d645e78",
+        "4b82dc5e-d7c8-4eb4-9f28-17e9abc25e87-attachment.receipt.json": "6f1fb7839fa43865d6d0b5fac4ebc8d533323b0c723452ded558ca4c942749a8"
+      }
+    }
+  ]
+}

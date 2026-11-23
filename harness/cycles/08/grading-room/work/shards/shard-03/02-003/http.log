@@ -1,0 +1,24 @@
+
+GET /api/state 
+200 {"now":null,"sequence":0,"houses":[{"id":"soukanvuori","name":"Soukanvuori · sauna F","route":"manager","bookingOperator":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitäjä","disputeRole":"manager","authorityRole":"board","duration":90,"resources":[{"id":"8","name":"pukuhuone 8","days":["Tuesday"],"starts":["17:00","18:30","20:00"],"group":"8","timeClass":"general"},{"id":"9","name":"pukuhuone 9","days":["Thursday","Friday","Saturday"],"starts":["17:00","18:30","20:00"],"group":"9","timeClass":"general"}],"policies":[{"version":"v1","authority":"House board","effectiveAt":"1970-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"house-standing-tariff","salePriceReference":"house-resale-tariff"}]}],"bookings":[],"releases":[],"queue":[],"notices":[],"disputes":[]}
+
+POST /api/bookings {"house":"soukanvuori","household":"12","role":"shareholder","resource":"8","day":"Tuesday","start":"17:00"}
+200 {"id":"b1","house":"soukanvuori","household":"12","resource":"8","day":"Tuesday","start":"17:00","date":null,"kind":"standing","policyVersion":"v1","createdAt":"2026-11-22T00:00:01.157Z","status":"confirmed","history":[{"event":"confirmed","at":"2026-11-22T00:00:01.157Z","policyVersion":"v1"}],"end":"18:30","timeClass":"general","group":"8","priceReference":"house-standing-tariff"}
+
+POST /api/releases {"bookingId":"b1","household":"12","date":"2026-11-24","mode":"FREE"}
+200 {"id":"o2","bookingId":"b1","house":"soukanvuori","household":"12","date":"2026-11-24","resource":"8","start":"17:00","end":"18:30","mode":"FREE","status":"released","policyVersion":"v1","history":[{"event":"released","at":"2026-11-22T00:00:01.160Z"}]}
+
+GET /api/views?house=soukanvuori&date=2026-11-24 
+200 {"posted":[{"bookingId":"b1","house":"soukanvuori","resource":"8","day":"Tuesday","start":"17:00","end":"18:30","date":"2026-11-24","household":null,"status":"released","policyVersion":"v1"}],"heater":[],"billing":[{"bookingId":"b1","payer":"12","chargeKind":"standing","policyVersion":"v1","priceReference":"house-standing-tariff","billingRole":"vastikekirjanpitäjä"}]}
+
+date -u -s "2026-11-24 19:00:00"
+Tue Nov 24 19:00:00 UTC 2026
+
+GET /api/state 
+200 {"now":null,"sequence":2,"houses":[{"id":"soukanvuori","name":"Soukanvuori · sauna F","route":"manager","bookingOperator":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitäjä","disputeRole":"manager","authorityRole":"board","duration":90,"resources":[{"id":"8","name":"pukuhuone 8","days":["Tuesday"],"starts":["17:00","18:30","20:00"],"group":"8","timeClass":"general"},{"id":"9","name":"pukuhuone 9","days":["Thursday","Friday","Saturday"],"starts":["17:00","18:30","20:00"],"group":"9","timeClass":"general"}],"policies":[{"version":"v1","authority":"House board","effectiveAt":"1970-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"house-standing-tariff","salePriceReference":"house-resale-tariff"}]}],"bookings":[{"id":"b1","house":"soukanvuori","household":"12","resource":"8","day":"Tuesday","start":"17:00","date":null,"kind":"standing","policyVersion":"v1","createdAt":"2026-11-22T00:00:01.157Z","status":"confirmed","history":[{"event":"confirmed","at":"2026-11-22T00:00:01.157Z","policyVersion":"v1"}],"end":"18:30","timeClass":"general","group":"8","priceReference":"house-standing-tariff"}],"releases":[{"id":"o2","bookingId":"b1","house":"soukanvuori","household":"12","date":"2026-11-24","resource":"8","start":"17:00","end":"18:30","mode":"FREE","status":"unclaimed","policyVersion":"v1","history":[{"event":"released","at":"2026-11-22T00:00:01.160Z"},{"event":"expired","at":"2026-11-24T19:00:00.002Z"}]}],"queue":[],"notices":[],"disputes":[]}
+
+GET /api/views?house=soukanvuori&date=2026-11-24 
+200 {"posted":[{"bookingId":"b1","house":"soukanvuori","resource":"8","day":"Tuesday","start":"17:00","end":"18:30","date":"2026-11-24","household":null,"status":"unclaimed","policyVersion":"v1"}],"heater":[],"billing":[{"bookingId":"b1","payer":"12","chargeKind":"standing","policyVersion":"v1","priceReference":"house-standing-tariff","billingRole":"vastikekirjanpitäjä"}]}
+
+GET /api/views?house=soukanvuori&date=2026-12-01 
+200 {"posted":[{"bookingId":"b1","house":"soukanvuori","resource":"8","day":"Tuesday","start":"17:00","end":"18:30","date":"2026-12-01","household":"12","status":"held","policyVersion":"v1"}],"heater":[{"bookingId":"b1","house":"soukanvuori","resource":"8","day":"Tuesday","start":"17:00","end":"18:30","date":"2026-12-01","household":"12","status":"held","policyVersion":"v1","signal":"heat"}],"billing":[{"bookingId":"b1","payer":"12","chargeKind":"standing","policyVersion":"v1","priceReference":"house-standing-tariff","billingRole":"vastikekirjanpitäjä"}]}

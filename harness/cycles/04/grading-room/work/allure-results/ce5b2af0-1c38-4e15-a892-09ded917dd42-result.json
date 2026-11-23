@@ -1,0 +1,81 @@
+{
+  "uuid": "ce5b2af0-1c38-4e15-a892-09ded917dd42",
+  "name": "A free eligible slot does not put a multi-slot household under notice",
+  "fullName": "loyly.scarcity-forfeit.03-001",
+  "testCaseId": "loyly.scarcity-forfeit.03-001",
+  "historyId": "loyly.scarcity-forfeit.03-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET masthugget/queue \u2192 200; POST masthugget/evaluate-scarcity \u2192 200; GET masthugget/notices \u2192 200; GET masthugget/notices \u2192 200; GET masthugget/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256724185,
+  "stop": 1795256727872,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a household holds two standing slots and an eligible slot is free",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Given: another household is waiting",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the scarcity rule is evaluated",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: neither standing holding is put under notice",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "f8c842ef-2b73-4bb2-b63e-412e851c6cf0-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

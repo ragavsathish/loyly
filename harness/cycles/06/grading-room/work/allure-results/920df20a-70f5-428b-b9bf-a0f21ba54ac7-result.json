@@ -1,0 +1,88 @@
+{
+  "uuid": "920df20a-70f5-428b-b9bf-a0f21ba54ac7",
+  "name": "A notice keeps the policy version that created its deadlines",
+  "fullName": "loyly.house-policy.04-007",
+  "testCaseId": "loyly.house-policy.04-007",
+  "historyId": "loyly.house-policy.04-007",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST created v1 notice with 14/30-day deadlines, recorded future v2 revision and advanced guest clock; prior notice retained dates and later notice used v2 with 7/21-day deadlines."
+  },
+  "start": 1795281258711,
+  "stop": 1795281258711,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: a scarcity notice was recorded under a house rule with 14 and 30-day clocks",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST created v1 notice with 14/30-day deadlines, recorded future v2 revision and advanced guest clock; prior notice retained dates and later notice used v2 with 7/21-day deadlines."
+      }
+    },
+    {
+      "name": "When: an authorized party revises those clock lengths for future notices",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST created v1 notice with 14/30-day deadlines, recorded future v2 revision and advanced guest clock; prior notice retained dates and later notice used v2 with 7/21-day deadlines."
+      }
+    },
+    {
+      "name": "Then: the existing notice keeps its original choose and lapse instants; a later notice uses the revised rule version",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST created v1 notice with 14/30-day deadlines, recorded future v2 revision and advanced guest clock; prior notice retained dates and later notice used v2 with 7/21-day deadlines."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "observations.json",
+      "source": "594d1b7a-48de-47e6-aa27-4c5a41b97327-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "vm-final.log",
+      "source": "e5244410-3650-4f00-ad41-1371908b2e89-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "command.txt",
+      "source": "cd3556e2-3a47-4e70-a6b2-799bc95bf5cd-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "exit-final.txt",
+      "source": "d1db8707-777e-44a4-af4f-ad2b4a61b8d2-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

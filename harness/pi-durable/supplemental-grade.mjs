@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import Ajv2020 from "ajv/dist/2020.js";
+import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { candidateDigest } from "./grading-room.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -26,9 +26,9 @@ export function collectSupplementalGrade(original, probes) {
   const scoreInput = JSON.parse(readFileSync(join(original, "score-input.json"), "utf8"));
   if (candidateSha256 !== scoreInput.candidate_sha256)
     throw new Error("frozen candidate differs from the original scored candidate");
-  const schemaFile = join(HERE, "allure-lifecycle-result.schema.json");
+  const schemaFile = join(HERE, "../evidence-core/allure-lifecycle-result.schema.json");
   const schemaSha256 = fileSha(schemaFile);
-  const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, "utf8")));
+  const validate = compileAllureSchema(JSON.parse(readFileSync(schemaFile, "utf8")));
   const out = join(probes, "combined");
   if (existsSync(out)) throw new Error("supplemental combined output already exists");
   const results = join(out, "allure-results");
@@ -44,8 +44,11 @@ export function collectSupplementalGrade(original, probes) {
     if (resultFiles.length !== 1) throw new Error(`${producer.id}: need one Allure result`);
     const file = resultFiles[0];
     const result = JSON.parse(readFileSync(join(dir, file), "utf8"));
-    if (!validate(result))
-      throw new Error(`${producer.id}: Allure schema rejected result: ${JSON.stringify(validate.errors)}`);
+    try {
+      validate(result, `${producer.id}/${file}`);
+    } catch (cause) {
+      throw new Error(`${producer.id}: ${cause instanceof Error ? cause.message : String(cause)}`);
+    }
     if (file !== `${result.uuid}-result.json` || !["passed", "failed", "skipped", "broken"].includes(result.status)
         || result.stage !== "finished" || !Number.isInteger(result.start)
         || !Number.isInteger(result.stop) || result.stop < result.start

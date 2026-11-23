@@ -1,0 +1,73 @@
+{
+  "uuid": "3d7b2fd8-d981-43f1-bf35-8c6ce5b4af27",
+  "name": "A held slot cannot be confirmed for another household",
+  "fullName": "loyly.booking-core.01-004",
+  "historyId": "loyly.booking-core.01-004",
+  "testCaseId": "loyly.booking-core.01-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Apartment 3 POST same slot returned 409; GET bookings retains apartment 12 holding."
+  },
+  "start": 1790812880527,
+  "stop": 1790812880669,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: establish scenario prerequisites on fresh state",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See HTTP transcript"
+      }
+    },
+    {
+      "name": "When: perform scenario action",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See HTTP transcript"
+      }
+    },
+    {
+      "name": "Then: observe all stated consequences",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Apartment 3 POST same slot returned 409; GET bookings retains apartment 12 holding."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response evidence",
+      "source": "c0ab9e7a-ed25-4e76-97e4-b90535c2076b-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

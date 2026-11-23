@@ -1,0 +1,64 @@
+{
+  "uuid": "e955d34d-d4f9-47ab-b71a-d17ce2ae24ef",
+  "name": "A household with one family-time booking cannot take another",
+  "fullName": "loyly.time-classes.05-001",
+  "testCaseId": "loyly.time-classes.05-001",
+  "historyId": "loyly.time-classes.05-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST June 6 10:00 confirmed booking-2; POST 11:30 returned 409 class-cap with family-time cap 1 and existing booking-2 identified."
+  },
+  "start": 1780272000000,
+  "stop": 1780272002000,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Time classes and class-scoped caps"
+    },
+    {
+      "name": "story",
+      "value": "A cap counts only bookings in its configured class"
+    },
+    {
+      "name": "tag",
+      "value": "@item-05-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: cap 1 and apartment 12 upcoming family booking-2",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: request second family window June 6 11:30",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: HTTP 409 family-time cap identifies booking-2",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock observations",
+      "source": "cf977671-922f-466a-8785-5af4bbc1ed7f-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

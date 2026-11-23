@@ -1,0 +1,89 @@
+{
+  "uuid": "2af8b983-460b-47af-baa7-c0e85f0bcd3d",
+  "name": "One multi-holding household receives only one active notice",
+  "fullName": "loyly.scarcity-forfeit.03-014",
+  "testCaseId": "loyly.scarcity-forfeit.03-014",
+  "historyId": "loyly.scarcity-forfeit.03-014",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST masthugget/evaluate-scarcity \u2192 200; GET masthugget/notices \u2192 200; POST masthugget/evaluate-scarcity \u2192 200; GET masthugget/notices \u2192 200; GET masthugget/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256727975,
+  "stop": 1795256731900,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-014"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: one household holds three standing slots in a full eligible group",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Given: an eligible household is waiting in that group",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: scarcity is evaluated twice before the first notice lapses",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: only one notice is active for that multi-holding household",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: no second holding is selected for loss by the repeated evaluation",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "f55f3738-f205-428a-8b3d-f219e334af00-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "uuid": "a2a8c198-5508-42aa-ae54-5065aaf184a3",
+  "name": "A taken occurrence has one taker in every view",
+  "fullName": "loyly.occurrence-release.02-009",
+  "testCaseId": "loyly.occurrence-release.02-009",
+  "historyId": "loyly.occurrence-release.02-009",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Apartment 12 released 2026-11-24 FREE; 3 took it and 4 was refused. Dated list and heater named 3; billing retained 12 standing fee and no taker fee. Following Tuesday remained 12."
+  },
+  "start": 1795281231353,
+  "stop": 1795281234566,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "The three derived views describe one occurrence holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given apartment 12 has released one Tuesday occurrence",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 3 takes it",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then no other household can take that same occurrence",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And the posted list names apartment 3 while the heater schedule heats that occurrence",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And the billing signal follows the release mode without a second stored copy",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and responses",
+      "source": "247417a1-45ce-4782-82c9-fa7bff3e947d-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

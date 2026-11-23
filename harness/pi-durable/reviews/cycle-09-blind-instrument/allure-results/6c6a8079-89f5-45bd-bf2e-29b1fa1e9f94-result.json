@@ -1,0 +1,64 @@
+{
+  "uuid": "6c6a8079-89f5-45bd-bf2e-29b1fa1e9f94",
+  "name": "Lapse changes only the selected standing holding",
+  "fullName": "loyly.scarcity-forfeit.03-009",
+  "testCaseId": "loyly.scarcity-forfeit.03-009",
+  "historyId": "loyly.scarcity-forfeit.03-009",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": ">>> POST /api/houses/house-a/notices/notice-11/choose {\"household\": \"12\", \"bookingId\": \"booking-5\"}; <<< HTTP 200 {\"id\":\"notice-11\",\"status\":\"active\",\"household\":\"12\",\"group\":\"A\",\"startedAt\":\"2026-01-01T00:00:01.044Z\",\"chooseDeadline\":\"2026-01-15T00:00:01.044Z\",\"noticeDeadline\":\"2026-01-31T00:00:01.044Z\",\"policyVersion\":\"policy-4\",\"eligibleBookingIds\":[\"booking-5\",\"booking-7\"],\"selectedBookingId\":\"booking-5\",\"pendingSuccessor\":null,\"declined\":[],\"choiceHousehold\":null,\"offeredTo\":\"3\"}; checked: two standing holdings confirmed; first household waiting; one notice started; selected specified holding; both holdings retained before lapse; holder can still use selected holding; served real clock past 2026-01-31T00:00:01.044Z; only selected holding ended; list shows remaining holding only; billing shows remaining holding only; selected slot returns to pool; historical list and billing reflect selected holding before lapse. Full transcript attached."
+  },
+  "start": 1768435206006,
+  "stop": 1769817606005,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: one of a household's two standing holdings was selected under notice",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: the notice deadline passes",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: the household loses the selected standing holding; its other standing holding remains held; the posted list and billing signal reflect the same holding history",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock evidence",
+      "source": "5e063521-d4e7-4237-81ba-9a35bd61ff26-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

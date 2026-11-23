@@ -1,0 +1,73 @@
+{
+  "confirmation": {
+    "ok": true,
+    "booking": {
+      "id": "12-pukuhuone 8-Tuesday-17:00",
+      "apartment": "12",
+      "dressingRoom": "pukuhuone 8",
+      "weekday": "Tuesday",
+      "startTime": "17:00",
+      "endTime": "18:30",
+      "standing": true
+    },
+    "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday.",
+    "repeats": "every coming Tuesday"
+  },
+  "views": {
+    "schedule_status": 200,
+    "tuesday_hold": [
+      {
+        "dressingRoom": "pukuhuone 8",
+        "weekday": "Tuesday",
+        "startTime": "17:00",
+        "endTime": "18:30",
+        "heldBy": "12",
+        "bookable": false
+      }
+    ],
+    "slot_list": {
+      "slots": [
+        {
+          "apartment": "12",
+          "dressingRoom": "pukuhuone 8",
+          "weekday": "Tuesday",
+          "time": "17:00-18:30"
+        }
+      ]
+    },
+    "heater": {
+      "schedule": [
+        {
+          "dressingRoom": "pukuhuone 8",
+          "weekday": "Tuesday",
+          "heatFrom": "17:00",
+          "heatTo": "18:30"
+        }
+      ]
+    },
+    "billing": {
+      "activeCharges": [
+        {
+          "payer": "12",
+          "basis": "standing_slot",
+          "dressingRoom": "pukuhuone 8",
+          "weekday": "Tuesday",
+          "startTime": "17:00"
+        }
+      ],
+      "ledger": [
+        {
+          "type": "standing_slot_charge",
+          "apartment": "12",
+          "dressingRoom": "pukuhuone 8",
+          "weekday": "Tuesday",
+          "startTime": "17:00",
+          "action": "raised"
+        }
+      ]
+    },
+    "slot_list_status": 200,
+    "heater_status": 200,
+    "billing_status": 200
+  }
+}

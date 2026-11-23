@@ -1,0 +1,81 @@
+{
+  "uuid": "3e9b9b84-261c-422a-9aac-3f0831c3dc5c",
+  "name": "Waiting in another resource group does not trigger notice here",
+  "fullName": "loyly.scarcity-forfeit.03-004",
+  "testCaseId": "loyly.scarcity-forfeit.03-004",
+  "historyId": "loyly.scarcity-forfeit.03-004",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "not reached: default house refused the group B waiting request, so the required cross-group queue was not established."
+  },
+  "start": 1795305924806,
+  "stop": 1795306044806,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Given all standing slots in resource group A are held by households including one with two holdings",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Given: And resource group B has a waiting household but group A has none",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "When: When scarcity is evaluated for group A",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    },
+    {
+      "name": "Then: Then no group A holding is put under notice",
+      "status": "failed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "not reached: required scenario setup or consequence not established; see attached observations."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "7ed4b674-236f-4086-aa59-80c93f888622-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

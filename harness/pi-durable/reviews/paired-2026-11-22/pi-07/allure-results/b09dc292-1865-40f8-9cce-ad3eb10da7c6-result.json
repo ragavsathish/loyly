@@ -1,0 +1,64 @@
+{
+  "uuid": "b09dc292-1865-40f8-9cce-ad3eb10da7c6",
+  "name": "Releasing one week does not offer a different week",
+  "fullName": "loyly.occurrence-release.02-002",
+  "testCaseId": "loyly.occurrence-release.02-002",
+  "historyId": "loyly.occurrence-release.02-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST FREE release for June 2 returned offered; apartment 3 take returned taken. June 9 projection retains apartment 12 and normal standing charge."
+  },
+  "start": 1780272000000,
+  "stop": 1780272002000,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Releasing one week preserves the standing holding"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: apartment 12 holds booking-2 Tuesday 17:00 ph8",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: release June 2 then take by apartment 3",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: named date taken by 3; following Tuesday assigned to 12 with list, heat and fee checked",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP and clock observations",
+      "source": "467061e5-da64-44ea-ac07-26699eeefa28-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

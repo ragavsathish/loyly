@@ -1,0 +1,74 @@
+{
+  "uuid": "ab2b9c42-ff8f-4c3b-aa53-5cf791ebfe61",
+  "name": "Withdrawing an untaken offer before its occurrence begins",
+  "fullName": "loyly.occurrence-release.02-006",
+  "testCaseId": "loyly.occurrence-release.02-006",
+  "historyId": "loyly.occurrence-release.02-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST FREE offer then holder withdraw: HTTP 200 withdrawn, dated list and heater restore 12; take by 3 refused HTTP 422 not-offered, standing fee and later Tuesday remain with 12."
+  },
+  "start": 1767614435160,
+  "stop": 1767614436192,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "One-week occurrence release"
+    },
+    {
+      "name": "story",
+      "value": "Free and paid taking have different billing consequences"
+    },
+    {
+      "name": "tag",
+      "value": "@item-02-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given apartment 12 has offered one Tuesday occurrence and nobody has taken it",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When apartment 12 withdraws the offer before that occurrence begins",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then apartment 12 may use that occurrence again",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And no other household can take the withdrawn offer",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "And the standing holding remains with apartment 12",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and clock observations",
+      "source": "aaf0f788-4c4f-4aef-bdce-e910c9090766-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

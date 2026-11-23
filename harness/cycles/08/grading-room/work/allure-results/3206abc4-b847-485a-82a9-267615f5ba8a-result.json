@@ -1,0 +1,78 @@
+{
+  "uuid": "3206abc4-b847-485a-82a9-267615f5ba8a",
+  "name": "The refusal for a closed day is judged usable",
+  "fullName": "loyly.booking-core.01-011",
+  "testCaseId": "loyly.booking-core.01-011",
+  "historyId": "loyly.booking-core.01-011",
+  "status": "skipped",
+  "stage": "pending",
+  "statusDetails": {
+    "message": "not reached: blind subagent review required; closed-day POST returned the attached refusal."
+  },
+  "start": 1795306260191,
+  "stop": 1795306261191,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "usability"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A refusal is judged by whether a resident can act on it without asking again"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-011"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given the household in apartment 12 has been refused a standing slot on Tuesday at 17:00 in pukuhuone 9",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When a fresh independent subagent with no prior context or configuration reads only the refusal",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: blind subagent review required"
+      }
+    },
+    {
+      "name": "Then it can name a dressing room, weekday and start time for a standing-slot request that the app confirms from fresh state, using nothing but the refusal",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: blind subagent review required"
+      }
+    },
+    {
+      "name": "Then a refusal it cannot act on fails this budget, and its wording is changed before the slice is called done",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: blind subagent review required"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Refusal text",
+      "source": "aa94a09b-4dd1-4d3e-97ea-d407701b5814-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

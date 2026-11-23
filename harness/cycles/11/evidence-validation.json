@@ -1,0 +1,12 @@
+{
+  "items": 11,
+  "passed": 11,
+  "rawAllureResults": 11,
+  "blindAllureResults": 1,
+  "assessments": [
+    "blind-review"
+  ],
+  "nextPhase": {
+    "phase": "blind-review"
+  }
+}

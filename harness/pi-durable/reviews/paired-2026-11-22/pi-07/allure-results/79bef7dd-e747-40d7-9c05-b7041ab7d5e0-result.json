@@ -1,0 +1,69 @@
+{
+  "uuid": "79bef7dd-e747-40d7-9c05-b7041ab7d5e0",
+  "name": "The refusal for a closed day is judged usable",
+  "fullName": "loyly.booking-core.01-011",
+  "testCaseId": "loyly.booking-core.01-011",
+  "historyId": "loyly.booking-core.01-011",
+  "status": "skipped",
+  "stage": "pending",
+  "statusDetails": {
+    "message": "not reached: blind subagent review required; POST demo/bookings ph9 Tuesday 17:00 returned HTTP 409; exact text handed off without context."
+  },
+  "start": 1780745475000,
+  "stop": 1780745480000,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "usability"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A refusal is judged by whether a resident can act on it without asking again"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-011"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: closed-day request returned HTTP 409",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: not reached: independent blind subagent review required",
+      "status": "skipped",
+      "stage": "pending"
+    },
+    {
+      "name": "Then: not reached: independent suggestion and fresh-state replay required",
+      "status": "skipped",
+      "stage": "pending"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Blind refusal",
+      "source": "c62d9746-8565-4385-b442-96eb7531ad11-attachment.txt",
+      "type": "text/plain"
+    },
+    {
+      "name": "HTTP and clock observations",
+      "source": "a2987ee2-3d2e-4af9-9868-82620f02b0dd-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

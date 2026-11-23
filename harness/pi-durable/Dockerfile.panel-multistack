@@ -1,0 +1,11 @@
+# Specialist grading VM for generated Node, Babashka and JVM candidates.
+# The Clojure builder base pins Java 21, the Clojure CLI and Babashka; the
+# browser and probe scripts need Node and Chromium in the same guest.
+FROM pi-harness/builder-clojure@sha256:c651a2139f37385b3bcfe11e042baa78798f2858163335f6131446866a44f4bb
+
+RUN apk add --no-cache nodejs npm chromium font-noto \
+ && export PATH=/usr/sbin:/usr/bin:/sbin:/bin \
+ && node --version \
+ && bb --version \
+ && java -version \
+ && chromium-browser --version

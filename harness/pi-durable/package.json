@@ -2,10 +2,19 @@
   "name": "@loyly/pi-durable-harness",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=24.12.0"
+  },
   "scripts": {
     "demo": "node demo.mjs",
     "export": "node export.mjs",
-    "test": "node --test --test-concurrency=1 test/*.test.mjs"
+    "check": "tsc -p tsconfig.json && tsc -p ../cycle-core/tsconfig.json && tsc -p ../evidence-core/tsconfig.json && cmp -s allure-lifecycle-result.schema.json ../evidence-core/allure-lifecycle-result.schema.json",
+    "quality": "npm run check && npm run lint && npm run format:check -- '*.ts' 'tasks/*.ts' '../cycle-core/*.ts' '../evidence-core/*.ts' eslint.config.mjs package.json tsconfig.json",
+    "lint": "eslint . && npm run lint:core",
+    "lint:core": "cd .. && ./pi-durable/node_modules/.bin/eslint --config pi-durable/eslint.config.mjs cycle-core evidence-core",
+    "format": "prettier --write",
+    "format:check": "prettier --check",
+    "test": "node --test --test-concurrency=1 test/*.test.mjs ../cycle-core/test/*.test.mjs ../evidence-core/test/*.test.mjs"
   },
   "dependencies": {
     "@earendil-works/chord": "1.5.1",
@@ -20,9 +29,17 @@
     "@opentelemetry/sdk-metrics": "3.1.1",
     "@opentelemetry/sdk-node": "0.301.2",
     "ajv": "^8.20.0",
+    "effect": "4.1.5",
     "playwright-core": "1.65.1"
   },
   "devDependencies": {
-    "allure": "3.33.0"
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.19.2",
+    "allure": "3.33.0",
+    "eslint": "10.15.0",
+    "globals": "17.14.0",
+    "prettier": "3.10.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.73.0"
   }
 }

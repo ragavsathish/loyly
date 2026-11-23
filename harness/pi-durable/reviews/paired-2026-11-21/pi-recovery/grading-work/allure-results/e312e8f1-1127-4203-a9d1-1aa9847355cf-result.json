@@ -1,0 +1,73 @@
+{
+  "uuid": "e312e8f1-1127-4203-a9d1-1aa9847355cf",
+  "name": "A policy revision does not rewrite an earlier refusal",
+  "fullName": "loyly.house-policy.04-006",
+  "historyId": "loyly.house-policy.04-006",
+  "testCaseId": "loyly.house-policy.04-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Closed-day refusal recorded with v1 and reason; board revision v2 recorded; GET state retains unchanged refusal."
+  },
+  "start": 1790899201205,
+  "stop": 1790899201359,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: establish scenario prerequisites on fresh state",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See HTTP transcript"
+      }
+    },
+    {
+      "name": "When: perform scenario action",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See HTTP transcript"
+      }
+    },
+    {
+      "name": "Then: observe all stated consequences",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Closed-day refusal recorded with v1 and reason; board revision v2 recorded; GET state retains unchanged refusal."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response evidence",
+      "source": "761a7795-9be6-4f5a-965a-8ff20fc5f983-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

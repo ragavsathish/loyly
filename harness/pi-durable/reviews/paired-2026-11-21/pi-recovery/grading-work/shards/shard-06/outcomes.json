@@ -1,0 +1,26 @@
+{
+  "05-001": [
+    "passed",
+    "Second dated request returned HTTP 409: {\"code\": \"class-cap\", \"reason\": \"family time cap is 1 active or upcoming booking(s) per household; existing booking booking-1 uses the allowance.\", \"existingBooking\": \"booking-1\", \"decision\": {\"id\": \"decision-3\", \"house\": \"house-a\", \"household\": \"12\", \"request\": {\"house\": \"house-a\", \"household\": \"12\", \"resource\": \"room\", \"date\": \"2026-11-28\", \"start\": \"18:30\", \"operator\": \"manager\"}, \"outcome\": \"refused\", \"reason\": \"family time cap is 1 active or upcoming booking(s) per household; existing booking booking-1 uses the allowance.\", \"code\": \"class-cap\", \"policyVersion\": \"v1\", \"at\": \"2026-11-21T17:35:22.137Z\"}}; booking and views reread.",
+    1795282519340,
+    1795282523111
+  ],
+  "05-002": [
+    "passed",
+    "Second dated request returned HTTP 201: {\"booking\": {\"id\": \"booking-3\", \"house\": \"house-a\", \"household\": \"12\", \"kind\": \"occurrence\", \"resource\": \"room\", \"resourceName\": \"Room\", \"sauna\": \"Sauna A\", \"group\": \"A\", \"weekday\": \"Saturday\", \"start\": \"17:00\", \"end\": \"18:30\", \"class\": \"family\", \"date\": \"2026-11-28\", \"confirmedAt\": \"2026-11-21T17:35:26.103Z\", \"policyVersion\": \"v1\", \"priceReference\": \"standing-price\", \"history\": [{\"id\": \"event-4\", \"booking\": \"booking-3\", \"type\": \"confirmed\", \"at\": \"2026-11-21T17:35:26.103Z\", \"policyVersion\": \"v1\"}]}}; booking and views reread.",
+    1795282523111,
+    1795282527363
+  ],
+  "05-003": [
+    "passed",
+    "Second dated request returned HTTP 201: {\"booking\": {\"id\": \"booking-3\", \"house\": \"house-a\", \"household\": \"12\", \"kind\": \"occurrence\", \"resource\": \"room\", \"resourceName\": \"Room\", \"sauna\": \"Sauna A\", \"group\": \"A\", \"weekday\": \"Saturday\", \"start\": \"20:00\", \"end\": \"21:30\", \"class\": \"other\", \"date\": \"2026-11-28\", \"confirmedAt\": \"2026-11-21T17:35:30.941Z\", \"policyVersion\": \"v1\", \"priceReference\": \"standing-price\", \"history\": [{\"id\": \"event-4\", \"booking\": \"booking-3\", \"type\": \"confirmed\", \"at\": \"2026-11-21T17:35:30.941Z\", \"policyVersion\": \"v1\"}]}}; booking and views reread.",
+    1795282527363,
+    1795282532044
+  ],
+  "05-004": [
+    "passed",
+    "Second dated request returned HTTP 201: {\"booking\": {\"id\": \"booking-3\", \"house\": \"house-b\", \"household\": \"12\", \"kind\": \"occurrence\", \"resource\": \"room\", \"resourceName\": \"Room\", \"sauna\": \"Sauna A\", \"group\": \"A\", \"weekday\": \"Saturday\", \"start\": \"18:30\", \"end\": \"20:00\", \"class\": \"family\", \"date\": \"2026-11-28\", \"confirmedAt\": \"2026-11-21T17:35:34.898Z\", \"policyVersion\": \"v1\", \"priceReference\": \"standing-price\", \"history\": [{\"id\": \"event-4\", \"booking\": \"booking-3\", \"type\": \"confirmed\", \"at\": \"2026-11-21T17:35:34.898Z\", \"policyVersion\": \"v1\"}]}}; booking and views reread.",
+    1795282532044,
+    1795282535942
+  ]
+}

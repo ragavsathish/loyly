@@ -1,0 +1,81 @@
+{
+  "uuid": "c9577f95-3103-4ce4-8f7a-ed6810e8d74a",
+  "name": "Waiting in another resource group does not trigger notice here",
+  "fullName": "loyly.scarcity-forfeit.03-004",
+  "testCaseId": "loyly.scarcity-forfeit.03-004",
+  "historyId": "loyly.scarcity-forfeit.03-004",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET masthugget/queue \u2192 200; POST masthugget/evaluate-scarcity \u2192 200; GET masthugget/notices \u2192 200; GET masthugget/notices \u2192 200; GET masthugget/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256724183,
+  "stop": 1795256728023,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Scarcity requires both full capacity and a waiting household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-004"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: all standing slots in resource group A are held by households including one with two holdings",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Given: resource group B has a waiting household but group A has none",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: scarcity is evaluated for group A",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: no group A holding is put under notice",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "defa489d-ff6f-40df-8948-4e6e13a178ef-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

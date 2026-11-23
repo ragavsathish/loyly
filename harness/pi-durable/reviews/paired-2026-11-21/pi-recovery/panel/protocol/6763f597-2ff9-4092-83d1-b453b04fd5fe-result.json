@@ -1,0 +1,77 @@
+{
+  "uuid": "6763f597-2ff9-4092-83d1-b453b04fd5fe",
+  "name": "One hundred overlapping races leave one holder",
+  "fullName": "loyly.booking-core.01-010.protocol-panel",
+  "historyId": "loyly.booking-core.01-010.protocol-panel",
+  "testCaseId": "loyly.booking-core.01-010.protocol-panel",
+  "status": "failed",
+  "stage": "finished",
+  "start": 1795283234195,
+  "stop": 1795283261616,
+  "statusDetails": {
+    "message": "Error: derived views have an unexpected shape\n    at normalize (file:///worker/panel-candidate.mjs:25:13)\n    at readDerivedViews (file:///worker/panel-candidate.mjs:31:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async oneRace (file:///worker/panel-protocol.mjs:49:17)\n    at async file:///worker/panel-protocol.mjs:99:35\n    at async step (file:///worker/panel-protocol.mjs:37:16)\n    at async file:///worker/panel-protocol.mjs:98:3"
+  },
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Node.js"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Two households requesting one free slot leave exactly one holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-010"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "candidate_sha256",
+      "value": "8ffe62eb046ae03e5b1907b06f7341cb1c8301e9ccc9f5eb7a94f62330e89dfc"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Start fresh candidate in the Gondolin VM",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795283261363,
+      "stop": 1795283261557
+    },
+    {
+      "name": "Run 100 overlapping two-household races with a fresh slot each time",
+      "status": "failed",
+      "stage": "finished",
+      "start": 1795283261557,
+      "statusDetails": {
+        "message": "Error: derived views have an unexpected shape"
+      },
+      "stop": 1795283261582
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Hundred race observations",
+      "source": "bf574fbc-9b0b-4d79-ba5a-11feea99f345-attachment.json",
+      "type": "application/json"
+    },
+    {
+      "name": "Gondolin VM execution receipt",
+      "source": "ebbf4957-bd9d-4f90-835e-943b7336d867-attachment.receipt.json",
+      "type": "application/json"
+    }
+  ]
+}

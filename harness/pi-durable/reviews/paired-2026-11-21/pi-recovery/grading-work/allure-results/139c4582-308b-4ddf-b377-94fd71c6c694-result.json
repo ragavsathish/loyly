@@ -1,0 +1,73 @@
+{
+  "uuid": "139c4582-308b-4ddf-b377-94fd71c6c694",
+  "name": "A notice keeps the policy version that created its deadlines",
+  "fullName": "loyly.house-policy.04-007",
+  "historyId": "loyly.house-policy.04-007",
+  "testCaseId": "loyly.house-policy.04-007",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "v1 notice retained chooseAt and lapseAt after board revision; guest clock crossed served effective instant and a later group B notice used v2 with 7/20-day deadlines."
+  },
+  "start": 1790899233710,
+  "stop": 1790899233710,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "Policy revisions and disputes preserve their evidence"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: establish scenario prerequisites on fresh state",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See HTTP transcript"
+      }
+    },
+    {
+      "name": "When: perform scenario action",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See HTTP transcript"
+      }
+    },
+    {
+      "name": "Then: observe all stated consequences",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "v1 notice retained chooseAt and lapseAt after board revision; guest clock crossed served effective instant and a later group B notice used v2 with 7/20-day deadlines."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response evidence",
+      "source": "9221914e-70e3-4743-b5f7-6b2ee832dcb1-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

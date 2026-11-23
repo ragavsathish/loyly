@@ -1,0 +1,64 @@
+{
+  "uuid": "c4f4a1dc-1377-42f1-8115-28b8b4e6a2d3",
+  "name": "The weekly schedule shows each dressing room's own sauna days",
+  "fullName": "loyly.booking-core.01-001",
+  "testCaseId": "loyly.booking-core.01-001",
+  "historyId": "loyly.booking-core.01-001",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET config and schedule: resource 8 opens Tuesday, resource 9 opens Thursday, Friday, Saturday; schedule has two free Tuesday slots for 8 and none for 9."
+  },
+  "start": 1795341625468,
+  "stop": 1795341625745,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Availability is per dressing room, per weekday"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: room 9 opens Thursday, Friday and Saturday; room 8 opens Tuesday",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When: GET sauna F weekly schedule",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then: Tuesday has free 17:00 and 18:30 for room 8 and none for room 9",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP request and response observations",
+      "source": "767885a2-23f5-444c-8594-b7e2fc155167-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+$ date -u -s '2030-01-01 12:00:00'
+Tue Jan  1 12:00:00 UTC 2030
+
+
+GET /api/houses
+HTTP 200
+{"houses":[{"id":"soukanvuori","name":"As Oy Soukanvuori","resources":[{"id":"ph8","name":"pukuhuone 8","sauna":"sauna F","group":"ph8","duration":90,"days":{"Tuesday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}},{"id":"ph9","name":"pukuhuone 9","sauna":"sauna F","group":"ph9","duration":90,"days":{"Thursday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Friday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Saturday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}}],"policies":[{"version":"v1","authority":"board","effective":"2020-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"route":"manager","bookingRole":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitaja","disputeRole":"manager","chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"standing-fee","salePriceReference":"resale-fee"}],"currentPolicy":{"version":"v1","authority":"board","effective":"2020-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"route":"manager","bookingRole":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitaja","disputeRole":"manager","chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"standing-fee","salePriceReference":"resale-fee"}}]}
+
+GET /api/state
+HTTP 200
+{"sequence":0,"now":null,"houses":[{"id":"soukanvuori","name":"As Oy Soukanvuori","resources":[{"id":"ph8","name":"pukuhuone 8","sauna":"sauna F","group":"ph8","duration":90,"days":{"Tuesday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}},{"id":"ph9","name":"pukuhuone 9","sauna":"sauna F","group":"ph9","duration":90,"days":{"Thursday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Friday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Saturday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}}],"policies":[{"version":"v1","authority":"board","effective":"2020-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"route":"manager","bookingRole":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitaja","disputeRole":"manager","chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"standing-fee","salePriceReference":"resale-fee"}]}],"households":[{"id":"12","house":"soukanvuori","role":"shareholder"},{"id":"3","house":"soukanvuori","role":"shareholder"},{"id":"4","house":"soukanvuori","role":"shareholder"}],"bookings":[],"decisions":[],"releases":[],"queues":[],"notices":[],"disputes":[],"clock":"2030-01-01T12:00:00.115Z"}
+
+POST /api/bookings {"house":"soukanvuori","household":"12","resource":"ph8","weekday":"Tuesday","start":"17:00","operator":"manager"}
+HTTP 201
+{"booking":{"id":"booking-1","house":"soukanvuori","household":"12","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2030-01-01T12:00:00.117Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-2","booking":"booking-1","type":"confirmed","at":"2030-01-01T12:00:00.117Z","policyVersion":"v1"}]}}
+
+GET /api/bookings?house=soukanvuori
+HTTP 200
+{"bookings":[{"id":"booking-1","house":"soukanvuori","household":"12","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2030-01-01T12:00:00.117Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-2","booking":"booking-1","type":"confirmed","at":"2030-01-01T12:00:00.117Z","policyVersion":"v1"}]}]}
+
+POST /api/releases {"booking":"booking-1","household":"12","date":"2030-01-08","mode":"FREE"}
+HTTP 201
+{"release":{"id":"release-3","house":"soukanvuori","booking":"booking-1","date":"2030-01-08","mode":"FREE","holder":"12","offeredAt":"2030-01-01T12:00:00.127Z","policyVersion":"v1"}}
+
+GET /api/releases?house=soukanvuori
+HTTP 200
+{"releases":[{"id":"release-3","house":"soukanvuori","booking":"booking-1","date":"2030-01-08","mode":"FREE","holder":"12","offeredAt":"2030-01-01T12:00:00.127Z","policyVersion":"v1","state":"released"}]}
+
+GET /api/views?house=soukanvuori&date=2030-01-08
+HTTP 200
+{"house":"soukanvuori","date":"2030-01-08","asOf":"2030-01-01T12:00:00.132Z","posted":[{"booking":"booking-1","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","weekday":"Tuesday","start":"17:00","end":"18:30","household":null,"kind":"standing","policyVersion":"v1","state":"released","date":"2030-01-08","occurrence":"release-3","mode":"FREE"}],"heater":[],"billing":[{"booking":"booking-1","payer":"12","kind":"standing","policyVersion":"v1","priceReference":"standing-fee"}]}
+
+GET /api/state
+HTTP 200
+{"sequence":4,"now":null,"houses":[{"id":"soukanvuori","name":"As Oy Soukanvuori","resources":[{"id":"ph8","name":"pukuhuone 8","sauna":"sauna F","group":"ph8","duration":90,"days":{"Tuesday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}},{"id":"ph9","name":"pukuhuone 9","sauna":"sauna F","group":"ph9","duration":90,"days":{"Thursday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Friday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Saturday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}}],"policies":[{"version":"v1","authority":"board","effective":"2020-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"route":"manager","bookingRole":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitaja","disputeRole":"manager","chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"standing-fee","salePriceReference":"resale-fee"}]}],"households":[{"id":"12","house":"soukanvuori","role":"shareholder"},{"id":"3","house":"soukanvuori","role":"shareholder"},{"id":"4","house":"soukanvuori","role":"shareholder"}],"bookings":[{"id":"booking-1","house":"soukanvuori","household":"12","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2030-01-01T12:00:00.117Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-2","booking":"booking-1","type":"confirmed","at":"2030-01-01T12:00:00.117Z","policyVersion":"v1"},{"id":"event-4","booking":"booking-1","type":"occurrence-released","at":"2030-01-01T12:00:00.127Z","policyVersion":"v1","occurrence":"release-3","date":"2030-01-08","mode":"FREE"}]}],"decisions":[],"releases":[{"id":"release-3","house":"soukanvuori","booking":"booking-1","date":"2030-01-08","mode":"FREE","holder":"12","offeredAt":"2030-01-01T12:00:00.127Z","policyVersion":"v1"}],"queues":[],"notices":[],"disputes":[],"clock":"2030-01-01T12:00:00.133Z"}
+
+$ date -u -s '2030-01-08 17:01:00'
+Tue Jan  8 17:01:00 UTC 2030
+
+
+GET /api/state
+HTTP 200
+{"sequence":4,"now":null,"houses":[{"id":"soukanvuori","name":"As Oy Soukanvuori","resources":[{"id":"ph8","name":"pukuhuone 8","sauna":"sauna F","group":"ph8","duration":90,"days":{"Tuesday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}},{"id":"ph9","name":"pukuhuone 9","sauna":"sauna F","group":"ph9","duration":90,"days":{"Thursday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Friday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}],"Saturday":[{"start":"17:00","class":"ordinary"},{"start":"18:30","class":"ordinary"}]}}],"policies":[{"version":"v1","authority":"board","effective":"2020-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"route":"manager","bookingRole":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitaja","disputeRole":"manager","chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"standing-fee","salePriceReference":"resale-fee"}]}],"households":[{"id":"12","house":"soukanvuori","role":"shareholder"},{"id":"3","house":"soukanvuori","role":"shareholder"},{"id":"4","house":"soukanvuori","role":"shareholder"}],"bookings":[{"id":"booking-1","house":"soukanvuori","household":"12","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2030-01-01T12:00:00.117Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-2","booking":"booking-1","type":"confirmed","at":"2030-01-01T12:00:00.117Z","policyVersion":"v1"},{"id":"event-4","booking":"booking-1","type":"occurrence-released","at":"2030-01-01T12:00:00.127Z","policyVersion":"v1","occurrence":"release-3","date":"2030-01-08","mode":"FREE"}]}],"decisions":[],"releases":[{"id":"release-3","house":"soukanvuori","booking":"booking-1","date":"2030-01-08","mode":"FREE","holder":"12","offeredAt":"2030-01-01T12:00:00.127Z","policyVersion":"v1"}],"queues":[],"notices":[],"disputes":[],"clock":"2030-01-08T17:01:00.000Z"}
+
+POST /api/releases/release-3/take {"household":"3"}
+HTTP 409
+{"code":"expired","reason":"The offer expired when its occurrence began."}
+
+GET /api/releases?house=soukanvuori
+HTTP 200
+{"releases":[{"id":"release-3","house":"soukanvuori","booking":"booking-1","date":"2030-01-08","mode":"FREE","holder":"12","offeredAt":"2030-01-01T12:00:00.127Z","policyVersion":"v1","state":"unclaimed"}]}
+
+GET /api/bookings?house=soukanvuori
+HTTP 200
+{"bookings":[{"id":"booking-1","house":"soukanvuori","household":"12","kind":"standing","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","group":"ph8","weekday":"Tuesday","start":"17:00","end":"18:30","class":"ordinary","confirmedAt":"2030-01-01T12:00:00.117Z","policyVersion":"v1","priceReference":"standing-fee","history":[{"id":"event-2","booking":"booking-1","type":"confirmed","at":"2030-01-01T12:00:00.117Z","policyVersion":"v1"},{"id":"event-4","booking":"booking-1","type":"occurrence-released","at":"2030-01-01T12:00:00.127Z","policyVersion":"v1","occurrence":"release-3","date":"2030-01-08","mode":"FREE"}]}]}
+
+GET /api/views?house=soukanvuori&date=2030-01-08
+HTTP 200
+{"house":"soukanvuori","date":"2030-01-08","asOf":"2030-01-08T17:01:00.002Z","posted":[{"booking":"booking-1","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","weekday":"Tuesday","start":"17:00","end":"18:30","household":null,"kind":"standing","policyVersion":"v1","state":"unclaimed","date":"2030-01-08","occurrence":"release-3","mode":"FREE"}],"heater":[],"billing":[{"booking":"booking-1","payer":"12","kind":"standing","policyVersion":"v1","priceReference":"standing-fee"}]}
+
+GET /api/views?house=soukanvuori&date=2030-01-15
+HTTP 200
+{"house":"soukanvuori","date":"2030-01-15","asOf":"2030-01-08T17:01:00.003Z","posted":[{"booking":"booking-1","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","weekday":"Tuesday","start":"17:00","end":"18:30","household":"12","kind":"standing","policyVersion":"v1","state":"held","date":"2030-01-15"}],"heater":[{"booking":"booking-1","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","weekday":"Tuesday","start":"17:00","end":"18:30","household":"12","kind":"standing","policyVersion":"v1","state":"held","date":"2030-01-15","heat":true}],"billing":[{"booking":"booking-1","payer":"12","kind":"standing","policyVersion":"v1","priceReference":"standing-fee"}]}
+
+GET /api/views?house=soukanvuori
+HTTP 200
+{"house":"soukanvuori","date":null,"asOf":"2030-01-08T17:01:00.003Z","posted":[{"booking":"booking-1","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","weekday":"Tuesday","start":"17:00","end":"18:30","household":"12","kind":"standing","policyVersion":"v1","state":"held"}],"heater":[{"booking":"booking-1","resource":"ph8","resourceName":"pukuhuone 8","sauna":"sauna F","weekday":"Tuesday","start":"17:00","end":"18:30","household":"12","kind":"standing","policyVersion":"v1","state":"held","heat":true}],"billing":[{"booking":"booking-1","payer":"12","kind":"standing","policyVersion":"v1","priceReference":"standing-fee"}]}
+
+SERVER OUTPUT
+LISTEN 18106

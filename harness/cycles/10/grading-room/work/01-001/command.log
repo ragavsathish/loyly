@@ -1,0 +1,9 @@
+$ cp -a /tmp/loyly-cursor-cycle-10/grading-room/impl/. /tmp/loyly-cursor-cycle-10/grading-room/work/01-001/runtime/
+$ cd /tmp/loyly-cursor-cycle-10/grading-room/work/01-001/runtime && ./start.sh 18101
+start_pid=27677
+GET /api/health -> 200 {"ok":true,"sauna":"sauna-F"}
+listeners=[27677]
+$ GET /api/schedule
+-> 200 {"saunaId":"sauna-F","dressingRooms":{"pukuhuone 8":{"Tuesday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]},"pukuhuone 9":{"Thursday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Friday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}],"Saturday":[{"startTime":"17:00","endTime":"18:30","status":"free","holder":null}]}}}
+reap pids=[27677]
+stopped listeners=[] exit=-15

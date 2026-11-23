@@ -1,0 +1,1 @@
+pukuhuone 9 has no sauna day on Tuesday. It opens Thursday, Friday, Saturday. You can request pukuhuone 8 (ph8) on Tuesday at 17:00. This alternative is open and free. Its standing-slot request fields are {"resource":"ph8","weekday":"Tuesday","start":"17:00"}.

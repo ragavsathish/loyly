@@ -1,0 +1,64 @@
+{
+  "uuid": "26df6f56-22ec-468b-8424-12198e44c610",
+  "name": "A second standing slot is granted while there is room",
+  "fullName": "loyly.booking-core.01-005",
+  "historyId": "loyly.booking-core.01-005",
+  "testCaseId": "loyly.booking-core.01-005",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Two standing booking requests confirmed; state re-read shows both holdings for apartment 12."
+  },
+  "start": 1795281225627,
+  "stop": 1795281226627,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A household may hold a second standing slot when there is room"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-005"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given the household in apartment 12 holds one standing slot And free standing slots remain in the weekly schedule",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When the household in apartment 12 requests a second standing slot on a free open slot",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then the second standing slot is confirmed And the household in apartment 12 holds two standing slots",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "fa1ac67b-8f2b-4cb7-aa95-d3f175398f85-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

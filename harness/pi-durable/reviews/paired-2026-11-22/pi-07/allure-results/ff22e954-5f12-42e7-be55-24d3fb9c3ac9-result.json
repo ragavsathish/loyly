@@ -1,0 +1,64 @@
+{
+  "uuid": "ff22e954-5f12-42e7-be55-24d3fb9c3ac9",
+  "name": "Booker standing is checked within the household's house",
+  "fullName": "loyly.house-policy.04-002",
+  "testCaseId": "loyly.house-policy.04-002",
+  "historyId": "loyly.house-policy.04-002",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "GET house policies shows demo resident and soukanvuori shareholder roles. POST Tuesday ph8 17:00 confirms resident in demo and shareholder with manager actor in soukanvuori. Cross-role requests at 18:30 are refused booker-role in both houses; GET views retains each confirmed holding."
+  },
+  "start": 1795305094680,
+  "stop": 1795305094832,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Pi black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Multiple houses and traceable policy"
+    },
+    {
+      "name": "story",
+      "value": "A house owns its calendars and eligible booker roles"
+    },
+    {
+      "name": "tag",
+      "value": "@item-04-002"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given demo permits resident and soukanvuori permits shareholder",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When eligible households request in their houses, and cross-role requests are checked",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then each house applies its own role, not the other house rule",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests, responses and measurements",
+      "source": "e340f0db-70c9-48ed-bc2f-036207a9d7fa-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

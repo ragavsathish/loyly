@@ -1,0 +1,81 @@
+{
+  "uuid": "6a58fdfa-4f00-4a71-849e-320632da5450",
+  "name": "A requested slot on an open day is confirmed",
+  "fullName": "loyly.booking-core.01-003",
+  "testCaseId": "loyly.booking-core.01-003",
+  "historyId": "loyly.booking-core.01-003",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "POST soukanvuori/standing \u2192 201; GET soukanvuori/schedule \u2192 200; GET soukanvuori/views \u2192 200; checked the corresponding booking, policy, queue or derived-view consequence in the attached responses."
+  },
+  "start": 1795256628641,
+  "stop": 1795256632725,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "A slot is confirmed against availability and held by one household"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-003"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: Tuesday at 17:00 in pukuhuone 8 is free",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the household in apartment 12 requests a standing slot on Tuesday at 17:00 in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the standing slot is confirmed for 17:00 to 18:30",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "Then: the household in apartment 12 holds it for every coming Tuesday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "10a813f9-0ac2-4178-b8e3-77e36edb79ae-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

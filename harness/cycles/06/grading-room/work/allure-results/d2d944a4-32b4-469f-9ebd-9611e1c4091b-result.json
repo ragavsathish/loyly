@@ -1,0 +1,64 @@
+{
+  "uuid": "d2d944a4-32b4-469f-9ebd-9611e1c4091b",
+  "name": "The holder chooses before the choose deadline",
+  "fullName": "loyly.scarcity-forfeit.03-006",
+  "historyId": "loyly.scarcity-forfeit.03-006",
+  "testCaseId": "loyly.scarcity-forfeit.03-006",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Holder chose holding-1; notice identifies it for loss, while both holdings and derived views remain with household 12."
+  },
+  "start": 1795281229785,
+  "stop": 1795281230785,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-006"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given a scarcity notice has started a 14-day choose clock and 30-day notice clock for a household with two holdings",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "When the household chooses one holding before the choose deadline",
+      "status": "passed",
+      "stage": "finished"
+    },
+    {
+      "name": "Then that holding is identified for loss at the notice deadline And the household keeps using it until the notice deadline And its other holding is not identified for loss",
+      "status": "passed",
+      "stage": "finished"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "HTTP requests and observations",
+      "source": "5668cfd7-a702-41d9-8355-a73ca2470ee7-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

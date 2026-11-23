@@ -1,0 +1,89 @@
+{
+  "uuid": "7c921566-be0a-4b68-9c3d-9dcf1868314c",
+  "name": "Lapse changes only the selected standing holding",
+  "fullName": "loyly.scarcity-forfeit.03-009",
+  "testCaseId": "loyly.scarcity-forfeit.03-009",
+  "historyId": "loyly.scarcity-forfeit.03-009",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "not reached: the holding was selected, but passage of the 30-day lapse deadline was not observable through the served controls"
+  },
+  "start": 1795256731865,
+  "stop": 1795256735917,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Codex black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Scarcity notice on a standing holding"
+    },
+    {
+      "name": "story",
+      "value": "Choosing and losing a holding are different events"
+    },
+    {
+      "name": "tag",
+      "value": "@item-03-009"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given: one of a household's two standing holdings was selected under notice",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "See attached request and response transcript."
+      }
+    },
+    {
+      "name": "When: the notice deadline passes",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the holding was selected, but passage of the 30-day lapse deadline was not observable through the served controls"
+      }
+    },
+    {
+      "name": "Then: the household loses the selected standing holding",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the holding was selected, but passage of the 30-day lapse deadline was not observable through the served controls"
+      }
+    },
+    {
+      "name": "Then: its other standing holding remains held",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the holding was selected, but passage of the 30-day lapse deadline was not observable through the served controls"
+      }
+    },
+    {
+      "name": "Then: the posted list and billing signal reflect the same holding history",
+      "status": "skipped",
+      "stage": "pending",
+      "statusDetails": {
+        "message": "not reached: the holding was selected, but passage of the 30-day lapse deadline was not observable through the served controls"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "VM command and HTTP observations",
+      "source": "f53f74a7-2b1d-4b66-8ad2-a9bef1cb9c46-attachment.txt",
+      "type": "text/plain"
+    }
+  ]
+}

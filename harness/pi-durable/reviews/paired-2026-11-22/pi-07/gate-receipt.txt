@@ -1,0 +1,4 @@
+exit=0
+room=/Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/pi-durable/scratch-compare-pi-02/gate-1/room
+candidate_sha256=4de4d7eb441fe61bedc9b47043e4f04d08c230eb935334c07065590117b9d906
+log_sha256=63bc91627ce76d2351e44d11183e37fa3d3363387b1ac7c9808f20383b172106
