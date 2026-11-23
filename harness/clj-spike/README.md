@@ -22,8 +22,9 @@ Shared oracle tools in `harness/*.clj` are untouched.
 | Grader shards | `grader-shards.ts` | ✅ partial | `partition-by-rule` + prepare; combine/Allure deferred |
 | Continuation | `continuation.ts` | ✅ | uncarried extract + prompt |
 | Allure identity | `evidence-core/validate-identity.ts` | ✅ | pure helpers |
+| Allure results | `allure-results.ts` + validate-result | ✅ partial | reader/judge; Ajv schema deferred |
 | Cycle phases / adapters | `tasks/*`, `*-adapter.ts` | ⏳ | orchestration + Pi |
-| Panel VM / Allure I/O | `panel-vm-*`, `allure-results.ts` | ⏳ | heavy I/O |
+| Panel VM | `panel-vm-*` | ⏳ | heavy I/O |
 | Pi audit | `audit-rows.ts` | ⏳ | needs Pi sqlite runtime |
 
 ## Layout
@@ -37,8 +38,10 @@ harness/clj-spike/
     gen_checklist.clj score.clj scoreboard.clj stamp_item_ids.clj
     score_receipt.clj live_contract.clj
     grading_room.clj validate_verdicts.clj blind_review.clj
+    panel_selection.clj panel_policy.clj
+    grader_shards.clj continuation.clj allure_results.clj
     demo.clj
-    evidence/validate_verdicts.clj
+    evidence/{validate_verdicts,validate_identity,validate_result,panel_*}.clj
     project/loyly/{identity,blind_policy,schemas,blind_answer}.clj
 ```
 

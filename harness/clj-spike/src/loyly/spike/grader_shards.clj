@@ -57,7 +57,6 @@
                        blind-review)
         full (hjson/read-json (slurp (io/file grading-room "checklist.json") :encoding "UTF-8"))
         partitions (partition-by-rule (get full "items") count)]
-    ;; `count` is only used above as shard cardinality (keyword arg).
     (mapv
      (fn [{:keys [id items]}]
        (let [base (io/file scratch "grader-shards" id)
