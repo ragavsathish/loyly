@@ -5,9 +5,9 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { candidateDigest, prepareGradingRoom } from '../grading-room.ts';
-import { readAllureResults } from '../allure-results.mjs';
+import { readAllureResults } from '../allure-results.ts';
 import { prepareBlindReview, writeBlindAgentAllure } from '../blind-review.mjs';
-import { panelPlanForManifest, projectReplayEvidence } from '../replay-evidence.mjs';
+import { panelPlanForManifest, projectReplayEvidence } from '../replay-evidence.ts';
 
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const schemaFile = new URL('../allure-lifecycle-result.schema.json', import.meta.url).pathname;

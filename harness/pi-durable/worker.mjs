@@ -14,7 +14,7 @@ import { GateRunError, GateRunner, verifyCandidate } from './gate-effects.ts';
 import { hasBuilderLaunch, runBuilder } from "./builder-adapter.mjs";
 import { candidateDigest as digestCandidate, verifyGradingRoom } from "./grading-room.ts";
 import { prepareShards, combineShards } from "./grader-shards.ts";
-import { runDurablePanel } from "./panel-adapter.mjs";
+import { runDurablePanel } from "./panel-adapter.ts";
 import { createLifecycle } from "../cycle-core/lifecycle.ts";
 import { createCycleEffects, hash } from './cycle-effects.ts';
 import { parseWorkerConfig } from './worker-config.ts';

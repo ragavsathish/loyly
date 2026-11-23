@@ -18,7 +18,7 @@ import {
 import { runBlindAgent } from '../blind-agent-adapter.mjs';
 import { bindScoreInput, verifyScoredCycle } from '../score-receipt.ts';
 import { prepareGradingRoom, verifyGradingRoom } from '../grading-room.ts';
-import { runDurablePanelReport } from '../panel-adapter.mjs';
+import { runDurablePanelReport } from '../panel-adapter.ts';
 
 interface CommandResult {
   code: number;

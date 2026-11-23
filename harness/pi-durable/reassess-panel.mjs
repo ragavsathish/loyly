@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { selectPanelAttempt } from './panel-adapter.mjs';
+import { selectPanelAttempt } from './panel-adapter.ts';
 import { runPanelVms, verifyPanelVmRun } from './panel-vm-run.mjs';
 import { compilePanel, verifyCompiledPanel } from './panel-compile.mjs';
 import { candidateDigest } from './grading-room.ts';

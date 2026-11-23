@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { readAuditRows } from "./audit-rows.ts";
-import { projectReplayEvidence } from "./replay-evidence.mjs";
+import { projectReplayEvidence } from "./replay-evidence.ts";
 
 const dirs = process.argv.slice(2).map((p) => resolve(p));
 if (dirs.length === 0) dirs.push(resolve("scratch"));

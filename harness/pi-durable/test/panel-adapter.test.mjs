@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { selectPanelAttempt } from '../panel-adapter.mjs';
+import { selectPanelAttempt } from '../panel-adapter.ts';
 
 const sha = (path) => createHash('sha256').update(readFileSync(path)).digest('hex');
 const verify = (out) => {

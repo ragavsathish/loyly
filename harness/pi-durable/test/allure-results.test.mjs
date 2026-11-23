@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { cpSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readAllureResults } from "../allure-results.mjs";
+import { readAllureResults } from "../allure-results.ts";
 
 const schema = new URL("../allure-lifecycle-result.schema.json", import.meta.url).pathname;
 function fixture() {

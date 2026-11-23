@@ -6,7 +6,7 @@ import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, wr
 import { createServer } from "node:net";
 import { join } from "node:path";
 import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
-import { readAllureResults } from "./allure-results.mjs";
+import { readAllureResults } from "./allure-results.ts";
 import { candidateDigest } from "./grading-room.ts";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");

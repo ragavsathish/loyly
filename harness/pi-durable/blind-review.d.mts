@@ -9,3 +9,15 @@ export function finalVerdictsFromBlindReview(args: Record<string, unknown>): {
   rawAllureSha256?: string;
   reviewSha256?: string;
 };
+export function readBlindAgentAllure(args: Record<string, unknown>): {
+  result: {
+    name: string;
+    status: string;
+    stage: string;
+    statusDetails: { message: string };
+    steps: { name: string; status: string; stage: string }[];
+    attachments: { name: string; type: string; source: string }[];
+    labels: { name: string; value: string }[];
+  };
+  reviewSha256: string;
+};

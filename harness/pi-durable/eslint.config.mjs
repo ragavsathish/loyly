@@ -17,6 +17,9 @@ export default [
       'grader-shards.mjs',
       'panel-selection.mjs',
       'audit-rows.mjs',
+      'allure-results.mjs',
+      'replay-evidence.mjs',
+      'panel-adapter.mjs',
     ],
   },
   {

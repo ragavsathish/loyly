@@ -14,7 +14,7 @@ import {
 import { join } from 'node:path';
 import { prepareGradingRoom, verifyGradingRoom } from './grading-room.ts';
 import type { GradingRoomDigests } from './grading-room.ts';
-import { readAllureResults } from './allure-results.mjs';
+import { readAllureResults } from './allure-results.ts';
 
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 
