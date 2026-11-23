@@ -15,6 +15,14 @@ import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-revi
 import { candidateDigest } from "./grading-room.ts";
 import { evaluatePanel } from "./panel-policy.ts";
 import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.ts";
+import {
+  BLIND_ITEM_ID,
+  DEFAULT_PANEL_PLAN,
+  LEGACY_PANEL_PLAN,
+  PANEL_VM_RUN,
+  PANEL_SUMMARY,
+  PANEL_REPORT,
+} from "./project/loyly/index.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -38,18 +46,18 @@ function checkedAllure(validate, value, name) {
 function specialistResults({ specialists, plan, planSha256, manifest, candidateSha256, schemaSha256,
   scoreSha256, sourceCommit, validate }) {
   const specs = plan.checks.filter((check) => check.source === "specialist");
-  if (!["loyly.supplemental-grade.v1", "loyly.panel-vm-run.v1"].includes(manifest.schema)
+  if (!["loyly.supplemental-grade.v1", PANEL_VM_RUN].includes(manifest.schema)
       || manifest.source_commit !== sourceCommit
       || manifest.candidate_sha256 !== candidateSha256
       || (plan.schema === 'harness.grading-panel-plan.v2'
         && manifest.worker_bundle_sha256 !== plan.bundle?.sha256)
       || manifest.allure_schema_sha256 !== schemaSha256
       || (manifest.schema === "loyly.supplemental-grade.v1" && manifest.original_score_sha256 !== scoreSha256)
-      || (manifest.schema === "loyly.panel-vm-run.v1"
+      || (manifest.schema === PANEL_VM_RUN
         && !((manifest.score_state === "pre-score" && manifest.original_score_sha256 === null)
           || ((manifest.score_state ?? "filed") === "filed" && manifest.original_score_sha256 === scoreSha256)))
       || (manifest.schema === "loyly.supplemental-grade.v1" && manifest.original_score_unchanged !== true)
-      || (manifest.schema === "loyly.panel-vm-run.v1" && manifest.plan_sha256 !== planSha256)
+      || (manifest.schema === PANEL_VM_RUN && manifest.plan_sha256 !== planSha256)
       || manifest.producers.length !== specs.length)
     throw new Error("specialist manifest is not bound to this scored candidate and plan");
   const directories = [], observations = [];
@@ -88,7 +96,7 @@ function specialistResults({ specialists, plan, planSha256, manifest, candidateS
       || producer.execution_receipt_sha256 !== fileSha(join(dir, receiptFile)))
       throw new Error(`${spec.id}: execution receipt is not candidate and image bound`);
     let runtime;
-    if (manifest.schema === "loyly.panel-vm-run.v1" && Number.isInteger(receipt.vm_exit_code)
+    if (manifest.schema === PANEL_VM_RUN && Number.isInteger(receipt.vm_exit_code)
         && receipt.isolation === "gondolin-qemu-vm"
         && receipt.mounts?.candidate === "read-only"
         && receipt.mounts?.worker === "read-only")
@@ -107,7 +115,7 @@ function specialistResults({ specialists, plan, planSha256, manifest, candidateS
       result_sha256: fileSha(join(dir, producer.result)), message: result.statusDetails.message,
       start: result.start, stop: result.stop });
   }
-  const intervals = manifest.schema === "loyly.panel-vm-run.v1"
+  const intervals = manifest.schema === PANEL_VM_RUN
     ? manifest.producers.map((row) => ({ start: row.started, stop: row.stopped })) : observations;
   const overlap = Math.min(...intervals.map((row) => row.stop))
     - Math.max(...intervals.map((row) => row.start));
@@ -120,7 +128,7 @@ async function compilePanel({
   original,
   specialists,
   out,
-  planFile = join(HERE, "booking-core.panel.json"),
+  planFile = join(HERE, DEFAULT_PANEL_PLAN),
 }: {
   original: string;
   specialists: string;
@@ -132,7 +140,7 @@ async function compilePanel({
   const plan = json(planFile);
   checked(schemaValidator(join(HERE, "panel-plan.schema.json")), plan, "panel plan");
   const scoreInput = json(join(original, "score-input.json"));
-  const legacy = plan.schema === 'loyly.grading-panel-plan.v1';
+  const legacy = plan.schema === LEGACY_PANEL_PLAN;
   const verdictsFile = join(original, legacy ? 'final-verdicts.json' : 'verdicts.json');
   const candidateSha256 = candidateDigest(join(original, "fenced-room"));
   if (candidateSha256 !== scoreInput.candidate_sha256) throw new Error("candidate changed after scoring");
@@ -185,7 +193,7 @@ async function compilePanel({
     if (!blindSpec || label(blind.result, "tool") !== blindSpec.tool
         || label(blind.result, "technique") !== blindSpec.technique)
       throw new Error("blind review differs from panel plan");
-    observations.push({ id: blindSpec.id, item: "01-011", tool: blindSpec.tool,
+    observations.push({ id: blindSpec.id, item: BLIND_ITEM_ID, tool: blindSpec.tool,
       technique: blindSpec.technique, status: blind.result.status, runtime: "gondolin-qemu-vm",
       result_sha256: fileSha(join(original, "blind-agent-allure", `${blind.result.uuid}-result.json`)),
       message: blind.result.statusDetails.message });
@@ -198,7 +206,7 @@ async function compilePanel({
     sourceCommit: scoreInput.source_commit, validate });
   observations.push(...extra.observations);
   const assessed = evaluatePanel(plan, scored.items, observations);
-  const summary = { schema: "loyly.grading-panel-summary.v1", project: plan.project,
+  const summary = { schema: PANEL_SUMMARY, project: plan.project,
     source_commit: scoreInput.source_commit, candidate_sha256: candidateSha256,
     plan_sha256: fileSha(planFile), allure_schema_sha256: schemaSha256,
     original_score_sha256: scored.scoreSha256, filed_score: scored.score,
@@ -222,7 +230,7 @@ async function compilePanel({
   if (fileSha(join(original, "instrument", "harness", "cycles", scoreCycleFor(original), "scores.json")) !== scored.scoreSha256)
     throw new Error("original score changed during panel compilation");
   writeFileSync(join(out, "panel-summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
-  const manifest = { schema: "loyly.grading-panel-report.v1",
+  const manifest = { schema: PANEL_REPORT,
     panel_summary_sha256: fileSha(join(out, "panel-summary.json")),
     report_html_sha256: fileSha(join(report, "index.html")),
     audit_entries_sha256: sha(rows.map((row) => JSON.stringify(row)).join("\n")),
@@ -235,7 +243,7 @@ async function compilePanel({
 function verifyCompiledPanel({
   original,
   out,
-  planFile = join(HERE, "booking-core.panel.json"),
+  planFile = join(HERE, DEFAULT_PANEL_PLAN),
 }: {
   original: string;
   out: string;
@@ -247,9 +255,9 @@ function verifyCompiledPanel({
   const manifest = json(join(out, "panel-manifest.json"));
   const plan = json(planFile);
   const score = verifyScoredCycle({ scratch: original, instrument: join(original, "instrument"),
-    verdictsFile: join(original, plan.schema === 'loyly.grading-panel-plan.v1'
+    verdictsFile: join(original, plan.schema === LEGACY_PANEL_PLAN
       ? 'final-verdicts.json' : 'verdicts.json'), cycle: scoreCycleFor(original) });
-  if (manifest.schema !== "loyly.grading-panel-report.v1"
+  if (manifest.schema !== PANEL_REPORT
       || manifest.panel_summary_sha256 !== fileSha(join(out, "panel-summary.json"))
       || manifest.report_html_sha256 !== fileSha(join(out, "allure-report", "index.html"))
       || manifest.result_count !== summary.checks.length

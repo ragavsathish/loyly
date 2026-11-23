@@ -1,24 +1,35 @@
 // @ts-nocheck
 // Blind-review adapter: shapes preserved from the .mjs source.
-// Typed narrowing follows once probe helpers are split.
+// Löyly product policy and booking probes live under project/loyly/.
 // Keep the black-box grader's pending result intact. A later blind agent review is a
 // separate, candidate-bound Allure result, never an edit to the model's evidence.
 import { createHash, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { readAllureResults } from "./allure-results.ts";
 import { candidateDigest } from "./grading-room.ts";
+import {
+  BLIND_ITEM_ID as REVIEW_ID,
+  BLIND_QUESTION as QUESTION,
+  BLIND_REFUSAL_FILE,
+  BLIND_SPEC_RELATIVE,
+  blindAllureFullName,
+  bookingFormAction,
+  publicJsonBooking,
+  resolveRoomInPublicForm,
+  BLIND_PACKET,
+  BLIND_PROBE,
+  BLIND_RESPONSE,
+  isHistoricalPersonCut,
+} from "./project/loyly/index.ts";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const fileHash = (path) => hash(readFileSync(path));
-const REVIEW_ID = "01-011";
-const SPEC = join("plan", "01-booking-core", "spec.feature");
-const PERSON_SPEC_SHA256 = "b28ee83dfaada8df0ed99b90121a50f3c55885ade4db323b68e03c4d5f15005e";
-const QUESTION = "Without reading the sauna-day configuration or another project file, read only refusal.txt. "
-  + "Name a request you expect to be accepted using that refusal alone.\n";
+const SPEC = BLIND_SPEC_RELATIVE;
+const refusalBasename = basename(BLIND_REFUSAL_FILE);
 
 function prepareBlindReview({ gradingRoom, out }) {
   if (existsSync(out)) throw new Error("blind review packet already exists");
@@ -26,9 +37,9 @@ function prepareBlindReview({ gradingRoom, out }) {
   const pending = judged.results.find((result) => result.labels.some((label) =>
     label.name === "tag" && label.value === `@item-${REVIEW_ID}`));
   if (!pending || pending.status !== "skipped" || pending.stage !== "pending")
-    throw new Error("grader did not leave 01-011 pending");
+    throw new Error(`grader did not leave ${REVIEW_ID} pending`);
   const shardRoot = join(gradingRoom, "work", "shards");
-  const sources = readdirSync(shardRoot).map((name) => join(shardRoot, name, "blind-review-011.txt"))
+  const sources = readdirSync(shardRoot).map((name) => join(shardRoot, name, refusalBasename))
     .filter((path) => existsSync(path));
   if (sources.length !== 1 || !lstatSync(sources[0]).isFile())
     throw new Error("need exactly one regular blind-review refusal file");
@@ -39,7 +50,7 @@ function prepareBlindReview({ gradingRoom, out }) {
     attachment.source)).equals(refusal)))
     throw new Error("blind packet differs from the pending Allure refusal attachment");
   const packet = {
-    schema: "loyly.blind-review-packet.v1", item: REVIEW_ID,
+    schema: BLIND_PACKET, item: REVIEW_ID,
     candidate_sha256: candidateDigest(gradingRoom),
     checklist_sha256: fileHash(join(gradingRoom, "checklist.json")),
     spec_sha256: fileHash(join(gradingRoom, SPEC)),
@@ -51,7 +62,7 @@ function prepareBlindReview({ gradingRoom, out }) {
   writeFileSync(join(out, "question.txt"), QUESTION);
   writeFileSync(join(out, "packet.json"), `${JSON.stringify(packet, null, 2)}\n`);
   writeFileSync(join(out, "response-template.json"), `${JSON.stringify({
-    schema: "loyly.blind-review-response.v1",
+    schema: BLIND_RESPONSE,
     packet_sha256: fileHash(join(out, "packet.json")), reviewer_kind: "agent", reviewer: "",
     had_not_read_configuration: false, saw_only_refusal: false,
     answer: "", verdict: "", reason: "", reviewed_at: 0,
@@ -66,7 +77,7 @@ function verifyBlindReviewPacket({ packetDir, gradingRoom }) {
   const pending = judged.results.find((result) => result.labels.some((label) =>
     label.name === "tag" && label.value === `@item-${REVIEW_ID}`));
   const refusal = readFileSync(join(packetDir, "refusal.txt"));
-  if (packet.schema !== "loyly.blind-review-packet.v1" || packet.item !== REVIEW_ID
+  if (packet.schema !== BLIND_PACKET || packet.item !== REVIEW_ID
       || packet.candidate_sha256 !== candidateDigest(gradingRoom)
       || packet.checklist_sha256 !== fileHash(join(gradingRoom, "checklist.json"))
       || packet.spec_sha256 !== fileHash(join(gradingRoom, SPEC))
@@ -83,7 +94,7 @@ function verifyBlindReviewPacket({ packetDir, gradingRoom }) {
 function validateBlindReview({ packetDir, reviewFile, gradingRoom }) {
   const { packet, packetSha256 } = verifyBlindReviewPacket({ packetDir, gradingRoom });
   const review = JSON.parse(readFileSync(reviewFile, "utf8"));
-  if (review.schema !== "loyly.blind-review-response.v1"
+  if (review.schema !== BLIND_RESPONSE
       || review.packet_sha256 !== packetSha256
       || review.reviewer_kind !== "agent"
       || typeof review.reviewer !== "string" || !review.reviewer.trim()
@@ -97,78 +108,6 @@ function validateBlindReview({ packetDir, reviewFile, gradingRoom }) {
 }
 
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-function bookingFormAction(html) {
-  const attribute = (tag, name) => new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, "i")
-    .exec(tag)?.[1];
-  const forms = [...html.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/gi)].filter(([, tag, body]) =>
-    attribute(tag, "method")?.toLowerCase() === "post"
-    && ["household", "resource", "weekday", "start"].every((name) =>
-      new RegExp(`<(?:input|select)\\b[^>]*\\bname\\s*=\\s*["']${name}["']`, "i").test(body)));
-  if (forms.length > 1) throw new Error("expected at most one public booking form");
-  if (!forms.length) return null;
-  const path = attribute(forms[0][1], "action");
-  if (!/^\/[A-Za-z0-9/?=&%._-]*$/.test(path ?? "") || path.startsWith("//"))
-    throw new Error("booking form action must be a same-origin path");
-  return path;
-}
-async function publicJsonBooking(base, body, answer) {
-  const params = new URLSearchParams(body);
-  const room = /^@room:(\d+)$/.exec(params.get("resource") ?? "")?.[1];
-  if (!room || !new RegExp(`^REQUEST:\\s*pukuhuone\\s+${room}\\s*\\|`, "i").test(answer))
-    throw new Error("blind answer and requested room differ");
-  const housesResponse = await fetch(`${base}/api/houses`, { signal: AbortSignal.timeout(1000) });
-  if (!housesResponse.ok) throw new Error("no public booking form or house API");
-  const houseListing = await housesResponse.json();
-  const houses = Array.isArray(houseListing) ? houseListing : houseListing.houses;
-  if (!Array.isArray(houses)) throw new Error("public house API has no houses");
-  const matches = [];
-  for (const house of houses) {
-    if (typeof house.id !== "string" || !/^[A-Za-z0-9_-]+$/.test(house.id)) continue;
-    let policy = house.policy, resources = policy?.resources;
-    let route = policy?.route ?? policy?.bookingMode;
-    const modernRoles = typeof policy?.bookingMode === "string";
-    const houseScoped = Array.isArray(houseListing) || modernRoles;
-    let path = houseScoped ? `/api/houses/${house.id}/bookings` : "/api/bookings";
-    if (!Array.isArray(resources)) {
-      const stateResponse = await fetch(`${base}/api/houses/${house.id}/state`,
-        { signal: AbortSignal.timeout(1000) });
-      if (!stateResponse.ok) continue;
-      const state = await stateResponse.json();
-      policy = state.policy;
-      resources = state.resources;
-      route = state.route?.kind;
-      path = `/api/houses/${house.id}/bookings`;
-    }
-    const named = resources?.filter((resource) =>
-      resource.name?.trim().toLowerCase() === `pukuhuone ${room}`) ?? [];
-    if (route === "self-service" && named.length === 1)
-      matches.push({ house: house.id, resource: named[0].id,
-        role: policy?.eligibleRoles?.[0] ?? policy?.bookerRoles?.[0], path, modernRoles });
-  }
-  if (matches.length !== 1) throw new Error("blind room is not unique in the public self-service API");
-  const match = matches[0];
-  const payload = { house: match.house, household: params.get("household"), resource: match.resource,
-    weekday: params.get("weekday"), start: params.get("start"), kind: "standing",
-    ...(match.modernRoles ? { bookerRole: match.role, actorRole: match.role } : { role: match.role }) };
-  if (!Object.values(payload).every((value) => typeof value === "string" && value.trim()))
-    throw new Error("public booking request is incomplete");
-  return { path: match.path, body: JSON.stringify(payload), contentType: "application/json" };
-}
-function resolveRoomInPublicForm(html, body, answer) {
-  const params = new URLSearchParams(body);
-  const token = /^@room:(\d+)$/.exec(params.get("resource") ?? "");
-  if (!token) return body;
-  if (!new RegExp(`^REQUEST:\\s*pukuhuone\\s+${token[1]}\\s*\\|`, "i").test(answer))
-    throw new Error("blind answer and requested room differ");
-  const select = /<select\b[^>]*\bname\s*=\s*["']resource["'][^>]*>([\s\S]*?)<\/select>/i.exec(html);
-  if (!select) throw new Error("public booking form has no resource selection");
-  const options = [...select[1].matchAll(/<option\b[^>]*\bvalue\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/option>/gi)];
-  const matching = options.filter(([, , label]) => label.replace(/<[^>]+>/g, "").trim().toLowerCase()
-    === `pukuhuone ${token[1]}`);
-  if (matching.length !== 1) throw new Error("blind room is not a unique public form option");
-  params.set("resource", matching[0][1]);
-  return params.toString();
-}
 async function freePort() {
   const server = createServer();
   await new Promise((resolve, reject) => server.once("error", reject).listen(0, "127.0.0.1", resolve));
@@ -229,7 +168,7 @@ async function probeBlindAnswer({ packetDir, reviewFile, gradingRoom, request, o
     writeFileSync(join(out, "server.log"), logs.join(""));
   }
   writeFileSync(join(out, "response.txt"), response.body);
-  const verification = { schema: "loyly.blind-review-probe.v1", item: REVIEW_ID,
+  const verification = { schema: BLIND_PROBE, item: REVIEW_ID,
     candidate_sha256: packet.candidate_sha256, packet_sha256: packetSha256,
     review_sha256: reviewSha256, request: { ...request,
       resolved_path: response.resolvedPath, resolved_body: response.resolvedBody },
@@ -247,7 +186,7 @@ function writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verificatio
   if (review.verdict === "pass") {
     if (!verificationDir) throw new Error("positive blind review needs an independent HTTP probe");
     verification = JSON.parse(readFileSync(join(verificationDir, "verification.json"), "utf8"));
-    if (verification.schema !== "loyly.blind-review-probe.v1"
+    if (verification.schema !== BLIND_PROBE
         || verification.item !== REVIEW_ID || verification.candidate_sha256 !== packet.candidate_sha256
         || verification.packet_sha256 !== packetSha256 || verification.review_sha256 !== reviewSha256
         || verification.request?.matches_answer !== true
@@ -257,10 +196,10 @@ function writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verificatio
   }
   const item = JSON.parse(readFileSync(join(gradingRoom, "checklist.json"), "utf8"))
     .items.find((value) => value.id === REVIEW_ID);
-  if (!item) throw new Error("01-011 not selected");
+  if (!item) throw new Error(`${REVIEW_ID} not selected`);
   const uuid = randomUUID(), attachment = `${randomUUID()}-attachment.json`;
   const responseAttachment = verification ? `${randomUUID()}-attachment.txt` : null;
-  const fullName = `loyly.booking-core.${REVIEW_ID}.blind-agent-review`;
+  const fullName = blindAllureFullName('blind-agent-review');
   const status = review.verdict === "pass" && verification?.accepted === true ? "passed" : "failed";
   const result = {
     uuid, name: item.name, fullName, testCaseId: fullName, historyId: fullName,
@@ -302,7 +241,7 @@ function readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verification
   const result = JSON.parse(readFileSync(join(out, resultFiles[0]), "utf8"));
   const item = JSON.parse(readFileSync(join(gradingRoom, "checklist.json"), "utf8"))
     .items.find((value) => value.id === REVIEW_ID);
-  const fullName = `loyly.booking-core.${REVIEW_ID}.blind-agent-review`;
+  const fullName = blindAllureFullName('blind-agent-review');
   if (review.verdict === "pass" && !verificationDir)
     throw new Error("positive blind review needs an independent HTTP probe");
   const verification = review.verdict === "pass"
@@ -346,7 +285,7 @@ function readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verification
 function finalVerdictsFromBlindReview(args) {
   const { packetDir, reviewFile, gradingRoom } = args;
   const { packet } = validateBlindReview({ packetDir, reviewFile, gradingRoom });
-  if (packet.spec_sha256 === PERSON_SPEC_SHA256)
+  if (isHistoricalPersonCut(packet.spec_sha256))
     throw new Error("the historical person-worded cut cannot be scored with a blind subagent");
   const raw = readAllureResults(gradingRoom);
   const supplemental = readBlindAgentAllure(args);

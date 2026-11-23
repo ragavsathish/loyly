@@ -19,6 +19,11 @@ import { runBlindAgent } from '../blind-agent-adapter.mjs';
 import { bindScoreInput, verifyScoredCycle } from '../score-receipt.ts';
 import { prepareGradingRoom, verifyGradingRoom } from '../grading-room.ts';
 import { runDurablePanelReport } from '../panel-adapter.ts';
+import {
+  BLIND_ITEM_ID,
+  BLIND_SPEC_RELATIVE,
+  BOOKING_SLICE,
+} from '../project/loyly/index.ts';
 
 interface CommandResult {
   code: number;
@@ -307,7 +312,7 @@ export function createCycleTask(deps: CycleDependencies) {
         const plan = live
           ? null
           : readFileSync(
-              join(sourceRoot, 'docs', 'plan', '01-booking-core', 'spec.feature'),
+              join(sourceRoot, 'docs', 'plan', BOOKING_SLICE, 'spec.feature'),
               'utf8',
             );
         const instruction = live
@@ -641,7 +646,7 @@ export function createCycleTask(deps: CycleDependencies) {
                   packet_sha256: packetSha256,
                   candidate_sha256: candidateDigest(gradingRoom),
                   spec_sha256: hash(
-                    readFileSync(join(gradingRoom, 'plan', '01-booking-core', 'spec.feature')),
+                    readFileSync(join(gradingRoom, BLIND_SPEC_RELATIVE)),
                   ),
                 });
               return {
@@ -836,7 +841,8 @@ export function createCycleTask(deps: CycleDependencies) {
         const scored = scoreReceipt?.items ?? [];
         const score = scoreReceipt?.score ?? null;
         const blindAgentReviewFailed =
-          blindRequired && scored.some((item) => item.id === '01-011' && item.verdict === 'fail');
+          blindRequired &&
+          scored.some((item) => item.id === BLIND_ITEM_ID && item.verdict === 'fail');
         const attempt = task.state.checkpoint.attempt ?? 2;
         await runtime.commit(async (tx) => {
           await audit(tx, task, 'score', reason ? 'failed' : 'filed', {

@@ -15,6 +15,7 @@ import { join } from 'node:path';
 import { prepareGradingRoom, verifyGradingRoom } from './grading-room.ts';
 import type { GradingRoomDigests } from './grading-room.ts';
 import { readAllureResults } from './allure-results.ts';
+import { PROJECT_ID, defaultsBlindReview } from './project/loyly/index.ts';
 
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 
@@ -113,8 +114,8 @@ function prepareShards({
   candidateSha256,
   schemaSha256,
   count,
-  project = 'loyly',
-  blindReview = project === 'loyly',
+  project = PROJECT_ID,
+  blindReview = defaultsBlindReview(project),
 }: PrepareShardsArgs): PreparedShard[] {
   const full = JSON.parse(readFileSync(join(gradingRoom, 'checklist.json'), 'utf8')) as {
     items: { id: string; rule?: string; source?: string }[];

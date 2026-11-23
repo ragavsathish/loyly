@@ -8,6 +8,7 @@ import { readAllureResults, type AllureLifecycleResult } from './allure-results.
 import { readBlindAgentAllure } from './blind-review.ts';
 import { verifyGradingRoom } from './grading-room.ts';
 import { verifyPanelVmRun } from './panel-vm-run.ts';
+import { BLIND_ITEM_ID } from './project/loyly/index.ts';
 
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 const here = fileURLToPath(new URL('.', import.meta.url));
@@ -170,7 +171,7 @@ function projectReplayEvidence(dir: string, rows: AuditRow[]): ReplayEvidence[] 
     projected.push(
       summary(
         supplemental.result,
-        '01-011',
+        BLIND_ITEM_ID,
         blind.seq,
         'blind-review',
         supplemental.reviewSha256,

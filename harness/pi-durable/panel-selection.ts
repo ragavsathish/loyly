@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { specialistWorkers } from './panel-vm-run.ts';
 import { validatePanelCoverage } from '../evidence-core/panel-selection.ts';
+import { BLIND_ITEM_ID, LEGACY_PANEL_PLAN } from './project/loyly/index.ts';
 
 interface PanelPlanDocument {
   schema?: string;
@@ -31,8 +32,12 @@ function validatePanelSelection(
 ): PanelSelectionResult {
   if (!validateSchema(plan))
     throw new Error(`panel plan schema: ${JSON.stringify(validateSchema.errors)}`);
-  const legacy = plan.schema === 'loyly.grading-panel-plan.v1';
-  const coverage = validatePanelCoverage(plan as never, checklist, legacy ? '01-011' : undefined);
+  const legacy = plan.schema === LEGACY_PANEL_PLAN;
+  const coverage = validatePanelCoverage(
+    plan as never,
+    checklist,
+    legacy ? BLIND_ITEM_ID : undefined,
+  );
   const specialists = specialistWorkers(plan) as { id: string }[];
   return {
     selected: coverage.selected,

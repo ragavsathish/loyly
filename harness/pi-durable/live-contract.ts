@@ -6,6 +6,12 @@ import { fileURLToPath } from 'node:url';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { validatePanelSelection } from './panel-selection.ts';
 import { specialistWorkers } from './panel-vm-run.ts';
+import {
+  BLIND_ITEM_ID,
+  DEFAULT_PANEL_PLAN,
+  PROJECT_ID,
+  requiresBlindHandoff,
+} from './project/loyly/index.ts';
 
 interface AgentConfig {
   command: string;
@@ -180,10 +186,7 @@ export function checkLiveRun(
     config.grader.schema_sha256,
   );
   if (config.panel) {
-    requireHash(
-      join(HERE, config.panel.plan_file ?? 'booking-core.panel.json'),
-      config.panel.plan_sha256,
-    );
+    requireHash(join(HERE, config.panel.plan_file ?? DEFAULT_PANEL_PLAN), config.panel.plan_sha256);
     verifyImage(config.panel.image, config.panel.image_sha256);
   }
   if (!makeChecklist) return { source, scratch, config };
@@ -200,14 +203,15 @@ export function checkLiveRun(
   const selectedChecklist = JSON.parse(readFileSync(checklist, 'utf8')) as Checklist;
   if (
     config.schema === 'harness.pi-live-run.v2' &&
-    config.project === 'loyly' &&
-    selectedChecklist.items.some((item) => item.id === '01-011')
+    requiresBlindHandoff(config.project ?? PROJECT_ID, selectedChecklist.items)
   )
-    throw Error('selected Löyly refusal item requires the v1 blind-review contract');
+    throw Error(
+      `selected ${PROJECT_ID} refusal item ${BLIND_ITEM_ID} requires the v1 blind-review contract`,
+    );
   verifySelectedSpecs(source, config.source, selectedChecklist);
   if (config.panel) {
     const panelPlan = JSON.parse(
-      readFileSync(join(HERE, config.panel.plan_file ?? 'booking-core.panel.json'), 'utf8'),
+      readFileSync(join(HERE, config.panel.plan_file ?? DEFAULT_PANEL_PLAN), 'utf8'),
     ) as { schema: string; project?: string };
     if (
       config.schema === 'harness.pi-live-run.v2' &&

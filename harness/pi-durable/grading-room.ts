@@ -10,6 +10,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { basename, isAbsolute, join } from 'node:path';
+import { GRADING_ROOM, PROJECT_ID, defaultsBlindReview } from './project/loyly/index.ts';
 
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 
@@ -36,7 +37,7 @@ interface GradingRoomVerifyInput {
 }
 
 interface GradingRoomReceipt {
-  schema: 'loyly.grading-room.v1';
+  schema: typeof GRADING_ROOM;
   candidateSha256: string;
   checklistSha256: string;
   schemaSha256: string;
@@ -106,8 +107,8 @@ function prepareGradingRoom({
   candidateSha256,
   checklistSha256,
   schemaSha256,
-  project = 'loyly',
-  blindReview = project === 'loyly',
+  project = PROJECT_ID,
+  blindReview = defaultsBlindReview(project),
 }: GradingRoomDigests): GradingRoomReceipt {
   if (!/^[a-z][a-z0-9-]*$/.test(project)) throw new Error('invalid grading project');
   for (const path of [sourceRoom, candidateRoom, checklistFile, schemaFile, out])
@@ -146,14 +147,14 @@ function prepareGradingRoom({
   )
     throw new Error('grading copy differs from the gated candidate, checklist or schema');
   const receipt: GradingRoomReceipt = {
-    schema: 'loyly.grading-room.v1',
+    schema: GRADING_ROOM,
     candidateSha256,
     checklistSha256,
     schemaSha256,
     planSha256: planDigest(out),
     sourcePlan: plans.length === 1 ? `plan/${plans[0]}` : null,
     sourcePlans: plans.map((plan) => `plan/${plan}`),
-    ...(project === 'loyly' && blindReview ? {} : { project, blindReview }),
+    ...(project === PROJECT_ID && blindReview ? {} : { project, blindReview }),
   };
   writeFileSync(join(out, '.grading-room.json'), JSON.stringify(receipt));
   return receipt;
@@ -164,8 +165,8 @@ function verifyGradingRoom({
   candidateSha256,
   checklistSha256,
   schemaSha256,
-  project = 'loyly',
-  blindReview = project === 'loyly',
+  project = PROJECT_ID,
+  blindReview = defaultsBlindReview(project),
 }: GradingRoomVerifyInput): GradingRoomReceipt {
   const receipt = JSON.parse(
     readFileSync(join(out, '.grading-room.json'), 'utf8'),
@@ -173,8 +174,8 @@ function verifyGradingRoom({
   const expectedPlans = selectedPlans(join(out, 'checklist.json')).map((plan) => `plan/${plan}`);
   const recordedPlans = receipt.sourcePlans ?? (receipt.sourcePlan ? [receipt.sourcePlan] : []);
   if (
-    receipt.schema !== 'loyly.grading-room.v1' ||
-    (receipt.project ?? 'loyly') !== project ||
+    receipt.schema !== GRADING_ROOM ||
+    (receipt.project ?? PROJECT_ID) !== project ||
     (receipt.blindReview ?? true) !== blindReview ||
     receipt.candidateSha256 !== candidateSha256 ||
     receipt.checklistSha256 !== checklistSha256 ||

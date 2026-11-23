@@ -7,6 +7,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runPanelVms, verifyPanelVmRun } from './panel-vm-run.ts';
 import { compilePanel, verifyCompiledPanel } from './panel-compile.ts';
+import { DEFAULT_PANEL_PLAN } from './project/loyly/index.ts';
 
 const sha = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 const fileSha = (path: string) => sha(readFileSync(path));
@@ -103,7 +104,7 @@ async function runDurablePanel({
   const here = new URL('.', import.meta.url);
   const resolvedPlan =
     planFile === undefined
-      ? fileURLToPath(new URL('booking-core.panel.json', here))
+      ? fileURLToPath(new URL(DEFAULT_PANEL_PLAN, here))
       : typeof planFile === 'string'
         ? planFile
         : fileURLToPath(planFile);

@@ -1,4 +1,5 @@
 import type { ValidatedRun } from './live-contract.ts';
+import { DEFAULT_PANEL_PLAN } from './project/loyly/index.ts';
 
 // The worker receives only this approved set of LOYLY_* values.
 export function workerEnvironment(
@@ -60,7 +61,7 @@ export function workerEnvironment(
           LOYLY_PANEL_IMAGE: config.panel.image,
           LOYLY_PANEL_IMAGE_SHA256: config.panel.image_sha256,
           LOYLY_PANEL_PLAN_SHA256: config.panel.plan_sha256,
-          LOYLY_PANEL_PLAN_FILE: config.panel.plan_file ?? 'booking-core.panel.json',
+          LOYLY_PANEL_PLAN_FILE: config.panel.plan_file ?? DEFAULT_PANEL_PLAN,
         }
       : {}),
   };

@@ -12,11 +12,17 @@ import {
 } from '../evidence-core/validate-identity.ts';
 import { validateResultEvidence } from '../evidence-core/validate-result.ts';
 import { compileAllureSchema } from '../evidence-core/validate-schema.ts';
+import {
+  BLIND_ITEM_ID,
+  BLIND_SPEC_RELATIVE,
+  PROJECT_ID,
+  isBlindPendingResult,
+  pendingEvidencePrefix,
+  requiresBlindHandoff,
+} from './project/loyly/index.ts';
 
 const RESULT =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-result\.json$/;
-// Preserve the old calibration room, while requiring the revised handoff in every new cut.
-const PERSON_SPEC_SHA256 = 'b28ee83dfaada8df0ed99b90121a50f3c55885ade4db323b68e03c4d5f15005e';
 
 interface ChecklistItem {
   id: string;
@@ -97,7 +103,7 @@ function readAllureResults(room: string): AllureJudgement {
     project?: string;
     blindReview?: boolean;
   };
-  const project = receipt.project ?? 'loyly';
+  const project = receipt.project ?? PROJECT_ID;
   const blindReview = receipt.blindReview ?? true;
   if (!/^[a-z][a-z0-9-]*$/.test(project)) throw new Error('invalid grading project');
   if (
@@ -108,15 +114,12 @@ function readAllureResults(room: string): AllureJudgement {
     throw new Error('invalid grading checklist');
   const identities = new Map(items.map((item) => [item.id, identity(room, item, project)]));
   const specSha256 =
-    blindReview && project === 'loyly' && items.some((item) => item.id === '01-011')
+    blindReview && requiresBlindHandoff(project, items)
       ? createHash('sha256')
-          .update(readFileSync(join(room, 'plan', '01-booking-core', 'spec.feature')))
+          .update(readFileSync(join(room, BLIND_SPEC_RELATIVE)))
           .digest('hex')
       : null;
-  const pendingPrefix =
-    specSha256 === PERSON_SPEC_SHA256
-      ? 'not reached: blind human review required'
-      : 'not reached: blind subagent review required';
+  const pendingPrefix = pendingEvidencePrefix(specSha256);
   const dir = join(room, 'work', 'allure-results');
   const files = readdirSync(dir).filter((name) => RESULT.test(name));
   if (files.length !== items.length)
@@ -149,13 +152,11 @@ function readAllureResults(room: string): AllureJudgement {
     }
     if (
       blindReview &&
-      project === 'loyly' &&
-      id === '01-011' &&
-      (result.status !== 'skipped' ||
-        result.stage !== 'pending' ||
-        !result.statusDetails.message.startsWith(pendingPrefix))
+      requiresBlindHandoff(project, items) &&
+      id === BLIND_ITEM_ID &&
+      !isBlindPendingResult(result, pendingPrefix)
     )
-      throw new Error('01-011 needs a separate blind subagent review');
+      throw new Error(`${BLIND_ITEM_ID} needs a separate blind subagent review`);
     byId.set(id, result);
   }
   const verdicts = items.map((item) => {

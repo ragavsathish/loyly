@@ -1,4 +1,5 @@
 import { join, resolve } from 'node:path';
+import { DEFAULT_PANEL_PLAN } from './project/loyly/index.ts';
 
 export function parseWorkerConfig(
   ROOT: string,
@@ -118,7 +119,7 @@ export function parseWorkerConfig(
     live && environment.LOYLY_PANEL_IMAGE
       ? {
           image: resolve(environment.LOYLY_PANEL_IMAGE),
-          planFile: environment.LOYLY_PANEL_PLAN_FILE ?? 'booking-core.panel.json',
+          planFile: environment.LOYLY_PANEL_PLAN_FILE ?? DEFAULT_PANEL_PLAN,
           planSha256: environment.LOYLY_PANEL_PLAN_SHA256,
           imageSha256: environment.LOYLY_PANEL_IMAGE_SHA256,
         }

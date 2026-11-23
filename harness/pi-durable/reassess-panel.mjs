@@ -11,6 +11,7 @@ import { compilePanel, verifyCompiledPanel } from './panel-compile.ts';
 import { candidateDigest } from './grading-room.ts';
 import { scoreCycleFor, verifyScoredCycle } from './score-receipt.ts';
 import { readAuditRows } from './audit-rows.ts';
+import { DEFAULT_PANEL_PLAN } from './project/loyly/index.ts';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
@@ -37,7 +38,7 @@ export async function checkReassessment(config) {
     throw Error('reassessment output must be a private directory in the original scratch');
   if (git('rev-parse', 'HEAD') !== config.controller_commit || git('status', '--porcelain'))
     throw Error('controller differs from the pinned clean commit');
-  const planFile = join(HERE, config.plan_file ?? 'booking-core.panel.json');
+  const planFile = join(HERE, config.plan_file ?? DEFAULT_PANEL_PLAN);
   if (fileSha(planFile) !== config.plan_sha256
       || fileSha(join(image, 'manifest.json')) !== config.image_sha256)
     throw Error('panel plan or VM image changed');

@@ -12,6 +12,11 @@ import { compileAllureSchema } from '../evidence-core/validate-schema.ts';
 import { candidateDigest, treeDigest } from './grading-room.ts';
 import { scoreCycleFor } from './score-receipt.ts';
 import { verifyRuntimeProfileEvidence } from './runtime-profile-evidence.mjs';
+import {
+  DEFAULT_PANEL_PLAN,
+  LEGACY_PANEL_PLAN,
+  PANEL_VM_RUN,
+} from './project/loyly/index.ts';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -22,7 +27,7 @@ const LEGACY_WORKERS = [
   { id: 'telemetry', script: 'panel-telemetry.mjs', tool: 'OpenTelemetry', item: '01-003' },
 ];
 function workerBundle(plan) {
-  if (plan.schema === 'loyly.grading-panel-plan.v1') return { root: HERE, sha256: null };
+  if (plan.schema === LEGACY_PANEL_PLAN) return { root: HERE, sha256: null };
   if (plan.schema !== 'harness.grading-panel-plan.v2'
       || !/^[a-z][a-z0-9/-]*$/.test(plan.bundle?.path ?? '')
       || !/^[0-9a-f]{64}$/.test(plan.bundle?.sha256 ?? ''))
@@ -38,7 +43,7 @@ function specialistWorkers(plan) {
   if (!checks.length || new Set(checks.map((check) => check.id)).size !== checks.length)
     throw new Error('panel needs unique specialist checks');
   return checks.map((check) => {
-    const legacy = plan.schema === 'loyly.grading-panel-plan.v1'
+    const legacy = plan.schema === LEGACY_PANEL_PLAN
       ? LEGACY_WORKERS.find((row) => row.id === check.id) : null;
     const script = check.script ?? legacy?.script;
     if (!script || !/^[a-z][a-z0-9-]*\.mjs$/.test(script)
@@ -150,7 +155,7 @@ async function runPanelVms({
   original,
   image,
   out,
-  planFile = join(HERE, 'booking-core.panel.json'),
+  planFile = join(HERE, DEFAULT_PANEL_PLAN),
 }: {
   original: string;
   image: string;
@@ -186,7 +191,7 @@ async function runPanelVms({
     - Math.max(...producers.map((row) => row.started));
   if (overlap <= 0) throw new Error('panel VMs did not overlap');
   if (scoreDigest(original) !== scoreSha256) throw new Error('score changed during VM grading');
-  const manifest = { schema: 'loyly.panel-vm-run.v1', source_commit: scoreInput.source_commit,
+  const manifest = { schema: PANEL_VM_RUN, source_commit: scoreInput.source_commit,
     candidate_sha256: candidateSha256, original_score_sha256: scoreSha256,
     allure_schema_sha256: fileSha(schemaFile), plan_sha256: fileSha(planFile), image_digest: imageDigest,
     worker_support_sha256: fileSha(join(HERE, 'panel-candidate.mjs')),
@@ -203,7 +208,7 @@ function verifyPanelVmRun({
   original,
   out,
   imageDigest,
-  planFile = join(HERE, 'booking-core.panel.json'),
+  planFile = join(HERE, DEFAULT_PANEL_PLAN),
 }: {
   original: string;
   out: string;
@@ -221,7 +226,7 @@ function verifyPanelVmRun({
   const workers = specialistWorkers(plan);
   const schemaFile = join(HERE, '../evidence-core/allure-lifecycle-result.schema.json');
   const validate = compileAllureSchema(JSON.parse(readFileSync(schemaFile, 'utf8')));
-  if (manifest.schema !== 'loyly.panel-vm-run.v1'
+  if (manifest.schema !== PANEL_VM_RUN
       || manifest.source_commit !== scoreInput.source_commit
       || manifest.candidate_sha256 !== candidateSha256
       || ((manifest.score_state ?? 'filed') === 'filed' && manifest.original_score_sha256 !== scoreSha256)
