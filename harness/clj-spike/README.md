@@ -6,6 +6,19 @@ that surface into Babashka Clojure.
 
 Shared oracle tools in `harness/*.clj` are untouched.
 
+## Libraries
+
+Prefer Babashka / CLJ libs over hand-rolled plumbing:
+
+| Concern | Library |
+|---------|---------|
+| Compact JSON | `cheshire` (built into bb) |
+| SHA-256 | `org.clj-commons/digest` (`bb.edn` `:deps`) |
+| Files | `babashka.fs` |
+| Process / git | `babashka.process` |
+
+**Kept custom:** pretty JSON write + order-preserving read in `hjson.clj` — checklist/score byte shape (`@harness-012`) and key order (`@harness-029`). Cheshire’s defaults do not honour those.
+
 ## Status
 
 | Area | TS source | Spike | Notes |

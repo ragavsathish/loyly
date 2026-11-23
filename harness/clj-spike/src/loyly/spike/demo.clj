@@ -1,7 +1,7 @@
 (ns loyly.spike.demo
   "Smoke the TS→CLJ spike: measure + loyly + receipt + verdicts + grading-room digests."
-  (:require [clojure.java.io :as io]
-            [clojure.java.shell :as sh]
+  (:require [babashka.fs :as fs]
+            [babashka.process :as p]
             [clojure.string :as str]
             [loyly.spike.blind-review :as blind]
             [loyly.spike.continuation :as cont]
@@ -27,24 +27,23 @@
   (System/exit 1))
 
 (defn- sh! [& args]
-  (let [{:keys [exit out err]} (apply sh/sh args)]
+  (let [{:keys [exit out err]} @(p/process (vec args) {:out :string :err :string})]
     (when-not (zero? exit)
       (die (str (str/join " " args) " failed: " err out)))
     out))
 
 (defn -main [& args]
   (let [repo (or (second (drop-while #(not= "--root" %) (vec args))) ".")
-        repo (.getCanonicalFile (io/file repo))
-        scratch (io/file (System/getProperty "java.io.tmpdir")
+        repo (fs/file (fs/absolutize repo))
+        scratch (fs/file (fs/temp-dir)
                          (str "loyly-clj-spike-" (System/currentTimeMillis)))]
-    (.mkdirs (io/file scratch "harness" "cycles" "02"))
-    (let [instrument (io/file scratch "instrument")
-          checklist-file (io/file scratch "checklist.json")]
+    (fs/create-dirs (fs/path scratch "harness" "cycles" "02"))
+    (let [instrument (fs/file scratch "instrument")
+          checklist-file (fs/file scratch "checklist.json")]
       (sh! "git" "clone" "-q" "--depth" "1" (str "file://" repo) (str instrument))
-      (.mkdirs (io/file instrument "harness" "cycles" "02"))
+      (fs/create-dirs (fs/path instrument "harness" "cycles" "02"))
       (checklist/generate {:root (str instrument) :out (str checklist-file)})
-      (sh! "cp" (str checklist-file)
-           (str (io/file instrument "harness" "cycles" "02" "checklist.json")))
+      (fs/copy checklist-file (fs/path instrument "harness" "cycles" "02" "checklist.json"))
       (let [checklist (hjson/read-json (slurp checklist-file :encoding "UTF-8"))
             items (get checklist "items")
             _ (when-not (policy/requires-blind-handoff id/PROJECT_ID items)
@@ -74,13 +73,13 @@
                          sort
                          vec)
             specs (mapv (fn [file]
-                          (array-map "file" file "sha256" (d/file-sha256 (io/file instrument file))))
+                          (array-map "file" file "sha256" (d/file-sha256 (fs/path instrument file))))
                         sources)
             _ (live/verify-selected-specs (str instrument)
                                           (array-map "specs" specs)
                                           checklist)
             panel-plan (hjson/read-json
-                        (slurp (io/file instrument "harness" "pi-durable"
+                        (slurp (fs/file instrument "harness" "pi-durable"
                                         id/DEFAULT_PANEL_PLAN)
                                :encoding "UTF-8"))
             panel-sel (panel/validate-panel-selection panel-plan checklist)
@@ -108,43 +107,42 @@
                                           "verdict" "pass"
                                           "evidence" (str "observed " (get item "id")))))
                            items)
-            ;; Compact JSON like the TS score-receipt test (JSON.stringify, no pretty).
-            verdicts-file (io/file scratch "verdicts.json")
+            verdicts-file (fs/file scratch "verdicts.json")
             _ (hjson/spit-utf8 verdicts-file (hjson/compact-json verdicts))
-            room-dir (io/file scratch "grading-room")
-            _ (do (.mkdirs (io/file room-dir "work"))
-                  (sh! "cp" (str checklist-file) (str (io/file room-dir "checklist.json")))
-                  (hjson/spit-utf8 (io/file room-dir "work" "verdicts.json")
+            room-dir (fs/file scratch "grading-room")
+            _ (do (fs/create-dirs (fs/path room-dir "work"))
+                  (fs/copy checklist-file (fs/path room-dir "checklist.json"))
+                  (hjson/spit-utf8 (fs/file room-dir "work" "verdicts.json")
                                    (hjson/compact-json verdicts))
-                  (hjson/spit-utf8 (io/file room-dir "work" "surprises.json") "[]")
-                  (hjson/spit-utf8 (io/file room-dir id/BLIND_REFUSAL_FILE)
+                  (hjson/spit-utf8 (fs/file room-dir "work" "surprises.json") "[]")
+                  (hjson/spit-utf8 (fs/file room-dir id/BLIND_REFUSAL_FILE)
                                    "pukuhuone 9 closed Monday; try Thursday 17:00\n"))
             judged (vv/validate-verdicts (str room-dir))
             _ (when-not (pos? (:pass judged))
                 (die "expected some passing verdicts"))
-            cand (io/file scratch "candidate")
-            _ (do (.mkdirs (io/file cand "impl"))
-                  (hjson/spit-utf8 (io/file cand "impl" "start.sh") "#!/bin/sh\necho ok\n")
-                  (.setExecutable (io/file cand "impl" "start.sh") true))
+            cand (fs/file scratch "candidate")
+            _ (do (fs/create-dirs (fs/path cand "impl"))
+                  (hjson/spit-utf8 (fs/file cand "impl" "start.sh") "#!/bin/sh\necho ok\n")
+                  (fs/set-posix-file-permissions (fs/path cand "impl" "start.sh") "rwxr-xr-x"))
             cand-sha (room/candidate-digest (str cand))
-            schema-file (io/file repo "harness" "pi-durable"
+            schema-file (fs/file repo "harness" "pi-durable"
                                  "allure-lifecycle-result.schema.json")
-            _ (when-not (.isFile schema-file)
+            _ (when-not (fs/regular-file? schema-file)
                 (die (str "missing schema at " schema-file)))
             checklist-sha (d/file-sha256 checklist-file)
             schema-sha (d/file-sha256 schema-file)
-            grade-out (io/file scratch "grade-out")
+            grade-out (fs/file scratch "grade-out")
             receipt-map (room/prepare-grading-room
                          {:source-room (str instrument)
                           :candidate-room (str cand)
-                          :checklist-file (str checklist-file)
-                          :schema-file (.getAbsolutePath schema-file)
-                          :out (.getAbsolutePath grade-out)
+                          :checklist-file (str (fs/absolutize checklist-file))
+                          :schema-file (str (fs/absolutize schema-file))
+                          :out (str (fs/absolutize grade-out))
                           :candidate-sha256 cand-sha
                           :checklist-sha256 checklist-sha
                           :schema-sha256 schema-sha})
             _ (room/verify-grading-room
-               {:out (.getAbsolutePath grade-out)
+               {:out (str (fs/absolutize grade-out))
                 :candidate-sha256 cand-sha
                 :checklist-sha256 checklist-sha
                 :schema-sha256 schema-sha})

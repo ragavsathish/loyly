@@ -1,6 +1,6 @@
 (ns loyly.spike.grader-shards
   "PoC port of partitionByRule (+ prepareShards) from harness/pi-durable/grader-shards.ts"
-  (:require [clojure.java.io :as io]
+  (:require [babashka.fs :as fs]
             [loyly.spike.digest :as d]
             [loyly.spike.grading-room :as room]
             [loyly.spike.hjson :as hjson]
@@ -30,14 +30,14 @@
                   (recur (rest items) order (update groups key conj item))
                   (recur (rest items) (conj order key) (assoc groups key [item])))))
             [order groups]))
-        n (min shard-count (clojure.core/count order))
+        n (min shard-count (count order))
         shards (vec (repeat n []))]
     (let [shards
           (reduce
            (fn [shards key]
              (let [group (get groups key)
-                   idx (apply min-key (fn [i] (clojure.core/count (nth shards i)))
-                              (range (clojure.core/count shards)))]
+                   idx (apply min-key (fn [i] (count (nth shards i)))
+                              (range (count shards)))]
                (update shards idx into group)))
            shards
            order)]
@@ -55,39 +55,39 @@
   (let [blind-review (if (nil? blind-review)
                        (id/defaults-blind-review project)
                        blind-review)
-        full (hjson/read-json (slurp (io/file grading-room "checklist.json") :encoding "UTF-8"))
+        full (hjson/read-json (slurp (fs/file grading-room "checklist.json") :encoding "UTF-8"))
         partitions (partition-by-rule (get full "items") count)]
     (mapv
      (fn [{:keys [id items]}]
-       (let [base (io/file scratch "grader-shards" id)
-             checklist-file (io/file base "inputs" "checklist.json")
-             out (io/file base (str "grading-" id))
+       (let [base (fs/path scratch "grader-shards" id)
+             checklist-file (fs/file base "inputs" "checklist.json")
+             out (fs/file base (str "grading-" id))
              payload (array-map "items" items
                                 "counts" (array-map "total" (count items)))
              bytes (str (hjson/compact-json payload) "\n")]
-         (.mkdirs (io/file base "inputs"))
-         (when (and (.isFile checklist-file)
+         (fs/create-dirs (fs/path base "inputs"))
+         (when (and (fs/regular-file? checklist-file)
                     (not= (slurp checklist-file :encoding "UTF-8") bytes))
            (throw (ex-info (str "grader shard selection changed: " id) {:id id})))
-         (when-not (.isFile checklist-file)
+         (when-not (fs/regular-file? checklist-file)
            (hjson/spit-utf8 checklist-file bytes))
          (let [checklist-sha (d/file-sha256 checklist-file)
                args {:source-room source-room
                      :candidate-room grading-room
-                     :checklist-file (.getAbsolutePath checklist-file)
+                     :checklist-file (str (fs/absolutize checklist-file))
                      :schema-file schema-file
-                     :out (.getAbsolutePath out)
+                     :out (str (fs/absolutize out))
                      :candidate-sha256 candidate-sha256
                      :checklist-sha256 checklist-sha
                      :schema-sha256 schema-sha256
                      :project project
                      :blind-review blind-review}]
-           (if (.exists out)
+           (if (fs/exists? out)
              (room/verify-grading-room args)
              (room/prepare-grading-room args))
            {:id id
             :items (mapv #(get % "id") items)
-            :out (.getAbsolutePath out)
+            :out (str (fs/absolutize out))
             :checklist-sha256 checklist-sha
             :args args})))
      partitions)))

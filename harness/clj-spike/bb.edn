@@ -1,7 +1,8 @@
 {:paths ["src"]
+ :deps {org.clj-commons/digest {:mvn/version "1.4.100"}}
+ ;; cheshire + babashka.fs + babashka.process ship with Babashka.
  :tasks
- {;; Prefer: harness/clj-spike/bin/spike <task> --root … 
-  ;; Tasks forward argv after the task name into each -main.
+ {;; Prefer: harness/clj-spike/bin/spike <task> --root …
   gen-checklist
   {:doc "Derive checklist (TS measure/gen-checklist)"
    :requires ([loyly.spike.gen-checklist :as g])

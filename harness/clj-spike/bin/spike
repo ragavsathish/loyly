@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Wrapper: harness/clj-spike/bin/spike <task> [args...]
-# Uses -m so flags like --out are not swallowed by babashka's task runner.
+# Runs with this folder's bb.edn (:deps / :paths). Default --root is the repo.
 set -euo pipefail
-ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
-SRC="$ROOT/harness/clj-spike/src"
+SPIKE="$(cd "$(dirname "$0")/.." && pwd)"
+REPO="$(cd "$SPIKE/../.." && pwd)"
 if [[ $# -lt 1 ]]; then
   echo "usage: harness/clj-spike/bin/spike <gen-checklist|score|scoreboard|stamp|demo> [args...]" >&2
   exit 2
@@ -20,4 +20,14 @@ case "$task" in
     exit 2
     ;;
 esac
-exec bb -cp "$SRC" -m "$ns" "$@"
+# bb.edn lives in $SPIKE; default the working tree to the git repo root.
+has_root=0
+for a in "$@"; do
+  if [[ "$a" == "--root" ]]; then has_root=1; break; fi
+done
+cd "$SPIKE"
+if [[ $has_root -eq 0 ]]; then
+  exec bb -m "$ns" --root "$REPO" "$@"
+else
+  exec bb -m "$ns" "$@"
+fi

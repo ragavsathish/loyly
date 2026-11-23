@@ -1,6 +1,7 @@
 (ns loyly.spike.allure-results
   "PoC port of harness/pi-durable/allure-results.ts (Ajv schema compile deferred)."
-  (:require [clojure.java.io :as io]
+  (:require [babashka.fs :as fs]
+            [clojure.string :as str]
             [loyly.spike.digest :as d]
             [loyly.spike.evidence.validate-identity :as ident]
             [loyly.spike.evidence.validate-result :as evid]
@@ -29,15 +30,15 @@
                            (or (get item "id") "unknown"))
                       {})))
     (let [feature (ident/feature-title-from-spec
-                   (slurp (io/file room "plan" plan-dir "spec.feature") :encoding "UTF-8"))]
+                   (slurp (fs/file room "plan" plan-dir "spec.feature") :encoding "UTF-8"))]
       {:full-name (ident/allure-full-name
                    {:project project :slice-key slice-key :item-id (get item "id")})
        :feature feature})))
 
 (defn- load-allure-room [room]
-  (let [checklist (hjson/read-json (slurp (io/file room "checklist.json") :encoding "UTF-8"))
+  (let [checklist (hjson/read-json (slurp (fs/file room "checklist.json") :encoding "UTF-8"))
         items (get checklist "items")
-        receipt (hjson/read-json (slurp (io/file room ".grading-room.json") :encoding "UTF-8"))
+        receipt (hjson/read-json (slurp (fs/file room ".grading-room.json") :encoding "UTF-8"))
         project (or (get receipt "project") id/PROJECT_ID)
         blind-review (if (contains? receipt "blindReview")
                        (get receipt "blindReview")
@@ -51,28 +52,28 @@
 
 (defn- digest-allure-dir [dir expected-files]
   (let [digest (MessageDigest/getInstance "SHA-256")]
-    (doseq [name (sort (.list (io/file dir)))]
+    (doseq [name (sort (map fs/file-name (fs/list-dir dir)))]
       (when (or (not (contains? expected-files name))
-                (not (.isFile (io/file dir name))))
+                (not (fs/regular-file? (fs/path dir name))))
         (throw (ex-info (str "unexpected Allure result entry: " name) {:name name})))
       (.update digest (.getBytes name "UTF-8"))
       (.update digest (byte-array [0]))
-      (.update digest (.readAllBytes (io/input-stream (io/file dir name))))
+      (.update digest (fs/read-all-bytes (fs/path dir name)))
       (.update digest (byte-array [0])))
     (d/hex (.digest digest))))
 
 (defn- read-surprises [room by-id]
-  (let [raw (hjson/read-json (slurp (io/file room "work" "surprises.json") :encoding "UTF-8"))]
+  (let [raw (hjson/read-json (slurp (fs/file room "work" "surprises.json") :encoding "UTF-8"))]
     (when-not (vector? raw)
       (throw (ex-info "surprises must be a JSON array" {})))
     (vec
      (mapcat
       (fn [surprise]
         (let [ids (if (string? (get surprise "item"))
-                    (clojure.string/split (get surprise "item") #",\s*")
+                    (str/split (get surprise "item") #",\s*")
                     [])
               raw-path (get surprise "evidence_file")
-              evidence-file (if (and (string? raw-path) (not (clojure.string/starts-with? raw-path "work/")))
+              evidence-file (if (and (string? raw-path) (not (str/starts-with? raw-path "work/")))
                               (str "work/" raw-path)
                               raw-path)]
           (when (or (empty? ids)
@@ -80,9 +81,9 @@
                     (not (string? (get surprise "observation")))
                     (not (string? evidence-file))
                     (not (re-matches #"work/[A-Za-z0-9._/-]+" evidence-file))
-                    (clojure.string/includes? evidence-file "..")
+                    (str/includes? evidence-file "..")
                     (re-find #"^work/runtime-[^/]+/" evidence-file)
-                    (not (.isFile (io/file room evidence-file))))
+                    (not (fs/regular-file? (fs/path room evidence-file))))
             (throw (ex-info "invalid surprise evidence" {})))
           (map (fn [id]
                  (array-map "item" id
@@ -99,17 +100,17 @@
                                    [(get item "id") (identity-for room item project)])
                                  items))
         spec-sha (when (and blind-review (policy/requires-blind-handoff project items))
-                   (d/file-sha256 (io/file room id/BLIND_SPEC_RELATIVE)))
+                   (d/file-sha256 (fs/path room id/BLIND_SPEC_RELATIVE)))
         pending-prefix (policy/pending-evidence-prefix spec-sha)
-        dir (io/file room "work" "allure-results")
-        files (filterv #(re-matches RESULT-RE %) (.list dir))]
+        dir (fs/path room "work" "allure-results")
+        files (filterv #(re-matches RESULT-RE %) (map fs/file-name (fs/list-dir dir)))]
     (when-not (= (count files) (count items))
       (throw (ex-info "grader did not return one Allure result per selected item" {})))
     (let [expected-files (atom (set files))
           by-id
           (reduce
            (fn [by-id file]
-             (let [result (hjson/read-json (slurp (io/file dir file) :encoding "UTF-8"))]
+             (let [result (hjson/read-json (slurp (fs/file dir file) :encoding "UTF-8"))]
                (when-not (structural-allure? result)
                  (throw (ex-info (str "Allure result structural check failed: " file) {})))
                (when-not (= file (str (get result "uuid") "-result.json"))
@@ -130,8 +131,8 @@
                      "fullName" (:full-name expected)})
                    (evid/validate-result-evidence result item-id)
                    (doseq [attachment (get result "attachments")]
-                     (let [path (io/file dir (get attachment "source"))]
-                       (when-not (.isFile path)
+                     (let [path (fs/path dir (get attachment "source"))]
+                       (when-not (fs/regular-file? path)
                          (throw (ex-info (str "Allure attachment bytes missing for " item-id
                                               ": " (get attachment "source"))
                                          {})))

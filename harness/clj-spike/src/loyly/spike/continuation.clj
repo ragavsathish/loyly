@@ -1,6 +1,6 @@
 (ns loyly.spike.continuation
   "PoC port of pure helpers from harness/pi-durable/continuation.ts"
-  (:require [clojure.java.io :as io]
+  (:require [babashka.fs :as fs]
             [clojure.string :as str]
             [loyly.spike.evidence.validate-verdicts :as ev]
             [loyly.spike.hjson :as hjson]))
@@ -19,10 +19,10 @@
 (defn selected-uncarried
   "Synchronous port of selectedUncarried(room, checklistFile)."
   [room checklist-file]
-  (let [file (io/file room "impl" "UNCARRIED.md")]
-    (if-not (.isFile file)
+  (let [file (fs/file room "impl" "UNCARRIED.md")]
+    (if-not (fs/regular-file? file)
       []
-      (let [checklist (hjson/read-json (slurp (io/file checklist-file) :encoding "UTF-8"))]
+      (let [checklist (hjson/read-json (slurp (fs/file checklist-file) :encoding "UTF-8"))]
         (when-not (ev/selected-checklist? checklist)
           (throw (ex-info "invalid selected checklist" {:path (str checklist-file)})))
         (extract-uncarried checklist (slurp file :encoding "UTF-8"))))))

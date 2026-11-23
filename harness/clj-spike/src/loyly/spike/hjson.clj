@@ -1,16 +1,12 @@
 (ns loyly.spike.hjson
-  "JSON in the one dialect the harness speaks, plus the small pieces of plumbing
-  every tool in it needs.
+  "JSON + plumbing for the spike.
 
-  The writer reproduces a one-space-indented pretty printer with non-ASCII written
-  through literally: that byte shape is contract (harness/spec.feature @harness-012),
-  so it is spelled out here rather than delegated to a library whose defaults could
-  move underneath it.
-
-  The reader is hand written for one reason: a scored item is the checklist item's
-  keys IN THE CHECKLIST'S OWN ORDER (@harness-029), so parsing has to preserve the
-  order the keys arrived in. Objects come back as array maps, which are ordered."
-  (:require [clojure.java.io :as io]
+  Pretty write + order-preserving read stay hand-rolled: checklist/score byte
+  shape (@harness-012) and key order (@harness-029) are contracts Cheshire's
+  defaults do not honour. Compact JSON and filesystem helpers use libraries."
+  (:require [babashka.fs :as fs]
+            [cheshire.core :as json]
+            [clojure.java.io :as io]
             [clojure.string :as str]))
 
 ;; ---------------------------------------------------------------- writing
@@ -156,24 +152,9 @@
     v))
 
 (defn compact-json
-  "Compact JSON matching Node JSON.stringify for string-keyed maps/vectors.
-  Used by score-input receipts and grading-room receipts."
+  "Compact JSON via Cheshire (Node JSON.stringify shape for array-maps)."
   [v]
-  (cond
-    (nil? v) "null"
-    (string? v) (write-string v)
-    (number? v) (str v)
-    (boolean? v) (str v)
-    (keyword? v) (write-string (name v))
-    (map? v) (str "{"
-                  (str/join ","
-                            (for [[k val] v]
-                              (str (compact-json (if (keyword? k) (name k) (str k)))
-                                   ":"
-                                   (compact-json val))))
-                  "}")
-    (sequential? v) (str "[" (str/join "," (map compact-json v)) "]")
-    :else (throw (ex-info "unsupported json value" {:v v}))))
+  (json/generate-string v))
 
 (defn detail
   "The parser's own words about a failure, for the one message that carries them."
@@ -193,25 +174,26 @@
   resolved through symlinks from the script's own location and never from the
   working directory (harness/spec.feature, INVOCATION)."
   [script]
-  (.getParentFile (.getParentFile (.getCanonicalFile (io/file script)))))
+  (-> (fs/real-path script) fs/parent fs/parent fs/file))
 
 (defn rel
   "`f` as a path relative to `root`, with forward slashes."
   [root f]
-  (str/replace (subs (.getPath (io/file f)) (inc (count (.getPath (io/file root)))))
-               java.io.File/separator "/"))
+  (-> (fs/relativize (fs/path root) (fs/path f))
+      str
+      (str/replace "\\" "/")))
 
 (defn spec-files
   "Every docs/plan/[0-9]*/spec.feature under `root`, sorted by path as text."
   [root]
-  (->> (or (seq (.listFiles (io/file root "docs" "plan"))) [])
-       (filter #(.isDirectory %))
-       (filter #(re-find #"^[0-9]" (.getName %)))
-       (map #(io/file % "spec.feature"))
-       (filter #(.isFile %))
+  (->> (fs/list-dir (fs/path root "docs" "plan"))
+       (filter fs/directory?)
+       (filter #(re-find #"^[0-9]" (fs/file-name %)))
+       (map #(fs/file % "spec.feature"))
+       (filter fs/regular-file?)
        (sort-by #(rel root %))))
 
-(defn plan-dir [root] (.getPath (io/file root "docs" "plan")))
+(defn plan-dir [root] (str (fs/path root "docs" "plan")))
 
 (defn emit
   "Write text to a stream as UTF-8, whatever the ambient locale says."
@@ -232,10 +214,9 @@
 (defn spit-utf8
   "Write `text` to `f`, creating missing parent directories."
   [f ^String text]
-  (let [f (io/file f)]
-    (when-let [p (.getParentFile f)] (.mkdirs p))
-    (with-open [w (io/writer f :encoding "UTF-8")]
-      (.write w text))))
+  (let [f (fs/file f)]
+    (fs/create-dirs (fs/parent f))
+    (spit f text :encoding "UTF-8")))
 
 (defn ralign [s w]
   (let [s (str s)]

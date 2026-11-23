@@ -1,7 +1,7 @@
 (ns loyly.spike.live-contract
   "PoC port of pure helpers from harness/pi-durable/live-contract.ts.
   Full Ajv schema compile is deferred; callers pass already-shaped maps."
-  (:require [clojure.java.io :as io]
+  (:require [babashka.fs :as fs]
             [clojure.string :as str]
             [loyly.spike.digest :as d]
             [loyly.spike.gen-checklist :as checklist]
@@ -18,10 +18,10 @@
                       {:path path :actual actual :expected expected})))))
 
 (defn- path-in-source [repo relative]
-  (when (or (.isAbsolute (io/file relative))
+  (when (or (fs/absolute? (fs/path relative))
             (some #{".."} (str/split relative #"[\\/]")))
     (throw (ex-info "spec_file must stay inside the pinned source cut" {:relative relative})))
-  (io/file repo relative))
+  (fs/file repo relative))
 
 (defn verify-selected-specs
   "Port of verifySelectedSpecs(repo, source, checklist?)."
@@ -59,7 +59,7 @@
 (defn verify-image
   "Port of verifyImage(image, expectedManifestSha256)."
   [image expected-manifest-sha256]
-  (let [manifest-file (io/file image "manifest.json")]
+  (let [manifest-file (fs/file image "manifest.json")]
     (require-hash manifest-file expected-manifest-sha256)
     (let [manifest (hjson/read-json (slurp manifest-file :encoding "UTF-8"))
           assets (or (get manifest "assets") {})
@@ -68,14 +68,14 @@
         (let [expected (get checksums kind)]
           (when-not (and (string? expected) (re-matches #"[0-9a-f]{64}" expected))
             (throw (ex-info (str "image asset " kind " has no checksum") {:kind kind})))
-          (require-hash (io/file image name) expected))))))
+          (require-hash (fs/file image name) expected))))))
 
 (defn derive-approved-checklist
   "Port of deriveApprovedChecklist without panel VM worker probe."
   [{:keys [config source scratch]}]
-  (.mkdirs (io/file scratch))
-  (let [checklist-path (io/file scratch "approved-checklist.json")]
-    (when-not (.isFile checklist-path)
+  (fs/create-dirs scratch)
+  (let [checklist-path (fs/file scratch "approved-checklist.json")]
+    (when-not (fs/regular-file? checklist-path)
       (try
         (checklist/generate {:root source :out (str checklist-path)})
         (catch Exception e

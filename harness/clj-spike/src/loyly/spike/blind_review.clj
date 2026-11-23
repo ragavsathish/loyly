@@ -1,7 +1,7 @@
 (ns loyly.spike.blind-review
   "PoC port of pure blind-review validation from harness/pi-durable/blind-review.ts.
   Packet prepare / Allure / HTTP probe stay on the TS side for now."
-  (:require [clojure.java.io :as io]
+  (:require [babashka.fs :as fs]
             [clojure.string :as str]
             [loyly.spike.digest :as d]
             [loyly.spike.hjson :as hjson]
@@ -46,13 +46,12 @@
 (defn verify-packet-files
   "Check packetDir question/refusal digests against packet.json fields."
   [packet-dir]
-  (let [packet-file (io/file packet-dir "packet.json")
+  (let [packet-file (fs/file packet-dir "packet.json")
         packet (hjson/read-json (slurp packet-file :encoding "UTF-8"))
-        refusal (slurp (io/file packet-dir "refusal.txt") :encoding "UTF-8")
-        question (slurp (io/file packet-dir "question.txt") :encoding "UTF-8")]
+        refusal (slurp (fs/file packet-dir "refusal.txt") :encoding "UTF-8")
+        question (slurp (fs/file packet-dir "question.txt") :encoding "UTF-8")]
     (validate-blind-packet-shape packet)
     (when (or (not= (d/sha256-string refusal) (get packet "refusal_sha256"))
-              ;; refuse may be binary in TS; for spike treat as UTF-8 text
               (not= question policy/BLIND_QUESTION))
       (throw (ex-info "blind packet files no longer match packet.json" {})))
     {:packet packet

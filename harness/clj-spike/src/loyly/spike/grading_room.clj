@@ -1,22 +1,21 @@
 (ns loyly.spike.grading-room
   "PoC port of harness/pi-durable/grading-room.ts (digests + prepare/verify)."
-  (:require [clojure.java.io :as io]
+  (:require [babashka.fs :as fs]
             [loyly.spike.digest :as d]
             [loyly.spike.hjson :as hjson]
             [loyly.spike.project.loyly.identity :as id]
-            [loyly.spike.project.loyly.schemas :as schemas])
-  (:import [java.nio.file Files StandardCopyOption]))
+            [loyly.spike.project.loyly.schemas :as schemas]))
 
 (defn candidate-digest [room]
-  (d/tree-digest (io/file room "impl") "impl"))
+  (d/tree-digest (fs/path room "impl") "impl"))
 
 (defn plan-digest [room]
-  (d/tree-digest (io/file room "plan") "plan"))
+  (d/tree-digest (fs/path room "plan") "plan"))
 
 (defn selected-plans
   "Insertion-ordered unique plan slugs from checklist item sources (TS Set order)."
   [checklist-file]
-  (let [checklist (hjson/read-json (slurp (io/file checklist-file) :encoding "UTF-8"))
+  (let [checklist (hjson/read-json (slurp (fs/file checklist-file) :encoding "UTF-8"))
         items (get checklist "items")]
     (when (or (not (vector? items)) (empty? items))
       (throw (ex-info "grading checklist has no selected items" {})))
@@ -38,32 +37,10 @@
         acc))))
 
 (defn- absolute? [path]
-  (.isAbsolute (io/file path)))
+  (fs/absolute? (fs/path path)))
 
 (defn- digest64? [s]
   (boolean (and (string? s) (re-matches #"[0-9a-f]{64}" s))))
-
-(defn- copy-tree [from to]
-  (let [from (.getCanonicalFile (io/file from))
-        to (.getCanonicalFile (io/file to))]
-    (.mkdirs to)
-    (doseq [child (.listFiles from)]
-      (let [dest (io/file to (.getName child))]
-        (if (.isDirectory child)
-          (copy-tree child dest)
-          (do (.mkdirs (.getParentFile dest))
-              (Files/copy (.toPath child) (.toPath dest)
-                          (into-array StandardCopyOption
-                                      [StandardCopyOption/REPLACE_EXISTING
-                                       StandardCopyOption/COPY_ATTRIBUTES]))))))))
-
-(defn- copy-file [from to]
-  (let [to (io/file to)]
-    (.mkdirs (.getParentFile to))
-    (Files/copy (.toPath (io/file from)) (.toPath to)
-                (into-array StandardCopyOption
-                            [StandardCopyOption/REPLACE_EXISTING
-                             StandardCopyOption/COPY_ATTRIBUTES]))))
 
 (defn prepare-grading-room
   [{:keys [source-room candidate-room checklist-file schema-file out
@@ -80,28 +57,28 @@
         (throw (ex-info (str "grading path must be absolute: " path) {:path path}))))
     (when-not (every? digest64? [candidate-sha256 checklist-sha256 schema-sha256])
       (throw (ex-info "grading room needs approved digests" {})))
-    (when (or (not= (.getName (io/file checklist-file)) "checklist.json")
-              (not= (.getName (io/file schema-file)) "allure-lifecycle-result.schema.json")
+    (when (or (not= (fs/file-name checklist-file) "checklist.json")
+              (not= (fs/file-name schema-file) "allure-lifecycle-result.schema.json")
               (not= (d/file-sha256 checklist-file) checklist-sha256)
               (not= (d/file-sha256 schema-file) schema-sha256)
               (not= (candidate-digest candidate-room) candidate-sha256))
       (throw (ex-info "grading inputs differ from the gated candidate, checklist or schema" {})))
-    (when (.exists (io/file out))
+    (when (fs/exists? out)
       (throw (ex-info "grading room already exists; reconcile its receipt or inspect it" {})))
     (let [plans (selected-plans checklist-file)]
-      (.mkdirs (io/file out "plan"))
+      (fs/create-dirs (fs/path out "plan"))
       (doseq [plan plans]
-        (let [from (io/file source-room "docs" "plan" plan)]
-          (when-not (.isFile (io/file from "spec.feature"))
+        (let [from (fs/path source-room "docs" "plan" plan)]
+          (when-not (fs/regular-file? (fs/path from "spec.feature"))
             (throw (ex-info (str "selected plan missing: " plan) {:plan plan})))
-          (copy-tree from (io/file out "plan" plan))))
-      (copy-tree (io/file candidate-room "impl") (io/file out "impl"))
-      (copy-file checklist-file (io/file out "checklist.json"))
-      (copy-file schema-file (io/file out "allure-lifecycle-result.schema.json"))
-      (.mkdirs (io/file out "work"))
+          (fs/copy-tree from (fs/path out "plan" plan))))
+      (fs/copy-tree (fs/path candidate-room "impl") (fs/path out "impl"))
+      (fs/copy checklist-file (fs/path out "checklist.json"))
+      (fs/copy schema-file (fs/path out "allure-lifecycle-result.schema.json"))
+      (fs/create-dirs (fs/path out "work"))
       (when (or (not= (candidate-digest out) candidate-sha256)
-                (not= (d/file-sha256 (io/file out "checklist.json")) checklist-sha256)
-                (not= (d/file-sha256 (io/file out "allure-lifecycle-result.schema.json"))
+                (not= (d/file-sha256 (fs/path out "checklist.json")) checklist-sha256)
+                (not= (d/file-sha256 (fs/path out "allure-lifecycle-result.schema.json"))
                       schema-sha256))
         (throw (ex-info "grading copy differs from the gated candidate, checklist or schema" {})))
       (let [receipt (cond-> (array-map
@@ -114,7 +91,7 @@
                              "sourcePlans" (mapv #(str "plan/" %) plans))
                       (not (and (= project id/PROJECT_ID) blind-review))
                       (assoc "project" project "blindReview" blind-review))]
-        (hjson/spit-utf8 (io/file out ".grading-room.json")
+        (hjson/spit-utf8 (fs/file out ".grading-room.json")
                          (hjson/compact-json receipt))
         receipt))))
 
@@ -124,8 +101,8 @@
   (let [blind-review (if (nil? blind-review)
                        (id/defaults-blind-review project)
                        blind-review)
-        receipt (hjson/read-json (slurp (io/file out ".grading-room.json") :encoding "UTF-8"))
-        expected-plans (mapv #(str "plan/" %) (selected-plans (io/file out "checklist.json")))
+        receipt (hjson/read-json (slurp (fs/file out ".grading-room.json") :encoding "UTF-8"))
+        expected-plans (mapv #(str "plan/" %) (selected-plans (fs/file out "checklist.json")))
         recorded-plans (or (get receipt "sourcePlans")
                            (when-let [p (get receipt "sourcePlan")] [p])
                            [])]
@@ -141,13 +118,14 @@
               (not= (hjson/compact-json recorded-plans) (hjson/compact-json expected-plans))
               (not= (get receipt "planSha256") (plan-digest out))
               (not= (candidate-digest out) candidate-sha256)
-              (not= (d/file-sha256 (io/file out "checklist.json")) checklist-sha256)
-              (not= (d/file-sha256 (io/file out "allure-lifecycle-result.schema.json"))
+              (not= (d/file-sha256 (fs/path out "checklist.json")) checklist-sha256)
+              (not= (d/file-sha256 (fs/path out "allure-lifecycle-result.schema.json"))
                     schema-sha256))
       (throw (ex-info "grading room receipt or inputs changed" {})))
-    (doseq [name (.list (io/file out))]
-      (when-not (#{"plan" "impl" "checklist.json"
-                   "allure-lifecycle-result.schema.json" "work"
-                   ".grading-room.json"} name)
-        (throw (ex-info (str "unexpected grading-room entry: " name) {:name name}))))
+    (doseq [p (fs/list-dir out)]
+      (let [name (fs/file-name p)]
+        (when-not (#{"plan" "impl" "checklist.json"
+                     "allure-lifecycle-result.schema.json" "work"
+                     ".grading-room.json"} name)
+          (throw (ex-info (str "unexpected grading-room entry: " name) {:name name})))))
     receipt))
