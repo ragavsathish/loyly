@@ -1,0 +1,99 @@
+{
+  "uuid": "91c87f68-f2a0-4ba6-a0e7-d0128731bed3",
+  "historyId": "loyly.booking-core.01-001",
+  "testCaseId": "loyly.booking-core.01-001",
+  "fullName": "loyly.booking-core.01-001",
+  "name": "The weekly schedule shows each dressing room's own sauna days",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Request: GET / (weekly schedule for sauna F) and GET /api/schedule. Observed pukuhuone 9 sauna days ['Thursday', 'Friday', 'Saturday']; pukuhuone 8 sauna days ['Tuesday', 'Thursday']. Tuesday pukuhuone 8 bookable slots=[{'startTime': '17:00', 'endTime': '18:30', 'bookable': True, 'heldBy': None}]; Tuesday pukuhuone 9 slots=[] noSlots=True. Page and API schedules agree=True. Consequence: resident schedule matches both Tuesday assertions."
+  },
+  "start": 1795423373876,
+  "stop": 1795423373938,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Availability is per dressing room, per weekday"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-001"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given pukuhuone 9's sauna days are Thursday, Friday and Saturday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Inspected pukuhuone 9 separately. saunaDays=['Thursday', 'Friday', 'Saturday']."
+      },
+      "start": 1795423373876,
+      "stop": 1795423373938
+    },
+    {
+      "name": "And pukuhuone 8's sauna days include Tuesday",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Inspected pukuhuone 8 separately. saunaDays=['Tuesday', 'Thursday']."
+      },
+      "start": 1795423373876,
+      "stop": 1795423373938
+    },
+    {
+      "name": "When a resident views the weekly schedule for sauna F",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "GET / -> 200, embedded schedule parsed=True, sauna=sauna F. GET /api/schedule agrees=True."
+      },
+      "start": 1795423373876,
+      "stop": 1795423373938
+    },
+    {
+      "name": "Then Tuesday shows bookable slots for pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Tuesday pukuhuone 8 noSlots=False bookable slots=[{'startTime': '17:00', 'endTime': '18:30', 'bookable': True, 'heldBy': None}]."
+      },
+      "start": 1795423373876,
+      "stop": 1795423373938
+    },
+    {
+      "name": "And Tuesday shows no slots for pukuhuone 9",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Tuesday pukuhuone 9 noSlots=True slots=[]."
+      },
+      "start": 1795423373876,
+      "stop": 1795423373938
+    }
+  ],
+  "attachments": [
+    {
+      "name": "01-001 observation",
+      "source": "131e1042-7264-412c-b980-fb48a7fd55bf-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

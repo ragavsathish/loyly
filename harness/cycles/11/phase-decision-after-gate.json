@@ -1,0 +1,11 @@
+{
+  "afterBuild": {
+    "phase": "gate",
+    "attempt": 1
+  },
+  "afterGate": {
+    "phase": "grading-room",
+    "attempt": 1,
+    "candidateSha256": "4982f455df7039018d79bbd3f86140c765a923733760e0cfde67ac59910c9eca"
+  }
+}

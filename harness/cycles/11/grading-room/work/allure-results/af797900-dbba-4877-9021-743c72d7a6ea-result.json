@@ -1,0 +1,109 @@
+{
+  "uuid": "af797900-dbba-4877-9021-743c72d7a6ea",
+  "historyId": "loyly.booking-core.01-008",
+  "testCaseId": "loyly.booking-core.01-008",
+  "fullName": "loyly.booking-core.01-008",
+  "name": "Giving up a slot leaves no derived view still claiming it",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Request: POST /api/standing-slot/give-up apartment 12 Tuesday 17:00 pukuhuone 8. Observed 200 {\"ok\":true}. Afterward schedule hold=[], slot-list=[], heater=[], activeCharges=[], ledger=[{'type': 'standing_slot_charge', 'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'action': 'raised'}, {'type': 'standing_slot_charge', 'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'action': 'stopped'}]. Consequence: no view still claims the slot=True."
+  },
+  "start": 1795423374322,
+  "stop": 1795423374388,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "One booking is the single source of truth for the list, the timer and the billing"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-008"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given the household in apartment 12 holds the Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "Re-read before release, schedule hold=[{'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'endTime': '18:30', 'heldBy': '12', 'bookable': False}]."
+      },
+      "start": 1795423374322,
+      "stop": 1795423374388
+    },
+    {
+      "name": "When the household in apartment 12 gives up the standing slot",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "POST /api/standing-slot/give-up -> 200 {\"ok\":true}"
+      },
+      "start": 1795423374322,
+      "stop": 1795423374388
+    },
+    {
+      "name": "Then the posted slot list no longer shows the slot",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "slot-list Tuesday 17:00 pukuhuone 8 entries=[]."
+      },
+      "start": 1795423374322,
+      "stop": 1795423374388
+    },
+    {
+      "name": "And the heater schedule no longer heats for Tuesday 17:00",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "heater Tuesday 17:00 entries=[]."
+      },
+      "start": 1795423374322,
+      "stop": 1795423374388
+    },
+    {
+      "name": "And no further standing-slot charge is raised for apartment 12",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "activeCharges for 12=[]; ledger raised=1 stopped=1 entries=[{'type': 'standing_slot_charge', 'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'action': 'raised'}, {'type': 'standing_slot_charge', 'apartment': '12', 'dressingRoom': 'pukuhuone 8', 'weekday': 'Tuesday', 'startTime': '17:00', 'action': 'stopped'}]."
+      },
+      "start": 1795423374322,
+      "stop": 1795423374388
+    },
+    {
+      "name": "And no derived view disagrees with any other about the slot",
+      "status": "passed",
+      "stage": "finished",
+      "statusDetails": {
+        "message": "schedule hold after=[]; list clear=True; heat clear=True; no further charge=True."
+      },
+      "start": 1795423374322,
+      "stop": 1795423374388
+    }
+  ],
+  "attachments": [
+    {
+      "name": "01-008 observation",
+      "source": "42ec1560-7cf4-4ed2-9b1f-34bd00d03310-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}
