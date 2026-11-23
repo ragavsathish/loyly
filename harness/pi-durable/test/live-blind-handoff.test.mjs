@@ -6,7 +6,6 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync,
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { genChecklist } from "../measure/index.ts";
 
 const here = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const root = resolve(here, "../..");
@@ -53,7 +52,9 @@ function liveEnv(scratch) {
   { cwd: source, encoding: "utf8" });
   assert.equal(committed.status, 0, committed.stderr);
   const checklist = join(scratch, "approved-checklist.json");
-  genChecklist({ root: source, out: checklist });
+  const generated = spawnSync("bb", ["harness/gen_checklist.clj", "--out", checklist],
+    { cwd: source, encoding: "utf8" });
+  assert.equal(generated.status, 0, generated.stderr);
   const commit = spawnSync("git", ["rev-parse", "HEAD"], { cwd: source, encoding: "utf8" });
   assert.equal(commit.status, 0, commit.stderr);
   const image = join(root, ".pi/harness/.state/assets/builder-clojure");

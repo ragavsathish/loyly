@@ -6,7 +6,6 @@ import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } f
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { genChecklist, scoreCycle } from '../measure/index.ts';
 import { bindScoreInput, scoreCycleFor, verifyScoredCycle } from '../score-receipt.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -24,7 +23,7 @@ test('an existing legacy score is reconciled only against its original cut and v
     rmSync(cycle, { recursive: true, force: true });
     mkdirSync(cycle, { recursive: true });
     const checklistFile = join(scratch, 'checklist.json');
-    genChecklist({ root: instrument, out: checklistFile });
+    run('bb', ['harness/gen_checklist.clj', '--out', checklistFile], instrument);
     cpSync(checklistFile, join(cycle, 'checklist.json'));
     const checklist = JSON.parse(readFileSync(checklistFile, 'utf8'));
     const verdictsFile = join(scratch, 'verdicts.json');
@@ -41,7 +40,7 @@ test('an existing legacy score is reconciled only against its original cut and v
       candidateSha256: 'a'.repeat(64),
       verdictsFile,
     });
-    scoreCycle({ root: instrument, cycle: '02', verdictsPath: verdictsFile });
+    run('bb', ['harness/score.clj', '02', '--verdicts', verdictsFile], instrument);
     assert.equal(
       verifyScoredCycle({ scratch, instrument, verdictsFile }).score,
       `${checklist.items.length}/${checklist.items.length}`,
@@ -87,7 +86,7 @@ test('a filed score binds the selected pre-score panel manifest', () => {
     rmSync(cycle, { recursive: true, force: true });
     mkdirSync(cycle, { recursive: true });
     const checklistFile = join(scratch, 'checklist.json');
-    genChecklist({ root: instrument, out: checklistFile });
+    run('bb', ['harness/gen_checklist.clj', '--out', checklistFile], instrument);
     cpSync(checklistFile, join(cycle, 'checklist.json'));
     const verdictsFile = join(scratch, 'verdicts.json');
     const verdicts = JSON.parse(readFileSync(checklistFile)).items.map((item) => ({
@@ -113,7 +112,7 @@ test('a filed score binds the selected pre-score panel manifest', () => {
       verdictsFile,
     });
     assert.equal(bound.panel_manifest_sha256, digest);
-    scoreCycle({ root: instrument, cycle: '02', verdictsPath: verdictsFile });
+    run('bb', ['harness/score.clj', '02', '--verdicts', verdictsFile], instrument);
     assert.equal(
       verifyScoredCycle({ scratch, instrument, verdictsFile }).score,
       `${verdicts.length}/${verdicts.length}`,
@@ -136,7 +135,7 @@ test('a later product cycle binds its own score directory', () => {
     const cycle = join(instrument, 'harness', 'cycles', '03');
     mkdirSync(cycle, { recursive: true });
     const checklistFile = join(scratch, 'checklist.json');
-    genChecklist({ root: instrument, out: checklistFile });
+    run('bb', ['harness/gen_checklist.clj', '--out', checklistFile], instrument);
     cpSync(checklistFile, join(cycle, 'checklist.json'));
     const verdictsFile = join(scratch, 'verdicts.json');
     writeFileSync(
@@ -160,7 +159,7 @@ test('a later product cycle binds its own score directory', () => {
     assert.equal(input.score_cycle, '03');
     assert.equal(scoreCycleFor(scratch), '03');
     const total = JSON.parse(readFileSync(checklistFile)).items.length;
-    scoreCycle({ root: instrument, cycle: '03', verdictsPath: verdictsFile });
+    run('bb', ['harness/score.clj', '03', '--verdicts', verdictsFile], instrument);
     assert.equal(
       verifyScoredCycle({ scratch, instrument, verdictsFile, cycle: '03' }).score,
       `${total}/${total}`,

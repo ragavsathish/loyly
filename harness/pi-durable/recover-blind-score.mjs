@@ -8,7 +8,6 @@ import { readAuditRows } from "./audit-rows.ts";
 import { readAllureResults } from "./allure-results.ts";
 import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.ts";
 import { candidateDigest } from "./grading-room.ts";
-import { genChecklist, scoreCycle, scoreboard } from "./measure/index.ts";
 import { bindScoreInput, verifyScoredCycle } from "./score-receipt.ts";
 import { verifyPanelVmRun } from "./panel-vm-run.ts";
 
@@ -89,19 +88,17 @@ function fileSupplementalScore(prior, out, source, candidate, projected) {
     out, join(out, "clone.log"));
   const cycleDir = join(instrument, "harness", "cycles", cycle);
   mkdirSync(cycleDir, { recursive: true });
-  const checklistResult = genChecklist({
-    root: instrument, out: join(cycleDir, "checklist.json"),
-  });
-  writeFileSync(join(out, "checklist.log"), checklistResult.stderr);
+  command("bb", ["harness/gen_checklist.clj", "--out", join(cycleDir, "checklist.json")],
+    instrument, join(out, "checklist.log"));
   if (fileSha(join(cycleDir, "checklist.json")) !== fileSha(join(out, "checklist.json")))
     throw Error("recovered checklist differs from approved selection");
   bindScoreInput({ scratch: out, sourceRoot: source, instrument, candidateSha256: candidate,
     verdictsFile, scoreCycle: cycle });
-  const scored = scoreCycle({ root: instrument, cycle, verdictsPath: verdictsFile });
-  writeFileSync(join(out, "score.log"), scored.stdout);
+  command("bb", ["harness/score.clj", cycle, "--verdicts", verdictsFile],
+    instrument, join(out, "score.log"));
   const score = verifyScoredCycle({ scratch: out, instrument, verdictsFile, cycle });
   if (score.score !== "47/47") throw Error("recovery did not score every selected item");
-  writeFileSync(join(out, "scoreboard.log"), scoreboard({ root: instrument, cycle }).text);
+  command("bb", ["harness/scoreboard.clj", cycle], instrument, join(out, "scoreboard.log"));
   return { score, verdictsFile };
 }
 

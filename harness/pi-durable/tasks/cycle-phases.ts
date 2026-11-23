@@ -13,37 +13,10 @@ import {
 import { runBlindAgent } from '../blind-agent-adapter.mjs';
 import { bindScoreInput, verifyScoredCycle } from '../score-receipt.ts';
 import { prepareGradingRoom, verifyGradingRoom } from '../grading-room.ts';
-import {
-  genChecklist,
-  MeasureRefuse,
-  scoreCycle,
-  scoreboard as writeScoreboard,
-} from '../measure/index.ts';
 import { runDurablePanelReport } from '../panel-adapter.ts';
 import { hash } from '../cycle-effects.ts';
 import { BLIND_ITEM_ID, BLIND_SPEC_RELATIVE, BOOKING_SLICE } from '../project/loyly/index.ts';
 import { terminalFail, type CycleDependencies } from './cycle-types.ts';
-
-function measureLog(
-  scratch: string,
-  name: string,
-  run: () => { stdout?: string; stderr?: string },
-) {
-  try {
-    const result = run();
-    const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
-    writeFileSync(join(scratch, `${name}.log`), output);
-    return { code: 0, output, sha256: hash(output) };
-  } catch (cause: unknown) {
-    const message =
-      cause instanceof MeasureRefuse || cause instanceof Error
-        ? cause.message
-        : String(cause);
-    const output = `${message}\n`;
-    writeFileSync(join(scratch, `${name}.log`), output);
-    return { code: 1, output, sha256: hash(output) };
-  }
-}
 
 function phaseCut(deps: CycleDependencies, ctx) {
   const {
@@ -267,13 +240,11 @@ function phaseChecklist(deps: CycleDependencies, ctx) {
     attachedSchemaSha256,
   } = deps;
   return async (task, runtime) => {
-    const r = measureLog(scratch, 'checklist', () => {
-      const result = genChecklist({
-        root: sourceRoot,
-        out: join(scratch, 'checklist.json'),
-      });
-      return { stdout: '', stderr: result.stderr };
-    });
+    const r = command('checklist', 'bb', [
+      'harness/gen_checklist.clj',
+      '--out',
+      join(scratch, 'checklist.json'),
+    ]);
     const n =
       r.code === 0
         ? JSON.parse(readFileSync(join(scratch, 'checklist.json'), 'utf8')).items.length
@@ -1246,13 +1217,12 @@ function phaseScore(deps: CycleDependencies, ctx) {
       const cycleDir = join(instrument, 'harness', 'cycles', scoreCycle);
       mkdirSync(cycleDir, { recursive: true });
       if (!existsSync(join(cycleDir, 'checklist.json'))) {
-        const checklist = measureLog(scratch, 'score-checklist', () => {
-          const result = genChecklist({
-            root: instrument,
-            out: join(cycleDir, 'checklist.json'),
-          });
-          return { stdout: '', stderr: result.stderr };
-        });
+        const checklist = command(
+          'score-checklist',
+          'bb',
+          ['harness/gen_checklist.clj', '--out', join(cycleDir, 'checklist.json')],
+          { cwd: instrument },
+        );
         if (checklist.code !== 0) throw new Error('score checklist derivation failed');
       }
       if (existsSync(join(cycleDir, 'scores.json'))) {
@@ -1265,13 +1235,8 @@ function phaseScore(deps: CycleDependencies, ctx) {
         r = { code: 0, sha256: scoreReceipt.scoreSha256 };
         reconciled = true;
       } else {
-        r = measureLog(scratch, 'score', () => {
-          const result = scoreCycle({
-            root: instrument,
-            cycle: scoreCycle,
-            verdictsPath: verdictsFile,
-          });
-          return { stdout: result.stdout, stderr: '' };
+        r = command('score', 'bb', ['harness/score.clj', scoreCycle, '--verdicts', verdictsFile], {
+          cwd: instrument,
         });
         if (r.code !== 0) throw new Error('legacy scorer failed');
         scoreReceipt = verifyScoredCycle({
@@ -1281,9 +1246,8 @@ function phaseScore(deps: CycleDependencies, ctx) {
           cycle: scoreCycle,
         });
       }
-      board = measureLog(scratch, 'scoreboard', () => {
-        const result = writeScoreboard({ root: instrument, cycle: scoreCycle });
-        return { stdout: result.text, stderr: '' };
+      board = command('scoreboard', 'bb', ['harness/scoreboard.clj', scoreCycle], {
+        cwd: instrument,
       });
       if (board.code !== 0) throw new Error('legacy scoreboard failed');
     } catch (error: unknown) {

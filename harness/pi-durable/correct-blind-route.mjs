@@ -8,7 +8,6 @@ import { readAuditRows } from "./audit-rows.ts";
 import { BLIND_ITEM_ID, parseBlindAgentAnswer } from "./project/loyly/index.ts";
 import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.ts";
 import { candidateDigest } from "./grading-room.ts";
-import { genChecklist, scoreCycle, scoreboard } from "./measure/index.ts";
 import { bindScoreInput, verifyScoredCycle } from "./score-receipt.ts";
 
 const [priorArg, outArg] = process.argv.slice(2);
@@ -99,20 +98,16 @@ if (fileHash(join(previousDir, "scores.json")) !== priorScore.scoreSha256)
   throw new Error("prior score changed while copying its baseline");
 const newDir = join(instrument, "harness", "cycles", "03");
 mkdirSync(newDir, { recursive: true });
-const checklistResult = genChecklist({
-  root: instrument, out: join(newDir, "checklist.json"),
-});
-writeFileSync(join(out, "checklist.log"), checklistResult.stderr);
+command("bb", ["harness/gen_checklist.clj", "--out", join(newDir, "checklist.json")],
+  instrument, "checklist.log");
 if (fileHash(join(newDir, "checklist.json")) !== fileHash(join(out, "checklist.json")))
   throw new Error("correction checklist differs from the original selection");
 bindScoreInput({ scratch: out, sourceRoot: source, instrument, candidateSha256: candidate,
   verdictsFile });
-writeFileSync(join(out, "score.log"),
-  scoreCycle({ root: instrument, cycle: "03", verdictsPath: verdictsFile }).stdout);
+command("bb", ["harness/score.clj", "03", "--verdicts", verdictsFile], instrument, "score.log");
 const score = verifyScoredCycle({ scratch: out, instrument, verdictsFile, cycle: "03" });
 if (score.score !== "11/11") throw new Error("correction score is not 11/11");
-writeFileSync(join(out, "scoreboard.log"),
-  scoreboard({ root: instrument, cycle: "03" }).text);
+command("bb", ["harness/scoreboard.clj", "03"], instrument, "scoreboard.log");
 const controller = head(resolve(import.meta.dirname, "../.."));
 const allureDir = join(out, "blind-agent-allure");
 const correctedAllureSha256 = hash(readdirSync(allureDir).sort()

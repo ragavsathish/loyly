@@ -9,7 +9,6 @@ import { fileURLToPath } from "node:url";
 import { Effect, Layer } from 'effect';
 import { readAuditRows } from "../audit-rows.ts";
 import { continuationPrompt, selectedUncarried, selectedUncarriedEffect } from "../continuation.ts";
-import { genChecklist } from "../measure/index.ts";
 import { WorkspaceFiles } from '../workspace-effects.ts';
 
 const here = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -78,7 +77,9 @@ test('continuation file effects are lazy and injectable', () => {
 
 function fixtureEnv(scratch, mode = "carry", builderCommand) {
     const checklist = join(scratch, "approved-checklist.json");
-    genChecklist({ root, out: checklist });
+    const generated = spawnSync("bb", ["harness/gen_checklist.clj", "--out", checklist],
+      { cwd: root, encoding: "utf8" });
+    assert.equal(generated.status, 0, generated.stderr);
     const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" });
     assert.equal(head.status, 0, head.stderr);
     const image = join(root, ".pi/harness/.state/assets/builder-clojure");
