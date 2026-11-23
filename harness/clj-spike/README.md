@@ -44,7 +44,7 @@ Prefer Babashka / CLJ libs over hand-rolled plumbing:
 | Panel adapter | `panel-adapter.ts` | ✅ partial | selectPanelAttempt; VM launch deferred |
 | Replay evidence | `replay-evidence.ts` | ✅ partial | summary projection |
 | Contracts | `contracts.ts` | ✅ | selected-checklist? |
-| Cycle orchestration | `tasks/cycle*.ts` | ⏳ | Pi defineTask / Effect phases |
+| Cycle phases | `tasks/cycle-phases.ts` | ✅ partial | PHASES + cut/score helpers; Pi defineTask deferred |
 | Panel Allure report I/O | compile report / QEMU | ⏳ | |
 | Pi audit | `audit-rows.ts` | ⏳ | sqlite runtime |
 | Ajv schemas | live-run / panel-plan / allure | ⏳ | structural checks used instead |

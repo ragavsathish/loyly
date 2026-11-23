@@ -30,6 +30,7 @@
             [loyly.spike.score :as score]
             [loyly.spike.score-receipt :as receipt]
             [loyly.spike.scoreboard :as board]
+            [loyly.spike.tasks.cycle-phases :as phases]
             [loyly.spike.validate-verdicts :as vv]
             [loyly.spike.worker-config :as worker]))
 
@@ -217,6 +218,8 @@
                         (str scratch))]
                 (when-not (= "loyly.replay-evidence.v1" (get ev "schema"))
                   (die "replay-evidence summary failed")))
+            _ (when-not (= "score" (nth phases/PHASES 6))
+                (die "cycle-phases PHASES map drifted"))
             verdicts (mapv (fn [item]
                              (if (= (get item "id") id/BLIND_ITEM_ID)
                                (array-map "id" id/BLIND_ITEM_ID
