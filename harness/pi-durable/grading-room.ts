@@ -1,4 +1,4 @@
-// The independent grader receives the gated candidate and selected plan only.
+// Independent grader room: gated candidate + selected plan only.
 import { createHash } from 'node:crypto';
 import {
   cpSync,
@@ -13,7 +13,41 @@ import { basename, isAbsolute, join } from 'node:path';
 
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 
-export function treeDigest(root: string, prefix: string): string {
+interface GradingRoomDigests {
+  sourceRoom: string;
+  candidateRoom: string;
+  checklistFile: string;
+  schemaFile: string;
+  out: string;
+  candidateSha256: string;
+  checklistSha256: string;
+  schemaSha256: string;
+  project?: string;
+  blindReview?: boolean;
+}
+
+interface GradingRoomVerifyInput {
+  out: string;
+  candidateSha256: string;
+  checklistSha256: string;
+  schemaSha256: string;
+  project?: string;
+  blindReview?: boolean;
+}
+
+interface GradingRoomReceipt {
+  schema: 'loyly.grading-room.v1';
+  candidateSha256: string;
+  checklistSha256: string;
+  schemaSha256: string;
+  planSha256: string;
+  sourcePlan: string | null;
+  sourcePlans: string[];
+  project?: string;
+  blindReview?: boolean;
+}
+
+function treeDigest(root: string, prefix: string): string {
   const digest = createHash('sha256');
   const walk = (dir: string, currentPrefix: string): void => {
     for (const name of readdirSync(dir).sort()) {
@@ -35,9 +69,13 @@ export function treeDigest(root: string, prefix: string): string {
   return digest.digest('hex');
 }
 
-export const candidateDigest = (room: string) => treeDigest(join(room, 'impl'), 'impl');
+function candidateDigest(room: string): string {
+  return treeDigest(join(room, 'impl'), 'impl');
+}
 
-const planDigest = (room: string) => treeDigest(join(room, 'plan'), 'plan');
+function planDigest(room: string): string {
+  return treeDigest(join(room, 'plan'), 'plan');
+}
 
 function selectedPlans(checklistFile: string): string[] {
   const checklist = JSON.parse(readFileSync(checklistFile, 'utf8')) as {
@@ -59,32 +97,7 @@ function selectedPlans(checklistFile: string): string[] {
   return [...plans];
 }
 
-export interface GradingRoomDigests {
-  sourceRoom: string;
-  candidateRoom: string;
-  checklistFile: string;
-  schemaFile: string;
-  out: string;
-  candidateSha256: string;
-  checklistSha256: string;
-  schemaSha256: string;
-  project?: string;
-  blindReview?: boolean;
-}
-
-export interface GradingRoomReceipt {
-  schema: 'loyly.grading-room.v1';
-  candidateSha256: string;
-  checklistSha256: string;
-  schemaSha256: string;
-  planSha256: string;
-  sourcePlan: string | null;
-  sourcePlans: string[];
-  project?: string;
-  blindReview?: boolean;
-}
-
-export function prepareGradingRoom({
+function prepareGradingRoom({
   sourceRoom,
   candidateRoom,
   checklistFile,
@@ -146,21 +159,14 @@ export function prepareGradingRoom({
   return receipt;
 }
 
-export function verifyGradingRoom({
+function verifyGradingRoom({
   out,
   candidateSha256,
   checklistSha256,
   schemaSha256,
   project = 'loyly',
   blindReview = project === 'loyly',
-}: {
-  out: string;
-  candidateSha256: string;
-  checklistSha256: string;
-  schemaSha256: string;
-  project?: string;
-  blindReview?: boolean;
-}): GradingRoomReceipt {
+}: GradingRoomVerifyInput): GradingRoomReceipt {
   const receipt = JSON.parse(
     readFileSync(join(out, '.grading-room.json'), 'utf8'),
   ) as GradingRoomReceipt;
@@ -192,3 +198,6 @@ export function verifyGradingRoom({
     if (!allowed.has(name)) throw new Error(`unexpected grading-room entry: ${name}`);
   return receipt;
 }
+
+export type { GradingRoomDigests, GradingRoomVerifyInput, GradingRoomReceipt };
+export { treeDigest, candidateDigest, prepareGradingRoom, verifyGradingRoom };

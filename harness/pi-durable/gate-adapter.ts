@@ -9,6 +9,23 @@ const HOST = fileURLToPath(new URL('./gate-host.sh', import.meta.url));
 const pause = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 
+interface RunGateArgs {
+  room: string;
+  out: string;
+  candidateSha256: string;
+  timeoutMs?: number;
+}
+
+interface GateReceipt {
+  exit: number;
+  logSha256: string;
+  receipt: string;
+}
+
+interface GateRunResult extends GateReceipt {
+  reconciled: boolean;
+}
+
 function fields(path: string): Record<string, string> {
   return Object.fromEntries(
     readFileSync(path, 'utf8')
@@ -29,45 +46,35 @@ function live(pid: string | number | undefined): boolean {
   return r.status === 0 && r.stdout.includes('gate-host.sh');
 }
 
-function receipt(
-  out: string,
-  room: string,
-  candidateSha256: string,
-): { exit: number; logSha256: string; receipt: string } | null {
+function receipt(out: string, room: string, candidateSha256: string): GateReceipt | null {
   const path = join(out, 'receipt.txt');
   if (!existsSync(path)) return null;
   const result = fields(path);
+  const logSha256 = result.log_sha256;
+  const exit = result.exit;
   if (
     result.room !== room ||
     result.candidate_sha256 !== candidateSha256 ||
-    !/^\d+$/.test(result.exit ?? '') ||
-    !/^[0-9a-f]{64}$/.test(result.log_sha256 ?? '') ||
-    result.log_sha256 !== hash(readFileSync(join(out, 'gate.log')))
+    exit === undefined ||
+    !/^\d+$/.test(exit) ||
+    logSha256 === undefined ||
+    !/^[0-9a-f]{64}$/.test(logSha256) ||
+    logSha256 !== hash(readFileSync(join(out, 'gate.log')))
   )
     throw new Error('gate receipt does not match room, candidate or log');
   return {
-    exit: Number(result.exit),
-    logSha256: result.log_sha256,
+    exit: Number(exit),
+    logSha256,
     receipt: path,
   };
 }
 
-export async function runGate({
+async function runGate({
   room,
   out,
   candidateSha256,
   timeoutMs = 3_600_000,
-}: {
-  room: string;
-  out: string;
-  candidateSha256: string;
-  timeoutMs?: number;
-}): Promise<{
-  exit: number;
-  logSha256: string;
-  receipt: string;
-  reconciled: boolean;
-}> {
+}: RunGateArgs): Promise<GateRunResult> {
   if (!isAbsolute(room) || !isAbsolute(out) || !/^[0-9a-f]{64}$/.test(candidateSha256))
     throw new Error('gate needs absolute paths and a candidate SHA-256');
   if (!existsSync(join(room, 'harness', 'verify.sh'))) throw new Error('legacy gate missing');
@@ -141,3 +148,6 @@ export async function runGate({
     clearTimeout(timer);
   }
 }
+
+export type { RunGateArgs, GateReceipt, GateRunResult };
+export { runGate };

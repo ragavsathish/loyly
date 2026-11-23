@@ -13,9 +13,53 @@ import {
 } from 'node:fs';
 import { join } from 'node:path';
 import { prepareGradingRoom, verifyGradingRoom } from './grading-room.ts';
+import type { GradingRoomDigests } from './grading-room.ts';
 import { readAllureResults } from './allure-results.mjs';
 
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
+
+interface GradingScopeItem {
+  id?: string;
+  rule?: string;
+  source?: string;
+}
+
+interface RuleShard {
+  id: string;
+  items: GradingScopeItem[];
+}
+
+interface PrepareShardsArgs {
+  gradingRoom: string;
+  sourceRoom: string;
+  scratch: string;
+  schemaFile: string;
+  candidateSha256: string;
+  schemaSha256: string;
+  count: number;
+  project?: string;
+  blindReview?: boolean;
+}
+
+interface PreparedShard {
+  id: string;
+  items: string[];
+  out: string;
+  checklistSha256: string;
+  args: GradingRoomDigests;
+}
+
+interface CombineShardsArgs {
+  gradingRoom: string;
+  shards: {
+    id: string;
+    items: string[];
+    out: string;
+    checklistSha256: string;
+  }[];
+  candidateSha256: string;
+  schemaSha256: string;
+}
 
 function copySafeTree(from: string, to: string): void {
   const stat = lstatSync(from);
@@ -29,14 +73,11 @@ function copySafeTree(from: string, to: string): void {
   for (const name of readdirSync(from)) copySafeTree(join(from, name), join(to, name));
 }
 
-export function partitionByRule(
-  items: { id?: string; rule?: string; source?: string }[],
-  count: number,
-): { id: string; items: { id?: string; rule?: string; source?: string }[] }[] {
+function partitionByRule(items: GradingScopeItem[], count: number): RuleShard[] {
   if (!Number.isInteger(count) || count < 1 || count > 16)
     throw new Error('grader shards must be 1..16');
   if (!Array.isArray(items) || !items.length) throw new Error('empty grader checklist');
-  const groups = new Map<string, { id?: string; rule?: string; source?: string }[]>();
+  const groups = new Map<string, GradingScopeItem[]>();
   for (const item of items) {
     const source = /^docs\/plan\/(\d\d-[a-z][a-z0-9-]*)\/spec\.feature:\d+$/.exec(
       item.source ?? '',
@@ -49,7 +90,7 @@ export function partitionByRule(
   }
   const shards = Array.from(
     { length: Math.min(count, groups.size) },
-    () => [] as { id?: string; rule?: string; source?: string }[],
+    () => [] as GradingScopeItem[],
   );
   for (const group of groups.values()) {
     const smallest = shards.reduce(
@@ -64,7 +105,7 @@ export function partitionByRule(
   }));
 }
 
-export function prepareShards({
+function prepareShards({
   gradingRoom,
   sourceRoom,
   scratch,
@@ -74,17 +115,7 @@ export function prepareShards({
   count,
   project = 'loyly',
   blindReview = project === 'loyly',
-}: {
-  gradingRoom: string;
-  sourceRoom: string;
-  scratch: string;
-  schemaFile: string;
-  candidateSha256: string;
-  schemaSha256: string;
-  count: number;
-  project?: string;
-  blindReview?: boolean;
-}) {
+}: PrepareShardsArgs): PreparedShard[] {
   const full = JSON.parse(readFileSync(join(gradingRoom, 'checklist.json'), 'utf8')) as {
     items: { id: string; rule?: string; source?: string }[];
   };
@@ -99,7 +130,7 @@ export function prepareShards({
       throw new Error(`grader shard selection changed: ${id}`);
     writeFileSync(checklistFile, bytes);
     const checklistSha256 = hash(bytes);
-    const args = {
+    const args: GradingRoomDigests = {
       sourceRoom,
       candidateRoom: gradingRoom,
       checklistFile,
@@ -123,22 +154,7 @@ export function prepareShards({
   });
 }
 
-export function combineShards({
-  gradingRoom,
-  shards,
-  candidateSha256,
-  schemaSha256,
-}: {
-  gradingRoom: string;
-  shards: {
-    id: string;
-    items: string[];
-    out: string;
-    checklistSha256: string;
-  }[];
-  candidateSha256: string;
-  schemaSha256: string;
-}) {
+function combineShards({ gradingRoom, shards, candidateSha256, schemaSha256 }: CombineShardsArgs) {
   const full = JSON.parse(readFileSync(join(gradingRoom, 'checklist.json'), 'utf8')) as {
     items: { id: string }[];
   };
@@ -174,14 +190,7 @@ export function combineShards({
       project: roomMeta.project ?? 'loyly',
       blindReview: roomMeta.blindReview ?? true,
     });
-    const judged = readAllureResults(shard.out) as {
-      verdicts: unknown[];
-      surprises: {
-        item: string;
-        observation: string;
-        evidence_file: string;
-      }[];
-    };
+    const judged = readAllureResults(shard.out);
     if (judged.verdicts.length !== shard.items.length) throw new Error(`incomplete ${shard.id}`);
     const source = join(shard.out, 'work', 'allure-results');
     for (const name of readdirSync(source)) {
@@ -208,3 +217,6 @@ export function combineShards({
   writeFileSync(join(work, 'surprises.json'), JSON.stringify(surprises));
   return readAllureResults(gradingRoom);
 }
+
+export type { GradingScopeItem, RuleShard, PrepareShardsArgs, PreparedShard, CombineShardsArgs };
+export { partitionByRule, prepareShards, combineShards };

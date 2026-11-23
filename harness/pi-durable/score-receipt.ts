@@ -8,7 +8,39 @@ import { join } from 'node:path';
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 const fileHash = (path: string) => hash(readFileSync(path));
 
-export function scoreCycleFor(scratch: string): string {
+interface ScoreInput {
+  schema: 'loyly.score-input.v1';
+  source_commit: string;
+  candidate_sha256: string;
+  checklist_sha256: string;
+  verdicts_sha256: string;
+  score_cycle?: string;
+  panel_manifest_sha256?: string;
+}
+
+interface BindScoreInputArgs {
+  scratch: string;
+  sourceRoot: string;
+  instrument: string;
+  candidateSha256: string;
+  verdictsFile: string;
+  scoreCycle?: string;
+}
+
+interface VerifyScoredCycleArgs {
+  scratch: string;
+  instrument: string;
+  verdictsFile: string;
+  cycle?: string;
+}
+
+interface ScoredCycleResult {
+  items: unknown[];
+  scoreSha256: string;
+  score: string;
+}
+
+function scoreCycleFor(scratch: string): string {
   const input = JSON.parse(readFileSync(join(scratch, 'score-input.json'), 'utf8')) as {
     score_cycle?: string;
   };
@@ -49,31 +81,14 @@ function panelManifestHash(scratch: string): string | null {
   return digest;
 }
 
-export interface ScoreInput {
-  schema: 'loyly.score-input.v1';
-  source_commit: string;
-  candidate_sha256: string;
-  checklist_sha256: string;
-  verdicts_sha256: string;
-  score_cycle?: string;
-  panel_manifest_sha256?: string;
-}
-
-export function bindScoreInput({
+function bindScoreInput({
   scratch,
   sourceRoot,
   instrument,
   candidateSha256,
   verdictsFile,
   scoreCycle = '02',
-}: {
-  scratch: string;
-  sourceRoot: string;
-  instrument: string;
-  candidateSha256: string;
-  verdictsFile: string;
-  scoreCycle?: string;
-}): ScoreInput {
+}: BindScoreInputArgs): ScoreInput {
   if (head(instrument) !== head(sourceRoot))
     throw new Error('instrument clone is from another source cut');
   if (!/^\d\d$/.test(scoreCycle)) throw new Error('score cycle must be two digits');
@@ -96,21 +111,12 @@ export function bindScoreInput({
   return input;
 }
 
-export function verifyScoredCycle({
+function verifyScoredCycle({
   scratch,
   instrument,
   verdictsFile,
   cycle = '02',
-}: {
-  scratch: string;
-  instrument: string;
-  verdictsFile: string;
-  cycle?: string;
-}): {
-  items: unknown[];
-  scoreSha256: string;
-  score: string;
-} {
+}: VerifyScoredCycleArgs): ScoredCycleResult {
   const input = JSON.parse(readFileSync(join(scratch, 'score-input.json'), 'utf8')) as ScoreInput;
   const checklistFile = join(scratch, 'checklist.json');
   const cycleDir = join(instrument, 'harness', 'cycles', cycle);
@@ -166,3 +172,6 @@ export function verifyScoredCycle({
     score: `${recorded.items.filter((item) => (item as { verdict: string }).verdict === 'pass').length}/${items.length}`,
   };
 }
+
+export type { ScoreInput, BindScoreInputArgs, VerifyScoredCycleArgs, ScoredCycleResult };
+export { scoreCycleFor, bindScoreInput, verifyScoredCycle };
