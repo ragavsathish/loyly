@@ -146,6 +146,16 @@ checks one file, and `npm run format -- worker-config.ts` formats it. Keep the
 file list explicit when editing a pinned grader instruction, panel worker, or
 schema; formatting those files changes their approved digest.
 
+Static analysis (dead exports, circular deps, clones):
+
+```bash
+npm run analyze
+```
+
+Individual tools: `analyze:dead` (Knip), `analyze:deps` (Madge),
+`analyze:dupes` (jscpd). Digest-stable `.mjs` shims and dynamically loaded
+panel workers are ignored in Knip so they are not reported as unused files.
+
 ## Panel-only reassessment
 
 If a score has been filed but the panel instrument fails, use

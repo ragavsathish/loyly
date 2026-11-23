@@ -14,7 +14,11 @@
     "lint:core": "cd .. && ./pi-durable/node_modules/.bin/eslint --config pi-durable/eslint.config.mjs cycle-core evidence-core",
     "format": "prettier --write",
     "format:check": "prettier --check",
-    "test": "node --test --test-concurrency=1 test/*.test.mjs ../cycle-core/test/*.test.mjs ../evidence-core/test/*.test.mjs"
+    "test": "node --test --test-concurrency=1 test/*.test.mjs ../cycle-core/test/*.test.mjs ../evidence-core/test/*.test.mjs",
+    "analyze": "npm run analyze:dead && npm run analyze:deps && npm run analyze:dupes",
+    "analyze:dead": "knip",
+    "analyze:deps": "madge --circular --extensions ts,mjs,js --ts-config tsconfig.json .",
+    "analyze:dupes": "jscpd --config .jscpd.json --output ./scratch-jscpd --silent . ../cycle-core ../evidence-core"
   },
   "dependencies": {
     "@earendil-works/chord": "1.5.1",
@@ -38,6 +42,9 @@
     "allure": "3.33.0",
     "eslint": "10.15.0",
     "globals": "17.14.0",
+    "jscpd": "4.0.5",
+    "knip": "5.44.4",
+    "madge": "8.0.0",
     "prettier": "3.10.1",
     "typescript": "6.0.3",
     "typescript-eslint": "8.73.0"

@@ -1,0 +1,21 @@
+{
+  "format": ["typescript", "javascript"],
+  "reporters": ["console", "json"],
+  "ignore": [
+    "**/node_modules/**",
+    "node_modules/**",
+    "../cycle-core/node_modules/**",
+    "../evidence-core/node_modules/**",
+    "**/test/**",
+    "**/fixture/**",
+    "**/test/fixtures/**",
+    "**/scratch*/**",
+    "**/reviews/**",
+    "**/*.d.ts",
+    "**/*.panel.json"
+  ],
+  "gitignore": true,
+  "maxLines": 500,
+  "minLines": 10,
+  "minTokens": 50
+}
