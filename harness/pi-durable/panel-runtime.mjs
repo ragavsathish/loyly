@@ -10,7 +10,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
-import { treeDigest } from './grading-room.mjs';
+import { treeDigest } from './grading-room.ts';
 import { launchCandidate } from './panel-candidate.mjs';
 
 const out = '/out';

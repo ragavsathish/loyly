@@ -4,12 +4,28 @@ import tseslint from 'typescript-eslint';
 
 export default [
   {
-    ignores: ['node_modules/**', 'scratch*/**', 'reviews/**', 'fixture/**', 'example-replay.html'],
+    ignores: [
+      'node_modules/**',
+      'scratch*/**',
+      'reviews/**',
+      'fixture/**',
+      'example-replay.html',
+      // Thin re-export shims for digest-stable import paths.
+      'grading-room.mjs',
+      'score-receipt.mjs',
+      'gate-adapter.mjs',
+      'grader-shards.mjs',
+    ],
   },
   {
     files: ['**/*.mjs'],
     languageOptions: { globals: globals.node },
-    rules: js.configs.recommended.rules,
+    rules: {
+      ...js.configs.recommended.rules,
+      // Remaining .mjs adapters still catch-and-rethrow without cause;
+      // convert them before tightening this rule.
+      'preserve-caught-error': 'off',
+    },
   },
   {
     files: ['**/*.ts'],
@@ -24,6 +40,10 @@ export default [
       ...tseslint.configs.recommendedTypeChecked[1].rules,
       ...tseslint.configs.recommendedTypeChecked[2].rules,
       'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
     },
   },
   {

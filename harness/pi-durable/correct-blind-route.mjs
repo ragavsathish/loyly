@@ -7,8 +7,8 @@ import { join, resolve } from "node:path";
 import { readAuditRows } from "./audit-rows.mjs";
 import { parseBlindAgentAnswer } from "./blind-agent-adapter.mjs";
 import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.mjs";
-import { candidateDigest } from "./grading-room.mjs";
-import { bindScoreInput, verifyScoredCycle } from "./score-receipt.mjs";
+import { candidateDigest } from "./grading-room.ts";
+import { bindScoreInput, verifyScoredCycle } from "./score-receipt.ts";
 
 const [priorArg, outArg] = process.argv.slice(2);
 if (!priorArg || !outArg || process.argv.length !== 4)

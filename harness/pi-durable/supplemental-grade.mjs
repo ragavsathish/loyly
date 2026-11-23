@@ -6,7 +6,7 @@ import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, wr
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
-import { candidateDigest } from "./grading-room.mjs";
+import { candidateDigest } from "./grading-room.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");

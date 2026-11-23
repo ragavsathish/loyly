@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readAllureResults } from "./allure-results.mjs";
 import { readBlindAgentAllure } from "./blind-review.mjs";
-import { verifyGradingRoom } from "./grading-room.mjs";
+import { verifyGradingRoom } from "./grading-room.ts";
 import { verifyPanelVmRun } from "./panel-vm-run.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");

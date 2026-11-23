@@ -7,8 +7,8 @@ import { join, resolve } from "node:path";
 import { readAuditRows } from "./audit-rows.mjs";
 import { readAllureResults } from "./allure-results.mjs";
 import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.mjs";
-import { candidateDigest } from "./grading-room.mjs";
-import { bindScoreInput, verifyScoredCycle } from "./score-receipt.mjs";
+import { candidateDigest } from "./grading-room.ts";
+import { bindScoreInput, verifyScoredCycle } from "./score-receipt.ts";
 import { verifyPanelVmRun } from "./panel-vm-run.mjs";
 
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");

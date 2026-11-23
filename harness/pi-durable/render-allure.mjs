@@ -8,8 +8,8 @@ import { fileURLToPath } from "node:url";
 import { readAuditRows } from "./audit-rows.mjs";
 import { readAllureResults } from "./allure-results.mjs";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
-import { candidateDigest } from "./grading-room.mjs";
-import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.mjs";
+import { candidateDigest } from "./grading-room.ts";
+import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");

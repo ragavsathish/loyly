@@ -8,8 +8,8 @@ import { fileURLToPath } from 'node:url';
 import { selectPanelAttempt } from './panel-adapter.mjs';
 import { runPanelVms, verifyPanelVmRun } from './panel-vm-run.mjs';
 import { compilePanel, verifyCompiledPanel } from './panel-compile.mjs';
-import { candidateDigest } from './grading-room.mjs';
-import { scoreCycleFor, verifyScoredCycle } from './score-receipt.mjs';
+import { candidateDigest } from './grading-room.ts';
+import { scoreCycleFor, verifyScoredCycle } from './score-receipt.ts';
 import { readAuditRows } from './audit-rows.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));

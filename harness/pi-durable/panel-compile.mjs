@@ -10,9 +10,9 @@ import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { readAllureResults } from "./allure-results.mjs";
 import { readAuditRows } from "./audit-rows.mjs";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
-import { candidateDigest } from "./grading-room.mjs";
+import { candidateDigest } from "./grading-room.ts";
 import { evaluatePanel } from "./panel-policy.ts";
-import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.mjs";
+import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");

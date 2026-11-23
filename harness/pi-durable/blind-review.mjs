@@ -7,7 +7,7 @@ import { createServer } from "node:net";
 import { join } from "node:path";
 import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { readAllureResults } from "./allure-results.mjs";
-import { candidateDigest } from "./grading-room.mjs";
+import { candidateDigest } from "./grading-room.ts";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const fileHash = (path) => hash(readFileSync(path));

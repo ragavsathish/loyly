@@ -7,8 +7,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { compileAllureSchema } from '../evidence-core/validate-schema.ts';
-import { candidateDigest, treeDigest } from './grading-room.mjs';
-import { scoreCycleFor } from './score-receipt.mjs';
+import { candidateDigest, treeDigest } from './grading-room.ts';
+import { scoreCycleFor } from './score-receipt.ts';
 import { verifyRuntimeProfileEvidence } from './runtime-profile-evidence.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
