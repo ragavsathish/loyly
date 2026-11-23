@@ -155,6 +155,26 @@
       (fail s i (str "trailing data '" (.charAt s i) "'")))
     v))
 
+(defn compact-json
+  "Compact JSON matching Node JSON.stringify for string-keyed maps/vectors.
+  Used by score-input receipts and grading-room receipts."
+  [v]
+  (cond
+    (nil? v) "null"
+    (string? v) (write-string v)
+    (number? v) (str v)
+    (boolean? v) (str v)
+    (keyword? v) (write-string (name v))
+    (map? v) (str "{"
+                  (str/join ","
+                            (for [[k val] v]
+                              (str (compact-json (if (keyword? k) (name k) (str k)))
+                                   ":"
+                                   (compact-json val))))
+                  "}")
+    (sequential? v) (str "[" (str/join "," (map compact-json v)) "]")
+    :else (throw (ex-info "unsupported json value" {:v v}))))
+
 (defn detail
   "The parser's own words about a failure, for the one message that carries them."
   [e]

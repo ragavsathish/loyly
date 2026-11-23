@@ -20,4 +20,9 @@
   stamp
   {:doc "Stamp @item tags (stamp parity)"
    :requires ([loyly.spike.stamp-item-ids :as t])
-   :task (apply t/-main *command-line-args*)}}}
+   :task (apply t/-main *command-line-args*)}
+
+  demo
+  {:doc "End-to-end TS→CLJ spike smoke"
+   :requires ([loyly.spike.demo :as d])
+   :task (apply d/-main *command-line-args*)}}}
