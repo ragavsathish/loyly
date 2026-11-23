@@ -1,3 +1,0 @@
-  * If you need ICU with non-English locales and legacy charset support, install
-  * package icu-data-full.
-curl: (7) Failed to connect to localhost:8080 after 0 ms: Could not connect to server

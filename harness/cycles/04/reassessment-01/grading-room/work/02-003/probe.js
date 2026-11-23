@@ -1,1 +1,0 @@
-(async()=>{for(const h of ['soukanvuori','masthugget','self-service'])for(const a of ['route','schedule','policies']){let p='/api/'+h+'/'+a;let r=await fetch('http://localhost:3000'+p);console.log('\nGET',p,r.status,await r.text())}})()

@@ -1,1 +1,0 @@
-[{"item":"01-010","observation":"Initial in-script race counts interpreted the response shape incorrectly; corrected counts were computed from the recorded responses.","evidence_file":"work/shards/shard-02/01-010/race-counts.json"}]

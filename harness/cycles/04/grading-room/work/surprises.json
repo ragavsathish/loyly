@@ -1,7 +1,0 @@
-[
-  {
-    "item": "02-001",
-    "observation": "Alpine Node with its default English-only ICU data formatted the house date as 11/21/2026 and dated endpoints returned HTTP 500. Installing icu-data-full restored ISO formatting; final item probes use full ICU.",
-    "evidence_file": "work/icu-probe/command.log"
-  }
-]

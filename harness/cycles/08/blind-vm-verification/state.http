@@ -1,8 +1,0 @@
-HTTP/1.1 200 OK
-Content-Type: application/json
-Date: Sun, 22 Nov 2026 00:13:08 GMT
-Connection: keep-alive
-Keep-Alive: timeout=5
-Transfer-Encoding: chunked
-
-{"now":null,"sequence":0,"houses":[{"id":"soukanvuori","name":"Soukanvuori · sauna F","route":"manager","bookingOperator":"manager","operationsRole":"maintenance","billingRole":"vastikekirjanpitäjä","disputeRole":"manager","authorityRole":"board","duration":90,"resources":[{"id":"8","name":"pukuhuone 8","days":["Tuesday"],"starts":["17:00","18:30","20:00"],"group":"8","timeClass":"general"},{"id":"9","name":"pukuhuone 9","days":["Thursday","Friday","Saturday"],"starts":["17:00","18:30","20:00"],"group":"9","timeClass":"general"}],"policies":[{"version":"v1","authority":"House board","effectiveAt":"1970-01-01T00:00:00.000Z","bookerRoles":["shareholder"],"chooseDays":14,"noticeDays":30,"caps":{},"priceReference":"house-standing-tariff","salePriceReference":"house-resale-tariff"}]}],"bookings":[],"releases":[],"queue":[],"notices":[],"disputes":[]}

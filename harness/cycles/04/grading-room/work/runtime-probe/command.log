@@ -1,14 +1,0 @@
-Linux (none) 6.18.63-0-virt #1-Alpine SMP PREEMPT_DYNAMIC 2026-11-11 01:31:28 aarch64 GNU/Linux
-bunzip2
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0HTTP/1.1 200 OK
-  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0                              0
-access-control-allow-origin: *
-age: 5844
-cache-control: public, max-age=3600, s-maxage=14400
-cf-cache-status: HIT
-cf-ray: a5def7c66ebad82b-HEL
-content-type: application/json
-
-exit=0

@@ -1,1 +1,0 @@
-gondolin exec --image PINNED --mount-hostfs impl:/candidate:ro --mount-hostfs work/03-011:/result -- sh -c 'apk add nodejs; date -u -s 2026-11-21T12:00:00Z; copy candidate; start app; node /result/probe.js 03-011; stop and reap'

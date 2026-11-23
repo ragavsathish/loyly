@@ -1,2 +1,0 @@
-scored cycle 11: 11/11 pass
-filed: harness/cycles/11/scores.json

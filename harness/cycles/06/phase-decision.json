@@ -1,7 +1,0 @@
-{
-  "afterBuild": {"phase": "gate", "attempt": 1},
-  "afterGate": {"phase": "grading-room", "attempt": 1, "candidateSha256": "a2e963add722cf2abeb988e3c250ac637f8bde7a315d5893ac529b1002611450"},
-  "afterGrade": {"phase": "blind-review"},
-  "afterBlind": {"phase": "score"},
-  "blindResult": "passed"
-}

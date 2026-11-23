@@ -1,7 +1,0 @@
-[
-  {
-    "item": "01-004",
-    "observation": "The held-slot refusal names the holding household, not only that the slot is held. message='Refused: the slot on Tuesday at 17:00 in pukuhuone 8 is already held by apartment 12.' holder='12'.",
-    "evidence_file": "work/items/01-004/transcript.json"
-  }
-]

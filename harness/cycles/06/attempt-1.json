@@ -1,5 +1,0 @@
-{
-  "attempt": 1,
-  "build": {"status": "completed", "result": {}},
-  "gate": {"status": "completed", "result": {"passed": true, "candidateSha256": "a2e963add722cf2abeb988e3c250ac637f8bde7a315d5893ac529b1002611450", "log": "gate-attempt-1.log", "logSha256": "16d2b0374864014a97966572ff83d240e3a00957dfeb9034867776c981882448"}}
-}

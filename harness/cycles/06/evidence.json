@@ -1,8 +1,0 @@
-{
-  "checklist": "harness/cycles/06/checklist.json",
-  "verdicts": "harness/cycles/06/verdicts.json",
-  "surprises": "harness/cycles/06/grading-room/work/surprises.json",
-  "room": "harness/cycles/06/grading-room",
-  "rawAllureDirs": ["harness/cycles/06/grading-room/work/allure-results"],
-  "blindAllureDir": "harness/cycles/06/grading-room/work/blind-allure-results"
-}

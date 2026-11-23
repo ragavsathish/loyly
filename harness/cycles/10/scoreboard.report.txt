@@ -1,3 +1,0 @@
-cycle 10: 10/11 checklist items pass
-
-  no previous cycle to diff against: baseline cycle.

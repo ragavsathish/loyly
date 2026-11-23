@@ -1,8 +1,0 @@
-{
-  "counts": {
-    "one": 100,
-    "both": 0,
-    "neither": 0
-  },
-  "note": "Recomputed from recorded response status; original script counts used an incorrect response shape."
-}
