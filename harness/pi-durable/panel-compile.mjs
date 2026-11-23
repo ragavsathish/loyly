@@ -6,6 +6,7 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileS
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
+import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { readAllureResults } from "./allure-results.mjs";
 import { readAuditRows } from "./audit-rows.mjs";
 import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
@@ -23,6 +24,13 @@ function schemaValidator(path) {
 }
 function checked(validate, value, name) {
   if (!validate(value)) throw new Error(`${name}: ${JSON.stringify(validate.errors)}`);
+}
+function checkedAllure(validate, value, name) {
+  try {
+    validate(value, name);
+  } catch (cause) {
+    throw new Error(`${name}: ${cause instanceof Error ? cause.message : String(cause)}`);
+  }
 }
 
 function specialistResults({ specialists, plan, planSha256, manifest, candidateSha256, schemaSha256,
@@ -53,7 +61,7 @@ function specialistResults({ specialists, plan, planSha256, manifest, candidateS
     if (resultFiles.length !== 1 || resultFiles[0] !== producer.result)
       throw new Error(`${spec.id}: expected exactly one result`);
     const result = json(join(dir, producer.result));
-    checked(validate, result, `${spec.id} Allure result`);
+    checkedAllure(validate, result, `${spec.id} Allure result`);
     if (producer.result !== `${result.uuid}-result.json` || result.status !== producer.status
         || result.stage !== "finished" || label(result, "tag") !== producer.item
         || label(result, "tool") !== spec.tool || label(result, "technique") !== spec.technique
@@ -148,9 +156,9 @@ export async function compilePanel({ original, specialists, out,
   const schemaSha256 = fileSha(schemaFile);
   if (fileSha(join(room, "allure-lifecycle-result.schema.json")) !== schemaSha256)
     throw new Error("original room uses a different Allure schema");
-  const validate = schemaValidator(schemaFile), observations = [];
+  const validate = compileAllureSchema(json(schemaFile)), observations = [];
   for (const result of raw.results) {
-    checked(validate, result, "raw grader result");
+    checkedAllure(validate, result, "raw grader result");
     const item = label(result, "tag")?.slice(6);
     const spec = plan.checks.find((check) => check.source === "raw-grader" && check.items.includes(item));
     if (!spec || label(result, "tool") !== spec.tool || label(result, "technique") !== spec.technique)
@@ -161,7 +169,7 @@ export async function compilePanel({ original, specialists, out,
       message: result.statusDetails.message });
   }
   if (legacy) {
-    checked(validate, blind.result, "blind review Allure result");
+    checkedAllure(validate, blind.result, "blind review Allure result");
     const blindSpec = plan.checks.find((check) => check.source === "blind-review");
     if (!blindSpec || label(blind.result, "tool") !== blindSpec.tool
         || label(blind.result, "technique") !== blindSpec.technique)

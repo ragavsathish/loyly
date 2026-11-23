@@ -4,9 +4,11 @@ import {
   checkCandidateCaches,
   checkContract,
   checkEvidence,
+  checkPanel,
   decideAttempt,
   type CycleContract,
   type EvidenceFiles,
+  type PanelFiles,
 } from "./adapter.ts";
 import type {
   BuildResult,
@@ -18,9 +20,11 @@ const [action, inputFile] = process.argv.slice(2);
 if (
   !action ||
   !inputFile ||
-  !["preflight", "candidate", "decide", "evidence"].includes(action)
+  !["preflight", "candidate", "decide", "evidence", "panel"].includes(action)
 ) {
-  console.error("usage: node cli.ts preflight|candidate|decide|evidence <input.json>");
+  console.error(
+    "usage: node cli.ts preflight|candidate|decide|evidence|panel <input.json>",
+  );
   process.exit(2);
 }
 const input: unknown = JSON.parse(readFileSync(inputFile, "utf8"));
@@ -29,8 +33,9 @@ if (action === "preflight") report = checkContract(input as CycleContract);
 else if (action === "candidate") {
   const candidate = input as { room: string; mode?: "sealed" | "post-gate" };
   report = checkCandidateCaches(candidate.room, candidate.mode);
-}
-else if (action === "evidence") report = checkEvidence(input as EvidenceFiles);
+} else if (action === "evidence")
+  report = checkEvidence(input as EvidenceFiles);
+else if (action === "panel") report = checkPanel(input as PanelFiles);
 else {
   const decision = input as {
     attempt: number;

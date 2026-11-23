@@ -1,0 +1,143 @@
+{
+  "schema": "loyly.grading-panel-plan.v1",
+  "project": "loyly-whole-product",
+  "feature": "Whole L\u00f6yly product",
+  "checks": [
+    {
+      "id": "black-box",
+      "source": "raw-grader",
+      "role": "scored",
+      "tool": "Cursor black-box grader",
+      "technique": "acceptance",
+      "items": [
+        "01-001",
+        "01-002",
+        "01-003",
+        "01-004",
+        "01-005",
+        "01-006",
+        "01-007",
+        "01-008",
+        "01-009",
+        "01-010"
+      ],
+      "criterion": "Independent HTTP observations prove each selected Gherkin scenario against a fresh candidate copy.",
+      "failure": "A scenario is contradicted, missing, or cannot be observed.",
+      "target_runtime": "cursor-remote-session"
+    },
+    {
+      "id": "blind-handoff",
+      "source": "raw-grader",
+      "role": "handoff",
+      "tool": "Cursor black-box grader",
+      "technique": "usability",
+      "items": [
+        "01-011"
+      ],
+      "criterion": "The grader records the refusal and leaves the blind judgment pending.",
+      "failure": "The grader judges the refusal from its own context or omits the handoff.",
+      "target_runtime": "cursor-remote-session"
+    },
+    {
+      "id": "blind-review",
+      "source": "blind-review",
+      "role": "scored",
+      "tool": "fresh blind subagent",
+      "technique": "usability",
+      "items": [
+        "01-011"
+      ],
+      "criterion": "A fresh judge names an actionable request from only the refusal; a fresh app confirms that exact request.",
+      "failure": "The answer needs hidden context or its exact request is not confirmed over HTTP.",
+      "target_runtime": "cursor-remote-session"
+    },
+    {
+      "id": "occurrence-release-black-box",
+      "source": "raw-grader",
+      "role": "scored",
+      "tool": "Cursor black-box grader",
+      "technique": "acceptance",
+      "feature": "One-week occurrence release",
+      "items": [
+        "02-001",
+        "02-002",
+        "02-003",
+        "02-004",
+        "02-005",
+        "02-006",
+        "02-007",
+        "02-008",
+        "02-009",
+        "02-010"
+      ],
+      "criterion": "Independent HTTP observations prove One-week occurrence transfers, billing and derived views for every selected scenario.",
+      "failure": "A selected Then is contradicted, missing, or cannot be observed.",
+      "target_runtime": "cursor-remote-session"
+    },
+    {
+      "id": "scarcity-forfeit-black-box",
+      "source": "raw-grader",
+      "role": "scored",
+      "tool": "Cursor black-box grader",
+      "technique": "acceptance",
+      "feature": "Scarcity notice on a standing holding",
+      "items": [
+        "03-001",
+        "03-002",
+        "03-003",
+        "03-004",
+        "03-005",
+        "03-014",
+        "03-006",
+        "03-007",
+        "03-008",
+        "03-009",
+        "03-010",
+        "03-011",
+        "03-012",
+        "03-013"
+      ],
+      "criterion": "Independent HTTP observations prove Scoped queue, two deadlines and selected holding lapse for every selected scenario.",
+      "failure": "A selected Then is contradicted, missing, or cannot be observed.",
+      "target_runtime": "cursor-remote-session"
+    },
+    {
+      "id": "house-policy-black-box",
+      "source": "raw-grader",
+      "role": "scored",
+      "tool": "Cursor black-box grader",
+      "technique": "acceptance",
+      "feature": "Multiple houses and traceable policy",
+      "items": [
+        "04-001",
+        "04-002",
+        "04-003",
+        "04-004",
+        "04-005",
+        "04-006",
+        "04-007"
+      ],
+      "criterion": "Independent HTTP observations prove House isolation, roles, policy versions and dispute history for every selected scenario.",
+      "failure": "A selected Then is contradicted, missing, or cannot be observed.",
+      "target_runtime": "cursor-remote-session"
+    },
+    {
+      "id": "time-classes-black-box",
+      "source": "raw-grader",
+      "role": "scored",
+      "tool": "Cursor black-box grader",
+      "technique": "acceptance",
+      "feature": "Time classes and class-scoped caps",
+      "items": [
+        "05-001",
+        "05-002",
+        "05-003",
+        "05-004",
+        "05-005"
+      ],
+      "criterion": "Independent HTTP observations prove House-specific class caps and lifecycle for every selected scenario.",
+      "failure": "A selected Then is contradicted, missing, or cannot be observed.",
+      "target_runtime": "cursor-remote-session"
+    }
+  ]
+}

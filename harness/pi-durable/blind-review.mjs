@@ -5,7 +5,7 @@ import { spawn } from "node:child_process";
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
 import { join } from "node:path";
-import Ajv2020 from "ajv/dist/2020.js";
+import { compileAllureSchema } from "../evidence-core/validate-schema.ts";
 import { readAllureResults } from "./allure-results.mjs";
 import { candidateDigest } from "./grading-room.mjs";
 
@@ -279,9 +279,9 @@ export function writeBlindAgentAllure({ packetDir, reviewFile, gradingRoom, veri
     parameters: [{ name: "candidate_sha256", value: packet.candidate_sha256 },
       { name: "grader_allure_sha256", value: packet.allure_results_sha256 }],
   };
-  const schema = JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8"));
-  const validate = new Ajv2020({ strict: false }).compile(schema);
-  if (!validate(result)) throw new Error(`blind subagent Allure schema rejected result: ${JSON.stringify(validate.errors)}`);
+  compileAllureSchema(
+    JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8")),
+  )(result, "blind-result");
   mkdirSync(out, { recursive: true });
   writeFileSync(join(out, attachment), JSON.stringify({ packet_sha256: packetSha256,
     review_sha256: reviewSha256, review, verification }));
@@ -305,9 +305,10 @@ export function readBlindAgentAllure({ packetDir, reviewFile, gradingRoom, verif
   const verification = review.verdict === "pass"
     ? JSON.parse(readFileSync(join(verificationDir, "verification.json"), "utf8")) : null;
   const expectedStatus = review.verdict === "pass" && verification?.accepted === true ? "passed" : "failed";
-  const schema = JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8"));
-  const validate = new Ajv2020({ strict: false }).compile(schema);
-  if (!validate(result) || resultFiles[0] !== `${result.uuid}-result.json`
+  compileAllureSchema(
+    JSON.parse(readFileSync(join(gradingRoom, "allure-lifecycle-result.schema.json"), "utf8")),
+  )(result, resultFiles[0]);
+  if (resultFiles[0] !== `${result.uuid}-result.json`
       || result.name !== item?.name || result.fullName !== fullName
       || result.testCaseId !== fullName || result.historyId !== fullName
       || result.status !== expectedStatus || result.stage !== "finished"

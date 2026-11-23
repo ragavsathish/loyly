@@ -1,0 +1,99 @@
+{
+  "uuid": "1d856c7f-48bc-4ede-89eb-ed37b4199fcf",
+  "historyId": "loyly.booking-core.01-007",
+  "testCaseId": "loyly.booking-core.01-007",
+  "fullName": "loyly.booking-core.01-007",
+  "name": "Confirming a booking updates all three derived views together",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Request: POST /api/standing-slots/request {\"apartment\":12,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"} on a free slot. Observed confirmation HTTP 200 slot ss-1 17:00–18:30. Re-read of the same booking: schedule holder 12 status held end 18:30; posted list shows apartment 12 for that slot; heater schedule heats pukuhuone 8 Tuesday 17:00–18:30; invoicing signal inv-1 type standing_slot_charge names apartment 12 for that slot. Consequence: the posted list, heater schedule and billing signal all match the one confirmed booking."
+  },
+  "start": 1795357289630,
+  "stop": 1795357292806,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "One booking is the single source of truth for the list, the timer and the billing"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-007"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given Tuesday at 17:00 in pukuhuone 8 is free",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357289630,
+      "stop": 1795357292806,
+      "statusDetails": {
+        "message": "Schedule status free, holder null."
+      }
+    },
+    {
+      "name": "When the household in apartment 12's standing slot request for Tuesday at 17:00 in pukuhuone 8 is confirmed",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357289630,
+      "stop": 1795357292806,
+      "statusDetails": {
+        "message": "HTTP 200 slot ss-1."
+      }
+    },
+    {
+      "name": "Then the posted slot list shows the slot for apartment 12",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357289630,
+      "stop": 1795357292806,
+      "statusDetails": {
+        "message": "posted-list contains apartment 12, pukuhuone 8, Tuesday 17:00–18:30."
+      }
+    },
+    {
+      "name": "And the heater schedule heats pukuhuone 8's sauna for Tuesday 17:00 to 18:30",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357289630,
+      "stop": 1795357292806,
+      "statusDetails": {
+        "message": "heater entry heats true for that room and window."
+      }
+    },
+    {
+      "name": "And an invoicing signal is raised naming apartment 12 as payer for the standing slot",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357289630,
+      "stop": 1795357292806,
+      "statusDetails": {
+        "message": "inv-1 standing_slot_charge apartment 12 for the same slot."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Confirmation and three derived views",
+      "source": "fb308d44-ef79-48ca-9261-23722e599b89-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

@@ -31,7 +31,8 @@ the Codex/Gondolin runtime declarations. `node cli.ts decide attempt.json` appli
 `cycle-core` policy to recorded builder and gate outcomes. `node cli.ts evidence
 evidence.json` checks grader and blind Allure schema, attachments, exact item
 coverage, tool labels, surprises and final verdicts through `evidence-core`.
-These commands only read evidence and print reports. They do not fence, build,
+`node cli.ts panel panel.json` runs `evaluatePanel` over room Allure and filed
+verdicts. These commands only read evidence and print reports. They do not fence, build,
 grade or score. The evidence checker does not prove the candidate digest or
 Gondolin VM launch receipt; the orchestrator must bind and verify those raw
 receipts before scoring.

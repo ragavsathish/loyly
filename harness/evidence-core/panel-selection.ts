@@ -21,7 +21,7 @@ export function validatePanelCoverage(
   const selected = new Set(ids);
   if (handoffItem && !selected.has(handoffItem))
     throw new Error(
-      `current Pi blind handoff requires selected item ${handoffItem}`,
+      `blind handoff requires selected item ${handoffItem}`,
     );
   const checkIds = plan.checks.map((check) => check.id);
   if (new Set(checkIds).size !== checkIds.length)

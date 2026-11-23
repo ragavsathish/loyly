@@ -6,6 +6,7 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileS
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
+import { compileAllureSchema } from '../evidence-core/validate-schema.ts';
 import { candidateDigest, treeDigest } from './grading-room.mjs';
 import { scoreCycleFor } from './score-receipt.mjs';
 import { verifyRuntimeProfileEvidence } from './runtime-profile-evidence.mjs';
@@ -121,13 +122,18 @@ async function runWorker(worker, bundle, image, candidate, out, candidateSha256,
   result.attachments.push({ name: 'Gondolin VM execution receipt',
     source: receiptName, type: 'application/json' });
   writeFileSync(join(dir, resultFile), JSON.stringify(result, null, 2));
-  if (!validate(result) || resultFile !== `${result.uuid}-result.json`
+  try {
+    validate(result, resultFile);
+  } catch (cause) {
+    throw new Error(`${worker.id}: VM result is invalid: ${cause instanceof Error ? cause.message : String(cause)}`);
+  }
+  if (resultFile !== `${result.uuid}-result.json`
       || label(result, 'tool') !== worker.tool || label(result, 'tag') !== `@item-${worker.item}`
       || label(result, 'feature') !== worker.feature
       || label(result, 'technique') !== worker.technique
       || result.parameters?.find((entry) => entry.name === 'candidate_sha256')?.value !== candidateSha256
       || result.stage !== 'finished' || (exitCode === 0) !== (result.status === 'passed'))
-    throw new Error(`${worker.id}: VM result is invalid: ${JSON.stringify(validate.errors)}`);
+    throw new Error(`${worker.id}: VM result is invalid`);
   if (!bundle.sha256 && worker.script === 'panel-runtime.mjs')
     verifyRuntimeProfileEvidence({ dir, result, candidateSha256, probe: worker.probe });
   const files = [resultFile, ...result.attachments.map((attachment) => attachment.source)];
@@ -153,7 +159,7 @@ export async function runPanelVms({ original, image, out,
   if (verify.status !== 0) throw new Error(`Gondolin image verification failed: ${verify.stderr}`);
   const imageDigest = `sha256:${fileSha(join(image, 'manifest.json'))}`;
   const schemaFile = join(HERE, '../evidence-core/allure-lifecycle-result.schema.json');
-  const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, 'utf8')));
+  const validate = compileAllureSchema(JSON.parse(readFileSync(schemaFile, 'utf8')));
   const plan = JSON.parse(readFileSync(planFile, 'utf8'));
   const validatePlan = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(join(HERE, 'panel-plan.schema.json'), 'utf8')));
   if (!validatePlan(plan)) throw new Error(`invalid panel plan: ${JSON.stringify(validatePlan.errors)}`);
@@ -194,7 +200,7 @@ export function verifyPanelVmRun({ original, out, imageDigest,
   const bundle = workerBundle(plan);
   const workers = specialistWorkers(plan);
   const schemaFile = join(HERE, '../evidence-core/allure-lifecycle-result.schema.json');
-  const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(schemaFile, 'utf8')));
+  const validate = compileAllureSchema(JSON.parse(readFileSync(schemaFile, 'utf8')));
   if (manifest.schema !== 'loyly.panel-vm-run.v1'
       || manifest.source_commit !== scoreInput.source_commit
       || manifest.candidate_sha256 !== candidateSha256
@@ -224,7 +230,12 @@ export function verifyPanelVmRun({ original, out, imageDigest,
     const receiptFile = result.attachments?.find((attachment) =>
       attachment.name === 'Gondolin VM execution receipt')?.source;
     const files = [producer.result, ...(result.attachments ?? []).map((attachment) => attachment.source)];
-    if (!validate(result) || result.uuid + '-result.json' !== producer.result
+    try {
+      validate(result, producer.result);
+    } catch (cause) {
+      throw new Error(`${worker.id}: Allure result or attachment changed: ${cause instanceof Error ? cause.message : String(cause)}`);
+    }
+    if (result.uuid + '-result.json' !== producer.result
         || result.status !== producer.status || result.stage !== 'finished'
         || label(result, 'tool') !== worker.tool || label(result, 'tag') !== producer.item
         || label(result, 'feature') !== worker.feature

@@ -1,0 +1,99 @@
+{
+  "uuid": "1b41bc55-0bf0-4237-bced-ae41c830abd0",
+  "historyId": "loyly.booking-core.01-010",
+  "testCaseId": "loyly.booking-core.01-010",
+  "fullName": "loyly.booking-core.01-010",
+  "name": "The race is run one hundred times and never confirms twice",
+  "status": "passed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Request: the same in-flight pair, apartments 12 and 3 both posting Tuesday 17:00 in pukuhuone 8 before either response was read, repeated 100 times. Each run started only after GET /api/schedule showed that slot free; a prior holder was released with POST /api/standing-slots/give-up. Observed counts: one-confirmed 100, both-confirmed 0, neither-confirmed 0. Apartment 12 was the confirmed household on 51 runs and apartment 3 on 49. Every refused response was HTTP 409 reason slot_held. Every run left exactly one posted holder matching the confirmation. Consequence: all 100 runs confirmed exactly one household; none confirmed both; none refused both."
+  },
+  "start": 1795357299170,
+  "stop": 1795357302662,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "Two households requesting one free slot leave exactly one holder"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-010"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given the slot is free again at the start of every run",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357299170,
+      "stop": 1795357302662,
+      "statusDetails": {
+        "message": "Each of the 100 runs read the Tuesday 17:00 pukuhuone 8 slot as free before posting."
+      }
+    },
+    {
+      "name": "When the two household race above is run 100 times",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357299170,
+      "stop": 1795357302662,
+      "statusDetails": {
+        "message": "100 in-flight pairs; both sends finished before either read on every run."
+      }
+    },
+    {
+      "name": "Then all 100 runs confirm exactly one household",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357299170,
+      "stop": 1795357302662,
+      "statusDetails": {
+        "message": "one-confirmed 100; persisted holder matched the confirmed apartment each run."
+      }
+    },
+    {
+      "name": "And no run confirms both",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357299170,
+      "stop": 1795357302662,
+      "statusDetails": {
+        "message": "both-confirmed 0."
+      }
+    },
+    {
+      "name": "And no run refuses both",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357299170,
+      "stop": 1795357302662,
+      "statusDetails": {
+        "message": "neither-confirmed 0."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "One hundred in-flight race outcomes",
+      "source": "cddcfbe9-cbf3-46e8-8e67-61183ae29ecb-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+GET 200  /api/health  bytes=29  {"ok":true,"sauna":"sauna-F"}
+POST 404  /api/bookings  bytes=21  {"error":"not_found"}
+POST 404  /api/booking  bytes=21  {"error":"not_found"}
+POST 404  /api/slots  bytes=21  {"error":"not_found"}
+POST 404  /api/standing-slots  bytes=21  {"error":"not_found"}
+POST 404  /api/standing-slot  bytes=21  {"error":"not_found"}
+POST 404  /api/requests  bytes=21  {"error":"not_found"}
+POST 404  /api/request  bytes=21  {"error":"not_found"}
+POST 404  /api/book  bytes=21  {"error":"not_found"}
+POST 404  /api/reserve  bytes=21  {"error":"not_found"}
+POST 404  /api/schedule  bytes=21  {"error":"not_found"}

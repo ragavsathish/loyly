@@ -1,0 +1,109 @@
+{
+  "uuid": "f168e16e-abe1-4e89-878c-8dcae9db3106",
+  "historyId": "loyly.booking-core.01-008",
+  "testCaseId": "loyly.booking-core.01-008",
+  "fullName": "loyly.booking-core.01-008",
+  "name": "Giving up a slot leaves no derived view still claiming it",
+  "status": "failed",
+  "stage": "finished",
+  "statusDetails": {
+    "message": "Request: POST /api/standing-slots/give-up {\"apartment\":12,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"} after that standing slot was confirmed. Observed: HTTP 200 {\"ok\":true}. Re-read: posted list {\"slots\":[]}; heater schedule {\"entries\":[]}; schedule shows Tuesday 17:00 in pukuhuone 8 free with holder null. Invoicing signals still contain standing_slot_charge inv-1 for apartment 12, pukuhuone 8, Tuesday 17:00–18:30 and also standing_slot_cancelled inv-2 for apartment 12 at that slot. Consequence: the list and heater no longer claim the slot, but a standing-slot charge for apartment 12 remains, so the billing view disagrees with the other derived views."
+  },
+  "start": 1795357292807,
+  "stop": 1795357295987,
+  "labels": [
+    {
+      "name": "lifecycle",
+      "value": "pre-production"
+    },
+    {
+      "name": "technique",
+      "value": "acceptance"
+    },
+    {
+      "name": "tool",
+      "value": "Cursor black-box grader"
+    },
+    {
+      "name": "feature",
+      "value": "Booking core"
+    },
+    {
+      "name": "story",
+      "value": "One booking is the single source of truth for the list, the timer and the billing"
+    },
+    {
+      "name": "tag",
+      "value": "@item-01-008"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Given the household in apartment 12 holds the Tuesday 17:00 standing slot in pukuhuone 8",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357292807,
+      "stop": 1795357295987,
+      "statusDetails": {
+        "message": "Schedule holder 12 and all three views showed the booking before release."
+      }
+    },
+    {
+      "name": "When the household in apartment 12 gives up the standing slot",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357292807,
+      "stop": 1795357295987,
+      "statusDetails": {
+        "message": "POST /api/standing-slots/give-up returned 200 {\"ok\":true}."
+      }
+    },
+    {
+      "name": "Then the posted slot list no longer shows the slot",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357292807,
+      "stop": 1795357295987,
+      "statusDetails": {
+        "message": "posted-list slots is empty."
+      }
+    },
+    {
+      "name": "And the heater schedule no longer heats for Tuesday 17:00",
+      "status": "passed",
+      "stage": "finished",
+      "start": 1795357292807,
+      "stop": 1795357295987,
+      "statusDetails": {
+        "message": "heater entries is empty."
+      }
+    },
+    {
+      "name": "And no further standing-slot charge is raised for apartment 12",
+      "status": "failed",
+      "stage": "finished",
+      "start": 1795357292807,
+      "stop": 1795357295987,
+      "statusDetails": {
+        "message": "standing_slot_charge inv-1 for apartment 12 Tuesday 17:00–18:30 is still present after release."
+      }
+    },
+    {
+      "name": "And no derived view disagrees with any other about the slot",
+      "status": "failed",
+      "stage": "finished",
+      "start": 1795357292807,
+      "stop": 1795357295987,
+      "statusDetails": {
+        "message": "Posted list and heater show no slot, while invoicing still lists the standing_slot_charge and a standing_slot_cancelled signal."
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Give-up and derived views",
+      "source": "677dc8bb-eb2f-48cf-9cda-fa42ddeaa44d-attachment.json",
+      "type": "application/json"
+    }
+  ]
+}

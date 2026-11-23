@@ -1,0 +1,182 @@
+{
+  "item": "01-002",
+  "port": 18102,
+  "startMs": 1795357273747,
+  "exchanges": [
+    {
+      "method": "GET",
+      "path": "/api/schedule",
+      "request": null,
+      "status": 200,
+      "bodyText": "{\"saunaId\":\"sauna-F\",\"dressingRooms\":{\"pukuhuone 8\":{\"Tuesday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}]},\"pukuhuone 9\":{\"Thursday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Friday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Saturday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}]}}}",
+      "body": {
+        "saunaId": "sauna-F",
+        "dressingRooms": {
+          "pukuhuone 8": {
+            "Tuesday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ]
+          },
+          "pukuhuone 9": {
+            "Thursday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Friday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Saturday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ]
+          }
+        }
+      },
+      "elapsedMs": 1.105
+    },
+    {
+      "method": "POST",
+      "path": "/api/standing-slots/request",
+      "request": {
+        "apartment": 12,
+        "dressingRoom": "pukuhuone 9",
+        "weekday": "Tuesday",
+        "startTime": "17:00"
+      },
+      "status": 409,
+      "bodyText": "{\"ok\":false,\"reason\":\"closed_day\",\"message\":\"Valitettavasti pukuhuone 9 ei ole saunapäivää Tuesdayna. pukuhuone 9 on auki: Thursday, Friday, Saturday. Voit varata seisovan vuoron Tuesday klo 17:00 pukuhuone 8ssa.\",\"openDays\":[\"Thursday\",\"Friday\",\"Saturday\"],\"alternative\":{\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"}}",
+      "body": {
+        "ok": false,
+        "reason": "closed_day",
+        "message": "Valitettavasti pukuhuone 9 ei ole saunapäivää Tuesdayna. pukuhuone 9 on auki: Thursday, Friday, Saturday. Voit varata seisovan vuoron Tuesday klo 17:00 pukuhuone 8ssa.",
+        "openDays": [
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "alternative": {
+          "dressingRoom": "pukuhuone 8",
+          "weekday": "Tuesday",
+          "startTime": "17:00"
+        }
+      },
+      "elapsedMs": 1.336
+    },
+    {
+      "method": "GET",
+      "path": "/api/schedule",
+      "request": null,
+      "status": 200,
+      "bodyText": "{\"saunaId\":\"sauna-F\",\"dressingRooms\":{\"pukuhuone 8\":{\"Tuesday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}]},\"pukuhuone 9\":{\"Thursday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Friday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Saturday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}]}}}",
+      "body": {
+        "saunaId": "sauna-F",
+        "dressingRooms": {
+          "pukuhuone 8": {
+            "Tuesday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ]
+          },
+          "pukuhuone 9": {
+            "Thursday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Friday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Saturday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ]
+          }
+        }
+      },
+      "elapsedMs": 0.967
+    }
+  ],
+  "checks": [
+    {
+      "name": "request refused because pukuhuone 9 has no sauna day on Tuesday",
+      "ok": true,
+      "detail": {
+        "status": 409,
+        "reason": "closed_day",
+        "message": "Valitettavasti pukuhuone 9 ei ole saunapäivää Tuesdayna. pukuhuone 9 on auki: Thursday, Friday, Saturday. Voit varata seisovan vuoron Tuesday klo 17:00 pukuhuone 8ssa."
+      }
+    },
+    {
+      "name": "refusal names the days pukuhuone 9 does open",
+      "ok": true,
+      "detail": {
+        "daysNamedInBody": [
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "openDays": [
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "message": "Valitettavasti pukuhuone 9 ei ole saunapäivää Tuesdayna. pukuhuone 9 on auki: Thursday, Friday, Saturday. Voit varata seisovan vuoron Tuesday klo 17:00 pukuhuone 8ssa."
+      }
+    },
+    {
+      "name": "Tuesday in pukuhuone 9 still has no held slot",
+      "ok": true,
+      "detail": {
+        "tuesdaySlot": null
+      }
+    }
+  ],
+  "notes": [],
+  "givenRoom9Days": [
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ],
+  "refusal": "{\"ok\":false,\"reason\":\"closed_day\",\"message\":\"Valitettavasti pukuhuone 9 ei ole saunapäivää Tuesdayna. pukuhuone 9 on auki: Thursday, Friday, Saturday. Voit varata seisovan vuoron Tuesday klo 17:00 pukuhuone 8ssa.\",\"openDays\":[\"Thursday\",\"Friday\",\"Saturday\"],\"alternative\":{\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\"}}",
+  "refusalMessage": "Valitettavasti pukuhuone 9 ei ole saunapäivää Tuesdayna. pukuhuone 9 on auki: Thursday, Friday, Saturday. Voit varata seisovan vuoron Tuesday klo 17:00 pukuhuone 8ssa.",
+  "openDays": [
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ],
+  "stopMs": 1795357276920
+}

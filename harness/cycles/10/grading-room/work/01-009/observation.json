@@ -1,0 +1,418 @@
+{
+  "item": "01-009",
+  "port": 18109,
+  "startMs": 1795357295989,
+  "exchanges": [
+    {
+      "method": "GET",
+      "path": "/api/schedule",
+      "request": null,
+      "status": 200,
+      "bodyText": "{\"saunaId\":\"sauna-F\",\"dressingRooms\":{\"pukuhuone 8\":{\"Tuesday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}]},\"pukuhuone 9\":{\"Thursday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Friday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Saturday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}]}}}",
+      "body": {
+        "saunaId": "sauna-F",
+        "dressingRooms": {
+          "pukuhuone 8": {
+            "Tuesday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ]
+          },
+          "pukuhuone 9": {
+            "Thursday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Friday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Saturday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ]
+          }
+        }
+      },
+      "elapsedMs": 1.202
+    },
+    {
+      "method": "GET",
+      "path": "/api/schedule",
+      "request": null,
+      "status": 200,
+      "bodyText": "{\"saunaId\":\"sauna-F\",\"dressingRooms\":{\"pukuhuone 8\":{\"Tuesday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"held\",\"holder\":12}]},\"pukuhuone 9\":{\"Thursday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Friday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}],\"Saturday\":[{\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"status\":\"free\",\"holder\":null}]}}}",
+      "body": {
+        "saunaId": "sauna-F",
+        "dressingRooms": {
+          "pukuhuone 8": {
+            "Tuesday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "held",
+                "holder": 12
+              }
+            ]
+          },
+          "pukuhuone 9": {
+            "Thursday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Friday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ],
+            "Saturday": [
+              {
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "status": "free",
+                "holder": null
+              }
+            ]
+          }
+        }
+      },
+      "elapsedMs": 0.883
+    },
+    {
+      "method": "GET",
+      "path": "/api/views/posted-list",
+      "request": null,
+      "status": 200,
+      "bodyText": "{\"slots\":[{\"apartment\":12,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\",\"endTime\":\"18:30\"}]}",
+      "body": {
+        "slots": [
+          {
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30"
+          }
+        ]
+      },
+      "elapsedMs": 0.896
+    },
+    {
+      "method": "GET",
+      "path": "/api/views/heater-schedule",
+      "request": null,
+      "status": 200,
+      "bodyText": "{\"entries\":[{\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"heats\":true}]}",
+      "body": {
+        "entries": [
+          {
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "heats": true
+          }
+        ]
+      },
+      "elapsedMs": 0.527
+    },
+    {
+      "method": "GET",
+      "path": "/api/views/invoicing-signals",
+      "request": null,
+      "status": 200,
+      "bodyText": "{\"signals\":[{\"id\":\"inv-1\",\"type\":\"standing_slot_charge\",\"apartment\":12,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"basis\":\"standing_slot\"}]}",
+      "body": {
+        "signals": [
+          {
+            "id": "inv-1",
+            "type": "standing_slot_charge",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "basis": "standing_slot"
+          }
+        ]
+      },
+      "elapsedMs": 0.435
+    }
+  ],
+  "checks": [
+    {
+      "name": "Given Tuesday 17:00 in pukuhuone 8 is free and neither household holds it",
+      "ok": true,
+      "detail": {
+        "startTime": "17:00",
+        "endTime": "18:30",
+        "status": "free",
+        "holder": null
+      }
+    },
+    {
+      "name": "second request was sent before the first response was read",
+      "ok": true,
+      "detail": {
+        "bothSendsFinishedBeforeEitherRead": true,
+        "sendEnd": {
+          "12": 1948.73495115,
+          "3": 1948.735208277
+        },
+        "readStart": {
+          "12": 1948.735296358,
+          "3": 1948.735227918
+        },
+        "sendGapMs": 0.093
+      }
+    },
+    {
+      "name": "exactly one of the two requests is confirmed",
+      "ok": true,
+      "detail": {
+        "class": "one-confirmed",
+        "winner": 12,
+        "responses": {
+          "12": {
+            "status": 200,
+            "body": {
+              "ok": true,
+              "slot": {
+                "id": "ss-1",
+                "apartment": 12,
+                "dressingRoom": "pukuhuone 8",
+                "weekday": "Tuesday",
+                "startTime": "17:00",
+                "endTime": "18:30",
+                "slotMinutes": 90
+              },
+              "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+            }
+          },
+          "3": {
+            "status": 409,
+            "body": {
+              "ok": false,
+              "reason": "slot_held",
+              "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+              "holder": 12
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "the other is refused because the slot is held",
+      "ok": true,
+      "detail": {
+        "loser": 3,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "name": "exactly one household holds the slot",
+      "ok": true,
+      "detail": {
+        "holders": [
+          12
+        ],
+        "winner": 12,
+        "scheduleSlot": {
+          "startTime": "17:00",
+          "endTime": "18:30",
+          "status": "held",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "name": "no derived view shows two holders",
+      "ok": true,
+      "detail": {
+        "posted": [
+          {
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30"
+          }
+        ],
+        "postedApartments": [
+          12
+        ],
+        "charges": [
+          {
+            "id": "inv-1",
+            "type": "standing_slot_charge",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "basis": "standing_slot"
+          }
+        ],
+        "chargeApartments": [
+          12
+        ],
+        "heater": [
+          {
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "heats": true
+          }
+        ],
+        "twoPosted": false,
+        "twoCharges": false
+      }
+    }
+  ],
+  "notes": [],
+  "race": {
+    "responses": {
+      "12": {
+        "method": "POST",
+        "path": "/api/standing-slots/request",
+        "request": {
+          "apartment": 12,
+          "dressingRoom": "pukuhuone 8",
+          "weekday": "Tuesday",
+          "startTime": "17:00"
+        },
+        "status": 200,
+        "bodyText": "{\"ok\":true,\"slot\":{\"id\":\"ss-1\",\"apartment\":12,\"dressingRoom\":\"pukuhuone 8\",\"weekday\":\"Tuesday\",\"startTime\":\"17:00\",\"endTime\":\"18:30\",\"slotMinutes\":90},\"message\":\"Standing slot confirmed for 17:00 to 18:30 every Tuesday.\"}",
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        },
+        "timingMs": {
+          "go": 0.0,
+          "sendStart": 0.834,
+          "sendEnd": 0.906,
+          "readStart": 1.252,
+          "done": 1.999
+        }
+      },
+      "3": {
+        "method": "POST",
+        "path": "/api/standing-slots/request",
+        "request": {
+          "apartment": 3,
+          "dressingRoom": "pukuhuone 8",
+          "weekday": "Tuesday",
+          "startTime": "17:00"
+        },
+        "status": 409,
+        "bodyText": "{\"ok\":false,\"reason\":\"slot_held\",\"message\":\"The slot on Tuesday at 17:00 in pukuhuone 8 is already held.\",\"holder\":12}",
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        },
+        "timingMs": {
+          "go": 0.712,
+          "sendStart": 0.741,
+          "sendEnd": 1.163,
+          "readStart": 1.183,
+          "done": 2.529
+        }
+      }
+    },
+    "errors": {},
+    "overlap": {
+      "bothSendsFinishedBeforeEitherRead": true,
+      "sendEnd": {
+        "12": 1948.73495115,
+        "3": 1948.735208277
+      },
+      "readStart": {
+        "12": 1948.735296358,
+        "3": 1948.735227918
+      },
+      "sendGapMs": 0.093
+    }
+  },
+  "responseClass": "one-confirmed",
+  "derived": {
+    "posted": [
+      {
+        "apartment": 12,
+        "dressingRoom": "pukuhuone 8",
+        "weekday": "Tuesday",
+        "startTime": "17:00",
+        "endTime": "18:30"
+      }
+    ],
+    "postedApartments": [
+      12
+    ],
+    "charges": [
+      {
+        "id": "inv-1",
+        "type": "standing_slot_charge",
+        "apartment": 12,
+        "dressingRoom": "pukuhuone 8",
+        "weekday": "Tuesday",
+        "startTime": "17:00",
+        "endTime": "18:30",
+        "basis": "standing_slot"
+      }
+    ],
+    "chargeApartments": [
+      12
+    ],
+    "heater": [
+      {
+        "dressingRoom": "pukuhuone 8",
+        "weekday": "Tuesday",
+        "startTime": "17:00",
+        "endTime": "18:30",
+        "heats": true
+      }
+    ],
+    "twoPosted": false,
+    "twoCharges": false
+  },
+  "stopMs": 1795357299169
+}

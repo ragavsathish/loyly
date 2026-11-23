@@ -1,0 +1,3910 @@
+{
+  "counts": {
+    "one-confirmed": 100,
+    "both-confirmed": 0,
+    "neither-confirmed": 0
+  },
+  "violationCount": 0,
+  "runs": [
+    {
+      "n": 1,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.088,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 2,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.059,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 3,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.059,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 4,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.068,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 5,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.062,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 6,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.04,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 7,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.044,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 8,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.076,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 9,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.047,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 10,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.035,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 11,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.049,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 12,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.049,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 13,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.053,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 14,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.056,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 15,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.053,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 16,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.038,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 17,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.066,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 18,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.062,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 19,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.274,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 20,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.059,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 21,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.048,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 22,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.066,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 23,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.045,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 24,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.046,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 25,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.045,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 26,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.047,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 27,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.043,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 28,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.092,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 29,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.041,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 30,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.053,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 31,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.041,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 32,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.045,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 33,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.054,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 34,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.049,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 35,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.055,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 36,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.078,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 37,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.045,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 38,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.052,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 39,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.06,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 40,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.041,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 41,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.064,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 42,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.052,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 43,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.206,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 44,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.046,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 45,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.052,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 46,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.031,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 47,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.051,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 48,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.031,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 49,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.174,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 50,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.048,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 51,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.048,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 52,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.045,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 53,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.034,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 54,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.057,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 55,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.051,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 56,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.075,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 57,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.045,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 58,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.034,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 59,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.041,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 60,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.038,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 61,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.058,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 62,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.051,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 63,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.034,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 64,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.057,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 65,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.069,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 66,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.041,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 67,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.063,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 68,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.045,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 69,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.04,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 70,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.223,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 71,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.048,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 72,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.054,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 73,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.057,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 74,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.04,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 75,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.043,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 76,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.052,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 77,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.058,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 78,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.062,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 79,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.047,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 80,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.048,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 81,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.054,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 82,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.04,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 83,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.033,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 84,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.048,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 85,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.038,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 86,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.053,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 87,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.051,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 88,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.058,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 89,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.084,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 90,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.037,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 91,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.052,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 92,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.04,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 93,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.053,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 94,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.04,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 95,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.044,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 96,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.061,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    },
+    {
+      "n": 97,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.041,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 98,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.059,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 99,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        12
+      ],
+      "postedApartments": [
+        12
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.044,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 12,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      },
+      "apartment3": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 12
+        }
+      }
+    },
+    {
+      "n": 100,
+      "class": "one-confirmed",
+      "inFlight": "in-flight",
+      "holders": [
+        3
+      ],
+      "postedApartments": [
+        3
+      ],
+      "stateOne": true,
+      "sendGapMs": 0.059,
+      "bothSendsFinishedBeforeEitherRead": true,
+      "apartment12": {
+        "status": 409,
+        "body": {
+          "ok": false,
+          "reason": "slot_held",
+          "message": "The slot on Tuesday at 17:00 in pukuhuone 8 is already held.",
+          "holder": 3
+        }
+      },
+      "apartment3": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "slot": {
+            "id": "ss-1",
+            "apartment": 3,
+            "dressingRoom": "pukuhuone 8",
+            "weekday": "Tuesday",
+            "startTime": "17:00",
+            "endTime": "18:30",
+            "slotMinutes": 90
+          },
+          "message": "Standing slot confirmed for 17:00 to 18:30 every Tuesday."
+        }
+      }
+    }
+  ]
+}
