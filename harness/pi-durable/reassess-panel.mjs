@@ -6,8 +6,8 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from '
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { selectPanelAttempt } from './panel-adapter.ts';
-import { runPanelVms, verifyPanelVmRun } from './panel-vm-run.mjs';
-import { compilePanel, verifyCompiledPanel } from './panel-compile.mjs';
+import { runPanelVms, verifyPanelVmRun } from './panel-vm-run.ts';
+import { compilePanel, verifyCompiledPanel } from './panel-compile.ts';
 import { candidateDigest } from './grading-room.ts';
 import { scoreCycleFor, verifyScoredCycle } from './score-receipt.ts';
 import { readAuditRows } from './audit-rows.ts';

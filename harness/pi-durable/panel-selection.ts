@@ -2,7 +2,7 @@
 // builder or grader starts. The panel remains a separate, pinned instrument.
 import { readFileSync } from 'node:fs';
 import { Ajv2020 } from 'ajv/dist/2020.js';
-import { specialistWorkers } from './panel-vm-run.mjs';
+import { specialistWorkers } from './panel-vm-run.ts';
 import { validatePanelCoverage } from '../evidence-core/panel-selection.ts';
 
 interface PanelPlanDocument {
@@ -33,10 +33,10 @@ function validatePanelSelection(
     throw new Error(`panel plan schema: ${JSON.stringify(validateSchema.errors)}`);
   const legacy = plan.schema === 'loyly.grading-panel-plan.v1';
   const coverage = validatePanelCoverage(plan as never, checklist, legacy ? '01-011' : undefined);
-  const specialists = specialistWorkers(plan);
+  const specialists = specialistWorkers(plan) as { id: string }[];
   return {
     selected: coverage.selected,
-    specialists: (specialists as { id: string }[]).map((worker) => worker.id),
+    specialists: specialists.map((worker) => worker.id),
   };
 }
 

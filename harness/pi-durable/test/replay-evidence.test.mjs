@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { candidateDigest, prepareGradingRoom } from '../grading-room.ts';
 import { readAllureResults } from '../allure-results.ts';
-import { prepareBlindReview, writeBlindAgentAllure } from '../blind-review.mjs';
+import { prepareBlindReview, writeBlindAgentAllure } from '../blind-review.ts';
 import { panelPlanForManifest, projectReplayEvidence } from '../replay-evidence.ts';
 
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');

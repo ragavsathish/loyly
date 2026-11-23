@@ -20,6 +20,10 @@ export default [
       'allure-results.mjs',
       'replay-evidence.mjs',
       'panel-adapter.mjs',
+      'builder-adapter.mjs',
+      'blind-review.mjs',
+      'panel-compile.mjs',
+      'panel-vm-run.mjs',
     ],
   },
   {
@@ -62,9 +66,8 @@ export default [
     rules: { 'no-unused-vars': 'off' },
   },
   {
-    // Cycle was lifted out of worker.mjs with durable shapes preserved;
-    // phase generics and unsafe-* cleanup follow remaining adapter typing.
-    files: ['tasks/cycle.ts'],
+    // Lifted adapters preserve durable shapes; phase generics / null narrowing follow.
+    files: ['tasks/cycle.ts', 'blind-review.ts', 'panel-compile.ts', 'panel-vm-run.ts'],
     rules: {
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -75,6 +78,9 @@ export default [
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/require-await': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/only-throw-error': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
+      'preserve-caught-error': 'off',
     },
   },
 ];

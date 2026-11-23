@@ -4,7 +4,7 @@ import { spawn } from "node:child_process";
 import { chmodSync, existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { runBuilder } from "../builder-adapter.mjs";
+import { runBuilder } from "../builder-adapter.ts";
 
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 function fixture(sleep = 0) {

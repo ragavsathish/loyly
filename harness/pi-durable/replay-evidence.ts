@@ -5,9 +5,9 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readAllureResults, type AllureLifecycleResult } from './allure-results.ts';
-import { readBlindAgentAllure } from './blind-review.mjs';
+import { readBlindAgentAllure } from './blind-review.ts';
 import { verifyGradingRoom } from './grading-room.ts';
-import { verifyPanelVmRun } from './panel-vm-run.mjs';
+import { verifyPanelVmRun } from './panel-vm-run.ts';
 
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 const here = fileURLToPath(new URL('.', import.meta.url));
@@ -161,7 +161,10 @@ function projectReplayEvidence(dir: string, rows: AuditRow[]): ReplayEvidence[] 
       verificationDir:
         review.verdict === 'pass' ? join(dir, 'blind-agent-verification') : undefined,
       out: join(dir, 'blind-agent-allure'),
-    });
+    }) as {
+      result: AllureLifecycleResult;
+      reviewSha256: string;
+    };
     if (supplemental.reviewSha256 !== blind.review_sha256)
       throw new Error('blind Allure evidence differs from the committed review digest');
     projected.push(
@@ -189,7 +192,11 @@ function projectReplayEvidence(dir: string, rows: AuditRow[]): ReplayEvidence[] 
     original: dir,
     out,
     planFile: panelPlanForManifest(manifest),
-  });
+  }) as {
+    manifest: {
+      producers: { id: string; item: string; result: string }[];
+    };
+  };
   const panelManifestSha256 = panel.manifest_sha256;
   if (
     !panelManifestSha256 ||

@@ -6,10 +6,10 @@ import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync
 import { join, resolve } from "node:path";
 import { readAuditRows } from "./audit-rows.ts";
 import { readAllureResults } from "./allure-results.ts";
-import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.mjs";
+import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.ts";
 import { candidateDigest } from "./grading-room.ts";
 import { bindScoreInput, verifyScoredCycle } from "./score-receipt.ts";
-import { verifyPanelVmRun } from "./panel-vm-run.mjs";
+import { verifyPanelVmRun } from "./panel-vm-run.ts";
 
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const fileSha = (path) => sha(readFileSync(path));

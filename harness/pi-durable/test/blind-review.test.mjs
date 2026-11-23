@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { finalVerdictsFromBlindReview, prepareBlindReview, probeBlindAnswer, validateBlindReview,
   verifyBlindReviewPacket,
-  writeBlindAgentAllure } from "../blind-review.mjs";
+  writeBlindAgentAllure } from "../blind-review.ts";
 import { parseBlindAgentAnswer } from "../blind-agent-adapter.mjs";
 
 const schema = new URL("../allure-lifecycle-result.schema.json", import.meta.url).pathname;

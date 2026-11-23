@@ -6,7 +6,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync
 import { join, resolve } from "node:path";
 import { readAuditRows } from "./audit-rows.ts";
 import { parseBlindAgentAnswer } from "./blind-agent-adapter.mjs";
-import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.mjs";
+import { finalVerdictsFromBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.ts";
 import { candidateDigest } from "./grading-room.ts";
 import { bindScoreInput, verifyScoredCycle } from "./score-receipt.ts";
 

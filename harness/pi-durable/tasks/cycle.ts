@@ -14,7 +14,7 @@ import {
   probeBlindAnswer,
   verifyBlindReviewPacket,
   writeBlindAgentAllure,
-} from '../blind-review.mjs';
+} from '../blind-review.ts';
 import { runBlindAgent } from '../blind-agent-adapter.mjs';
 import { bindScoreInput, verifyScoredCycle } from '../score-receipt.ts';
 import { prepareGradingRoom, verifyGradingRoom } from '../grading-room.ts';

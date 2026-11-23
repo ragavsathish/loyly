@@ -4,8 +4,9 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { runPanelVms, verifyPanelVmRun } from './panel-vm-run.mjs';
-import { compilePanel, verifyCompiledPanel } from './panel-compile.mjs';
+import { fileURLToPath } from 'node:url';
+import { runPanelVms, verifyPanelVmRun } from './panel-vm-run.ts';
+import { compilePanel, verifyCompiledPanel } from './panel-compile.ts';
 
 const sha = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
 const fileSha = (path: string) => sha(readFileSync(path));
@@ -100,23 +101,28 @@ async function runDurablePanel({
   scratch = resolve(scratch);
   image = resolve(image);
   const here = new URL('.', import.meta.url);
-  planFile ??= new URL('booking-core.panel.json', here);
+  const resolvedPlan =
+    planFile === undefined
+      ? fileURLToPath(new URL('booking-core.panel.json', here))
+      : typeof planFile === 'string'
+        ? planFile
+        : fileURLToPath(planFile);
   if (
     !/^[0-9a-f]{64}$/.test(approvedPlanSha256 ?? '') ||
     !/^[0-9a-f]{64}$/.test(approvedImageSha256 ?? '') ||
-    sha(readFileSync(planFile)) !== approvedPlanSha256 ||
+    sha(readFileSync(resolvedPlan)) !== approvedPlanSha256 ||
     fileSha(join(image, 'manifest.json')) !== approvedImageSha256
   )
     throw new Error('panel plan or Gondolin image differs from approved digest');
   return selectPanelAttempt({
     root: join(scratch, 'panel-vm'),
-    launch: (out) => runPanelVms({ original: scratch, image, out, planFile }),
+    launch: (out) => runPanelVms({ original: scratch, image, out, planFile: resolvedPlan }),
     verify: (out) =>
       verifyPanelVmRun({
         original: scratch,
         out,
         imageDigest: `sha256:${approvedImageSha256}`,
-        planFile,
+        planFile: resolvedPlan,
       }),
   });
 }

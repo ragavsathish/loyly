@@ -11,7 +11,7 @@ import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite
 import { runGate } from "./gate-adapter.ts";
 import { Effect, Layer } from 'effect';
 import { GateRunError, GateRunner, verifyCandidate } from './gate-effects.ts';
-import { hasBuilderLaunch, runBuilder } from "./builder-adapter.mjs";
+import { hasBuilderLaunch, runBuilder } from "./builder-adapter.ts";
 import { candidateDigest as digestCandidate, verifyGradingRoom } from "./grading-room.ts";
 import { prepareShards, combineShards } from "./grader-shards.ts";
 import { runDurablePanel } from "./panel-adapter.ts";

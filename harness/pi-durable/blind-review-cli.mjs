@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { readFileSync } from "node:fs";
-import { prepareBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.mjs";
+import { prepareBlindReview, probeBlindAnswer, writeBlindAgentAllure } from "./blind-review.ts";
 
 const [action, ...paths] = process.argv.slice(2);
 if (action === "prepare" && paths.length === 2) {

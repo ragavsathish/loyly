@@ -3,8 +3,8 @@
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { runBuilder } from "./builder-adapter.mjs";
-import { verifyBlindReviewPacket } from "./blind-review.mjs";
+import { runBuilder } from "./builder-adapter.ts";
+import { verifyBlindReviewPacket } from "./blind-review.ts";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const fileHash = (path) => hash(readFileSync(path));

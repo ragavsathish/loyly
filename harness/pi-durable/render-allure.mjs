@@ -7,7 +7,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readAuditRows } from "./audit-rows.ts";
 import { readAllureResults } from "./allure-results.ts";
-import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.mjs";
+import { finalVerdictsFromBlindReview, readBlindAgentAllure } from "./blind-review.ts";
 import { candidateDigest } from "./grading-room.ts";
 import { scoreCycleFor, verifyScoredCycle } from "./score-receipt.ts";
 
