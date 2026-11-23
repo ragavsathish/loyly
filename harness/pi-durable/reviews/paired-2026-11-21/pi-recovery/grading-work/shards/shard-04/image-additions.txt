@@ -1,2 +1,0 @@
-apk add nodejs
-apk add nodejs

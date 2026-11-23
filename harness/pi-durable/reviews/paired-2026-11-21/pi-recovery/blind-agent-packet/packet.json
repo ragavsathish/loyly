@@ -1,9 +1,0 @@
-{
-  "schema": "loyly.blind-review-packet.v1",
-  "item": "01-011",
-  "candidate_sha256": "8ffe62eb046ae03e5b1907b06f7341cb1c8301e9ccc9f5eb7a94f62330e89dfc",
-  "checklist_sha256": "06f0dba7ba9aa07152950cd0bc6c38560f6c6b95a3fa88354909a4561434dda2",
-  "spec_sha256": "574366386208aada2436975c0397890bd6f9885b0483aea6bbf0beb579bdd21e",
-  "allure_results_sha256": "9a67a87df2537ae680387917d439e61c90fbff2abd2a6a7cefe23be123e4eb5f",
-  "refusal_sha256": "d36d9f0fd0c521477f4f7a96d41f430bfccf44eee8279208e42d3bb5ad3c2418"
-}

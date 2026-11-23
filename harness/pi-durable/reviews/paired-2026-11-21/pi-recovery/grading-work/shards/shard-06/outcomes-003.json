@@ -1,8 +1,0 @@
-{
-  "02-003": [
-    "failed",
-    "not reached: clock advance past occurrence not reached: previous baseline jump disconnected harness and reset VM",
-    1795282751401,
-    1795282754348
-  ]
-}

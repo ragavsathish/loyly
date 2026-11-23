@@ -1,9 +1,0 @@
-Error: blind room is not unique in the public self-service API
-    at publicJsonBooking (file:///Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/pi-durable/blind-review.mjs:141:35)
-    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
-    at async probeBlindAnswer (file:///Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/pi-durable/blind-review.mjs:208:9)
-    at async blind-review (file:///Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/pi-durable/worker.mjs:379:11)
-    at async file:///Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/pi-durable/node_modules/@earendil-works/pi-durable/dist/harness/scheduler.js:2086:21
-    at async file:///Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/pi-durable/node_modules/@earendil-works/pi-durable/dist/harness/scheduler.js:2120:24
-    at async #run (file:///Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/pi-durable/node_modules/@earendil-works/pi-durable/dist/harness/scheduler.js:2080:23)
-    at async file:///Users/sathish.narayanan/Documents/git/loyly-pi-whole-app/harness/pi-durable/node_modules/@earendil-works/pi-durable/dist/harness/scheduler.js:2053:21

@@ -1,1 +1,0 @@
-{"id":"booking-4","status":"confirmed","kind":"standing","household":"12","resource":"8","sauna":"F","resourceName":"pukuhuone 8","weekday":"Tuesday","start":"17:00","end":"18:30","duration":90,"timeClass":"ordinary","group":"ph8","date":null,"createdAt":"2026-11-22T11:51:23.528Z","endedAt":null,"policyVersion":"policy-2","priceRef":"house standing tariff"}

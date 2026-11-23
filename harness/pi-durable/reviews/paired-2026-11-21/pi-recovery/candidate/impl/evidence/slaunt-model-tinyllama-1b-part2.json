@@ -1,7 +1,0 @@
-{
-  "version": "0.1.0",
-  "dist.unpackedSize": 161296624,
-  "dist.tarball": "https://registry.npmjs.org/slaunt-model-tinyllama-1b-part2/-/slaunt-model-tinyllama-1b-part2-0.1.0.tgz",
-  "description": "Second npm data part of Slaunt Audit's bundled TinyLlama 1.1B GGUF model",
-  "readme": "# Slaunt Audit bundled model data (part 2)\n\nThis package is an immutable data part of the Apache-2.0 TinyLlama 1.1B Chat\nIQ2_XXS model embedded in `slaunt`. `slaunt` verifies the part size and the\nassembled model SHA-256 before loading it locally.\n\nDo not install this data part directly. It is pulled automatically by the\n`slaunt` package.\n"
-}
