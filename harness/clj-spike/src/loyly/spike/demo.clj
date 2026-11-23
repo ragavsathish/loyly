@@ -4,8 +4,11 @@
             [clojure.java.shell :as sh]
             [clojure.string :as str]
             [loyly.spike.blind-review :as blind]
+            [loyly.spike.continuation :as cont]
             [loyly.spike.digest :as d]
+            [loyly.spike.evidence.validate-identity :as ident]
             [loyly.spike.gen-checklist :as checklist]
+            [loyly.spike.grader-shards :as shards]
             [loyly.spike.grading-room :as room]
             [loyly.spike.hjson :as hjson]
             [loyly.spike.live-contract :as live]
@@ -83,6 +86,19 @@
             panel-sel (panel/validate-panel-selection panel-plan checklist)
             _ (when-not (seq (:specialists panel-sel))
                 (die "expected specialist checks on booking-core panel plan"))
+            shard-parts (shards/partition-by-rule items 2)
+            _ (when-not (= 2 (count shard-parts))
+                (die "expected two grader shards for booking-core rules"))
+            _ (let [src (get (first items) "source")
+                    {:keys [plan-dir slice-key]} (ident/parse-plan-source src)
+                    full (ident/allure-full-name
+                          {:project id/PROJECT_ID :slice-key slice-key
+                           :item-id (get (first items) "id")})]
+                (when (or (empty? plan-dir) (empty? full))
+                  (die "allure identity helpers failed")))
+            _ (let [prompt (cont/continuation-prompt ["01-001" "01-002"])]
+                (when-not (str/includes? prompt "@item-01-001")
+                  (die "continuation prompt missing item")))
             verdicts (mapv (fn [item]
                              (if (= (get item "id") id/BLIND_ITEM_ID)
                                (array-map "id" id/BLIND_ITEM_ID
@@ -153,6 +169,7 @@
               " pass=" (:pass judged)
               " plans=" (count (get receipt-map "sourcePlans"))
               " panel-specialists=" (count (:specialists panel-sel))
+              " shards=" (count shard-parts)
               " blind-item=" id/BLIND_ITEM_ID "\n"
               (str/trim-newline (:text board)) "\n"
               "scratch=" scratch "\n")))))

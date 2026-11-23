@@ -19,8 +19,12 @@ Shared oracle tools in `harness/*.clj` are untouched.
 | Blind review | `blind-review.ts` | ✅ partial | shape/packet file checks + answer parse; Allure/HTTP probe deferred |
 | Panel selection | `panel-selection.ts` + evidence-core | ✅ | coverage; Ajv schema deferred |
 | Panel policy | `panel-policy.ts` + evidence-core | ✅ | `evaluate-panel` |
+| Grader shards | `grader-shards.ts` | ✅ partial | `partition-by-rule` + prepare; combine/Allure deferred |
+| Continuation | `continuation.ts` | ✅ | uncarried extract + prompt |
+| Allure identity | `evidence-core/validate-identity.ts` | ✅ | pure helpers |
 | Cycle phases / adapters | `tasks/*`, `*-adapter.ts` | ⏳ | orchestration + Pi |
-| Panel VM / Allure | `panel-vm-*`, `allure-*` | ⏳ | heavy I/O |
+| Panel VM / Allure I/O | `panel-vm-*`, `allure-results.ts` | ⏳ | heavy I/O |
+| Pi audit | `audit-rows.ts` | ⏳ | needs Pi sqlite runtime |
 
 ## Layout
 
