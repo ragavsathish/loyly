@@ -23,49 +23,43 @@ Prefer Babashka / CLJ libs over hand-rolled plumbing:
 
 | Area | TS source | Spike | Notes |
 |------|-----------|-------|-------|
-| Measure | `measure/*` | ✅ | `gen_checklist`, `score`, `scoreboard`, `stamp_item_ids` |
-| Product | `project/loyly/*` | ✅ | identity, blind-policy, schemas, blind-answer |
+| Measure | `measure/*` | ✅ | byte-parity with TS |
+| Product | `project/loyly/*` | ✅ | + barrel `project/loyly.clj` |
 | Score receipt | `score-receipt.ts` | ✅ | bind + verify |
 | Evidence verdicts | `evidence-core/validate-verdicts.ts` | ✅ | + pi-durable wrapper |
-| Live contract | `live-contract.ts` | ✅ partial | specs, image, derive checklist; Ajv + panel VM deferred |
+| Live contract | `live-contract.ts` | ✅ partial | specs, image, derive; Ajv deferred |
 | Grading room | `grading-room.ts` | ✅ | digests, prepare, verify |
-| Blind review | `blind-review.ts` | ✅ partial | shape/packet file checks + answer parse; Allure/HTTP probe deferred |
-| Panel selection | `panel-selection.ts` + evidence-core | ✅ | coverage; Ajv schema deferred |
-| Panel policy | `panel-policy.ts` + evidence-core | ✅ | `evaluate-panel` |
-| Grader shards | `grader-shards.ts` | ✅ partial | `partition-by-rule` + prepare; combine/Allure deferred |
-| Continuation | `continuation.ts` | ✅ | uncarried extract + prompt |
-| Allure identity | `evidence-core/validate-identity.ts` | ✅ | pure helpers |
-| Allure results | `allure-results.ts` + validate-result | ✅ partial | reader/judge; Ajv schema deferred |
-| Cycle phases / adapters | `tasks/*`, `*-adapter.ts` | ⏳ | orchestration + Pi |
-| Panel VM | `panel-vm-*` | ⏳ | heavy I/O |
-| Pi audit | `audit-rows.ts` | ⏳ | needs Pi sqlite runtime |
+| Blind review | `blind-review.ts` | ✅ partial | shapes + answer; Allure/HTTP deferred |
+| Panel selection/policy | panel-* + evidence-core | ✅ | coverage + evaluate-panel |
+| Panel VM workers | `panel-vm-run.ts` | ✅ partial | specialistWorkers / bundle; QEMU deferred |
+| Grader shards | `grader-shards.ts` | ✅ partial | partition + prepare |
+| Continuation | `continuation.ts` | ✅ | uncarried + prompt |
+| Allure | identity + results + validate-result | ✅ partial | Ajv deferred |
+| Gate adapter | `gate-adapter.ts` | ✅ partial | receipt reconcile; spawn deferred |
+| Builder adapter | `builder-adapter.ts` | ✅ partial | launch lookup / validate; spawn deferred |
+| Launch / worker config | `launch-config.ts`, `worker-config.ts` | ✅ | env mapping + parse |
+| Cycle orchestration | `tasks/*`, effects | ⏳ | Pi Effect / defineTask |
+| Panel compile / Allure report | `panel-compile.ts` | ⏳ | |
+| Pi audit | `audit-rows.ts` | ⏳ | sqlite runtime |
 
 ## Layout
 
 ```
 harness/clj-spike/
-  bin/spike
-  bb.edn
+  bin/spike  bb.edn
   src/loyly/spike/
-    hjson.clj digest.clj
-    gen_checklist.clj score.clj scoreboard.clj stamp_item_ids.clj
-    score_receipt.clj live_contract.clj
-    grading_room.clj validate_verdicts.clj blind_review.clj
-    panel_selection.clj panel_policy.clj
-    grader_shards.clj continuation.clj allure_results.clj
+    hjson.clj digest.clj receipt_fields.clj
+    measure ports, score_receipt, live_contract, grading_room, …
+    gate_adapter.clj builder_adapter.clj panel_vm.clj
     demo.clj
-    evidence/{validate_verdicts,validate_identity,validate_result,panel_*}.clj
-    project/loyly/{identity,blind_policy,schemas,blind_answer}.clj
+    evidence/…  project/loyly/…  project/loyly.clj
 ```
 
 ## Run
 
 ```sh
-harness/clj-spike/bin/spike gen-checklist --root . --out checklist.json
-harness/clj-spike/bin/spike score --root . 02 --verdicts verdicts.json
-harness/clj-spike/bin/spike scoreboard --root . 02
-harness/clj-spike/bin/spike stamp --root .
-harness/clj-spike/bin/spike demo --root .
+harness/clj-spike/bin/spike demo
+harness/clj-spike/bin/spike gen-checklist --out checklist.json
 ```
 
 ## Invariant

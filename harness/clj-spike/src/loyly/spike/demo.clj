@@ -12,15 +12,21 @@
             [loyly.spike.grading-room :as room]
             [loyly.spike.hjson :as hjson]
             [loyly.spike.live-contract :as live]
+            [loyly.spike.builder-adapter :as builder]
+            [loyly.spike.gate-adapter :as gate]
+            [loyly.spike.launch-config :as launch]
             [loyly.spike.panel-selection :as panel]
+            [loyly.spike.panel-vm :as panel-vm]
             [loyly.spike.project.loyly.blind-answer :as answer]
             [loyly.spike.project.loyly.blind-policy :as policy]
             [loyly.spike.project.loyly.identity :as id]
             [loyly.spike.project.loyly.schemas :as schemas]
+            [loyly.spike.receipt-fields :as fields]
             [loyly.spike.score :as score]
             [loyly.spike.score-receipt :as receipt]
             [loyly.spike.scoreboard :as board]
-            [loyly.spike.validate-verdicts :as vv]))
+            [loyly.spike.validate-verdicts :as vv]
+            [loyly.spike.worker-config :as worker]))
 
 (defn- die [msg]
   (hjson/err (str msg "\n"))
@@ -83,8 +89,66 @@
                                         id/DEFAULT_PANEL_PLAN)
                                :encoding "UTF-8"))
             panel-sel (panel/validate-panel-selection panel-plan checklist)
+            pi-durable (fs/file instrument "harness" "pi-durable")
+            workers (panel-vm/specialist-workers panel-plan pi-durable)
+            _ (when-not (= 3 (count workers))
+                (die "expected three legacy specialist workers"))
             _ (when-not (seq (:specialists panel-sel))
                 (die "expected specialist checks on booking-core panel plan"))
+            ;; Gate / builder receipt helpers against scratch fixtures.
+            _ (let [gate-out (fs/file scratch "gate-out")
+                    cand-sha (apply str (repeat 64 "a"))
+                    room-path (str (fs/absolutize instrument))]
+                (fs/create-dirs gate-out)
+                (hjson/spit-utf8 (fs/file gate-out "gate.log") "gate ok\n")
+                (let [log-sha (d/file-sha256 (fs/file gate-out "gate.log"))]
+                  (hjson/spit-utf8 (fs/file gate-out "receipt.txt")
+                                   (str "room=" room-path "\n"
+                                        "candidate_sha256=" cand-sha "\n"
+                                        "exit=0\n"
+                                        "log_sha256=" log-sha "\n"))
+                  (when-not (= 0 (:exit (gate/read-gate-receipt
+                                         (str (fs/absolutize gate-out))
+                                         room-path cand-sha)))
+                    (die "gate receipt parse failed")))
+                (let [ev (fs/file scratch "builder-evidence" "launch-1")]
+                  (fs/create-dirs ev)
+                  (hjson/spit-utf8 (fs/file ev "launch.txt")
+                                   (str "session_id=s1\nrequest_id=s1\n"
+                                        "instruction_sha256=" (apply str (repeat 64 "b")) "\n"
+                                        "model=test\nroom=/tmp/room\nbuilder_image=/tmp/img\n"))
+                  (when-not (builder/has-builder-launch?
+                             (str (fs/absolutize (fs/parent ev))) "s1" "s1")
+                    (die "builder launch lookup failed"))
+                  (when-not (= "s1" (get (fields/parse-fields (fs/file ev "launch.txt"))
+                                         "session_id"))
+                    (die "receipt fields parse failed"))))
+            _ (let [cfg (worker/parse-worker-config
+                         (str repo) (str scratch) "repair" {})
+                    env (launch/worker-environment
+                         {:config (array-map
+                                   "schema" "loyly.pi-live-run.v1"
+                                   "run_id" "spike"
+                                   "score_cycle" "02"
+                                   "source" (array-map "commit" (apply str (repeat 40 "0"))
+                                                       "checklist_sha256" (apply str (repeat 64 "c")))
+                                   "builder" (array-map "command" "/c" "command_sha256" (apply str (repeat 64 "1"))
+                                                        "image" "/i" "image_sha256" (apply str (repeat 64 "2"))
+                                                        "model" "m" "instruction_sha256" (apply str (repeat 64 "3")))
+                                   "grader" (array-map "command" "/c" "command_sha256" (apply str (repeat 64 "1"))
+                                                       "image" "/i" "image_sha256" (apply str (repeat 64 "2"))
+                                                       "model" "g" "settings" "/s"
+                                                       "settings_sha256" (apply str (repeat 64 "4"))
+                                                       "instruction_sha256" (apply str (repeat 64 "5"))
+                                                       "schema_sha256" (apply str (repeat 64 "6"))
+                                                       "shards" 3))
+                          :source "/src"}
+                         {"PATH" "/bin" "LOYLY_IGNORED" "x"})]
+                (when-not (and (= "repair" (:mode cfg)) (false? (:live cfg)))
+                  (die "worker-config repair mode failed"))
+                (when (or (not= "spike" (get env "LOYLY_RUN_ID"))
+                          (contains? env "LOYLY_IGNORED"))
+                  (die "launch-config env mapping failed")))
             shard-parts (shards/partition-by-rule items 2)
             _ (when-not (= 2 (count shard-parts))
                 (die "expected two grader shards for booking-core rules"))
@@ -166,7 +230,7 @@
          (str "clj-spike demo OK: " (:score verified)
               " pass=" (:pass judged)
               " plans=" (count (get receipt-map "sourcePlans"))
-              " panel-specialists=" (count (:specialists panel-sel))
+              " panel-specialists=" (count workers)
               " shards=" (count shard-parts)
               " blind-item=" id/BLIND_ITEM_ID "\n"
               (str/trim-newline (:text board)) "\n"
