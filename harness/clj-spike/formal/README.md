@@ -3,10 +3,10 @@
 Own Clojure modules for the **formal-verification road**. Separate from the
 spike ports under `../src/loyly/spike/` (legacy assurance).
 
-**Behaviour spec:** [`../pi-durable/spec.feature`](../pi-durable/spec.feature)
-(`@formal-*` and `@cycle-*`). Outside `docs/plan/` so it never enters the
-product checklist; outside shared `harness/spec.feature` so the three-repo
-instrument stays untouched.
+**Behaviour spec:** [`../../cycle.spec.feature`](../../cycle.spec.feature)
+(`@formal-*` and `@cycle-*`). Language-agnostic. Outside `docs/plan/` so it
+never enters the product checklist; outside shared `harness/spec.feature` so
+the three-repo instrument stays untouched.
 
 | Module | Role |
 |--------|------|
