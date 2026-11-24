@@ -42,7 +42,8 @@
     "loyly.spike.audit-rows"
     "loyly.spike.formal.models"
     "loyly.spike.formal.trace"
-    "loyly.spike.formal.props"})
+    "loyly.spike.formal.props"
+    "loyly.spike.formal.theory"})
 
 (defn- clj-files []
   (->> (fs/glob src "**.clj")

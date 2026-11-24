@@ -26,10 +26,11 @@ The spike mirrors the harness’s dual path to independent examination:
 | Road | In the spike |
 |------|----------------|
 | **Legacy assurance** | Gate / grade / blind / panel workers — systematic evaluation with injectable spawn/QEMU/HTTP |
-| **Formal verification** | Malli models (`formal/models.clj`), JSON Schema pin digests (`formal/trace.clj`), test.check properties (`formal/props.clj`) |
+| **Formal verification** | Many-sorted theory 𝒜 = (Sorts, Predicates, Functions, Invariants) in `formal/` — Malli carriers, Validₛ, digest laws, JSON Schema pins |
 
 ```sh
-harness/clj-spike/bin/spike formal
+harness/clj-spike/bin/spike formal              # prove invariants
+harness/clj-spike/bin/spike formal --theory     # print the mathematical theory
 ```
 
 Certification stays outside the builder: an independent grader + panel confirms the process. Runtime backends (Pi sqlite, Gondolin, Ajv compile, Effect/`defineTask`) remain injectable hooks so the CLJ API is complete without claiming those infra pieces run in Babashka.

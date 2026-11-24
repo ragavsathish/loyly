@@ -12,8 +12,13 @@ task="$1"; shift
 case "$task" in
   formal)
     cd "$SPIKE"
-    if [[ $# -eq 0 ]]; then
-      exec bb scripts/formal.clj --root "$REPO"
+    # Preserve flags like --theory; default --root when omitted.
+    has_root=0
+    for a in "$@"; do
+      if [[ "$a" == "--root" ]]; then has_root=1; break; fi
+    done
+    if [[ $has_root -eq 0 ]]; then
+      exec bb scripts/formal.clj "$@" --root "$REPO"
     else
       exec bb scripts/formal.clj "$@"
     fi
