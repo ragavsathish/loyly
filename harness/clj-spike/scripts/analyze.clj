@@ -43,7 +43,8 @@
     "loyly.spike.formal.models"
     "loyly.spike.formal.trace"
     "loyly.spike.formal.props"
-    "loyly.spike.formal.theory"})
+    "loyly.spike.formal.theory"
+    "loyly.spike.formal.cycle"})
 
 (defn- clj-files []
   (->> (fs/glob src "**.clj")

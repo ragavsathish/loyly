@@ -12,7 +12,8 @@
 
   This is the formal-verification road: models define the system;
   properties and pins prove instances and artifacts obey them."
-  (:require [loyly.spike.formal.models :as models]
+  (:require [loyly.spike.formal.cycle :as cycle]
+            [loyly.spike.formal.models :as models]
             [loyly.spike.formal.trace :as trace]
             [loyly.spike.project.loyly :as loyly]
             [malli.core :as m]))
@@ -95,7 +96,7 @@
     :kind :fixture-instance}])
 
 (defn theory
-  "Closed description of 𝒜 for export / examination."
+  "Closed description of 𝒜 for export / examination, plus cycle 𝒞."
   []
   {:schema "loyly.formal-theory.v1"
    :title "Löyly clj-spike many-sorted theory"
@@ -105,7 +106,8 @@
    :invariants Invariants
    :morphisms Morphisms
    :registry-digest (trace/registry-digest)
-   :project loyly/PROJECT_ID})
+   :project loyly/PROJECT_ID
+   :cycle (cycle/cycle-theory)})
 
 (defn sort-form
   "Pretty closed form of one sort (for human inspection)."

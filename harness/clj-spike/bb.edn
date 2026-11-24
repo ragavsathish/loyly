@@ -32,7 +32,7 @@
 
   formal
   {:doc "Formal verification: Malli models, traceability, properties"
-   :task (shell {:dir "."} "bb" "scripts/formal.clj")}
+   :task (apply shell {:dir "."} "bb" "scripts/formal.clj" *command-line-args*)}
 
   lint
   {:doc "clj-kondo + loyly product-literal / deep-import (TS eslint)"

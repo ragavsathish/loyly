@@ -3,6 +3,7 @@
 (ns loyly.spike.scripts.formal
   (:require [babashka.fs :as fs]
             [clojure.string :as str]
+            [loyly.spike.formal.cycle :as cycle]
             [loyly.spike.formal.models :as models]
             [loyly.spike.formal.props :as props]
             [loyly.spike.formal.theory :as theory]
@@ -35,14 +36,17 @@
                                     fs))))
                (update :invariants
                        (fn [inv]
-                         (mapv #(update % :proved-by str) inv)))))
+                         (mapv #(update % :proved-by str) inv)))
+               (update-in [:cycle :proof] identity)))
           (println (str "theory OK (" (count (:sorts 𝒜)) " sorts, "
-                        (count (:invariants 𝒜)) " invariants)"))
+                        (count (:invariants 𝒜)) " model invariants, "
+                        (count (get-in 𝒜 [:cycle :Q])) " cycle phases)"))
           :ok)
 
       :prove
       (let [cert (trace/certificate repo)
             suite (props/run-all! :num-tests 40)
+            cyc (cycle/prove-cycle!)
             sample (models/generate :blind-packet :seed 1)]
         (when-not (:pass? suite)
           (binding [*out* *err*]
@@ -54,6 +58,10 @@
           :theory (:schema 𝒜)
           :sorts (count (:sorts 𝒜))
           :invariants (mapv :id (:invariants 𝒜))
+          :cycle {:schema "loyly.formal-cycle.v1"
+                  :q0 (:q0 cyc)
+                  :path (:path cyc)
+                  :invariants (:invariants cyc)}
           :registry-digest (:registry-digest cert)
           :json-schema-pins (mapv :file (:json-schema-pins cert))
           :panel-file (get-in cert [:panel :file])

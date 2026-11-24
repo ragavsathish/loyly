@@ -4,6 +4,7 @@
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
             [loyly.spike.digest :as d]
+            [loyly.spike.formal.cycle :as cycle]
             [loyly.spike.formal.models :as models]
             [loyly.spike.project.loyly :as loyly]
             [malli.generator :as mg]))
@@ -55,11 +56,24 @@
   (prop/for-all [p (mg/generator (models/schema :blind-packet))]
     (= loyly/BLIND_ITEM_ID (get p "item"))))
 
+(defn prop-cycle-state-obeys
+  "∀ generated CycleState · valid-state?."
+  []
+  (prop/for-all [s (mg/generator cycle/CycleState)]
+    (cycle/valid-state? s)))
+
+(defn prop-succ-on-path
+  "∀ adjacent (q,q') on the unique path · transition?(q,q')."
+  []
+  (prop/for-all [i (gen/choose 0 (- (count cycle/Q) 2))]
+    (cycle/transition? (nth cycle/Q i) (nth cycle/Q (inc i)))))
+
 (defn run-all!
   "Execute the formal property suite; throw on first failure."
   [& {:keys [num-tests] :or {num-tests 40}}]
   (let [models-to-gen [:sha256 :commit :item-id :blind-packet :blind-response
                        :panel-summary :score-input :gate-receipt :replay-evidence]
+        _ (cycle/prove-cycle!)
         results
         (vec
          (concat
@@ -67,11 +81,14 @@
            (check! :sha256-deterministic (prop-sha256-deterministic) :num-tests num-tests)
            (check! :sha256-length (prop-sha256-length) :num-tests num-tests)
            (check! :invalid-sha-rejected (prop-invalid-sha-rejected) :num-tests (min 30 num-tests))
-           (check! :blind-packet-item (prop-blind-packet-item-fixed) :num-tests num-tests)]
+           (check! :blind-packet-item (prop-blind-packet-item-fixed) :num-tests num-tests)
+           (check! :cycle-state-obeys (prop-cycle-state-obeys) :num-tests (min 25 num-tests))
+           (check! :cycle-succ-on-path (prop-succ-on-path) :num-tests num-tests)]
           (for [m models-to-gen]
             (check! (keyword (str "gen-obeys-" (name m)))
                     (prop-generated-obeys-model m)
                     :num-tests (min 25 num-tests)))))]
     {:schema "loyly.formal-props.v1"
      :pass? (every? :pass? results)
-     :results results}))
+     :results results
+     :cycle (cycle/prove-cycle!)}))

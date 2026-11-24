@@ -197,7 +197,8 @@
    ["source_digest" Sha256]])
 
 (def Registry
-  "Named models for explain / generate / digest."
+  "Named models for explain / generate / digest.
+  Cycle sorts (PhaseName, CycleState) live in formal.cycle."
   {:sha256 Sha256
    :commit Commit40
    :item-id ItemId

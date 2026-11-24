@@ -26,12 +26,41 @@ The spike mirrors the harness’s dual path to independent examination:
 | Road | In the spike |
 |------|----------------|
 | **Legacy assurance** | Gate / grade / blind / panel workers — systematic evaluation with injectable spawn/QEMU/HTTP |
-| **Formal verification** | Many-sorted theory 𝒜 = (Sorts, Predicates, Functions, Invariants) in `formal/` — Malli carriers, Validₛ, digest laws, JSON Schema pins |
+| **Formal verification** | Models 𝒜 = (𝒮,𝒫,ℱ,ℐ) plus cycle 𝒞 = (Q,q₀,→,L,F) in `formal/` |
 
 ```sh
-harness/clj-spike/bin/spike formal              # prove invariants
-harness/clj-spike/bin/spike formal --theory     # print the mathematical theory
+harness/clj-spike/bin/spike formal              # prove model + cycle invariants
+harness/clj-spike/bin/spike formal --theory     # print 𝒜 and 𝒞
 ```
+
+### Models 𝒜 and cycle 𝒞
+
+\[
+\mathcal{A} = (\mathcal{S},\mathcal{P},\mathcal{F},\mathcal{I})
+\qquad
+\mathcal{C} = (Q,q_0,\to,L,F)
+\]
+
+| Symbol | Meaning | Code |
+|--------|---------|------|
+| \(\mathcal{S}\) | sorts (carriers) | `formal.models/Registry` |
+| \(\mathcal{P}\) | \(\mathrm{Valid}_s(x)\) | `models/valid?` |
+| \(\mathcal{F}\) | \(H\), \(\delta\), \(\Delta\), \(\iota\) | digest + trace |
+| \(\mathcal{I}\) | I1–I7 | `formal.props` + `formal.trace` |
+| \(Q\) | ALL-PHASES | `formal.cycle/Q` |
+| \(q_0\) | cut | `formal.cycle/q0` |
+| \(\to\) | linear succ | `formal.cycle/succ` |
+| \(L\) | phase ↦ model obligations | `formal.cycle/labeling` |
+| \(F\) | \{done\} | `formal.cycle/F` |
+| C1–C5 | cycle invariants | `formal.cycle/prove-cycle!` |
+
+\[
+\mathrm{run} = q_0 \xrightarrow{*} \mathrm{done}
+\qquad
+\bigcup_{q\in Q} L(q) \subseteq \mathrm{Registry}
+\qquad
+\mathrm{blind\text{-}review} \prec \mathrm{score}
+\]
 
 Certification stays outside the builder: an independent grader + panel confirms the process. Runtime backends (Pi sqlite, Gondolin, Ajv compile, Effect/`defineTask`) remain injectable hooks so the CLJ API is complete without claiming those infra pieces run in Babashka.
 
