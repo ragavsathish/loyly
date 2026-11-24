@@ -72,7 +72,9 @@
   "Execute the formal property suite; throw on first failure."
   [& {:keys [num-tests] :or {num-tests 40}}]
   (let [models-to-gen [:sha256 :commit :item-id :blind-packet :blind-response
-                       :panel-summary :score-input :gate-receipt :replay-evidence]
+                       :blind-probe :panel-summary :score-input :checklist
+                       :verdict :verdicts :scores :grading-room :panel-vm-run
+                       :panel-report :gate-receipt :replay-evidence :live-run]
         _ (cycle/prove-cycle!)
         results
         (vec
@@ -87,7 +89,7 @@
           (for [m models-to-gen]
             (check! (keyword (str "gen-obeys-" (name m)))
                     (prop-generated-obeys-model m)
-                    :num-tests (min 25 num-tests)))))]
+                    :num-tests (min (if (= m :live-run) 15 25) num-tests)))))]
     {:schema "loyly.formal-props.v1"
      :pass? (every? :pass? results)
      :results results

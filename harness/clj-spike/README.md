@@ -43,10 +43,10 @@ harness/clj-spike/bin/spike formal --theory     # print 𝒜 and 𝒞
 
 | Symbol | Meaning | Code |
 |--------|---------|------|
-| \(\mathcal{S}\) | sorts (carriers) | `formal.models/Registry` |
+| \(\mathcal{S}\) | sorts (carriers) | `formal.models/Registry` (20 sorts incl. LiveRun v1/v2, GradingRoom, PanelVmRun/Report, Checklist/Verdicts/Scores) |
 | \(\mathcal{P}\) | \(\mathrm{Valid}_s(x)\) | `models/valid?` |
 | \(\mathcal{F}\) | \(H\), \(\delta\), \(\Delta\), \(\iota\) | digest + trace |
-| \(\mathcal{I}\) | I1–I7 | `formal.props` + `formal.trace` |
+| \(\mathcal{I}\) | I1–I10 | `formal.props` + `formal.trace` |
 | \(Q\) | ALL-PHASES | `formal.cycle/Q` |
 | \(q_0\) | cut | `formal.cycle/q0` |
 | \(\to\) | linear succ | `formal.cycle/succ` |

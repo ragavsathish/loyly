@@ -88,20 +88,20 @@
   {"cut"           #{:commit}
    "preflight"     #{:live-run}
    "fence"         #{:commit}
-   "checklist"     #{:item-id}
+   "checklist"     #{:checklist :item-id}
    "render"        #{}
    "build"         #{:sha256}
    "after-build"   #{:sha256}
    "gate"          #{:gate-receipt :sha256}
    "after-gate"    #{:gate-receipt}
-   "grading-room"  #{:score-input :sha256}
-   "grade"         #{:allure-lifecycle}
+   "grading-room"  #{:grading-room :sha256}
+   "grade"         #{:allure-lifecycle :verdicts}
    "after-grade"   #{:allure-lifecycle}
-   "blind-review"  #{:blind-packet :blind-response}
-   "panel"         #{:panel-plan}
-   "after-panel"   #{:panel-summary}
-   "score"         #{:score-input}
-   "panel-report"  #{:panel-summary :replay-evidence}
+   "blind-review"  #{:blind-packet :blind-response :blind-probe}
+   "panel"         #{:panel-plan :panel-vm-run}
+   "after-panel"   #{:panel-summary :panel-vm-run}
+   "score"         #{:score-input :scores :verdicts}
+   "panel-report"  #{:panel-report :panel-summary :replay-evidence}
    "done"          #{}})
 
 (defn labels

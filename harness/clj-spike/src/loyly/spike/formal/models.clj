@@ -134,7 +134,22 @@
    ["original_score_sha256" Sha256]
    ["panel_outcome" [:string {:min 1}]]])
 
+(def CycleDigits
+  [:re {:gen/gen (gen/fmap #(format "%02d" %) (gen/choose 0 99))} #"^\d{2}$"])
+
+(def ProjectId
+  [:re {:gen/gen id-token-gen} #"^[a-z][a-z0-9-]*$"])
+
+(def RunId
+  [:re {:gen/gen (gen/fmap #(apply str %)
+                           (gen/vector
+                            (gen/elements
+                             (vec "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-"))
+                            1 12))}
+   #"^[A-Za-z0-9._-]+$"])
+
 (def AgentPin
+  "Base agent pin (builder)."
   [:map
    ["command" [:string {:min 1}]]
    ["command_sha256" Sha256]
@@ -142,31 +157,100 @@
    ["image_sha256" Sha256]
    ["model" [:string {:min 1}]]
    ["instruction_sha256" Sha256]
+   ["instruction_file" {:optional true}
+    [:re {:gen/gen (gen/fmap #(str % ".md") id-token-gen)} #"^[A-Za-z0-9._-]+\.md$"]]
    ["settings" {:optional true} [:string {:min 1}]]
    ["settings_sha256" {:optional true} Sha256]
    ["schema_sha256" {:optional true} Sha256]
    ["shards" {:optional true} [:int {:min 1 :max 16}]]])
 
+(def GraderPin
+  "Grader pin — settings, schema digest and shard count required."
+  [:map
+   ["command" [:string {:min 1}]]
+   ["command_sha256" Sha256]
+   ["image" [:string {:min 1}]]
+   ["image_sha256" Sha256]
+   ["model" [:string {:min 1}]]
+   ["instruction_sha256" Sha256]
+   ["instruction_file" {:optional true}
+    [:re {:gen/gen (gen/fmap #(str % ".md") id-token-gen)} #"^[A-Za-z0-9._-]+\.md$"]]
+   ["settings" [:string {:min 1}]]
+   ["settings_sha256" Sha256]
+   ["schema_sha256" Sha256]
+   ["shards" [:int {:min 1 :max 16}]]])
+
+(def BlindAgentPin
+  "Blind-review agent pin — settings required."
+  [:map
+   ["command" [:string {:min 1}]]
+   ["command_sha256" Sha256]
+   ["image" [:string {:min 1}]]
+   ["image_sha256" Sha256]
+   ["model" [:string {:min 1}]]
+   ["instruction_sha256" Sha256]
+   ["instruction_file" {:optional true}
+    [:re {:gen/gen (gen/fmap #(str % ".md") id-token-gen)} #"^[A-Za-z0-9._-]+\.md$"]]
+   ["settings" [:string {:min 1}]]
+   ["settings_sha256" Sha256]])
+
+(def PanelPin
+  [:map
+   ["image" [:string {:min 1}]]
+   ["image_sha256" Sha256]
+   ["plan_sha256" Sha256]
+   ["plan_file" {:optional true}
+    [:re {:gen/gen (gen/fmap #(str % ".panel.json") id-token-gen)}
+     #"^[a-z][a-z0-9-]*\.panel\.json$"]]])
+
 (def LiveRunSource
   [:map
-   ["repo" {:optional true} [:string {:min 1}]]
+   ["repo" [:string {:min 1}]]
    ["commit" Commit40]
    ["checklist_sha256" Sha256]
+   ["spec_file" {:optional true} [:string {:min 1}]]
+   ["spec_sha256" {:optional true} Sha256]
    ["specs" {:optional true}
     [:vector {:min 1}
      [:map ["file" [:string {:min 1}]] ["sha256" Sha256]]]]])
 
-(def LiveRun
+(def LiveRunV1
+  "loyly.pi-live-run.v1 — blind + panel required; no project."
   [:map
-   ["schema" [:enum "loyly.pi-live-run.v1" "harness.pi-live-run.v2"]]
-   ["run_id" [:re {:gen/gen (gen/fmap #(apply str %)
-                                      (gen/vector (gen/elements (vec "AZaz09._-")) 1 12))}
-              #"^[A-Za-z0-9._-]+$"]]
-   ["score_cycle" {:optional true}
-    [:re {:gen/gen (gen/fmap #(format "%02d" %) (gen/choose 0 99))} #"^\d{2}$"]]
+   ["schema" [:= "loyly.pi-live-run.v1"]]
+   ["run_id" RunId]
+   ["score_cycle" {:optional true} CycleDigits]
+   ["controller_commit" Commit40]
    ["source" LiveRunSource]
+   ["scratch" [:string {:min 1}]]
    ["builder" AgentPin]
-   ["grader" AgentPin]])
+   ["grader" GraderPin]
+   ["blind" BlindAgentPin]
+   ["panel" PanelPin]
+   ["runtime" {:optional true}
+    [:map ["java21" {:optional true} :boolean]]]])
+
+(def LiveRunV2
+  "harness.pi-live-run.v2 — project required; blind forbidden."
+  [:map
+   ["schema" [:= "harness.pi-live-run.v2"]]
+   ["project" ProjectId]
+   ["run_id" RunId]
+   ["score_cycle" {:optional true} CycleDigits]
+   ["controller_commit" Commit40]
+   ["source" LiveRunSource]
+   ["scratch" [:string {:min 1}]]
+   ["builder" AgentPin]
+   ["grader" GraderPin]
+   ["panel" {:optional true} PanelPin]
+   ["runtime" {:optional true}
+    [:map ["java21" {:optional true} :boolean]]]])
+
+(def LiveRun
+  [:multi {:dispatch #(get % "schema")
+           :default ::invalid}
+   ["loyly.pi-live-run.v1" LiveRunV1]
+   ["harness.pi-live-run.v2" LiveRunV2]])
 
 (def ScoreInput
   [:map
@@ -175,8 +259,92 @@
    ["candidate_sha256" Sha256]
    ["checklist_sha256" Sha256]
    ["verdicts_sha256" Sha256]
-   ["score_cycle" {:optional true}
-    [:re {:gen/gen (gen/fmap #(format "%02d" %) (gen/choose 0 99))} #"^\d{2}$"]]])
+   ["score_cycle" {:optional true} CycleDigits]
+   ["panel_manifest_sha256" {:optional true} Sha256]])
+
+(def ChecklistItem
+  [:map
+   ["id" ItemId]
+   ["name" [:string {:min 1}]]
+   ["rule" [:string {:min 1}]]
+   ["source" [:string {:min 1}]]])
+
+(def Checklist
+  [:map
+   ["items" [:vector {:min 1} ChecklistItem]]
+   ["counts" [:map ["total" [:int {:min 1}]]]]])
+
+(def Verdict
+  [:map
+   ["id" ItemId]
+   ["verdict" [:enum "pass" "fail"]]
+   ["evidence" :string]])
+
+(def Verdicts
+  [:vector {:min 1} Verdict])
+
+(def ScoredItem
+  [:map
+   ["id" ItemId]
+   ["name" {:optional true} [:string {:min 1}]]
+   ["rule" {:optional true} [:string {:min 1}]]
+   ["source" {:optional true} [:string {:min 1}]]
+   ["verdict" [:enum "pass" "fail"]]
+   ["evidence" :string]])
+
+(def Scores
+  [:map
+   ["items" [:vector {:min 1} ScoredItem]]])
+
+(def GradingRoom
+  "Receipt written as `.grading-room.json`."
+  [:map
+   ["schema" [:= loyly/GRADING_ROOM]]
+   ["candidateSha256" Sha256]
+   ["checklistSha256" Sha256]
+   ["schemaSha256" Sha256]
+   ["planSha256" Sha256]
+   ["sourcePlans" [:vector {:min 1} [:string {:min 1}]]]
+   ["sourcePlan" {:optional true} [:maybe [:string {:min 1}]]]
+   ["project" {:optional true} ProjectId]
+   ["blindReview" {:optional true} :boolean]])
+
+(def PanelVmProducer
+  [:map
+   ["started" [:int {:min 0}]]
+   ["stopped" [:int {:min 0}]]
+   ["tool" {:optional true} [:string {:min 1}]]
+   ["item" {:optional true} [:string {:min 1}]]
+   ["status" {:optional true} :string]
+   ["result" {:optional true} :string]
+   ["image_digest" {:optional true} Sha256]])
+
+(def PanelVmRun
+  "Panel VM attempt `manifest.json`."
+  [:map
+   ["schema" [:= loyly/PANEL_VM_RUN]]
+   ["source_commit" Commit40]
+   ["candidate_sha256" Sha256]
+   ["plan_sha256" Sha256]
+   ["allure_schema_sha256" Sha256]
+   ["original_score_unchanged" [:= true]]
+   ["producers" [:vector {:min 1} PanelVmProducer]]
+   ["score_state" {:optional true} [:enum "filed" "pre-score"]]
+   ["original_score_sha256" {:optional true} Sha256]
+   ["worker_bundle_sha256" {:optional true} Sha256]
+   ["image_digest" {:optional true} Sha256]
+   ["parallel_overlap_ms" {:optional true} [:int {:min 0}]]])
+
+(def PanelReport
+  "Compiled panel report `panel-manifest.json`."
+  [:map
+   ["schema" [:= loyly/PANEL_REPORT]]
+   ["panel_summary_sha256" Sha256]
+   ["report_html_sha256" Sha256]
+   ["audit_entries_sha256" Sha256]
+   ["specialist_manifest_sha256" Sha256]
+   ["result_count" [:int {:min 0}]]
+   ["original_score_unchanged" [:= true]]])
 
 (def GateReceiptFields
   [:map
@@ -210,6 +378,13 @@
    :panel-summary PanelSummary
    :live-run LiveRun
    :score-input ScoreInput
+   :checklist Checklist
+   :verdict Verdict
+   :verdicts Verdicts
+   :scores Scores
+   :grading-room GradingRoom
+   :panel-vm-run PanelVmRun
+   :panel-report PanelReport
    :gate-receipt GateReceiptFields
    :replay-evidence ReplayEvidence})
 

@@ -75,7 +75,16 @@
     :proved-by 'loyly.spike.formal.trace/prove-booking-panel!}
    {:id :I7
     :statement "TS JSON Schema files for panel/live/allure are present and digested"
-    :proved-by 'loyly.spike.formal.trace/pin-all-json-schemas!}])
+    :proved-by 'loyly.spike.formal.trace/pin-all-json-schemas!}
+   {:id :I8
+    :statement "∀ r ∈ LiveRun. schema∈{v1,v2} ∧ Valid_live-run(r)"
+    :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}
+   {:id :I9
+    :statement "∀ g ∈ GradingRoom. g.schema = loyly.grading-room.v1"
+    :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}
+   {:id :I10
+    :statement "∀ m ∈ PanelVmRun ∪ PanelReport. original_score_unchanged = true"
+    :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}])
 
 (def Morphisms
   "Traceability arrows from formal sorts to published TS artifacts."
@@ -93,7 +102,19 @@
     :kind :json-schema-pin}
    {:from :panel-plan
     :to (str "harness/pi-durable/" loyly/DEFAULT_PANEL_PLAN)
-    :kind :fixture-instance}])
+    :kind :fixture-instance}
+   {:from :grading-room
+    :to "harness/pi-durable/grading-room.ts"
+    :kind :ts-source}
+   {:from :panel-vm-run
+    :to "harness/pi-durable/panel-vm-run.ts"
+    :kind :ts-source}
+   {:from :panel-report
+    :to "harness/pi-durable/panel-compile.ts"
+    :kind :ts-source}
+   {:from :score-input
+    :to "harness/pi-durable/score-receipt.ts"
+    :kind :ts-source}])
 
 (defn theory
   "Closed description of 𝒜 for export / examination, plus cycle 𝒞."
