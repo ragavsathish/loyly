@@ -13,6 +13,56 @@
 (def PHASES
   ["cut" "preflight" "build" "gate" "grade" "blind-review" "score" "panel" "done"])
 
+(def ALL-PHASES
+  ["cut" "preflight" "fence" "checklist" "render" "build" "after-build"
+   "gate" "after-gate" "grading-room" "grade" "after-grade" "blind-review"
+   "panel" "after-panel" "score" "panel-report" "done"])
+
+(defn- stub-phase [name]
+  (fn [_deps]
+    {:code 0 :phase name :sha256 (effects/hash-value (str "stub:" name))}))
+
+(def phase-preflight (stub-phase "preflight"))
+(def phase-fence (stub-phase "fence"))
+(def phase-checklist (stub-phase "checklist"))
+(def phase-render (stub-phase "render"))
+(def phase-build (stub-phase "build"))
+(def phase-after-build (stub-phase "after-build"))
+(def phase-gate (stub-phase "gate"))
+(def phase-after-gate (stub-phase "after-gate"))
+(def phase-grading-room (stub-phase "grading-room"))
+(def phase-grade (stub-phase "grade"))
+(def phase-after-grade (stub-phase "after-grade"))
+(def phase-blind-review (stub-phase "blind-review"))
+(def phase-panel (stub-phase "panel"))
+(def phase-after-panel (stub-phase "after-panel"))
+(def phase-panel-report (stub-phase "panel-report"))
+(def phase-done (stub-phase "done"))
+
+(declare phase-cut phase-score)
+
+(defn create-cycle-phases
+  "Map of portable phase handlers (Pi defineTask bodies stay on TS)."
+  [_deps]
+  {:cut phase-cut
+   :preflight phase-preflight
+   :fence phase-fence
+   :checklist phase-checklist
+   :render phase-render
+   :build phase-build
+   :after-build phase-after-build
+   :gate phase-gate
+   :after-gate phase-after-gate
+   :grading-room phase-grading-room
+   :grade phase-grade
+   :after-grade phase-after-grade
+   :blind-review phase-blind-review
+   :panel phase-panel
+   :after-panel phase-after-panel
+   :score phase-score
+   :panel-report phase-panel-report
+   :done phase-done})
+
 (defn phase-cut
   "Pin an approved source cut when `:approved-commit` is set."
   [{:keys [fx approved-commit approved-source-repo source-root cut]}]

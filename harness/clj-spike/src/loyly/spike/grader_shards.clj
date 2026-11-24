@@ -1,10 +1,39 @@
 (ns loyly.spike.grader-shards
   "PoC port of partitionByRule (+ prepareShards) from harness/pi-durable/grader-shards.ts"
   (:require [babashka.fs :as fs]
+            [loyly.spike.allure-results :as allure]
             [loyly.spike.digest :as d]
             [loyly.spike.grading-room :as room]
             [loyly.spike.hjson :as hjson]
-            [loyly.spike.project.loyly :as loyly]))
+            [loyly.spike.project.loyly :as loyly])
+  (:import [java.nio.file Files LinkOption]))
+
+(defn copy-safe-tree
+  "Recursive copy without following symlinks (port of grader-shards copySafeTree)."
+  [from to]
+  (let [from (fs/path from)
+        attrs (Files/readAttributes from "basic:fileAttributes"
+                                    (into-array LinkOption [LinkOption/NOFOLLOW_LINKS]))]
+    (cond
+      (.isSymbolicLink attrs)
+      (throw (ex-info (str "grader evidence contains a symlink or special file: " from)
+                      {:from (str from)}))
+
+      (.isRegularFile attrs)
+      (do
+        (when-let [parent (fs/parent to)]
+          (fs/create-dirs parent))
+        (fs/copy from to {:replace-existing true}))
+
+      (.isDirectory attrs)
+      (do
+        (fs/create-dirs to)
+        (doseq [name (fs/list-dir from)]
+          (copy-safe-tree (fs/path from name) (fs/path to name))))
+
+      :else
+      (throw (ex-info (str "grader evidence contains a symlink or special file: " from)
+                      {:from (str from)})))))
 
 (defn partition-by-rule
   "Balance rule-groups across up to `shard-count` shards (1..16)."
@@ -92,3 +121,62 @@
             :checklist-sha256 checklist-sha
             :args args})))
      partitions)))
+
+(defn combine-shards
+  "Merge shard grading rooms into one collector view (port of combineShards)."
+  [{:keys [grading-room shards candidate-sha256 schema-sha256]}]
+  (let [full (hjson/read-json (slurp (fs/file grading-room "checklist.json") :encoding "UTF-8"))
+        selected (mapv #(get % "id") (get full "items"))
+        seen (vec (mapcat :items shards))]
+    (when (or (not= (count seen) (count selected))
+              (not= (count (set seen)) (count selected))
+              (some #(not (contains? (set seen) %)) selected))
+      (throw (ex-info "grader shards do not cover the approved checklist exactly once" {})))
+    (let [work (fs/path grading-room "work")
+          combined (fs/path work "allure-results")
+          shards-dir (fs/path work "shards")]
+      (when (fs/exists? combined) (fs/delete-tree combined))
+      (when (fs/exists? shards-dir) (fs/delete-tree shards-dir))
+      (fs/create-dirs combined)
+      (fs/create-dirs shards-dir)
+      (let [surprises (atom [])
+            room-meta (hjson/read-json
+                       (slurp (fs/file grading-room ".grading-room.json") :encoding "UTF-8"))]
+        (doseq [shard shards]
+          (room/verify-grading-room
+           (array-map
+            :out (:out shard)
+            :candidate-sha256 candidate-sha256
+            :checklist-sha256 (:checklist-sha256 shard)
+            :schema-sha256 schema-sha256
+            :project (or (get room-meta "project") "loyly")
+            :blind-review (if (contains? room-meta "blindReview")
+                            (get room-meta "blindReview")
+                            true)))
+          (let [judged (allure/read-allure-results (:out shard))]
+            (when-not (= (count (:verdicts judged)) (count (:items shard)))
+              (throw (ex-info (str "incomplete " (:id shard)) {:id (:id shard)})))
+            (let [source (fs/path (:out shard) "work" "allure-results")]
+              (doseq [name (map fs/file-name (fs/list-dir source))]
+                (let [dest (fs/path combined name)]
+                  (when (fs/exists? dest)
+                    (throw (ex-info (str "Allure filename collision: " name) {:name name})))
+                  (fs/copy (fs/path source name) dest)))
+              (let [evidence (fs/path shards-dir (:id shard))]
+                (fs/create-dirs evidence)
+                (doseq [name (map fs/file-name (fs/list-dir (fs/path (:out shard) "work")))]
+                  (let [source-path (fs/path (:out shard) "work" name)]
+                    (when (and (not= name "allure-results")
+                               (not= name "surprises.json")
+                               (not (and (re-matches #"runtime-.*" name)
+                                         (fs/directory? source-path))))
+                      (copy-safe-tree source-path (fs/path evidence name))))))
+              (swap! surprises into
+                     (map (fn [s]
+                            (assoc s "evidence_file"
+                                   (str "work/shards/" (:id shard) "/"
+                                        (subs (get s "evidence_file") 5))))
+                          (:surprises judged)))))
+        (hjson/spit-utf8 (fs/file work "surprises.json")
+                         (hjson/compact-json @surprises))
+        (allure/read-allure-results grading-room))))))

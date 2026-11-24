@@ -1,7 +1,7 @@
 (ns loyly.spike.project.loyly.blind-probe
-  "PoC port of sync helpers from harness/pi-durable/project/loyly/blind-probe.ts.
-  publicJsonBooking (HTTP) stays on the TS side for now."
-  (:require [clojure.string :as str]))
+  "Port of harness/pi-durable/project/loyly/blind-probe.ts."
+  (:require [cheshire.core :as json]
+            [clojure.string :as str]))
 
 (defn- attribute [tag name]
   (second (re-find (re-pattern (str "(?i)\\b" name "\\s*=\\s*[\"']([^\"']+)[\"']")) tag)))
@@ -10,15 +10,17 @@
   "Return the same-origin POST action path for the public booking form, or nil."
   [html]
   (let [forms
-        (->> (re-seq #"(?is)<form\b([^>]*)>([\s\S]*?)</form>" html)
-             (filter (fn [[_ tag body]]
-                       (and (= "post" (some-> (attribute tag "method") str/lower-case))
-                            (every? (fn [name]
-                                      (re-find (re-pattern
-                                                (str "(?i)<(?:input|select)\\b[^>]*\\bname\\s*=\\s*[\"']"
-                                                     name "[\"']"))
-                                               body))
-                                    ["household" "resource" "weekday" "start"])))))]
+        (filter
+         (fn [[_ tag body]]
+           (and (= "post" (some-> (attribute tag "method") str/lower-case))
+                (every? (fn [name]
+                          (re-find
+                           (re-pattern
+                            (str "(?i)<(?:input|select)\\b[^>]*\\bname\\s*=\\s*[\"']"
+                                 name "[\"']"))
+                           body))
+                        ["household" "resource" "weekday" "start"])))
+         (re-seq #"(?is)<form\b([^>]*)>([\s\S]*?)</form>" html))]
     (when (> (count forms) 1)
       (throw (ex-info "expected at most one public booking form" {})))
     (when (seq forms)
@@ -28,9 +30,7 @@
           (throw (ex-info "booking form action must be a same-origin path" {})))
         path))))
 
-(defn- form-encode
-  "application/x-www-form-urlencoded without java.net.URLEncoder quirks for spaces."
-  [params]
+(defn- form-encode [params]
   (->> params
        (map (fn [[k v]]
               (str (java.net.URLEncoder/encode (str k) "UTF-8")
@@ -73,3 +73,109 @@
             (when-not (= 1 (count matching))
               (throw (ex-info "blind room is not a unique public form option" {})))
             (form-encode (assoc params "resource" (second (first matching))))))))))
+
+(defn- assert-room-answer [params answer]
+  (let [resource (get params "resource")
+        room (some-> (when (string? resource) (re-matches #"^@room:(\d+)$" resource))
+                     second)]
+    (when (or (nil? room)
+              (not (re-find (re-pattern (str "(?i)^REQUEST:\\s*pukuhuone\\s+" room "\\s*\\|"))
+                            answer)))
+      (throw (ex-info "blind answer and requested room differ" {})))
+    room))
+
+(defn- named-resource [resources room]
+  (filterv #(= (str/trim (str/lower-case (or (get % "name") ""))) (str "pukuhuone " room))
+           resources))
+
+(defn- booking-payload-from-match [{:keys [house resource role path modern-roles params]}]
+  (let [payload (cond-> {"house" house
+                         "household" (get params "household")
+                         "resource" resource
+                         "weekday" (get params "weekday")
+                         "start" (get params "start")
+                         "kind" "standing"}
+                  modern-roles (assoc "bookerRole" role "actorRole" role)
+                  (not modern-roles) (assoc "role" role))]
+    (when-not (every? #(and (string? %) (not (str/blank? %))) (vals payload))
+      (throw (ex-info "public booking request is incomplete" {})))
+    {:path path :body (json/generate-string payload) :content-type "application/json"}))
+
+(defn match-public-json-booking
+  "Pure match of house listing data to a JSON booking request (no HTTP)."
+  [house-listing body answer]
+  (let [params (parse-form-body body)
+        room (assert-room-answer params answer)
+        houses (cond
+                 (vector? house-listing) house-listing
+                 (and (map? house-listing) (vector? (get house-listing "houses")))
+                 (get house-listing "houses")
+                 :else (throw (ex-info "public house API has no houses" {})))
+        house-scoped? (vector? house-listing)
+        matches
+        (vec
+         (keep
+          (fn [house]
+            (let [id (get house "id")]
+              (when (and (string? id) (re-matches #"[A-Za-z0-9_-]+" id))
+                (let [policy (get house "policy")
+                      resources (get policy "resources")
+                      route (or (get policy "route") (get policy "bookingMode"))
+                      modern? (string? (get policy "bookingMode"))
+                      path (if (or house-scoped? modern?)
+                             (str "/api/houses/" id "/bookings")
+                             "/api/bookings")
+                      named (named-resource resources room)]
+                  (when (and (= route "self-service") (= 1 (count named)))
+                    {:house id
+                     :resource (get (first named) "id")
+                     :role (or (first (get policy "eligibleRoles"))
+                               (first (get policy "bookerRoles")))
+                     :path path
+                     :modern-roles modern?
+                     :params params})))))
+          houses))]
+    (when-not (= 1 (count matches))
+      (throw (ex-info "blind room is not unique in the public self-service API" {})))
+    (booking-payload-from-match (first matches))))
+
+(defn public-json-booking
+  "Resolve booking via GET `:fetch-fn` taking `{:method :url :timeout-ms}`."
+  [base body answer & {:keys [fetch-fn]}]
+  (when-not fetch-fn
+    (throw (ex-info "public-json-booking needs :fetch-fn" {})))
+  (let [res (fetch-fn {:method "GET" :url (str base "/api/houses") :timeout-ms 1000})]
+    (when-not (:ok res)
+      (throw (ex-info "no public booking form or house API" res)))
+    (let [listing (json/parse-string (:body res) true)]
+      (try
+        (match-public-json-booking listing body answer)
+        (catch Exception _
+          (let [params (parse-form-body body)
+                room (assert-room-answer params answer)
+                houses (if (vector? listing) listing (get listing "houses"))
+                matches (atom [])]
+            (doseq [house houses]
+              (let [id (get house "id")]
+                (when (and (string? id) (re-matches #"[A-Za-z0-9_-]+" id))
+                  (let [state (fetch-fn {:method "GET"
+                                         :url (str base "/api/houses/" id "/state")
+                                         :timeout-ms 1000})]
+                    (when (:ok state)
+                      (let [parsed (json/parse-string (:body state) true)
+                            resources (get parsed "resources")
+                            route (get-in parsed ["route" "kind"])
+                            policy (get parsed "policy")
+                            named (named-resource resources room)]
+                        (when (and (= route "self-service") (= 1 (count named)))
+                          (swap! matches conj
+                                 {:house id
+                                  :resource (get (first named) "id")
+                                  :role (or (first (get policy "eligibleRoles"))
+                                            (first (get policy "bookerRoles")))
+                                  :path (str "/api/houses/" id "/bookings")
+                                  :modern-roles (string? (get policy "bookingMode"))
+                                  :params params})))))))
+            (when-not (= 1 (count @matches))
+              (throw (ex-info "blind room is not unique in the public self-service API" {})))
+            (booking-payload-from-match (first @matches)))))))))

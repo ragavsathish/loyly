@@ -28,6 +28,8 @@
 (def parse-blind-agent-answer answer/parse-blind-agent-answer)
 (def booking-form-action probe/booking-form-action)
 (def resolve-room-in-public-form probe/resolve-room-in-public-form)
+(def match-public-json-booking probe/match-public-json-booking)
+(def public-json-booking probe/public-json-booking)
 
 (def GRADING_ROOM schemas/GRADING_ROOM)
 (def BLIND_PACKET schemas/BLIND_PACKET)

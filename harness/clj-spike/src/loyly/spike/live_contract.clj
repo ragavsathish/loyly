@@ -2,10 +2,14 @@
   "PoC port of pure helpers from harness/pi-durable/live-contract.ts.
   Full Ajv schema compile is deferred; callers pass already-shaped maps."
   (:require [babashka.fs :as fs]
+            [babashka.process :as p]
             [clojure.string :as str]
             [loyly.spike.digest :as d]
+            [loyly.spike.evidence.validate-schema :as schema]
             [loyly.spike.gen-checklist :as checklist]
             [loyly.spike.hjson :as hjson]
+            [loyly.spike.panel-selection :as panel]
+            [loyly.spike.panel-vm :as panel-vm]
             [loyly.spike.project.loyly :as loyly]))
 
 (def SPEC-PATH-RE #"^docs/plan/\d\d-[a-z][a-z0-9-]*/spec\.feature$")
@@ -97,3 +101,86 @@
   "Public pin check for a builder/grader/panel image tree."
   [image expected-manifest-sha256]
   (verify-image image expected-manifest-sha256))
+
+(defn- git-at [path & args]
+  (let [{:keys [exit out err]}
+        @(p/process (into ["git" "-C" path] args) {:out :string :err :string})]
+    (when (pos? exit)
+      (throw (ex-info (str "git failed at " path) {:err err :exit exit})))
+    (str/trim out)))
+
+(defn verify-pinned-agents
+  "Pin-check builder/grader/blind commands, images and instructions."
+  [config & {:keys [pi-durable]
+             :or {pi-durable "harness/pi-durable"}}]
+  (when (and (= (get config "schema") "loyly.pi-live-run.v1")
+             (or (get-in config ["builder" "instruction_file"])
+                 (get-in config ["blind" "instruction_file"])))
+    (throw (ex-info "only the grader selects a separate instruction file in v1" {})))
+  (let [here (fs/file pi-durable)
+        agents (cond-> [[(get config "builder") "builder-instruction.md"]
+                        [(get config "grader") (or (get-in config ["grader" "instruction_file"])
+                                                   "grader-instruction-01.md")]]
+                (get config "blind")
+                (conj [(get config "blind")
+                       (or (get-in config ["blind" "instruction_file"])
+                           "blind-agent-instruction.md")]))
+        checked-images (atom #{})]
+    (doseq [[agent instruction] agents]
+      (require-hash (fs/file (get agent "command")) (get agent "command_sha256"))
+      (let [image (str (fs/absolutize (get agent "image")))
+            image-key (str image ":" (get agent "image_sha256"))]
+        (when-not (contains? @checked-images image-key)
+          (verify-image image (get agent "image_sha256"))
+          (swap! checked-images conj image-key)))
+      (require-hash (fs/file here instruction) (get agent "instruction_sha256"))
+      (when-let [settings (get agent "settings")]
+        (require-hash (fs/file settings) (get agent "settings_sha256"))))
+    (when (= (get-in config ["builder" "model"]) (get-in config ["grader" "model"]))
+      (throw (ex-info "builder and black-box grader must use different models" {})))
+    (require-hash (fs/file here "../evidence-core/allure-lifecycle-result.schema.json")
+                  (get-in config ["grader" "schema_sha256"]))
+    (when-let [panel-cfg (get config "panel")]
+      (require-hash (fs/file here (or (get panel-cfg "plan_file") loyly/DEFAULT_PANEL_PLAN))
+                    (get panel-cfg "plan_sha256"))
+      (verify-image (get panel-cfg "image") (get panel-cfg "image_sha256")))))
+
+(defn- derive-approved-checklist-full
+  [{:keys [config source scratch pi-durable]
+    :or {pi-durable "harness/pi-durable"}}]
+  (let [selected (derive-approved-checklist {:config config :source source :scratch scratch})]
+    (when-let [panel-cfg (get config "panel")]
+      (let [here (fs/file pi-durable)
+            plan-path (fs/file here (or (get panel-cfg "plan_file") loyly/DEFAULT_PANEL_PLAN))
+            plan (hjson/read-json (slurp plan-path :encoding "UTF-8"))]
+        (when (and (= (get config "schema") "harness.pi-live-run.v2")
+                   (or (not= (get plan "schema") "harness.grading-panel-plan.v2")
+                       (not= (get plan "project") (get config "project"))))
+          (throw (ex-info "panel plan project differs from the live contract" {})))
+        (panel/validate-panel-selection plan selected)
+        (panel-vm/specialist-workers plan (str here))))
+    selected))
+
+(defn check-live-run
+  "Structural live-run validation without Ajv compile (injectable `:root` for git pins)."
+  [input & {:keys [make-checklist root pi-durable]
+            :or {make-checklist true
+                 root "."
+                 pi-durable "harness/pi-durable"}}]
+  (let [config ((schema/compile-schema :live-run nil) input "live run")
+        source (str (fs/absolutize (get-in config ["source" "repo"])))
+        scratch (str (fs/absolutize (get config "scratch")))
+        repo-root (str (fs/absolutize root))]
+    (when (or (= source repo-root) (= scratch source) (str/starts-with? scratch (str source "/")))
+      (throw (ex-info "source, controller and output must be separate" {})))
+    (when (or (not= (git-at repo-root "rev-parse" "HEAD") (get config "controller_commit"))
+              (not= (git-at source "rev-parse" "HEAD") (get-in config ["source" "commit"]))
+              (not (str/blank? (git-at repo-root "status" "--porcelain")))
+              (not (str/blank? (git-at source "status" "--porcelain"))))
+      (throw (ex-info "controller or source is dirty or differs from the approved commit" {})))
+    (verify-selected-specs source (get config "source"))
+    (verify-pinned-agents config :pi-durable pi-durable)
+    (when make-checklist
+      (derive-approved-checklist-full {:config config :source source :scratch scratch
+                                       :pi-durable pi-durable}))
+    {:source source :scratch scratch :config config}))

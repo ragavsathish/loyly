@@ -33,7 +33,13 @@
     "loyly.spike.gen-checklist"
     "loyly.spike.score"
     "loyly.spike.scoreboard"
-    "loyly.spike.stamp-item-ids"})
+    "loyly.spike.stamp-item-ids"
+    "loyly.spike.tasks.builder"
+    "loyly.spike.tasks.cycle"
+    "loyly.spike.tasks.gate"
+    "loyly.spike.tasks.grade"
+    "loyly.spike.tasks.panel"
+    "loyly.spike.audit-rows"})
 
 (defn- clj-files []
   (->> (fs/glob src "**.clj")
@@ -247,13 +253,15 @@
   (let [forms
         (mapcat
          (fn [path]
-           (let [text (slurp path)
-                 ;; crude: split on "(defn " / "(defn- "
-                 chunks (re-seq #"(?ms)^\((defn-?)\s+([a-zA-Z*+!?_-][^\s]*)[^\n]*\n(?:.*\n)*?(?=^\(|\Z)" text)]
-             (for [[full _kind name] chunks
-                   :let [body (str/trim full)
-                         lines (count (str/split-lines body))]
-                   :when (>= lines 6)]
+           (let [raw (slurp path)
+                 text (subs raw 0 (min (count raw) 20000))
+                 heads (re-seq #"(?m)^\((defn-?)\s+([a-zA-Z*+!?_-][^\s)]*)" text)]
+             (for [[_kind name] heads
+                   :let [anchor (str "(defn" (when (= _kind "defn-") "-") " " name)
+                         idx (.indexOf text anchor)
+                         body (when (pos? idx) (subs text idx (min (+ idx 1200) (count text))))
+                         lines (when body (count (str/split-lines body)))]
+                   :when (and body (>= lines 6) (<= lines 350))]
                {:path (rel path) :name name :lines lines
                 :hash (hash (str/replace body #"\s+" " "))})))
          (clj-files))

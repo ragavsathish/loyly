@@ -2,6 +2,7 @@
   "PoC port of launch-receipt helpers from harness/pi-durable/builder-adapter.ts.
   Process spawn stays on the TS side."
   (:require [babashka.fs :as fs]
+            [loyly.spike.digest :as d]
             [loyly.spike.receipt-fields :as fields]))
 
 (defn latest-launch
@@ -93,3 +94,63 @@
   (when-let [found (latest-launch evidence-dir session-id (or request-id session-id))]
     (validate-receipt found args)
     (assoc found :reconciled true)))
+
+(defn- ready-launch
+  "Wait until launch receipt has binding fields, or nil."
+  [evidence-dir session-id request-id & {:keys [pause-fn tries]
+                                          :or {pause-fn #(Thread/sleep %)
+                                               tries 100}}]
+  (loop [n 0 found (latest-launch evidence-dir session-id request-id)]
+    (cond
+      (nil? found) nil
+      (and (get-in found [:receipt "instruction_sha256"])
+           (get-in found [:receipt "model"])
+           (get-in found [:receipt "wrapper_pid"])) found
+      (>= n tries) (throw (ex-info "builder launch receipt stayed incomplete" {}))
+      :else (do (pause-fn 50)
+                (recur (inc n) (latest-launch evidence-dir session-id request-id))))))
+
+(defn live-pid?
+  "Return whether pid still runs expected command (injectable `:ps-fn`)."
+  [pid expected & {:keys [ps-fn]
+                   :or {ps-fn (fn [p exp]
+                                (try
+                                  (let [cmd (slurp (str "/proc/" p "/cmdline"))]
+                                    (and (string? cmd) (.contains cmd exp)))
+                                  (catch Exception _ false)))}}]
+  (when (re-matches #"^\d+$" (str pid))
+    (ps-fn pid expected)))
+
+(defn run-builder
+  "Run or reconcile builder host. Inject `:spawn-fn`, `:pause-fn`, `:live-pid-fn`."
+  [{:keys [instruction evidence-dir session-id request-id spawn-fn pause-fn readonly-inputs]
+    :or {request-id nil
+         pause-fn #(Thread/sleep %)
+         readonly-inputs false}
+    :as args}]
+  (assert-builder-args args)
+  (let [request-id (or request-id session-id)
+        instruction-sha256 (d/file-sha256 instruction)
+        ctx (assoc args :instruction-sha256 instruction-sha256
+                   :request-id request-id :readonly-inputs readonly-inputs)]
+    (fs/create-dirs evidence-dir)
+    (or (when-let [found (latest-launch evidence-dir session-id request-id)]
+        (validate-receipt found ctx)
+        (when-let [exit (get-in found [:receipt "exit"])]
+          {:exit (Long/parseLong exit) :reconciled true :receipt (:path found)}))
+      (do
+        (when-not spawn-fn
+          (throw (ex-info "builder spawn not implemented in clj-spike; pass :spawn-fn" {})))
+        (let [child (spawn-fn args)]
+          (when (:error child)
+            (throw (ex-info "builder spawn failed" child)))
+          (when (:wait-ms child)
+            (pause-fn (:wait-ms child)))
+          (let [found (ready-launch evidence-dir session-id request-id :pause-fn pause-fn)]
+            (validate-receipt found ctx)
+            (when-not (and found (get-in found [:receipt "exit"]))
+              (throw (ex-info "builder host exited without a completed launch receipt" {})))
+            (let [exit (Long/parseLong (get-in found [:receipt "exit"]))]
+              (when (and (some? (:exit child)) (not= exit (:exit child)))
+                (throw (ex-info "builder process exit differs from its launch receipt" {})))
+              {:exit exit :reconciled false :receipt (:path found)})))))))

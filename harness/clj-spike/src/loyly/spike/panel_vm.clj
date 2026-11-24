@@ -3,15 +3,23 @@
   VM launch / QEMU stay on the TS side."
   (:require [babashka.fs :as fs]
             [loyly.spike.digest :as d]
+            [loyly.spike.evidence.validate-schema :as schema]
             [loyly.spike.grading-room :as room]
             [loyly.spike.hjson :as hjson]
             [loyly.spike.project.loyly :as loyly]
+            [loyly.spike.runtime-profile-evidence :as profile]
             [loyly.spike.score-receipt :as receipt]))
 
 (def LEGACY_WORKERS
   [{:id "browser" :script "panel-browser.mjs" :tool "Playwright" :item "01-003"}
    {:id "protocol" :script "panel-protocol.mjs" :tool "Node.js" :item "01-010"}
    {:id "telemetry" :script "panel-telemetry.mjs" :tool "OpenTelemetry" :item "01-003"}])
+
+(defn- label [result name]
+  (some (fn [entry]
+          (when (= name (get entry "name"))
+            (get entry "value")))
+        (get result "labels")))
 
 (defn worker-bundle
   "Resolve specialist script root. `here` is the pi-durable directory."
@@ -94,3 +102,164 @@
   [original]
   {:binding (run-binding original)
    :score-sha256 (score-digest original)})
+
+(defn- assert-panel-vm-manifest
+  [{:keys [manifest score-input candidate-sha256 score-sha256 plan-sha256 bundle workers
+           schema-file image-digest]}]
+  (when (or (not= (get manifest "schema") loyly/PANEL_VM_RUN)
+            (not= (get manifest "source_commit") (get score-input "source_commit"))
+            (not= (get manifest "candidate_sha256") candidate-sha256)
+            (and (= (or (get manifest "score_state") "filed") "filed")
+                 (not= (get manifest "original_score_sha256") score-sha256))
+            (and (= (get manifest "score_state") "pre-score")
+                 (some? (get manifest "original_score_sha256")))
+            (not= (get manifest "plan_sha256") plan-sha256)
+            (and (:sha256 bundle) (not= (get manifest "worker_bundle_sha256") (:sha256 bundle)))
+            (not= (get manifest "allure_schema_sha256") (d/file-sha256 schema-file))
+            (not= (get manifest "original_score_unchanged") true)
+            (and image-digest (not= (get manifest "image_digest") image-digest))
+            (not= (count (get manifest "producers")) (count workers)))
+    (throw (ex-info "panel VM manifest differs from the scored cut, plan, schema or image" {}))))
+
+(defn- assert-panel-producer-row [worker producer manifest]
+  (when (or (nil? producer)
+            (not= (get producer "tool") (:tool worker))
+            (not= (get producer "item") (str "@item-" (:item worker)))
+            (not= (get producer "image_digest") (get manifest "image_digest"))
+            (not (integer? (get producer "started")))
+            (not (integer? (get producer "stopped")))
+            (> (get producer "started") (get producer "stopped")))
+    (throw (ex-info (str (:id worker) ": panel producer receipt differs")
+                    {:id (:id worker)}))))
+
+(defn- assert-panel-producer-allure
+  [{:keys [worker producer result dir candidate-sha256 validate]}]
+  (let [receipt-file (some (fn [a]
+                             (when (= "Gondolin VM execution receipt" (get a "name"))
+                               (get a "source")))
+                           (get result "attachments"))
+        files (into [(get producer "result")]
+                (map #(get % "source") (get result "attachments")))]
+    (validate result (get producer "result"))
+    (when (or (not= (str (get result "uuid") "-result.json") (get producer "result"))
+              (not= (get result "status") (get producer "status"))
+              (not= (get result "stage") "finished")
+              (not= (label result "tool") (:tool worker))
+              (not= (label result "tag") (get producer "item"))
+              (not= (label result "feature") (:feature worker))
+              (not= (label result "technique") (:technique worker))
+              (not= candidate-sha256
+                    (some #(when (= "candidate_sha256" (get % "name")) (get % "value"))
+                          (get result "parameters")))
+              (nil? receipt-file)
+              (not= (count (set files)) (count files))
+              (not= (count files) (count (get producer "files")))
+              (some (fn [name]
+                      (or (not (re-matches #"[A-Za-z0-9._-]+" name))
+                          (not (fs/regular-file? (fs/file dir name)))
+                          (not= (get-in producer ["files" name])
+                                (d/file-sha256 (fs/file dir name)))))
+                    files)
+              (not= (get producer "execution_receipt_sha256")
+                    (d/file-sha256 (fs/file dir receipt-file))))
+      (throw (ex-info (str (:id worker) ": Allure result or attachment changed")
+                      {:id (:id worker)})))
+    receipt-file))
+
+(defn- assert-gondolin-receipt
+  [{:keys [worker manifest receipt result candidate-sha256 bundle here]}]
+  (when (or (not= (get receipt "worker") (:id worker))
+            (not= (get receipt "candidate_sha256") candidate-sha256)
+            (not= (get receipt "imageDigest") (get manifest "image_digest"))
+            (not= (get receipt "worker_script_sha256")
+                  (d/file-sha256 (fs/path (:root bundle) (:script worker))))
+            (and (:sha256 bundle)
+                 (not= (get receipt "worker_bundle_sha256") (:sha256 bundle)))
+            (and (not (:sha256 bundle))
+                 (= (:script worker) "panel-runtime.mjs")
+                 (or (not= (get receipt "profile_validator_sha256")
+                           (d/file-sha256 (fs/file here "runtime-profile-evidence.mjs")))
+                     (not= (get receipt "profile_otel_schema_sha256")
+                           (d/file-sha256 (fs/file here "panel-otel-metrics.schema.json")))))
+            (and (get manifest "worker_support_sha256")
+                 (not= (get receipt "worker_support_sha256")
+                       (get manifest "worker_support_sha256")))
+            (not= (get receipt "isolation") "gondolin-qemu-vm")
+            (not= (get-in receipt ["mounts" "candidate"]) "read-only")
+            (not= (get-in receipt ["mounts" "worker"]) "read-only")
+            (not= (= (get receipt "vm_exit_code") 0) (= (get result "status") "passed")))
+    (throw (ex-info (str (:id worker) ": Gondolin execution receipt changed")
+                    {:id (:id worker)}))))
+
+(defn- verify-panel-vm-producer
+  [{:keys [worker manifest out candidate-sha256 bundle validate here]}]
+  (let [producer (first (filter #(= (:id worker) (get % "id")) (get manifest "producers")))
+        dir (fs/file out (:id worker))]
+    (assert-panel-producer-row worker producer manifest)
+    (let [results (filterv #(re-matches #"(?i)[0-9a-f-]{36}-result\.json$" %)
+                           (map fs/file-name (fs/list-dir dir)))]
+      (when (or (not= 1 (count results)) (not= (first results) (get producer "result")))
+        (throw (ex-info (str (:id worker) ": expected one result") {:id (:id worker)})))
+      (let [result (hjson/read-json (slurp (fs/file dir (first results)) :encoding "UTF-8"))]
+        (when (= (:script worker) "panel-runtime.mjs")
+          (profile/verify-runtime-profile-evidence
+           {:dir (str dir) :result result :candidate-sha256 candidate-sha256 :probe (:probe worker)}))
+        (let [receipt-file (assert-panel-producer-allure
+                            {:worker worker :producer producer :result result
+                             :dir (str dir) :candidate-sha256 candidate-sha256 :validate validate})
+              receipt (hjson/read-json (slurp (fs/file dir receipt-file) :encoding "UTF-8"))]
+          (assert-gondolin-receipt
+           {:worker worker :manifest manifest :receipt receipt :result result
+            :candidate-sha256 candidate-sha256 :bundle bundle :here here}))))))
+
+(defn verify-panel-vm-run
+  "Reconcile a completed panel VM attempt directory."
+  [{:keys [original out image-digest plan-file pi-durable]
+    :or {plan-file loyly/DEFAULT_PANEL_PLAN
+         pi-durable "harness/pi-durable"}}]
+  (let [original (str (fs/absolutize original))
+        out (str (fs/absolutize out))
+        here (fs/file original pi-durable)
+        manifest (hjson/read-json (slurp (fs/file out "manifest.json") :encoding "UTF-8"))
+        score-input (run-binding original)
+        candidate-sha256 (room/candidate-digest (fs/path original "fenced-room"))
+        score-sha256 (score-digest original)
+        plan-path (if (fs/absolute? (fs/path plan-file))
+                    (fs/file plan-file)
+                    (fs/file here plan-file))
+        plan-sha256 (d/file-sha256 plan-path)
+        plan (hjson/read-json (slurp plan-path :encoding "UTF-8"))
+        bundle (worker-bundle plan (str here))
+        workers (specialist-workers plan (str here))
+        schema-file (fs/file here "../evidence-core/allure-lifecycle-result.schema.json")
+        validate ((schema/compile-allure-schema nil))]
+    (assert-panel-vm-manifest
+     {:manifest manifest :score-input score-input :candidate-sha256 candidate-sha256
+      :score-sha256 score-sha256 :plan-sha256 plan-sha256 :bundle bundle :workers workers
+      :schema-file (str schema-file) :image-digest image-digest})
+    (doseq [worker workers]
+      (verify-panel-vm-producer
+       {:worker worker :manifest manifest :out out :candidate-sha256 candidate-sha256
+        :bundle bundle :validate validate :here (str here)}))
+    (let [overlap (- (apply min (map #(get % "stopped") (get manifest "producers")))
+                     (apply max (map #(get % "started") (get manifest "producers"))))]
+      (when (or (<= overlap 0) (not= overlap (get manifest "parallel_overlap_ms")))
+        (throw (ex-info "panel VM overlap receipt changed" {})))
+      {:out out :manifest manifest})))
+
+(defn run-panel-vms
+  "Launch parallel panel VMs via injectable `:gondolin-fn` (default: not implemented)."
+  [{:keys [original image out plan-file pi-durable gondolin-fn]
+    :or {plan-file loyly/DEFAULT_PANEL_PLAN
+         pi-durable "harness/pi-durable"}}]
+  (let [original (str (fs/absolutize original))
+        image (str (fs/absolutize image))
+        out (str (fs/absolutize out))]
+    (when (fs/exists? out)
+      (throw (ex-info "panel VM output already exists" {:out out})))
+    (if-not gondolin-fn
+      (throw (ex-info "panel VM launch needs :gondolin-fn in clj-spike" {}))
+      (let [result (gondolin-fn {:original original :image image :out out
+                                 :plan-file plan-file :pi-durable pi-durable})]
+        (verify-panel-vm-run (assoc result :original original :out out
+                                      :plan-file plan-file :pi-durable pi-durable))))))
