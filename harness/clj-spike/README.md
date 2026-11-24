@@ -28,8 +28,8 @@ The spike mirrors the harness’s dual path to independent examination:
 | **Legacy assurance** | Gate / grade / blind / panel workers — systematic evaluation with injectable spawn/QEMU/HTTP |
 | **Formal verification** | Own modules under `formal/src` (`loyly.formal.*`) — 𝒜 + 𝒞 |
 
-Gherkin for the cycle + formal road (language-agnostic):
-`harness/cycle.spec.feature` (`@cycle-*`, `@formal-*`).
+Gherkin: `harness/cycle.spec.feature` (language- and project-agnostic) and
+`harness/project/loyly/cycle.spec.feature` (Löyly-specific pins).
 
 ```sh
 harness/clj-spike/bin/spike formal              # prove model + cycle invariants

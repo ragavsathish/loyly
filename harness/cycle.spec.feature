@@ -1,12 +1,13 @@
 # The live cycle and the formal-verification road, specified.
 #
-# This file describes the observable behaviour of:
+# This file describes product-agnostic behaviour of:
 #   - the pinned live cycle (assurance)
 #   - the formal examiner (theory 𝒜 and cycle 𝒞)
 #
-# Language-agnostic: steps name contracts, digests, phases and reports — not
-# an implementation language, runtime, or package manager. Any conforming
-# implementation may satisfy them.
+# Language-agnostic and project-agnostic: steps name contracts, digests,
+# phases and reports — not an implementation language and not a product
+# (Löyly booking, …). Project-specific cycle/formal behaviour lives under
+# harness/project/<id>/cycle.spec.feature.
 #
 # CONVENTIONS:
 #
@@ -70,15 +71,15 @@ Feature: Live cycle and formal verification
       Then the check refuses because builder and grader need different models
 
     @cycle-005
-    Scenario: Booking refusal requires a fresh blind subagent
-      Given the selected checklist includes the booking refusal item
+    Scenario: A project policy may require a blind agent pin
+      Given a project policy that requires a blind agent for the selected items
       And the contract has no blind agent pin
       When the contract is checked
-      Then the check refuses because booking refusal needs a fresh blind subagent
+      Then the check refuses because the blind agent is required
 
     @cycle-006
-    Scenario: Blind review precedes score on the cycle path
-      Given the published cycle phase list
+    Scenario: When blind-review is on the path it precedes score
+      Given a cycle path that includes blind-review and score
       When the path from cut to done is read
       Then blind-review appears before score
       And done is the only terminal phase
@@ -171,12 +172,11 @@ Feature: Live cycle and formal verification
       And invariant I7 holds
 
     @formal-008
-    Scenario: The default booking panel plan validates as a panel plan
-      Given the published default booking panel plan
+    Scenario: A published default panel plan validates as a panel plan
+      Given the project's published default panel plan
       When the formal examiner loads that plan
       Then the plan satisfies Valid for panel-plan
       And the certificate records that the panel proof succeeded
-      And invariant I6 holds
 
     @formal-009
     Scenario: Formal prove succeeds against the published contracts
