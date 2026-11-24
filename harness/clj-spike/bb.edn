@@ -31,7 +31,7 @@
    :task (apply d/-main *command-line-args*)}
 
   cycle
-  {:doc "CLJ wrapper: Pi / Codex / Cursor cycle drivers (spawns Node)"
+  {:doc "CLJ wrapper: Pi / Codex / Cursor (CLJ check + adapters; Node for --run/preflight)"
    :requires ([loyly.spike.drivers :as drivers])
    :task (apply drivers/-main *command-line-args*)}
 

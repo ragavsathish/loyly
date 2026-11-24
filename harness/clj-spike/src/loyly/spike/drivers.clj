@@ -4,7 +4,8 @@
   Codex & Cursor adapter actions (decide|candidate|evidence|panel) run through
   CLJ spike modules by default. Pass --ts to spawn the Node CLIs instead.
 
-  Pi durable --check/--run still spawns Node (no CLJ Pi worker yet).
+  Pi --check uses loyly.spike.live-contract/check-live-run by default;
+  pass --ts to spawn Node. Pi --run still spawns Node (no CLJ worker yet).
   Codex/Cursor preflight still needs --ts (contract checker not ported).
 
   Spike only: TypeScript remains authoritative for scored production runs."
@@ -12,7 +13,8 @@
             [babashka.process :as p]
             [clojure.string :as str]
             [loyly.spike.adapters :as adapters]
-            [loyly.spike.hjson :as hjson]))
+            [loyly.spike.hjson :as hjson]
+            [loyly.spike.live-contract :as live]))
 
 (def ADAPTER-ACTIONS
   ["preflight" "candidate" "decide" "evidence" "panel"])
@@ -31,10 +33,14 @@
    :drivers
    [{:id "pi"
      :kind "durable-live"
-     :backend "node"
+     :backend "clj-spike"
      :script "harness/pi-durable/run-live.mjs"
+     :clj-actions ["--check"]
+     :node-actions ["--run"]
      :actions PI-ACTIONS
-     :usage "cycle pi --check|--run <live-run.json>"}
+     :usage "cycle pi --check <live-run.json>
+  cycle pi --run <live-run.json>          # Node worker
+  cycle pi --check <live-run.json> --ts   # Node checkLiveRun"}
     {:id "codex"
      :kind "orchestrator-adapter"
      :backend "clj-spike"
@@ -87,7 +93,7 @@
                             :err :inherit})]
     (:exit result)))
 
-(defn- invoke-pi!
+(defn- invoke-pi-ts!
   [{:keys [repo action contract node]}]
   (when-not (some #{action} PI-ACTIONS)
     (die! (str "pi actions: " (str/join "|" PI-ACTIONS))))
@@ -98,6 +104,23 @@
     (run-node! {:node node
                 :cwd cwd
                 :args [script action (str (fs/absolutize contract))]})))
+
+(defn- invoke-pi-check-clj!
+  "Validate a pinned live-run via CLJ check-live-run (TS checkLiveRun parity)."
+  [{:keys [repo contract]}]
+  (when-not (fs/regular-file? contract)
+    (die! (str "missing live-run contract: " contract)))
+  (try
+    (live/check-live-run
+     (hjson/read-json (slurp (str (fs/absolutize contract)) :encoding "UTF-8"))
+     :root repo
+     :pi-durable (str (fs/path repo "harness" "pi-durable")))
+    (println "pinned cycle contract verified")
+    0
+    (catch Exception e
+      (binding [*out* *err*]
+        (println (or (ex-message e) (str e))))
+      1)))
 
 (defn- invoke-adapter-ts!
   [{:keys [repo driver action input node]}]
@@ -151,8 +174,16 @@
       :pi
       (let [[contract] args]
         (when-not contract
-          (die! "usage: cycle pi --check|--run <live-run.json>"))
-        (invoke-pi! (assoc opts :action action :contract contract)))
+          (die! "usage: cycle pi --check|--run <live-run.json> [--ts]"))
+        (cond
+          (and (= action "--check") (not ts?))
+          (invoke-pi-check-clj! (assoc opts :contract contract))
+
+          (some #{action} PI-ACTIONS)
+          (invoke-pi-ts! (assoc opts :action action :contract contract))
+
+          :else
+          (die! (str "pi actions: " (str/join "|" PI-ACTIONS)))))
 
       :codex
       (cond
@@ -188,13 +219,15 @@
   (binding [*out* *err*]
     (println "usage:")
     (println "  spike cycle list")
-    (println "  spike cycle pi --check|--run <live-run.json>")
+    (println "  spike cycle pi --check <live-run.json>")
+    (println "  spike cycle pi --run <live-run.json>")
     (println "  spike cycle cursor|codex decide|candidate|evidence|panel <input.json>")
     (println "  spike cycle cursor|codex preflight <contract.json> --ts")
     (println "  spike cycle codex reassess <contract.json>")
     (println)
-    (println "Default: Codex/Cursor decide|candidate|evidence|panel use CLJ spike modules.")
-    (println "         Pass --ts to spawn the Node adapter CLIs instead.")
+    (println "Default: Pi --check and Codex/Cursor decide|candidate|evidence|panel")
+    (println "         use CLJ spike modules. Pass --ts to spawn Node instead.")
+    (println "         Pi --run and preflight/reassess still use Node.")
     (println "Options: --root <repo>  --node <bin>")))
 
 (defn- parse-opts

@@ -42,8 +42,10 @@ The `cycle` command is a Babashka front-end:
 - **Codex / Cursor** `decide|candidate|evidence|panel` → **CLJ spike modules**
   (`cycle-core`, `candidate-caches`, `evidence.check-room`,
   `evidence.assess-room-panel`) by default.
-- Pass `--ts` to spawn the Node adapter CLIs instead.
-- **Pi** `--check|--run` and **preflight** still use Node (not ported yet).
+- **Pi** `--check` → `live-contract/check-live-run` by default.
+- Pass `--ts` to spawn the Node adapter / `run-live` CLIs instead.
+- **Pi** `--run`, **preflight**, and Codex **reassess** still use Node
+  (worker / contract checker not ported yet).
 
 ### Models 𝒜 and cycle 𝒞
 
@@ -99,7 +101,7 @@ Certification stays outside the builder: an independent grader + panel confirms 
 | Replay evidence | `replay-evidence.ts` | ✅ | `project-replay-evidence` (injected rows) |
 | Contracts | `contracts.ts` | ✅ | selected-checklist? |
 | Cycle phases / tasks | `tasks/*` | ✅ | ALL-PHASES + thin task wrappers; Pi runtime injectable |
-| Cycle drivers (Pi/Codex/Cursor) | `run-live` / `*-cycle/cli.ts` | ✅ | `drivers` → CLJ adapters (evidence/panel/decide/candidate); `--ts` for Node |
+| Cycle drivers (Pi/Codex/Cursor) | `run-live` / `*-cycle/cli.ts` | ✅ | `drivers` → CLJ adapters + Pi `--check`; `--run`/preflight/`--ts` → Node |
 | Pi audit | `audit-rows.ts` | ✅ | `audit-rows.json` / `:read-fn` (sqlite deferred) |
 | Schema / formal | Ajv + Malli | ✅ | Own `formal/src` (`loyly.formal.*`); Ajv injectable; `bin/spike formal` |
 
