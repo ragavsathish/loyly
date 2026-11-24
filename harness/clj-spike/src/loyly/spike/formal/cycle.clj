@@ -86,22 +86,22 @@
 (def labeling
   "L(q) = models that must be Valid at/after phase q (traceability to 𝒜 sorts)."
   {"cut"           #{:commit}
-   "preflight"     #{:live-run}
+   "preflight"     #{:live-run :worker-config}
    "fence"         #{:commit}
    "checklist"     #{:checklist :item-id}
-   "render"        #{}
-   "build"         #{:sha256}
+   "render"        #{:continuation-ids}
+   "build"         #{:sha256 :continuation-ids}
    "after-build"   #{:sha256}
    "gate"          #{:gate-receipt :sha256}
    "after-gate"    #{:gate-receipt}
    "grading-room"  #{:grading-room :sha256}
-   "grade"         #{:allure-lifecycle :verdicts}
-   "after-grade"   #{:allure-lifecycle}
+   "grade"         #{:allure-lifecycle :verdicts :grader-shards :audit-row}
+   "after-grade"   #{:allure-lifecycle :audit-rows}
    "blind-review"  #{:blind-packet :blind-response :blind-probe}
-   "panel"         #{:panel-plan :panel-vm-run}
-   "after-panel"   #{:panel-summary :panel-vm-run}
+   "panel"         #{:panel-plan :panel-vm-run :panel-selection}
+   "after-panel"   #{:panel-summary :panel-vm-run :panel-selection}
    "score"         #{:score-input :scores :verdicts}
-   "panel-report"  #{:panel-report :panel-summary :replay-evidence}
+   "panel-report"  #{:panel-report :panel-summary :replay-evidence :audit-rows}
    "done"          #{}})
 
 (defn labels

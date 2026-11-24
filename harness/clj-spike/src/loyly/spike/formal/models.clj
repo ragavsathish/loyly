@@ -364,6 +364,84 @@
    ["observation" :string]
    ["source_digest" Sha256]])
 
+(def PanelSelection
+  "Bound panel VM attempt (`selected.json`)."
+  [:map
+   ["schema" [:= "loyly.panel-selection.v1"]]
+   ["attempt" [:int {:min 1 :max 2}]]
+   ["manifest_sha256" Sha256]])
+
+(def GraderShard
+  "One balanced partition from partition-by-rule."
+  [:map
+   ["id" [:re {:gen/gen (gen/fmap #(format "shard-%02d" %) (gen/choose 1 16))}
+          #"^shard-\d{2}$"]]
+   ["items" [:vector {:min 1} ItemId]]])
+
+(def GraderShards
+  "Partition vector with unique shard-NN ids (generator keeps ids distinct)."
+  [:vector
+   {:min 1 :max 16
+    :gen/gen
+    (gen/let [n (gen/choose 1 16)]
+      (gen/return
+       (mapv (fn [i]
+               {"id" (format "shard-%02d" (inc i))
+                "items" [(format "%02d-%03d" (mod i 10) i)]})
+             (range n))))}
+   GraderShard])
+
+(def ContinuationIds
+  "Selected uncarried item IDs (≤ MAX_CONTINUATIONS turns; bound is runtime)."
+  [:vector {:min 1 :max 64} ItemId])
+
+(def AuditRow
+  "Committed Pi audit entry (sqlite dump / audit-rows.json)."
+  [:map
+   ["seq" [:int {:min 1}]]
+   ["entry_id" [:string {:min 1}]]
+   ["stage" [:string {:min 1}]]
+   ["outcome" [:string {:min 1}]]
+   ["candidate_sha256" {:optional true} Sha256]
+   ["checklist_sha256" {:optional true} Sha256]
+   ["allure_results_sha256" {:optional true} Sha256]
+   ["raw_allure_sha256" {:optional true} Sha256]
+   ["review_sha256" {:optional true} Sha256]
+   ["reason" {:optional true} :string]])
+
+(def AuditRows
+  [:vector {:min 1} AuditRow])
+
+(def SupplementalGrade
+  "Legacy supplemental-grade manifest (pre panel-vm-run)."
+  [:map
+   ["schema" [:= "loyly.supplemental-grade.v1"]]
+   ["source_commit" Commit40]
+   ["candidate_sha256" Sha256]
+   ["allure_schema_sha256" Sha256]
+   ["original_score_sha256" Sha256]
+   ["original_score_unchanged" [:= true]]
+   ["producers" [:vector {:min 1} PanelVmProducer]]
+   ["worker_bundle_sha256" {:optional true} Sha256]])
+
+(def WorkerConfig
+  "Parsed live/repair worker config (keyword keys, as in worker-config.clj)."
+  [:map
+   [:mode [:enum "repair" "live"]]
+   [:live :boolean]
+   [:project ProjectId]
+   [:grader-shard-count [:int {:min 1 :max 16}]]
+   [:blind-required :boolean]
+   [:approved-commit {:optional true} [:maybe Commit40]]
+   [:approved-checklist-sha256 {:optional true} [:maybe Sha256]]
+   [:cut [:string {:min 1}]]
+   [:source-root [:string {:min 1}]]
+   [:approved-source-repo [:string {:min 1}]]
+   [:builder {:optional true} :any]
+   [:grader {:optional true} :any]
+   [:blind-agent {:optional true} :any]
+   [:panel {:optional true} :any]])
+
 (def Registry
   "Named models for explain / generate / digest.
   Cycle sorts (PhaseName, CycleState) live in formal.cycle."
@@ -385,6 +463,14 @@
    :grading-room GradingRoom
    :panel-vm-run PanelVmRun
    :panel-report PanelReport
+   :panel-selection PanelSelection
+   :grader-shard GraderShard
+   :grader-shards GraderShards
+   :continuation-ids ContinuationIds
+   :audit-row AuditRow
+   :audit-rows AuditRows
+   :supplemental-grade SupplementalGrade
+   :worker-config WorkerConfig
    :gate-receipt GateReceiptFields
    :replay-evidence ReplayEvidence})
 

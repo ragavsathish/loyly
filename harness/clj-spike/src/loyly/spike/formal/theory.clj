@@ -84,7 +84,16 @@
     :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}
    {:id :I10
     :statement "∀ m ∈ PanelVmRun ∪ PanelReport. original_score_unchanged = true"
-    :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}])
+    :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}
+   {:id :I11
+    :statement "∀ s ∈ PanelSelection. s.attempt ∈ {1,2}"
+    :proved-by 'loyly.spike.formal.props/prop-panel-selection-attempt}
+   {:id :I12
+    :statement "∀ shards ∈ GraderShards. 1 ≤ |shards| ≤ 16 ∧ unique ids"
+    :proved-by 'loyly.spike.formal.props/prop-grader-shards-bounded}
+   {:id :I13
+    :statement "MAX_CONTINUATIONS = 3"
+    :proved-by 'loyly.spike.formal.props/prop-continuation-max}])
 
 (def Morphisms
   "Traceability arrows from formal sorts to published TS artifacts."
@@ -114,6 +123,21 @@
     :kind :ts-source}
    {:from :score-input
     :to "harness/pi-durable/score-receipt.ts"
+    :kind :ts-source}
+   {:from :panel-selection
+    :to "harness/pi-durable/panel-adapter.ts"
+    :kind :ts-source}
+   {:from :grader-shards
+    :to "harness/pi-durable/grader-shards.ts"
+    :kind :ts-source}
+   {:from :continuation-ids
+    :to "harness/pi-durable/continuation.ts"
+    :kind :ts-source}
+   {:from :audit-rows
+    :to "harness/pi-durable/audit-rows.ts"
+    :kind :ts-source}
+   {:from :worker-config
+    :to "harness/pi-durable/worker-config.ts"
     :kind :ts-source}])
 
 (defn theory

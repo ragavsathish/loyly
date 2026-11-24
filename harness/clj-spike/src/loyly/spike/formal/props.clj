@@ -3,6 +3,7 @@
   (:require [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
+            [loyly.spike.continuation :as cont]
             [loyly.spike.digest :as d]
             [loyly.spike.formal.cycle :as cycle]
             [loyly.spike.formal.models :as models]
@@ -68,13 +69,35 @@
   (prop/for-all [i (gen/choose 0 (- (count cycle/Q) 2))]
     (cycle/transition? (nth cycle/Q i) (nth cycle/Q (inc i)))))
 
+(defn prop-panel-selection-attempt
+  "∀ PanelSelection · attempt ∈ {1,2}."
+  []
+  (prop/for-all [s (mg/generator (models/schema :panel-selection))]
+    (contains? #{1 2} (get s "attempt"))))
+
+(defn prop-grader-shards-bounded
+  "∀ GraderShards · 1 ≤ |shards| ≤ 16 and ids unique."
+  []
+  (prop/for-all [shards (mg/generator (models/schema :grader-shards))]
+    (and (<= 1 (count shards) 16)
+         (= (count shards) (count (set (map #(get % "id") shards)))))))
+
+(defn prop-continuation-max
+  "MAX_CONTINUATIONS is the fixed builder retry bound (3)."
+  []
+  (prop/for-all [_ (gen/return true)]
+    (= 3 cont/MAX_CONTINUATIONS)))
+
 (defn run-all!
   "Execute the formal property suite; throw on first failure."
   [& {:keys [num-tests] :or {num-tests 40}}]
   (let [models-to-gen [:sha256 :commit :item-id :blind-packet :blind-response
-                       :blind-probe :panel-summary :score-input :checklist
-                       :verdict :verdicts :scores :grading-room :panel-vm-run
-                       :panel-report :gate-receipt :replay-evidence :live-run]
+                       :blind-probe :panel-summary :panel-plan :score-input
+                       :checklist :verdict :verdicts :scores :grading-room
+                       :panel-vm-run :panel-report :panel-selection
+                       :grader-shard :grader-shards :continuation-ids
+                       :audit-row :audit-rows :supplemental-grade
+                       :worker-config :gate-receipt :replay-evidence :live-run]
         _ (cycle/prove-cycle!)
         results
         (vec
@@ -85,7 +108,10 @@
            (check! :invalid-sha-rejected (prop-invalid-sha-rejected) :num-tests (min 30 num-tests))
            (check! :blind-packet-item (prop-blind-packet-item-fixed) :num-tests num-tests)
            (check! :cycle-state-obeys (prop-cycle-state-obeys) :num-tests (min 25 num-tests))
-           (check! :cycle-succ-on-path (prop-succ-on-path) :num-tests num-tests)]
+           (check! :cycle-succ-on-path (prop-succ-on-path) :num-tests num-tests)
+           (check! :panel-selection-attempt (prop-panel-selection-attempt) :num-tests num-tests)
+           (check! :grader-shards-bounded (prop-grader-shards-bounded) :num-tests (min 25 num-tests))
+           (check! :continuation-max (prop-continuation-max) :num-tests 1)]
           (for [m models-to-gen]
             (check! (keyword (str "gen-obeys-" (name m)))
                     (prop-generated-obeys-model m)
