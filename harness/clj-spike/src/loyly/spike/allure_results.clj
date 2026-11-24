@@ -6,8 +6,7 @@
             [loyly.spike.evidence.validate-identity :as ident]
             [loyly.spike.evidence.validate-result :as evid]
             [loyly.spike.hjson :as hjson]
-            [loyly.spike.project.loyly.blind-policy :as policy]
-            [loyly.spike.project.loyly.identity :as id])
+            [loyly.spike.project.loyly :as loyly])
   (:import [java.security MessageDigest]))
 
 (def ^:private RESULT-RE
@@ -39,7 +38,7 @@
   (let [checklist (hjson/read-json (slurp (fs/file room "checklist.json") :encoding "UTF-8"))
         items (get checklist "items")
         receipt (hjson/read-json (slurp (fs/file room ".grading-room.json") :encoding "UTF-8"))
-        project (or (get receipt "project") id/PROJECT_ID)
+        project (or (get receipt "project") loyly/PROJECT_ID)
         blind-review (if (contains? receipt "blindReview")
                        (get receipt "blindReview")
                        true)]
@@ -99,9 +98,9 @@
         identities (into {} (map (fn [item]
                                    [(get item "id") (identity-for room item project)])
                                  items))
-        spec-sha (when (and blind-review (policy/requires-blind-handoff project items))
-                   (d/file-sha256 (fs/path room id/BLIND_SPEC_RELATIVE)))
-        pending-prefix (policy/pending-evidence-prefix spec-sha)
+        spec-sha (when (and blind-review (loyly/requires-blind-handoff project items))
+                   (d/file-sha256 (fs/path room loyly/BLIND_SPEC_RELATIVE)))
+        pending-prefix (loyly/pending-evidence-prefix spec-sha)
         dir (fs/path room "work" "allure-results")
         files (filterv #(re-matches RESULT-RE %) (map fs/file-name (fs/list-dir dir)))]
     (when-not (= (count files) (count items))
@@ -138,10 +137,10 @@
                                          {})))
                        (swap! expected-files conj (get attachment "source"))))
                    (when (and blind-review
-                              (policy/requires-blind-handoff project items)
-                              (= item-id id/BLIND_ITEM_ID)
-                              (not (policy/blind-pending-result? result pending-prefix)))
-                     (throw (ex-info (str id/BLIND_ITEM_ID
+                              (loyly/requires-blind-handoff project items)
+                              (= item-id loyly/BLIND_ITEM_ID)
+                              (not (loyly/blind-pending-result? result pending-prefix)))
+                     (throw (ex-info (str loyly/BLIND_ITEM_ID
                                           " needs a separate blind subagent review")
                                      {})))
                    (assoc by-id item-id result)))))

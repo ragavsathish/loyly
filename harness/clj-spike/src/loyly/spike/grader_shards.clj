@@ -4,7 +4,7 @@
             [loyly.spike.digest :as d]
             [loyly.spike.grading-room :as room]
             [loyly.spike.hjson :as hjson]
-            [loyly.spike.project.loyly.identity :as id]))
+            [loyly.spike.project.loyly :as loyly]))
 
 (defn partition-by-rule
   "Balance rule-groups across up to `shard-count` shards (1..16)."
@@ -31,29 +31,27 @@
                   (recur (rest items) (conj order key) (assoc groups key [item])))))
             [order groups]))
         n (min shard-count (count order))
-        shards (vec (repeat n []))]
-    (let [shards
-          (reduce
-           (fn [shards key]
-             (let [group (get groups key)
-                   idx (apply min-key (fn [i] (count (nth shards i)))
-                              (range (count shards)))]
-               (update shards idx into group)))
-           shards
-           order)]
-      (mapv (fn [i shard-items]
-              {:id (format "shard-%02d" (inc i))
-               :items (vec shard-items)})
-            (range) shards))))
+        shards (reduce
+                (fn [shards key]
+                  (let [group (get groups key)
+                        idx (apply min-key (fn [i] (count (nth shards i)))
+                                   (range (count shards)))]
+                    (update shards idx into group)))
+                (vec (repeat n []))
+                order)]
+    (mapv (fn [i shard-items]
+            {:id (format "shard-%02d" (inc i))
+             :items (vec shard-items)})
+          (range) shards)))
 
 (defn prepare-shards
   "Partition checklist and materialize per-shard grading rooms."
   [{:keys [grading-room source-room scratch schema-file
            candidate-sha256 schema-sha256 count
            project blind-review]
-    :or {project id/PROJECT_ID}}]
+    :or {project loyly/PROJECT_ID}}]
   (let [blind-review (if (nil? blind-review)
-                       (id/defaults-blind-review project)
+                       (loyly/defaults-blind-review project)
                        blind-review)
         full (hjson/read-json (slurp (fs/file grading-room "checklist.json") :encoding "UTF-8"))
         partitions (partition-by-rule (get full "items") count)]

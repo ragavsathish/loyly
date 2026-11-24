@@ -2,8 +2,7 @@
   "PoC port of summary projection from harness/pi-durable/replay-evidence.ts.
   Full projectReplayEvidence (needs Allure rooms + audit rows) stays partial."
   (:require [babashka.fs :as fs]
-            [loyly.spike.digest :as d]
-            [loyly.spike.hjson :as hjson]))
+            [loyly.spike.digest :as d]))
 
 (defn panel-plan-for-manifest
   "Find the unique local *.panel.json matching manifest plan_sha256 under `here`."

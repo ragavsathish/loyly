@@ -1,7 +1,7 @@
 (ns loyly.spike.panel-compile
   "PoC port of pure helpers from harness/pi-durable/panel-compile.ts.
   Full Allure report compilation stays on the TS side."
-  (:require [loyly.spike.project.loyly.schemas :as schemas]))
+  (:require [loyly.spike.project.loyly :as loyly]))
 
 (defn label
   "Allure label value by name."
@@ -14,7 +14,7 @@
 (defn assert-specialist-manifest-bound
   [{:keys [plan plan-sha256 manifest candidate-sha256 schema-sha256
            score-sha256 source-commit specs]}]
-  (when (or (not (#{"loyly.supplemental-grade.v1" schemas/PANEL_VM_RUN}
+  (when (or (not (#{"loyly.supplemental-grade.v1" loyly/PANEL_VM_RUN}
                   (get manifest "schema")))
             (not= (get manifest "source_commit") source-commit)
             (not= (get manifest "candidate_sha256") candidate-sha256)
@@ -24,14 +24,14 @@
             (not= (get manifest "allure_schema_sha256") schema-sha256)
             (and (= (get manifest "schema") "loyly.supplemental-grade.v1")
                  (not= (get manifest "original_score_sha256") score-sha256))
-            (and (= (get manifest "schema") schemas/PANEL_VM_RUN)
+            (and (= (get manifest "schema") loyly/PANEL_VM_RUN)
                  (not (or (and (= (get manifest "score_state") "pre-score")
                                (nil? (get manifest "original_score_sha256")))
                           (and (= (or (get manifest "score_state") "filed") "filed")
                                (= (get manifest "original_score_sha256") score-sha256)))))
             (and (= (get manifest "schema") "loyly.supplemental-grade.v1")
                  (not= (get manifest "original_score_unchanged") true))
-            (and (= (get manifest "schema") schemas/PANEL_VM_RUN)
+            (and (= (get manifest "schema") loyly/PANEL_VM_RUN)
                  (not= (get manifest "plan_sha256") plan-sha256))
             (not= (count (get manifest "producers")) (count specs)))
     (throw (ex-info "specialist manifest is not bound to this scored candidate and plan" {}))))
@@ -40,7 +40,7 @@
   "Infer runtime label from execution receipt + manifest schema."
   [spec receipt manifest]
   (cond
-    (and (= (get manifest "schema") schemas/PANEL_VM_RUN)
+    (and (= (get manifest "schema") loyly/PANEL_VM_RUN)
          (integer? (get receipt "vm_exit_code"))
          (= (get receipt "isolation") "gondolin-qemu-vm")
          (= (get-in receipt ["mounts" "candidate"]) "read-only")
@@ -67,7 +67,7 @@
 
 (defn assert-specialist-overlap
   [manifest observations]
-  (let [intervals (if (= (get manifest "schema") schemas/PANEL_VM_RUN)
+  (let [intervals (if (= (get manifest "schema") loyly/PANEL_VM_RUN)
                     (mapv (fn [row]
                             {:start (get row "started") :stop (get row "stopped")})
                           (get manifest "producers"))
@@ -85,7 +85,7 @@
   "Minimal panel-summary object fields the TS compiler emits (sans Allure I/O)."
   [{:keys [candidate-sha256 plan-sha256 original-score-sha256 evaluation]}]
   (array-map
-   "schema" schemas/PANEL_SUMMARY
+   "schema" loyly/PANEL_SUMMARY
    "candidate_sha256" candidate-sha256
    "plan_sha256" plan-sha256
    "original_score_sha256" original-score-sha256

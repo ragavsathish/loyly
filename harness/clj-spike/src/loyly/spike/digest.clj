@@ -32,8 +32,9 @@
                       {:path (str path) :err err :exit exit})))
     (str/trim out)))
 
-(defn- unix-mode [file]
+(defn- unix-mode
   "Octal permission bits matching Node fs.lstatSync().mode & 0o777."
+  [file]
   (try
     (bit-and (int (Files/getAttribute (fs/path file) "unix:mode"
                                       (into-array LinkOption [LinkOption/NOFOLLOW_LINKS])))

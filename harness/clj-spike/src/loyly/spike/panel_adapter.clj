@@ -16,7 +16,7 @@
                    :else (launch (str out)))]
       (if-not result
         {:ok false
-         :failure (str "attempt was interrupted without a complete receipt")}
+         :failure "attempt was interrupted without a complete receipt"}
         (let [checked (verify (str out))]
           {:ok true
            :had-manifest had-manifest

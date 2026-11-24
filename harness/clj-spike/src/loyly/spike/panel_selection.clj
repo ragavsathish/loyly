@@ -1,8 +1,7 @@
 (ns loyly.spike.panel-selection
   "PoC port of harness/pi-durable/panel-selection.ts (coverage; Ajv deferred)."
   (:require [loyly.spike.evidence.panel-selection :as core]
-            [loyly.spike.project.loyly.identity :as id]
-            [loyly.spike.project.loyly.schemas :as schemas]))
+            [loyly.spike.project.loyly :as loyly]))
 
 (defn- structural-plan? [plan]
   (and (map? plan)
@@ -21,10 +20,10 @@
   [plan checklist]
   (when-not (structural-plan? plan)
     (throw (ex-info "panel plan schema: structural validation failed" {})))
-  (let [legacy? (= (get plan "schema") schemas/LEGACY_PANEL_PLAN)
+  (let [legacy? (= (get plan "schema") loyly/LEGACY_PANEL_PLAN)
         coverage (core/validate-panel-coverage
                   plan checklist
-                  :handoff-item (when legacy? id/BLIND_ITEM_ID))
+                  :handoff-item (when legacy? loyly/BLIND_ITEM_ID))
         specialists (->> (get plan "checks")
                          (filter #(= "specialist" (get % "source")))
                          (mapv #(get % "id")))]

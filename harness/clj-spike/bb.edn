@@ -26,4 +26,28 @@
   demo
   {:doc "End-to-end TS→CLJ spike smoke"
    :requires ([loyly.spike.demo :as d])
-   :task (apply d/-main *command-line-args*)}}}
+   :task (apply d/-main *command-line-args*)}
+
+  lint
+  {:doc "clj-kondo + loyly product-literal / deep-import (TS eslint)"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "lint")}
+
+  analyze
+  {:doc "Full static analysis: lint + deps + dead + dupes + metrics"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze")}
+
+  analyze:deps
+  {:doc "Require-graph cycles (TS madge)"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze:deps")}
+
+  analyze:dead
+  {:doc "Unreachable namespaces / unused defs (TS knip)"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze:dead")}
+
+  analyze:dupes
+  {:doc "Near-identical defn bodies (TS jscpd)"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze:dupes")}
+
+  analyze:metrics
+  {:doc "LOC / form / branch metrics (TS metrics.mjs)"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze:metrics")}}}

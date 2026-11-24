@@ -5,7 +5,7 @@
             [loyly.spike.digest :as d]
             [loyly.spike.grading-room :as room]
             [loyly.spike.hjson :as hjson]
-            [loyly.spike.project.loyly.schemas :as schemas]
+            [loyly.spike.project.loyly :as loyly]
             [loyly.spike.score-receipt :as receipt]))
 
 (def LEGACY_WORKERS
@@ -17,7 +17,7 @@
   "Resolve specialist script root. `here` is the pi-durable directory."
   [plan here]
   (cond
-    (= (get plan "schema") schemas/LEGACY_PANEL_PLAN)
+    (= (get plan "schema") loyly/LEGACY_PANEL_PLAN)
     {:root (str here) :sha256 nil}
 
     (not (and (= (get plan "schema") "harness.grading-panel-plan.v2")
@@ -42,7 +42,7 @@
       (throw (ex-info "panel needs unique specialist checks" {})))
     (mapv
      (fn [check]
-       (let [legacy (when (= (get plan "schema") schemas/LEGACY_PANEL_PLAN)
+       (let [legacy (when (= (get plan "schema") loyly/LEGACY_PANEL_PLAN)
                       (first (filter #(= (:id %) (get check "id")) LEGACY_WORKERS)))
              script (or (get check "script") (:script legacy))]
          (when (or (nil? script)

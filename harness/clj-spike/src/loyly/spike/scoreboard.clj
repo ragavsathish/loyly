@@ -64,7 +64,7 @@
                                " so the two headline")
                        "  rates count different things and must not be read against each other."
                        "  The added items cover work last cycle's spec never asked for."]))))
-          text (str (str/join "\n" (concat head body [""])))]
+          text (str/join "\n" (concat head body [""]))]
       (hjson/out text)
       {:text text})))
 

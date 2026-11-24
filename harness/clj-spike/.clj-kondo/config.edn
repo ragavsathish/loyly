@@ -1,0 +1,20 @@
+{:lint-as {loyly.spike.hjson/refuse clojure.core/str}
+ :linters
+ {:unused-namespace {:level :warning}
+  :unused-referred-var {:level :warning}
+  :unused-binding {:level :warning}
+  :redundant-let {:level :warning}
+  :misplaced-docstring {:level :warning}
+  :single-key-in {:level :warning}
+  :unsorted-required-namespaces {:level :warning}
+  :consistent-alias
+  {:level :warning
+   :aliases {loyly.spike.project.loyly loyly
+             loyly.spike.hjson hjson
+             loyly.spike.digest d
+             babashka.fs fs
+             babashka.process p
+             cheshire.core json
+             clj-commons.digest digest
+             clojure.string str}}}
+ :output {:exclude-files ["scripts/"]}}

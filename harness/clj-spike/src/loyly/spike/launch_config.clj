@@ -1,7 +1,7 @@
 (ns loyly.spike.launch-config
   "PoC port of harness/pi-durable/launch-config.ts"
   (:require [clojure.string :as str]
-            [loyly.spike.project.loyly.identity :as id]))
+            [loyly.spike.project.loyly :as loyly]))
 
 (defn worker-environment
   "Build the approved LOYLY_* env map from a validated live run.
@@ -65,4 +65,4 @@
                     "LOYLY_PANEL_IMAGE_SHA256" (get panel "image_sha256")
                     "LOYLY_PANEL_PLAN_SHA256" (get panel "plan_sha256")
                     "LOYLY_PANEL_PLAN_FILE" (or (get panel "plan_file")
-                                               id/DEFAULT_PANEL_PLAN)}))))
+                                               loyly/DEFAULT_PANEL_PLAN)}))))

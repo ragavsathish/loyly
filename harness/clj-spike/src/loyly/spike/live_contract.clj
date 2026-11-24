@@ -6,8 +6,7 @@
             [loyly.spike.digest :as d]
             [loyly.spike.gen-checklist :as checklist]
             [loyly.spike.hjson :as hjson]
-            [loyly.spike.project.loyly.blind-policy :as policy]
-            [loyly.spike.project.loyly.identity :as id]))
+            [loyly.spike.project.loyly :as loyly]))
 
 (def SPEC-PATH-RE #"^docs/plan/\d\d-[a-z][a-z0-9-]*/spec\.feature$")
 
@@ -84,11 +83,11 @@
     (require-hash checklist-path (get-in config ["source" "checklist_sha256"]))
     (let [selected (hjson/read-json (slurp checklist-path :encoding "UTF-8"))]
       (when (and (= (get config "schema") "harness.pi-live-run.v2")
-                 (policy/requires-blind-handoff
-                  (or (get config "project") id/PROJECT_ID)
+                 (loyly/requires-blind-handoff
+                  (or (get config "project") loyly/PROJECT_ID)
                   (get selected "items")))
         (throw (ex-info
-                (str "selected " id/PROJECT_ID " refusal item " id/BLIND_ITEM_ID
+                (str "selected " loyly/PROJECT_ID " refusal item " loyly/BLIND_ITEM_ID
                      " requires the v1 blind-review contract")
                 {})))
       (verify-selected-specs source (get config "source") selected)

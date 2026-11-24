@@ -5,15 +5,12 @@
             [clojure.string :as str]
             [loyly.spike.digest :as d]
             [loyly.spike.hjson :as hjson]
-            [loyly.spike.project.loyly.blind-answer :as answer]
-            [loyly.spike.project.loyly.blind-policy :as policy]
-            [loyly.spike.project.loyly.identity :as id]
-            [loyly.spike.project.loyly.schemas :as schemas]))
+            [loyly.spike.project.loyly :as loyly]))
 
 (defn validate-blind-response-shape
   "Structural checks from validateBlindReview (sans packet binding)."
   [review packet-sha256]
-  (when (or (not= (get review "schema") schemas/BLIND_RESPONSE)
+  (when (or (not= (get review "schema") loyly/BLIND_RESPONSE)
             (not= (get review "packet_sha256") packet-sha256)
             (not= (get review "reviewer_kind") "agent")
             (not (string? (get review "reviewer")))
@@ -33,8 +30,8 @@
 (defn validate-blind-packet-shape
   "Structural checks for a blind packet.json (sans Allure attachment equality)."
   [packet]
-  (when (or (not= (get packet "schema") schemas/BLIND_PACKET)
-            (not= (get packet "item") id/BLIND_ITEM_ID)
+  (when (or (not= (get packet "schema") loyly/BLIND_PACKET)
+            (not= (get packet "item") loyly/BLIND_ITEM_ID)
             (not (re-matches #"[0-9a-f]{64}" (str (get packet "candidate_sha256"))))
             (not (re-matches #"[0-9a-f]{64}" (str (get packet "checklist_sha256"))))
             (not (re-matches #"[0-9a-f]{64}" (str (get packet "spec_sha256"))))
@@ -52,7 +49,7 @@
         question (slurp (fs/file packet-dir "question.txt") :encoding "UTF-8")]
     (validate-blind-packet-shape packet)
     (when (or (not= (d/sha256-string refusal) (get packet "refusal_sha256"))
-              (not= question policy/BLIND_QUESTION))
+              (not= question loyly/BLIND_QUESTION))
       (throw (ex-info "blind packet files no longer match packet.json" {})))
     {:packet packet
      :packet-sha256 (d/file-sha256 packet-file)}))
@@ -60,4 +57,4 @@
 (defn parse-review-answer
   "Apply Löyly blind-answer policy to a validated review answer + refusal text."
   [review refusal]
-  (answer/parse-blind-agent-answer (get review "answer") refusal))
+  (loyly/parse-blind-agent-answer (get review "answer") refusal))

@@ -5,10 +5,16 @@ set -euo pipefail
 SPIKE="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$SPIKE/../.." && pwd)"
 if [[ $# -lt 1 ]]; then
-  echo "usage: harness/clj-spike/bin/spike <gen-checklist|score|scoreboard|stamp|demo> [args...]" >&2
+  echo "usage: harness/clj-spike/bin/spike <gen-checklist|score|scoreboard|stamp|demo|lint|analyze> [args...]" >&2
   exit 2
 fi
 task="$1"; shift
+case "$task" in
+  lint|analyze|analyze:deps|analyze:dead|analyze:dupes|analyze:metrics|lint:kondo|lint:loyly)
+    cd "$SPIKE"
+    exec bb scripts/analyze.clj "$task" "$@"
+    ;;
+esac
 case "$task" in
   gen-checklist|gen_checklist) ns=loyly.spike.gen-checklist ;;
   score) ns=loyly.spike.score ;;

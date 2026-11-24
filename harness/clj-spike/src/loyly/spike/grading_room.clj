@@ -3,8 +3,7 @@
   (:require [babashka.fs :as fs]
             [loyly.spike.digest :as d]
             [loyly.spike.hjson :as hjson]
-            [loyly.spike.project.loyly.identity :as id]
-            [loyly.spike.project.loyly.schemas :as schemas]))
+            [loyly.spike.project.loyly :as loyly]))
 
 (defn candidate-digest [room]
   (d/tree-digest (fs/path room "impl") "impl"))
@@ -46,9 +45,9 @@
   [{:keys [source-room candidate-room checklist-file schema-file out
            candidate-sha256 checklist-sha256 schema-sha256
            project blind-review]
-    :or {project id/PROJECT_ID}}]
+    :or {project loyly/PROJECT_ID}}]
   (let [blind-review (if (nil? blind-review)
-                       (id/defaults-blind-review project)
+                       (loyly/defaults-blind-review project)
                        blind-review)]
     (when-not (re-matches #"[a-z][a-z0-9-]*" project)
       (throw (ex-info "invalid grading project" {:project project})))
@@ -82,14 +81,14 @@
                       schema-sha256))
         (throw (ex-info "grading copy differs from the gated candidate, checklist or schema" {})))
       (let [receipt (cond-> (array-map
-                             "schema" schemas/GRADING_ROOM
+                             "schema" loyly/GRADING_ROOM
                              "candidateSha256" candidate-sha256
                              "checklistSha256" checklist-sha256
                              "schemaSha256" schema-sha256
                              "planSha256" (plan-digest out)
                              "sourcePlan" (when (= 1 (count plans)) (str "plan/" (first plans)))
                              "sourcePlans" (mapv #(str "plan/" %) plans))
-                      (not (and (= project id/PROJECT_ID) blind-review))
+                      (not (and (= project loyly/PROJECT_ID) blind-review))
                       (assoc "project" project "blindReview" blind-review))]
         (hjson/spit-utf8 (fs/file out ".grading-room.json")
                          (hjson/compact-json receipt))
@@ -97,17 +96,17 @@
 
 (defn verify-grading-room
   [{:keys [out candidate-sha256 checklist-sha256 schema-sha256 project blind-review]
-    :or {project id/PROJECT_ID}}]
+    :or {project loyly/PROJECT_ID}}]
   (let [blind-review (if (nil? blind-review)
-                       (id/defaults-blind-review project)
+                       (loyly/defaults-blind-review project)
                        blind-review)
         receipt (hjson/read-json (slurp (fs/file out ".grading-room.json") :encoding "UTF-8"))
         expected-plans (mapv #(str "plan/" %) (selected-plans (fs/file out "checklist.json")))
         recorded-plans (or (get receipt "sourcePlans")
                            (when-let [p (get receipt "sourcePlan")] [p])
                            [])]
-    (when (or (not= (get receipt "schema") schemas/GRADING_ROOM)
-              (not= (or (get receipt "project") id/PROJECT_ID) project)
+    (when (or (not= (get receipt "schema") loyly/GRADING_ROOM)
+              (not= (or (get receipt "project") loyly/PROJECT_ID) project)
               (not= (if (contains? receipt "blindReview")
                       (get receipt "blindReview")
                       true)

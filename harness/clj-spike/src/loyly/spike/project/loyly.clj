@@ -16,6 +16,9 @@
 (def blind-allure-full-name id/blind-allure-full-name)
 
 (def BLIND_QUESTION policy/BLIND_QUESTION)
+(def PENDING_HUMAN policy/PENDING_HUMAN)
+(def PENDING_SUBAGENT policy/PENDING_SUBAGENT)
+(def PERSON_SPEC_SHA256 policy/PERSON_SPEC_SHA256)
 (def requires-blind-handoff policy/requires-blind-handoff)
 (def pending-evidence-prefix policy/pending-evidence-prefix)
 (def historical-person-cut? policy/historical-person-cut?)

@@ -1,7 +1,7 @@
 (ns loyly.spike.worker-config
   "PoC port of harness/pi-durable/worker-config.ts"
   (:require [babashka.fs :as fs]
-            [loyly.spike.project.loyly.identity :as id]))
+            [loyly.spike.project.loyly :as loyly]))
 
 (def ^:private HASH64 #"[0-9a-f]{64}")
 (def ^:private HASH40 #"[0-9a-f]{40}")
@@ -94,7 +94,7 @@
 (defn- parse-panel [environment live?]
   (let [panel (when (and live? (env environment "LOYLY_PANEL_IMAGE"))
                 {:image (str (fs/absolutize (env environment "LOYLY_PANEL_IMAGE")))
-                 :plan-file (or (env environment "LOYLY_PANEL_PLAN_FILE") id/DEFAULT_PANEL_PLAN)
+                 :plan-file (or (env environment "LOYLY_PANEL_PLAN_FILE") loyly/DEFAULT_PANEL_PLAN)
                  :plan-sha256 (env environment "LOYLY_PANEL_PLAN_SHA256")
                  :image-sha256 (env environment "LOYLY_PANEL_IMAGE_SHA256")})]
     (when (and live? (= (env environment "LOYLY_PANEL_REQUIRED") "1") (nil? panel))
@@ -131,7 +131,7 @@
             (throw (ex-info "LOYLY_GRADER_SHARDS must be an integer from 1 to 16" {})))
         blind (parse-blind root environment live? builder)
         blind-required (and live? (not= (env environment "LOYLY_BLIND_REQUIRED") "0"))
-        project (or (env environment "HARNESS_PROJECT_ID") id/PROJECT_ID)
+        project (or (env environment "HARNESS_PROJECT_ID") loyly/PROJECT_ID)
         _ (when-not (re-matches #"[a-z][a-z0-9-]*" project)
             (throw (ex-info "invalid harness project" {})))
         panel (parse-panel environment live?)]

@@ -69,6 +69,26 @@ harness/clj-spike/bin/spike demo
 harness/clj-spike/bin/spike gen-checklist --out checklist.json
 ```
 
+## Static analysis (TS parity)
+
+Mirrors `harness/pi-durable` `npm run lint` / `npm run analyze`:
+
+| TS | CLJ spike |
+|----|-----------|
+| eslint (+ loyly plugin) | `clj-kondo` + `scripts/analyze.clj` product-literal / deep-import rules |
+| madge (cycles) | `analyze:deps` |
+| knip (unused) | `analyze:dead` (unused namespaces fail; unused defs advisory) |
+| jscpd | `analyze:dupes` (advisory) |
+| metrics.mjs | `analyze:metrics` |
+
+```sh
+harness/clj-spike/bin/spike lint
+harness/clj-spike/bin/spike analyze
+# or: cd harness/clj-spike && bb lint && bb analyze
+```
+
+Install `clj-kondo` on `PATH` (or `~/.local/bin`) for the lint gate. Product literals and deep `project.loyly.*` imports are banned outside `project/loyly/` — import the barrel `loyly.spike.project.loyly` instead (Clojure best practice matching the TS eslint plugin).
+
 ## Invariant
 
 TypeScript remains authoritative for Pi cycles until a spike slice is proven

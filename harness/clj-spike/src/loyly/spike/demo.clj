@@ -3,28 +3,28 @@
   (:require [babashka.fs :as fs]
             [babashka.process :as p]
             [clojure.string :as str]
+            [loyly.spike.allure-results :as allure]
             [loyly.spike.blind-review :as blind]
+            [loyly.spike.builder-adapter :as builder]
             [loyly.spike.continuation :as cont]
+            [loyly.spike.contracts :as contracts]
             [loyly.spike.cycle-effects :as effects]
             [loyly.spike.digest :as d]
             [loyly.spike.evidence.validate-identity :as ident]
+            [loyly.spike.gate-adapter :as gate]
+            [loyly.spike.gate-effects :as gate-fx]
             [loyly.spike.gen-checklist :as checklist]
             [loyly.spike.grader-shards :as shards]
             [loyly.spike.grading-room :as room]
             [loyly.spike.hjson :as hjson]
-            [loyly.spike.live-contract :as live]
-            [loyly.spike.builder-adapter :as builder]
-            [loyly.spike.gate-adapter :as gate]
             [loyly.spike.launch-config :as launch]
+            [loyly.spike.live-contract :as live]
             [loyly.spike.panel-adapter :as panel-ad]
             [loyly.spike.panel-compile :as compile]
+            [loyly.spike.panel-policy :as panel-pol]
             [loyly.spike.panel-selection :as panel]
             [loyly.spike.panel-vm :as panel-vm]
-            [loyly.spike.project.loyly.blind-answer :as answer]
-            [loyly.spike.project.loyly.blind-policy :as policy]
-            [loyly.spike.project.loyly.blind-probe :as probe]
-            [loyly.spike.project.loyly.identity :as id]
-            [loyly.spike.project.loyly.schemas :as schemas]
+            [loyly.spike.project.loyly :as loyly]
             [loyly.spike.receipt-fields :as fields]
             [loyly.spike.replay-evidence :as replay]
             [loyly.spike.score :as score]
@@ -32,7 +32,8 @@
             [loyly.spike.scoreboard :as board]
             [loyly.spike.tasks.cycle-phases :as phases]
             [loyly.spike.validate-verdicts :as vv]
-            [loyly.spike.worker-config :as worker]))
+            [loyly.spike.worker-config :as worker]
+            [loyly.spike.workspace-effects :as ws]))
 
 (defn- die [msg]
   (hjson/err (str msg "\n"))
@@ -58,15 +59,15 @@
       (fs/copy checklist-file (fs/path instrument "harness" "cycles" "02" "checklist.json"))
       (let [checklist (hjson/read-json (slurp checklist-file :encoding "UTF-8"))
             items (get checklist "items")
-            _ (when-not (policy/requires-blind-handoff id/PROJECT_ID items)
+            _ (when-not (loyly/requires-blind-handoff loyly/PROJECT_ID items)
                 (die "expected booking-core checklist to require blind handoff"))
-            _ (let [parsed (answer/parse-blind-agent-answer
+            _ (let [parsed (loyly/parse-blind-agent-answer
                             "REQUEST: pukuhuone 9 | Thursday | 17:00"
                             "pukuhuone 9 is closed Monday; try Thursday 17:00 instead.")]
                 (when-not (= "pass" (:verdict parsed))
                   (die "blind answer parse failed")))
             _ (blind/validate-blind-response-shape
-               (array-map "schema" schemas/BLIND_RESPONSE
+               (array-map "schema" loyly/BLIND_RESPONSE
                           "packet_sha256" (apply str (repeat 64 "c"))
                           "reviewer_kind" "agent"
                           "reviewer" "spike-agent"
@@ -92,7 +93,7 @@
                                           checklist)
             panel-plan (hjson/read-json
                         (slurp (fs/file instrument "harness" "pi-durable"
-                                        id/DEFAULT_PANEL_PLAN)
+                                        loyly/DEFAULT_PANEL_PLAN)
                                :encoding "UTF-8"))
             panel-sel (panel/validate-panel-selection panel-plan checklist)
             pi-durable (fs/file instrument "harness" "pi-durable")
@@ -101,6 +102,12 @@
                 (die "expected three legacy specialist workers"))
             _ (when-not (seq (:specialists panel-sel))
                 (die "expected specialist checks on booking-core panel plan"))
+            _ (when-not (contracts/selected-checklist? checklist)
+                (die "contracts selected-checklist? rejected booking-core"))
+            _ (when-not (ws/exists? (str scratch))
+                (die "workspace-effects exists? failed"))
+            _ (when-not (fn? allure/read-allure-results)
+                (die "allure-results read-allure-results missing"))
             ;; Gate / builder receipt helpers against scratch fixtures.
             _ (let [gate-out (fs/file scratch "gate-out")
                     cand-sha (apply str (repeat 64 "a"))
@@ -116,7 +123,16 @@
                   (when-not (= 0 (:exit (gate/read-gate-receipt
                                          (str (fs/absolutize gate-out))
                                          room-path cand-sha)))
-                    (die "gate receipt parse failed")))
+                    (die "gate receipt parse failed"))
+                  (let [verified (gate-fx/verify-candidate
+                                  {:room room-path
+                                   :out (str (fs/absolutize gate-out))
+                                   :candidate-sha256 cand-sha
+                                   :run (fn [req]
+                                          (gate/read-gate-receipt
+                                           (:out req) (:room req) (:candidate-sha256 req)))})]
+                    (when-not (:passed verified)
+                      (die "gate-effects verify-candidate failed"))))
                 (let [ev (fs/file scratch "builder-evidence" "launch-1")]
                   (fs/create-dirs ev)
                   (hjson/spit-utf8 (fs/file ev "launch.txt")
@@ -161,7 +177,7 @@
             _ (let [src (get (first items) "source")
                     {:keys [plan-dir slice-key]} (ident/parse-plan-source src)
                     full (ident/allure-full-name
-                          {:project id/PROJECT_ID :slice-key slice-key
+                          {:project loyly/PROJECT_ID :slice-key slice-key
                            :item-id (get (first items) "id")})]
                 (when (or (empty? plan-dir) (empty? full))
                   (die "allure identity helpers failed")))
@@ -171,7 +187,7 @@
             _ (let [runtime (compile/specialist-runtime
                              {"id" "protocol"}
                              {"vm_exit_code" 0}
-                             {"schema" schemas/PANEL_VM_RUN})]
+                             {"schema" loyly/PANEL_VM_RUN})]
                 (when-not (= "gondolin-qemu-vm" runtime)
                   (die "panel-compile specialist-runtime failed")))
             _ (let [html (str "<form method=\"post\" action=\"/book\">"
@@ -181,8 +197,8 @@
                               "</select>"
                               "<input name=\"weekday\"/><input name=\"start\"/>"
                               "</form>")
-                    action (probe/booking-form-action html)
-                    resolved (probe/resolve-room-in-public-form
+                    action (loyly/booking-form-action html)
+                    resolved (loyly/resolve-room-in-public-form
                               html "household=12&resource=%40room%3A9&weekday=Thursday&start=17%3A00"
                               "REQUEST: pukuhuone 9 | Thursday | 17:00")]
                 (when-not (= "/book" action)
@@ -220,11 +236,13 @@
                   (die "replay-evidence summary failed")))
             _ (when-not (= "score" (nth phases/PHASES 6))
                 (die "cycle-phases PHASES map drifted"))
+            _ (when-not (fn? panel-pol/evaluate-panel)
+                (die "panel-policy evaluate-panel missing"))
             verdicts (mapv (fn [item]
-                             (if (= (get item "id") id/BLIND_ITEM_ID)
-                               (array-map "id" id/BLIND_ITEM_ID
+                             (if (= (get item "id") loyly/BLIND_ITEM_ID)
+                               (array-map "id" loyly/BLIND_ITEM_ID
                                           "verdict" "fail"
-                                          "evidence" (str policy/PENDING_SUBAGENT " (spike)"))
+                                          "evidence" (str loyly/PENDING_SUBAGENT " (spike)"))
                                (array-map "id" (get item "id")
                                           "verdict" "pass"
                                           "evidence" (str "observed " (get item "id")))))
@@ -237,7 +255,7 @@
                   (hjson/spit-utf8 (fs/file room-dir "work" "verdicts.json")
                                    (hjson/compact-json verdicts))
                   (hjson/spit-utf8 (fs/file room-dir "work" "surprises.json") "[]")
-                  (hjson/spit-utf8 (fs/file room-dir id/BLIND_REFUSAL_FILE)
+                  (hjson/spit-utf8 (fs/file room-dir loyly/BLIND_REFUSAL_FILE)
                                    "pukuhuone 9 closed Monday; try Thursday 17:00\n"))
             judged (vv/validate-verdicts (str room-dir))
             _ (when-not (pos? (:pass judged))
@@ -290,7 +308,7 @@
               " plans=" (count (get receipt-map "sourcePlans"))
               " panel-specialists=" (count workers)
               " shards=" (count shard-parts)
-              " blind-item=" id/BLIND_ITEM_ID "\n"
+              " blind-item=" loyly/BLIND_ITEM_ID "\n"
               (str/trim-newline (:text board)) "\n"
               "scratch=" scratch "\n")))))
   nil)

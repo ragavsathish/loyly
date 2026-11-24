@@ -6,7 +6,6 @@
   defaults do not honour. Compact JSON and filesystem helpers use libraries."
   (:require [babashka.fs :as fs]
             [cheshire.core :as json]
-            [clojure.java.io :as io]
             [clojure.string :as str]))
 
 ;; ---------------------------------------------------------------- writing
@@ -59,7 +58,7 @@
 
 ;; ---------------------------------------------------------------- reading
 
-(defn- fail [s i msg]
+(defn- fail [_s i msg]
   (throw (ex-info (str msg " at position " i) {:json/detail (str msg " at position " i)})))
 
 (declare read-value)
