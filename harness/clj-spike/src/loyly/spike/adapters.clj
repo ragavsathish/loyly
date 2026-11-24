@@ -4,19 +4,20 @@
             [loyly.spike.cycle-core :as life]
             [loyly.spike.evidence.assess-room-panel :as panel]
             [loyly.spike.evidence.check-room :as room]
-            [loyly.spike.hjson :as hjson]))
+            [loyly.spike.hjson :as hjson]
+            [loyly.spike.project.loyly :as loyly]))
 
 (def CURSOR-SEALS
   {"graderTool" "Cursor black-box grader"
    "blindTool" "fresh blind subagent"
-   "handoffItem" "01-011"
-   "project" "loyly"})
+   "handoffItem" loyly/BLIND_ITEM_ID
+   "project" loyly/PROJECT_ID})
 
 (def CODEX-SEALS
   {"graderTool" "Codex black-box grader"
    "blindTool" "fresh blind subagent"
-   "handoffItem" "01-011"
-   "project" "loyly"})
+   "handoffItem" loyly/BLIND_ITEM_ID
+   "project" loyly/PROJECT_ID})
 
 (defn- seals-for [driver]
   (case driver
