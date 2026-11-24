@@ -31,7 +31,12 @@
 (def entry-namespaces
   "CLI / task roots that keep a namespace alive (knip entry equivalents)."
   #{"loyly.spike.demo"
+    "loyly.spike.adapters"
+    "loyly.spike.candidate-caches"
+    "loyly.spike.cycle-core"
     "loyly.spike.drivers"
+    "loyly.spike.evidence.assess-room-panel"
+    "loyly.spike.evidence.check-room"
     "loyly.spike.gen-checklist"
     "loyly.spike.score"
     "loyly.spike.scoreboard"

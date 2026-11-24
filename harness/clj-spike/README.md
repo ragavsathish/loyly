@@ -37,9 +37,13 @@ harness/clj-spike/bin/spike cycle codex preflight <contract.json>
 harness/clj-spike/bin/spike cycle cursor decide <attempt.json>
 ```
 
-The `cycle` command is a thin Babashka spawn over the authoritative Node CLIs
-(`pi-durable/run-live.mjs`, `codex-cycle/cli.ts`, `cursor-cycle/cli.ts`). It
-does not replace those drivers.
+The `cycle` command is a Babashka front-end:
+
+- **Codex / Cursor** `decide|candidate|evidence|panel` → **CLJ spike modules**
+  (`cycle-core`, `candidate-caches`, `evidence.check-room`,
+  `evidence.assess-room-panel`) by default.
+- Pass `--ts` to spawn the Node adapter CLIs instead.
+- **Pi** `--check|--run` and **preflight** still use Node (not ported yet).
 
 ### Models 𝒜 and cycle 𝒞
 
@@ -95,7 +99,7 @@ Certification stays outside the builder: an independent grader + panel confirms 
 | Replay evidence | `replay-evidence.ts` | ✅ | `project-replay-evidence` (injected rows) |
 | Contracts | `contracts.ts` | ✅ | selected-checklist? |
 | Cycle phases / tasks | `tasks/*` | ✅ | ALL-PHASES + thin task wrappers; Pi runtime injectable |
-| Cycle drivers (Pi/Codex/Cursor) | `run-live` / `*-cycle/cli.ts` | ✅ | `drivers.clj` spawns Node; `bin/spike cycle` |
+| Cycle drivers (Pi/Codex/Cursor) | `run-live` / `*-cycle/cli.ts` | ✅ | `drivers` → CLJ adapters (evidence/panel/decide/candidate); `--ts` for Node |
 | Pi audit | `audit-rows.ts` | ✅ | `audit-rows.json` / `:read-fn` (sqlite deferred) |
 | Schema / formal | Ajv + Malli | ✅ | Own `formal/src` (`loyly.formal.*`); Ajv injectable; `bin/spike formal` |
 
