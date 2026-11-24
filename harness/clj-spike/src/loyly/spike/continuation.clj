@@ -3,7 +3,7 @@
   (:require [babashka.fs :as fs]
             [clojure.string :as str]
             [loyly.spike.evidence.validate-verdicts :as ev]
-            [loyly.spike.hjson :as hjson]))
+            [loyly.spike.workspace-effects :as ws]))
 
 (def MAX_CONTINUATIONS 3)
 
@@ -22,10 +22,10 @@
   (let [file (fs/file room "impl" "UNCARRIED.md")]
     (if-not (fs/regular-file? file)
       []
-      (let [checklist (hjson/read-json (slurp (fs/file checklist-file) :encoding "UTF-8"))]
+      (let [checklist (ws/read-workspace-json checklist-file)]
         (when-not (ev/selected-checklist? checklist)
           (throw (ex-info "invalid selected checklist" {:path (str checklist-file)})))
-        (extract-uncarried checklist (slurp file :encoding "UTF-8"))))))
+        (extract-uncarried checklist (ws/read-text file))))))
 
 (defn continuation-prompt [ids]
   (when (or (empty? ids)

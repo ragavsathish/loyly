@@ -45,16 +45,19 @@
           (range) shards)))
 
 (defn prepare-shards
-  "Partition checklist and materialize per-shard grading rooms."
+  "Partition checklist and materialize per-shard grading rooms.
+  Pass `:shard-count` (preferred) or `:count` for the partition size."
   [{:keys [grading-room source-room scratch schema-file
-           candidate-sha256 schema-sha256 count
+           candidate-sha256 schema-sha256 shard-count
            project blind-review]
-    :or {project loyly/PROJECT_ID}}]
-  (let [blind-review (if (nil? blind-review)
+    :or {project loyly/PROJECT_ID}
+    :as opts}]
+  (let [shard-count (or shard-count (:count opts))
+        blind-review (if (nil? blind-review)
                        (loyly/defaults-blind-review project)
                        blind-review)
         full (hjson/read-json (slurp (fs/file grading-room "checklist.json") :encoding "UTF-8"))
-        partitions (partition-by-rule (get full "items") count)]
+        partitions (partition-by-rule (get full "items") shard-count)]
     (mapv
      (fn [{:keys [id items]}]
        (let [base (fs/path scratch "grader-shards" id)

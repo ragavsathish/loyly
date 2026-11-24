@@ -26,7 +26,7 @@
 (defn has-builder-launch? [evidence-dir session-id request-id]
   (some? (latest-launch evidence-dir session-id request-id)))
 
-(defn validate-receipt
+(defn- validate-receipt
   [found {:keys [instruction-sha256 model room image readonly-inputs
                  session-id request-id
                  bash-timeout-floor-seconds bash-timeout-ceiling-seconds
@@ -54,7 +54,7 @@
                 "builder launch receipt differs from approved room, instruction, image or model"
                 {}))))))
 
-(defn assert-builder-args
+(defn- assert-builder-args
   [{:keys [command room instruction image evidence-dir state-root session-id request-id
            bash-timeout-floor-seconds bash-timeout-ceiling-seconds
            store-path parent-conversation-receipt]}]
@@ -85,3 +85,11 @@
                (or (not (fs/absolute? (fs/path parent-conversation-receipt)))
                    (not (fs/exists? parent-conversation-receipt))))
       (throw (ex-info "prior Pi conversation receipt missing" {})))))
+
+(defn reconcile-builder-launch
+  "Validate args and an existing launch receipt without spawning (TS runBuilder reconcile path)."
+  [{:keys [evidence-dir session-id request-id] :as args}]
+  (assert-builder-args args)
+  (when-let [found (latest-launch evidence-dir session-id (or request-id session-id))]
+    (validate-receipt found args)
+    (assoc found :reconciled true)))

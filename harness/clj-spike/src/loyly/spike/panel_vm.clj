@@ -65,7 +65,7 @@
           :probe (get check "probe")}))
      checks)))
 
-(defn run-binding
+(defn- run-binding
   "Port of runBinding(original): score-input or cut HEAD + candidate digest."
   [original]
   (let [input (fs/file original "score-input.json")]
@@ -79,7 +79,7 @@
                    "candidate_sha256"
                    (room/candidate-digest (fs/path original "fenced-room")))))))
 
-(defn score-digest
+(defn- score-digest
   "SHA-256 of the bound cycle scores.json, or nil."
   [original]
   (let [input (fs/file original "score-input.json")]
@@ -88,3 +88,9 @@
             score (fs/file original "instrument" "harness" "cycles" cycle "scores.json")]
         (when (fs/regular-file? score)
           (d/file-sha256 score))))))
+
+(defn panel-score-context
+  "Binding + optional score digest for a panel original room (pre-VM)."
+  [original]
+  {:binding (run-binding original)
+   :score-sha256 (score-digest original)})

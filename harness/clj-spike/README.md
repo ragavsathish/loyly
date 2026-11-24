@@ -77,7 +77,7 @@ Mirrors `harness/pi-durable` `npm run lint` / `npm run analyze`:
 |----|-----------|
 | eslint (+ loyly plugin) | `clj-kondo` + `scripts/analyze.clj` product-literal / deep-import rules |
 | madge (cycles) | `analyze:deps` |
-| knip (unused) | `analyze:dead` (unused namespaces fail; unused defs advisory) |
+| knip (unused) | `analyze:dead` (unused namespaces and unused public defs fail) |
 | jscpd | `analyze:dupes` (advisory) |
 | metrics.mjs | `analyze:metrics` |
 

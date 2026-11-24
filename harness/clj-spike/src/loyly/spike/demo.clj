@@ -133,18 +133,42 @@
                                            (:out req) (:room req) (:candidate-sha256 req)))})]
                     (when-not (:passed verified)
                       (die "gate-effects verify-candidate failed"))))
-                (let [ev (fs/file scratch "builder-evidence" "launch-1")]
+                (let [ev (fs/file scratch "builder-evidence" "launch-1")
+                      instr (fs/file scratch "builder-instr.txt")
+                      img (fs/file scratch "builder-image")
+                      instr-abs (str (fs/absolutize instr))
+                      img-abs (str (fs/absolutize img))]
                   (fs/create-dirs ev)
+                  (hjson/spit-utf8 instr "build\n")
+                  (fs/create-dirs img)
+                  (hjson/spit-utf8 (fs/file img "manifest.json")
+                                   (hjson/compact-json {"assets" {} "checksums" {}}))
                   (hjson/spit-utf8 (fs/file ev "launch.txt")
                                    (str "session_id=s1\nrequest_id=s1\n"
                                         "instruction_sha256=" (apply str (repeat 64 "b")) "\n"
-                                        "model=test\nroom=/tmp/room\nbuilder_image=/tmp/img\n"))
+                                        "model=test\nroom=" room-path "\n"
+                                        "builder_image=" img-abs "\n"))
                   (when-not (builder/has-builder-launch?
                              (str (fs/absolutize (fs/parent ev))) "s1" "s1")
                     (die "builder launch lookup failed"))
                   (when-not (= "s1" (get (fields/parse-fields (fs/file ev "launch.txt"))
                                          "session_id"))
-                    (die "receipt fields parse failed"))))
+                    (die "receipt fields parse failed"))
+                  (let [reconciled
+                        (builder/reconcile-builder-launch
+                         {:command instr-abs
+                          :room room-path
+                          :instruction instr-abs
+                          :image img-abs
+                          :evidence-dir (str (fs/absolutize (fs/parent ev)))
+                          :state-root (str (fs/absolutize scratch))
+                          :session-id "s1"
+                          :request-id "s1"
+                          :instruction-sha256 (apply str (repeat 64 "b"))
+                          :model "test"
+                          :readonly-inputs false})]
+                    (when-not (:reconciled reconciled)
+                      (die "reconcile-builder-launch failed")))))
             _ (let [cfg (worker/parse-worker-config
                          (str repo) (str scratch) "repair" {})
                     env (launch/worker-environment
@@ -184,12 +208,45 @@
             _ (let [prompt (cont/continuation-prompt ["01-001" "01-002"])]
                 (when-not (str/includes? prompt "@item-01-001")
                   (die "continuation prompt missing item")))
+            _ (when-not (= 3 cont/MAX_CONTINUATIONS)
+                (die "continuation MAX_CONTINUATIONS drifted"))
+            _ (let [uncarried (cont/selected-uncarried (str instrument) (str checklist-file))]
+                (when-not (vector? uncarried)
+                  (die "selected-uncarried should return a vector")))
             _ (let [runtime (compile/specialist-runtime
                              {"id" "protocol"}
                              {"vm_exit_code" 0}
                              {"schema" loyly/PANEL_VM_RUN})]
                 (when-not (= "gondolin-qemu-vm" runtime)
                   (die "panel-compile specialist-runtime failed")))
+            _ (let [summary (compile/build-panel-summary-shape
+                             {:candidate-sha256 (apply str (repeat 64 "a"))
+                              :plan-sha256 (apply str (repeat 64 "b"))
+                              :original-score-sha256 (apply str (repeat 64 "c"))
+                              :evaluation {:panel-outcome "ready-for-review"
+                                           :gaps [] :checks [] :items []}})
+                    manifest (array-map
+                              "schema" loyly/PANEL_VM_RUN
+                              "source_commit" (apply str (repeat 40 "0"))
+                              "candidate_sha256" (apply str (repeat 64 "a"))
+                              "allure_schema_sha256" (apply str (repeat 64 "s"))
+                              "score_state" "pre-score"
+                              "plan_sha256" (apply str (repeat 64 "b"))
+                              "parallel_overlap_ms" 7
+                              "producers" [{"started" 1 "stopped" 10}
+                                           {"started" 2 "stopped" 9}])
+                    _ (compile/verify-specialist-bindings
+                       {:plan panel-plan
+                        :plan-sha256 (apply str (repeat 64 "b"))
+                        :manifest manifest
+                        :candidate-sha256 (apply str (repeat 64 "a"))
+                        :schema-sha256 (apply str (repeat 64 "s"))
+                        :score-sha256 nil
+                        :source-commit (apply str (repeat 40 "0"))
+                        :specs [1 2]}
+                       [])]
+                (when-not (= loyly/PANEL_SUMMARY (get summary "schema"))
+                  (die "panel-compile summary shape failed")))
             _ (let [html (str "<form method=\"post\" action=\"/book\">"
                               "<input name=\"household\"/>"
                               "<select name=\"resource\">"
@@ -234,10 +291,47 @@
                         (str scratch))]
                 (when-not (= "loyly.replay-evidence.v1" (get ev "schema"))
                   (die "replay-evidence summary failed")))
+            _ (when-not (nil? (replay/project-grade-row
+                               [{"stage" "grade" "outcome" "failed"}]))
+                (die "project-grade-row should skip incomplete grade rows"))
             _ (when-not (= "score" (nth phases/PHASES 6))
                 (die "cycle-phases PHASES map drifted"))
+            _ (let [cut (phases/phase-cut
+                         {:fx (effects/create-cycle-effects
+                               {:root (str repo) :scratch (str scratch)
+                                :room (str instrument) :cut (str (fs/path scratch "cut2"))
+                                :source-root (str instrument)
+                                :approved-source-repo (str repo)
+                                :digest-candidate #(room/candidate-digest %)})
+                          :approved-commit nil})]
+                (when-not (zero? (:code cut))
+                  (die "phase-cut with no commit should no-op")))
             _ (when-not (fn? panel-pol/evaluate-panel)
                 (die "panel-policy evaluate-panel missing"))
+            _ (let [parsed (blind/parse-review-answer
+                            {"answer" "REQUEST: pukuhuone 9 | Thursday | 17:00"}
+                            "pukuhuone 9 is closed Monday; try Thursday 17:00 instead.")]
+                (when-not (= "pass" (:verdict parsed))
+                  (die "blind parse-review-answer failed")))
+            _ (let [packet-dir (fs/file scratch "blind-packet")
+                    refusal "pukuhuone 9 closed Monday; try Thursday 17:00\n"
+                    spec-sha (apply str (repeat 64 "e"))
+                    _ (fs/create-dirs packet-dir)
+                    _ (hjson/spit-utf8 (fs/file packet-dir "refusal.txt") refusal)
+                    _ (hjson/spit-utf8 (fs/file packet-dir "question.txt") loyly/BLIND_QUESTION)
+                    _ (hjson/spit-utf8
+                       (fs/file packet-dir "packet.json")
+                       (hjson/compact-json
+                        (array-map "schema" loyly/BLIND_PACKET
+                                   "item" loyly/BLIND_ITEM_ID
+                                   "candidate_sha256" (apply str (repeat 64 "a"))
+                                   "checklist_sha256" (apply str (repeat 64 "b"))
+                                   "spec_sha256" spec-sha
+                                   "allure_results_sha256" (apply str (repeat 64 "d"))
+                                   "refusal_sha256" (d/sha256-string refusal))))
+                    verified (blind/verify-packet-files (str packet-dir))]
+                (when-not (re-matches #"[0-9a-f]{64}" (:packet-sha256 verified))
+                  (die "verify-packet-files failed")))
             verdicts (mapv (fn [item]
                              (if (= (get item "id") loyly/BLIND_ITEM_ID)
                                (array-map "id" loyly/BLIND_ITEM_ID
@@ -301,7 +395,48 @@
                        :instrument (str instrument)
                        :verdicts-file (str verdicts-file)
                        :cycle "02"})
-            board (board/report {:root (str instrument) :cycle "02"})]
+            board (board/report {:root (str instrument) :cycle "02"})
+            _ (let [ctx (panel-vm/panel-score-context (str scratch))]
+                (when-not (map? (:binding ctx))
+                  (die "panel-score-context binding missing")))
+            _ (let [shards (shards/prepare-shards
+                            {:grading-room (str (fs/absolutize grade-out))
+                             :source-room (str instrument)
+                             :scratch (str scratch)
+                             :schema-file (str (fs/absolutize schema-file))
+                             :candidate-sha256 cand-sha
+                             :schema-sha256 schema-sha
+                             :shard-count 2})]
+                (when-not (= 2 (count shards))
+                  (die "prepare-shards expected two shards")))
+            _ (let [plan-path (fs/file pi-durable loyly/DEFAULT_PANEL_PLAN)
+                    plan-sha (d/file-sha256 plan-path)
+                    here (fs/file scratch "panel-plans")
+                    _ (fs/create-dirs here)
+                    _ (fs/copy plan-path (fs/path here loyly/DEFAULT_PANEL_PLAN))
+                    found (replay/panel-plan-for-manifest
+                           (str here) {"plan_sha256" plan-sha})]
+                (when-not (.endsWith ^String found loyly/DEFAULT_PANEL_PLAN)
+                  (die "panel-plan-for-manifest failed")))
+            _ (let [img (fs/file scratch "pinned-image")
+                    _ (fs/create-dirs img)
+                    manifest {"assets" {"rootfs" "rootfs.tar"}
+                              "checksums" {"rootfs" (d/sha256-string "root")}}
+                    _ (hjson/spit-utf8 (fs/file img "manifest.json")
+                                       (hjson/compact-json manifest))
+                    _ (hjson/spit-utf8 (fs/file img "rootfs.tar") "root")
+                    man-sha (d/file-sha256 (fs/file img "manifest.json"))]
+                (live/verify-pinned-image (str img) man-sha))
+            _ (let [approved (live/derive-approved-checklist
+                              {:config (array-map
+                                        "schema" "loyly.pi-live-run.v1"
+                                        "source" (array-map
+                                                  "checklist_sha256" checklist-sha
+                                                  "specs" specs))
+                               :source (str instrument)
+                               :scratch (str (fs/file scratch "approved"))})]
+                (when-not (pos? (count (get approved "items")))
+                  (die "derive-approved-checklist failed")))]
         (hjson/out
          (str "clj-spike demo OK: " (:score verified)
               " pass=" (:pass judged)

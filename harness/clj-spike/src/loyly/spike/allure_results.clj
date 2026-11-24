@@ -121,14 +121,13 @@
                  (let [expected (get identities item-id)]
                    (when-not expected
                      (throw (ex-info (str "Allure identity missing for " item-id) {})))
-                   (ident/assert-allure-identity
+                   (evid/assert-allure-result
                     result
-                    {"itemId" item-id
-                     "name" (get item "name")
-                     "rule" (get item "rule")
-                     "feature" (:feature expected)
-                     "fullName" (:full-name expected)})
-                   (evid/validate-result-evidence result item-id)
+                    {:identity {"itemId" item-id
+                                "name" (get item "name")
+                                "rule" (get item "rule")
+                                "feature" (:feature expected)
+                                "fullName" (:full-name expected)}})
                    (doseq [attachment (get result "attachments")]
                      (let [path (fs/path dir (get attachment "source"))]
                        (when-not (fs/regular-file? path)

@@ -12,9 +12,6 @@
   [^bytes bs]
   (apply str (map #(format "%02x" (bit-and % 0xff)) bs)))
 
-(defn sha256-bytes [^bytes bs]
-  (digest/sha-256 bs))
-
 (defn sha256-string [^String s]
   (digest/sha-256 s))
 

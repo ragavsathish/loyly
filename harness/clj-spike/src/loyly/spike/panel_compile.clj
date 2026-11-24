@@ -11,7 +11,7 @@
             (get entry "value")))
         (get result "labels")))
 
-(defn assert-specialist-manifest-bound
+(defn- assert-specialist-manifest-bound
   [{:keys [plan plan-sha256 manifest candidate-sha256 schema-sha256
            score-sha256 source-commit specs]}]
   (when (or (not (#{"loyly.supplemental-grade.v1" loyly/PANEL_VM_RUN}
@@ -65,7 +65,7 @@
 
     :else nil))
 
-(defn assert-specialist-overlap
+(defn- assert-specialist-overlap
   [manifest observations]
   (let [intervals (if (= (get manifest "schema") loyly/PANEL_VM_RUN)
                     (mapv (fn [row]
@@ -80,6 +80,13 @@
     (when (or (<= overlap 0)
               (not= overlap (get manifest "parallel_overlap_ms")))
       (throw (ex-info "the recorded specialist execution overlap is false" {})))))
+
+(defn verify-specialist-bindings
+  "Assert manifest binding + recorded overlap (TS specialistResults checks)."
+  [opts observations]
+  (assert-specialist-manifest-bound opts)
+  (assert-specialist-overlap (:manifest opts) observations)
+  true)
 
 (defn build-panel-summary-shape
   "Minimal panel-summary object fields the TS compiler emits (sans Allure I/O)."

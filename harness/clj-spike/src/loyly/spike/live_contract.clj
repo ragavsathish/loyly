@@ -55,7 +55,7 @@
            (throw (ex-info "approved spec files do not exactly cover the derived checklist" {})))))
      selected)))
 
-(defn verify-image
+(defn- verify-image
   "Port of verifyImage(image, expectedManifestSha256)."
   [image expected-manifest-sha256]
   (let [manifest-file (fs/file image "manifest.json")]
@@ -92,3 +92,8 @@
                 {})))
       (verify-selected-specs source (get config "source") selected)
       selected)))
+
+(defn verify-pinned-image
+  "Public pin check for a builder/grader/panel image tree."
+  [image expected-manifest-sha256]
+  (verify-image image expected-manifest-sha256))

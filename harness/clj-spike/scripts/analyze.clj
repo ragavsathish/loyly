@@ -235,17 +235,10 @@
     (when (or (seq orphans) (seq unused-defs))
       (binding [*out* *err*]
         (println (str "analyze:dead: " (count orphans) " unused ns, "
-                      (count unused-defs) " unused public defs"))
-        ;; Spike still growing — report but do not fail on unused defs yet;
-        ;; unused *namespaces* fail the gate (true dead files).
-        )
-      (when (seq orphans)
-        (System/exit 1)))
+                      (count unused-defs) " unused public defs")))
+      (System/exit 1))
     (println (str "analyze:dead OK (reachable " (count reachable)
-                  "/" (count graph) " namespaces"
-                  (when (seq unused-defs)
-                    (str "; " (count unused-defs) " unused defs noted"))
-                  ")"))
+                  "/" (count graph) " namespaces)"))
     :ok))
 
 (defn analyze-dupes!
