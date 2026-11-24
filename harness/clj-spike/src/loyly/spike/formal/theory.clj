@@ -70,7 +70,7 @@
     :statement "∀ m ∈ SortNames. ∀ x ← Gen(m). Valid_m(x)"
     :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}
    {:id :I6
-    :statement "booking-core.panel.json ∈ PanelPlan"
+    :statement (str loyly/DEFAULT_PANEL_PLAN " ∈ PanelPlan")
     :proved-by 'loyly.spike.formal.trace/prove-booking-panel!}
    {:id :I7
     :statement "TS JSON Schema files for panel/live/allure are present and digested"
