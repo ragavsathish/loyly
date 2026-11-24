@@ -19,35 +19,42 @@ Prefer Babashka / CLJ libs over hand-rolled plumbing:
 
 **Kept custom:** pretty JSON write + order-preserving read in `hjson.clj` — checklist/score byte shape (`@harness-012`) and key order (`@harness-029`). Cheshire’s defaults do not honour those.
 
+## Two roads (assurance ↔ models)
+
+The spike mirrors the harness’s dual path to independent examination:
+
+| Road | In the spike |
+|------|----------------|
+| **Legacy assurance** | Gate / grade / blind / panel workers — systematic evaluation with injectable spawn/QEMU/HTTP |
+| **Formal / model traceability** | Digests, receipts, structural schema validators (`evidence/validate_schema.clj`), live-contract pins |
+
+Certification stays outside the builder: an independent grader + panel confirms the process. Runtime backends (Pi sqlite, Gondolin, Ajv compile, Effect/`defineTask`) remain injectable hooks so the CLJ API is complete without claiming those infra pieces run in Babashka.
+
 ## Status
 
 | Area | TS source | Spike | Notes |
 |------|-----------|-------|-------|
 | Measure | `measure/*` | ✅ | byte-parity with TS |
-| Product | `project/loyly/*` | ✅ | + barrel `project/loyly.clj` |
+| Product | `project/loyly/*` | ✅ | + barrel; `public-json-booking` (`:fetch-fn`) |
 | Score receipt | `score-receipt.ts` | ✅ | bind + verify |
 | Evidence verdicts | `evidence-core/validate-verdicts.ts` | ✅ | + pi-durable wrapper |
-| Live contract | `live-contract.ts` | ✅ partial | specs, image, derive; Ajv deferred |
+| Live contract | `live-contract.ts` | ✅ | specs, pins, `check-live-run`; schema structural |
 | Grading room | `grading-room.ts` | ✅ | digests, prepare, verify |
-| Blind review | `blind-review.ts` | ✅ partial | shapes + answer; Allure/HTTP deferred |
+| Blind review | `blind-review.ts` | ✅ | prepare/validate/Allure; probe via `:probe-fn` |
 | Panel selection/policy | panel-* + evidence-core | ✅ | coverage + evaluate-panel |
-| Panel VM workers | `panel-vm-run.ts` | ✅ partial | specialistWorkers / bundle; QEMU deferred |
-| Grader shards | `grader-shards.ts` | ✅ partial | partition + prepare |
+| Panel VM | `panel-vm-run.ts` | ✅ | verify + `run-panel-vms` (`:gondolin-fn`) |
+| Grader shards | `grader-shards.ts` | ✅ | partition + prepare + combine |
 | Continuation | `continuation.ts` | ✅ | uncarried + prompt |
-| Allure | identity + results + validate-result | ✅ partial | Ajv deferred |
-| Gate adapter | `gate-adapter.ts` | ✅ partial | receipt reconcile; spawn deferred |
-| Builder adapter | `builder-adapter.ts` | ✅ partial | launch lookup / validate; spawn deferred |
+| Allure | identity + results + validate-result | ✅ | + structural schema stand-in |
+| Gate / builder | `*-adapter.ts` | ✅ | reconcile + `run-*` injectables |
 | Launch / worker config | `launch-config.ts`, `worker-config.ts` | ✅ | env mapping + parse |
-| Blind probe | `project/loyly/blind-probe.ts` | ✅ partial | form action + resolve; HTTP JSON booking deferred |
-| Cycle effects | `cycle-effects.ts` | ✅ | command / fence / cut / measure-log |
-| Gate / workspace effects | `gate-effects.ts`, `workspace-effects.ts` | ✅ | without Effect-TS runtime |
-| Panel adapter | `panel-adapter.ts` | ✅ partial | selectPanelAttempt; VM launch deferred |
-| Replay evidence | `replay-evidence.ts` | ✅ partial | summary projection |
+| Cycle / gate / workspace effects | `*-effects.ts` | ✅ | without Effect-TS runtime |
+| Panel adapter / compile | `panel-*.ts` | ✅ | durable panel + compile (`:allure-cli-fn`) |
+| Replay evidence | `replay-evidence.ts` | ✅ | `project-replay-evidence` (injected rows) |
 | Contracts | `contracts.ts` | ✅ | selected-checklist? |
-| Cycle phases | `tasks/cycle-phases.ts` | ✅ partial | PHASES + cut/score helpers; Pi defineTask deferred |
-| Panel Allure report I/O | compile report / QEMU | ⏳ | |
-| Pi audit | `audit-rows.ts` | ⏳ | sqlite runtime |
-| Ajv schemas | live-run / panel-plan / allure | ⏳ | structural checks used instead |
+| Cycle phases / tasks | `tasks/*` | ✅ | ALL-PHASES + thin task wrappers; Pi runtime injectable |
+| Pi audit | `audit-rows.ts` | ✅ | `audit-rows.json` / `:read-fn` (sqlite deferred) |
+| Schema compile | Ajv | ✅ | structural validators; real Ajv injectable |
 
 ## Layout
 
