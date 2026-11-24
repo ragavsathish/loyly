@@ -1,5 +1,7 @@
 {:paths ["src"]
- :deps {org.clj-commons/digest {:mvn/version "1.4.100"}}
+ :deps {org.clj-commons/digest {:mvn/version "1.4.100"}
+        metosin/malli {:mvn/version "0.16.4"}
+        org.clojure/test.check {:mvn/version "1.1.1"}}
  ;; cheshire + babashka.fs + babashka.process ship with Babashka.
  :tasks
  {;; Prefer: harness/clj-spike/bin/spike <task> --root …
@@ -28,13 +30,18 @@
    :requires ([loyly.spike.demo :as d])
    :task (apply d/-main *command-line-args*)}
 
+  formal
+  {:doc "Formal verification: Malli models, traceability, properties"
+   :task (shell {:dir "."} "bb" "scripts/formal.clj")}
+
   lint
   {:doc "clj-kondo + loyly product-literal / deep-import (TS eslint)"
    :task (shell {:dir "."} "bb" "scripts/analyze.clj" "lint")}
 
   analyze
-  {:doc "Full static analysis: lint + deps + dead + dupes + metrics"
-   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze")}
+  {:doc "Full static analysis: lint + deps + dead + dupes + metrics + formal"
+   :task (do (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze")
+             (shell {:dir "."} "bb" "scripts/formal.clj"))}
 
   analyze:deps
   {:doc "Require-graph cycles (TS madge)"

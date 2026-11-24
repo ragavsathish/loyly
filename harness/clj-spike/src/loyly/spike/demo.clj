@@ -11,6 +11,8 @@
             [loyly.spike.cycle-effects :as effects]
             [loyly.spike.digest :as d]
             [loyly.spike.evidence.validate-identity :as ident]
+            [loyly.spike.formal.models :as formal]
+            [loyly.spike.formal.trace :as ftrace]
             [loyly.spike.gate-adapter :as gate]
             [loyly.spike.gate-effects :as gate-fx]
             [loyly.spike.gen-checklist :as checklist]
@@ -104,6 +106,11 @@
                 (die "expected specialist checks on booking-core panel plan"))
             _ (when-not (contracts/selected-checklist? checklist)
                 (die "contracts selected-checklist? rejected booking-core"))
+            _ (let [cert (ftrace/certificate (str repo))]
+                (when-not (and (:registry-digest cert)
+                               (get-in cert [:panel :ok]))
+                  (die "formal certificate failed"))
+                (formal/assert! :sha256 (:registry-digest cert)))
             _ (when-not (ws/exists? (str scratch))
                 (die "workspace-effects exists? failed"))
             _ (when-not (fn? allure/read-allure-results)

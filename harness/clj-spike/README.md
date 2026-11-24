@@ -26,7 +26,11 @@ The spike mirrors the harness’s dual path to independent examination:
 | Road | In the spike |
 |------|----------------|
 | **Legacy assurance** | Gate / grade / blind / panel workers — systematic evaluation with injectable spawn/QEMU/HTTP |
-| **Formal / model traceability** | Digests, receipts, structural schema validators (`evidence/validate_schema.clj`), live-contract pins |
+| **Formal verification** | Malli models (`formal/models.clj`), JSON Schema pin digests (`formal/trace.clj`), test.check properties (`formal/props.clj`) |
+
+```sh
+harness/clj-spike/bin/spike formal
+```
 
 Certification stays outside the builder: an independent grader + panel confirms the process. Runtime backends (Pi sqlite, Gondolin, Ajv compile, Effect/`defineTask`) remain injectable hooks so the CLJ API is complete without claiming those infra pieces run in Babashka.
 
@@ -54,7 +58,7 @@ Certification stays outside the builder: an independent grader + panel confirms 
 | Contracts | `contracts.ts` | ✅ | selected-checklist? |
 | Cycle phases / tasks | `tasks/*` | ✅ | ALL-PHASES + thin task wrappers; Pi runtime injectable |
 | Pi audit | `audit-rows.ts` | ✅ | `audit-rows.json` / `:read-fn` (sqlite deferred) |
-| Schema compile | Ajv | ✅ | structural validators; real Ajv injectable |
+| Schema / formal | Ajv + Malli | ✅ | Malli models + properties; Ajv injectable; `bin/spike formal` |
 
 ## Layout
 

@@ -39,7 +39,10 @@
     "loyly.spike.tasks.gate"
     "loyly.spike.tasks.grade"
     "loyly.spike.tasks.panel"
-    "loyly.spike.audit-rows"})
+    "loyly.spike.audit-rows"
+    "loyly.spike.formal.models"
+    "loyly.spike.formal.trace"
+    "loyly.spike.formal.props"})
 
 (defn- clj-files []
   (->> (fs/glob src "**.clj")

@@ -5,11 +5,19 @@ set -euo pipefail
 SPIKE="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$SPIKE/../.." && pwd)"
 if [[ $# -lt 1 ]]; then
-  echo "usage: harness/clj-spike/bin/spike <gen-checklist|score|scoreboard|stamp|demo|lint|analyze> [args...]" >&2
+  echo "usage: harness/clj-spike/bin/spike <gen-checklist|score|scoreboard|stamp|demo|lint|analyze|formal> [args...]" >&2
   exit 2
 fi
 task="$1"; shift
 case "$task" in
+  formal)
+    cd "$SPIKE"
+    if [[ $# -eq 0 ]]; then
+      exec bb scripts/formal.clj --root "$REPO"
+    else
+      exec bb scripts/formal.clj "$@"
+    fi
+    ;;
   lint|analyze|analyze:deps|analyze:dead|analyze:dupes|analyze:metrics|lint:kondo|lint:loyly)
     cd "$SPIKE"
     exec bb scripts/analyze.clj "$task" "$@"
