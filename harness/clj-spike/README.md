@@ -31,7 +31,15 @@ The spike mirrors the harness’s dual path to independent examination:
 ```sh
 harness/clj-spike/bin/spike formal              # prove model + cycle invariants
 harness/clj-spike/bin/spike formal --theory     # print 𝒜 and 𝒞
+harness/clj-spike/bin/spike cycle list          # Pi / Codex / Cursor wrappers
+harness/clj-spike/bin/spike cycle pi --check <live-run.json>
+harness/clj-spike/bin/spike cycle codex preflight <contract.json>
+harness/clj-spike/bin/spike cycle cursor decide <attempt.json>
 ```
+
+The `cycle` command is a thin Babashka spawn over the authoritative Node CLIs
+(`pi-durable/run-live.mjs`, `codex-cycle/cli.ts`, `cursor-cycle/cli.ts`). It
+does not replace those drivers.
 
 ### Models 𝒜 and cycle 𝒞
 
@@ -87,6 +95,7 @@ Certification stays outside the builder: an independent grader + panel confirms 
 | Replay evidence | `replay-evidence.ts` | ✅ | `project-replay-evidence` (injected rows) |
 | Contracts | `contracts.ts` | ✅ | selected-checklist? |
 | Cycle phases / tasks | `tasks/*` | ✅ | ALL-PHASES + thin task wrappers; Pi runtime injectable |
+| Cycle drivers (Pi/Codex/Cursor) | `run-live` / `*-cycle/cli.ts` | ✅ | `drivers.clj` spawns Node; `bin/spike cycle` |
 | Pi audit | `audit-rows.ts` | ✅ | `audit-rows.json` / `:read-fn` (sqlite deferred) |
 | Schema / formal | Ajv + Malli | ✅ | Own `formal/src` (`loyly.formal.*`); Ajv injectable; `bin/spike formal` |
 

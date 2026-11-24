@@ -12,6 +12,7 @@
             [loyly.spike.contracts :as contracts]
             [loyly.spike.cycle-effects :as effects]
             [loyly.spike.digest :as d]
+            [loyly.spike.drivers :as drivers]
             [loyly.spike.evidence.validate-identity :as ident]
             [loyly.spike.gate-adapter :as gate]
             [loyly.spike.gate-effects :as gate-fx]
@@ -111,6 +112,15 @@
                                (get-in cert [:panel :ok]))
                   (die "formal certificate failed"))
                 (formal/assert! :sha256 (:registry-digest cert)))
+            _ (let [cat (drivers/catalog)]
+                (when-not (= 3 (count (:drivers cat)))
+                  (die "drivers catalog drifted (expected pi/codex/cursor)"))
+                (doseq [d (:drivers cat)]
+                  (when-not (fs/regular-file? (fs/path repo (:script d)))
+                    (die (str "driver script missing: " (:script d))))
+                  (when-let [re (:reassess d)]
+                    (when-not (fs/regular-file? (fs/path repo re))
+                      (die (str "reassess script missing: " re))))))
             _ (when-not (ws/exists? (str scratch))
                 (die "workspace-effects exists? failed"))
             _ (when-not (fn? allure/read-allure-results)

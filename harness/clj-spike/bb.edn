@@ -30,6 +30,11 @@
    :requires ([loyly.spike.demo :as d])
    :task (apply d/-main *command-line-args*)}
 
+  cycle
+  {:doc "CLJ wrapper: Pi / Codex / Cursor cycle drivers (spawns Node)"
+   :requires ([loyly.spike.drivers :as drivers])
+   :task (apply drivers/-main *command-line-args*)}
+
   formal
   {:doc "Formal verification module (loyly.formal.*)"
    :requires ([loyly.formal.main :as formal])
