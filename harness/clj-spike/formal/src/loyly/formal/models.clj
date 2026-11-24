@@ -1,4 +1,4 @@
-(ns loyly.spike.formal.models
+(ns loyly.formal.models
   "Mathematical models (Malli) for Löyly spike contracts.
   Formal-verification road: schemas define the system; validators prove
   instances obey them. Traceability to TS JSON Schema lives in formal.trace."

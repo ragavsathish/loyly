@@ -1,12 +1,12 @@
-(ns loyly.spike.formal.props
+(ns loyly.formal.props
   "Property-based proofs over formal models (test.check + Malli generators)."
   (:require [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
+            [loyly.formal.cycle :as cycle]
+            [loyly.formal.models :as models]
             [loyly.spike.continuation :as cont]
             [loyly.spike.digest :as d]
-            [loyly.spike.formal.cycle :as cycle]
-            [loyly.spike.formal.models :as models]
             [loyly.spike.project.loyly :as loyly]
             [malli.generator :as mg]))
 

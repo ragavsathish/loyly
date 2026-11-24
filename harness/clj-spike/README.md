@@ -26,7 +26,7 @@ The spike mirrors the harness’s dual path to independent examination:
 | Road | In the spike |
 |------|----------------|
 | **Legacy assurance** | Gate / grade / blind / panel workers — systematic evaluation with injectable spawn/QEMU/HTTP |
-| **Formal verification** | Models 𝒜 = (𝒮,𝒫,ℱ,ℐ) plus cycle 𝒞 = (Q,q₀,→,L,F) in `formal/` |
+| **Formal verification** | Own modules under `formal/src` (`loyly.formal.*`) — 𝒜 + 𝒞 |
 
 ```sh
 harness/clj-spike/bin/spike formal              # prove model + cycle invariants
@@ -43,16 +43,16 @@ harness/clj-spike/bin/spike formal --theory     # print 𝒜 and 𝒞
 
 | Symbol | Meaning | Code |
 |--------|---------|------|
-| \(\mathcal{S}\) | sorts (carriers) | `formal.models/Registry` (28 sorts: LiveRun, rooms, panel/score, shards, continuation, audit, worker-config) |
-| \(\mathcal{P}\) | \(\mathrm{Valid}_s(x)\) | `models/valid?` |
-| \(\mathcal{F}\) | \(H\), \(\delta\), \(\Delta\), \(\iota\) | digest + trace |
-| \(\mathcal{I}\) | I1–I13 | `formal.props` + `formal.trace` |
-| \(Q\) | ALL-PHASES | `formal.cycle/Q` |
-| \(q_0\) | cut | `formal.cycle/q0` |
-| \(\to\) | linear succ | `formal.cycle/succ` |
-| \(L\) | phase ↦ model obligations | `formal.cycle/labeling` |
-| \(F\) | \{done\} | `formal.cycle/F` |
-| C1–C5 | cycle invariants | `formal.cycle/prove-cycle!` |
+| \(\mathcal{S}\) | sorts (carriers) | `loyly.formal.models/Registry` (28 sorts) |
+| \(\mathcal{P}\) | \(\mathrm{Valid}_s(x)\) | `loyly.formal.models/valid?` |
+| \(\mathcal{F}\) | \(H\), \(\delta\), \(\Delta\), \(\iota\) | digest + `loyly.formal.trace` |
+| \(\mathcal{I}\) | I1–I13 | `loyly.formal.props` + `loyly.formal.trace` |
+| \(Q\) | ALL-PHASES | `loyly.formal.cycle/Q` |
+| \(q_0\) | cut | `loyly.formal.cycle/q0` |
+| \(\to\) | linear succ | `loyly.formal.cycle/succ` |
+| \(L\) | phase ↦ model obligations | `loyly.formal.cycle/labeling` |
+| \(F\) | \{done\} | `loyly.formal.cycle/F` |
+| C1–C5 | cycle invariants | `loyly.formal.cycle/prove-cycle!` |
 
 \[
 \mathrm{run} = q_0 \xrightarrow{*} \mathrm{done}
@@ -88,19 +88,17 @@ Certification stays outside the builder: an independent grader + panel confirms 
 | Contracts | `contracts.ts` | ✅ | selected-checklist? |
 | Cycle phases / tasks | `tasks/*` | ✅ | ALL-PHASES + thin task wrappers; Pi runtime injectable |
 | Pi audit | `audit-rows.ts` | ✅ | `audit-rows.json` / `:read-fn` (sqlite deferred) |
-| Schema / formal | Ajv + Malli | ✅ | Malli models + properties; Ajv injectable; `bin/spike formal` |
+| Schema / formal | Ajv + Malli | ✅ | Own `formal/src` (`loyly.formal.*`); Ajv injectable; `bin/spike formal` |
 
 ## Layout
 
 ```
 harness/clj-spike/
   bin/spike  bb.edn
-  src/loyly/spike/
-    hjson.clj digest.clj receipt_fields.clj
-    measure ports, score_receipt, live_contract, grading_room, …
-    gate_adapter.clj builder_adapter.clj panel_vm.clj
-    demo.clj
-    evidence/…  project/loyly/…  project/loyly.clj
+  src/loyly/spike/          # assurance ports (TS→CLJ)
+  formal/src/loyly/formal/  # formal verification modules (own ns)
+    models.clj cycle.clj props.clj theory.clj trace.clj main.clj
+  formal/README.md
 ```
 
 ## Run

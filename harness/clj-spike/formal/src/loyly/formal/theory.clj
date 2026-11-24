@@ -1,4 +1,4 @@
-(ns loyly.spike.formal.theory
+(ns loyly.formal.theory
   "Explicit mathematical theory for the clj-spike.
 
   We treat the spike as a many-sorted structure:
@@ -12,9 +12,9 @@
 
   This is the formal-verification road: models define the system;
   properties and pins prove instances and artifacts obey them."
-  (:require [loyly.spike.formal.cycle :as cycle]
-            [loyly.spike.formal.models :as models]
-            [loyly.spike.formal.trace :as trace]
+  (:require [loyly.formal.cycle :as cycle]
+            [loyly.formal.models :as models]
+            [loyly.formal.trace :as trace]
             [loyly.spike.project.loyly :as loyly]
             [malli.core :as m]))
 
@@ -42,11 +42,11 @@
        :law "∀ s. Valid_sha256(H(s)) ∧ |H(s)| = 64"}
    :registry-digest
    {:notation "Δ : 1 → Sha256"
-    :impl 'loyly.spike.formal.trace/registry-digest
+    :impl 'loyly.formal.trace/registry-digest
     :law "Δ pins the closed theory (all sort forms)"}
    :model-digest
    {:notation "δ : SortName → Sha256"
-    :impl 'loyly.spike.formal.trace/model-digest
+    :impl 'loyly.formal.trace/model-digest
     :law "δ(s) = H(pr-str(form(s)))"}
    :blind-item
    {:notation "ι : 1 → ItemId"
@@ -57,43 +57,43 @@
   "Statements we treat as theorems (checked by props + trace)."
   [{:id :I1
     :statement "∀ s ∈ String. Valid_sha256(H(s))"
-    :proved-by 'loyly.spike.formal.props/prop-sha256-hex}
+    :proved-by 'loyly.formal.props/prop-sha256-hex}
    {:id :I2
     :statement "∀ s ∈ String. H(s) = H(s)"
-    :proved-by 'loyly.spike.formal.props/prop-sha256-deterministic}
+    :proved-by 'loyly.formal.props/prop-sha256-deterministic}
    {:id :I3
     :statement "∀ s ∈ String. |H(s)| = 64"
-    :proved-by 'loyly.spike.formal.props/prop-sha256-length}
+    :proved-by 'loyly.formal.props/prop-sha256-length}
    {:id :I4
     :statement "∀ p ∈ BlindPacket. p.item = ι"
-    :proved-by 'loyly.spike.formal.props/prop-blind-packet-item-fixed}
+    :proved-by 'loyly.formal.props/prop-blind-packet-item-fixed}
    {:id :I5
     :statement "∀ m ∈ SortNames. ∀ x ← Gen(m). Valid_m(x)"
-    :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}
+    :proved-by 'loyly.formal.props/prop-generated-obeys-model}
    {:id :I6
     :statement (str loyly/DEFAULT_PANEL_PLAN " ∈ PanelPlan")
-    :proved-by 'loyly.spike.formal.trace/prove-booking-panel!}
+    :proved-by 'loyly.formal.trace/prove-booking-panel!}
    {:id :I7
     :statement "TS JSON Schema files for panel/live/allure are present and digested"
-    :proved-by 'loyly.spike.formal.trace/pin-all-json-schemas!}
+    :proved-by 'loyly.formal.trace/pin-all-json-schemas!}
    {:id :I8
     :statement "∀ r ∈ LiveRun. schema∈{v1,v2} ∧ Valid_live-run(r)"
-    :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}
+    :proved-by 'loyly.formal.props/prop-generated-obeys-model}
    {:id :I9
     :statement "∀ g ∈ GradingRoom. g.schema = loyly.grading-room.v1"
-    :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}
+    :proved-by 'loyly.formal.props/prop-generated-obeys-model}
    {:id :I10
     :statement "∀ m ∈ PanelVmRun ∪ PanelReport. original_score_unchanged = true"
-    :proved-by 'loyly.spike.formal.props/prop-generated-obeys-model}
+    :proved-by 'loyly.formal.props/prop-generated-obeys-model}
    {:id :I11
     :statement "∀ s ∈ PanelSelection. s.attempt ∈ {1,2}"
-    :proved-by 'loyly.spike.formal.props/prop-panel-selection-attempt}
+    :proved-by 'loyly.formal.props/prop-panel-selection-attempt}
    {:id :I12
     :statement "∀ shards ∈ GraderShards. 1 ≤ |shards| ≤ 16 ∧ unique ids"
-    :proved-by 'loyly.spike.formal.props/prop-grader-shards-bounded}
+    :proved-by 'loyly.formal.props/prop-grader-shards-bounded}
    {:id :I13
     :statement "MAX_CONTINUATIONS = 3"
-    :proved-by 'loyly.spike.formal.props/prop-continuation-max}])
+    :proved-by 'loyly.formal.props/prop-continuation-max}])
 
 (def Morphisms
   "Traceability arrows from formal sorts to published TS artifacts."

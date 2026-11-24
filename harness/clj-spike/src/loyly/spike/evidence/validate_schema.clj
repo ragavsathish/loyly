@@ -1,7 +1,7 @@
 (ns loyly.spike.evidence.validate-schema
   "Schema validators for pi-durable contracts.
-  Formal road: Malli models in loyly.spike.formal.models. Ajv remains injectable."
-  (:require [loyly.spike.formal.models :as models]))
+  Default predicates use the formal module (loyly.formal.models); Ajv injectable."
+  (:require [loyly.formal.models :as models]))
 
 (defn- fail! [msg explain]
   (throw (ex-info msg {:explain explain})))

@@ -1,17 +1,21 @@
-#!/usr/bin/env bb
-;; Formal verification gate for clj-spike (models + traceability + properties).
-(ns loyly.spike.scripts.formal
+(ns loyly.formal.main
+  "CLI entry for the formal-verification module (prove / print theory)."
   (:require [babashka.fs :as fs]
-            [clojure.string :as str]
-            [loyly.spike.formal.cycle :as cycle]
-            [loyly.spike.formal.models :as models]
-            [loyly.spike.formal.props :as props]
-            [loyly.spike.formal.theory :as theory]
-            [loyly.spike.formal.trace :as trace]
+            [loyly.formal.cycle :as cycle]
+            [loyly.formal.models :as models]
+            [loyly.formal.props :as props]
+            [loyly.formal.theory :as theory]
+            [loyly.formal.trace :as trace]
             [loyly.spike.hjson :as hjson]))
 
-(def root (-> *file* fs/parent fs/parent))
-(def repo (-> root fs/parent fs/parent))
+(defn- default-repo
+  "Resolve git repo root from clj-spike cwd (bb runs with cwd = clj-spike)."
+  []
+  (let [cwd (str (fs/cwd))
+        candidate (fs/path cwd ".." "..")]
+    (if (fs/directory? (fs/path candidate "harness"))
+      (str (fs/absolutize candidate))
+      (str (fs/absolutize (fs/path cwd ".." ".." ".."))))))
 
 (defn- out! [m]
   (println (hjson/compact-json m)))
@@ -20,7 +24,7 @@
   (let [args (vec args)
         mode (if (some #{"--theory"} args) :theory :prove)
         repo (or (second (drop-while #(not= "--root" %) args))
-                 (str repo))
+                 (default-repo))
         𝒜 (theory/theory)]
     (case mode
       :theory
@@ -70,6 +74,3 @@
           :sample-blind-item (get sample "item")})
         (println "formal OK")
         :ok))))
-
-(when (= *file* (System/getProperty "babashka.file"))
-  (apply -main *command-line-args*))

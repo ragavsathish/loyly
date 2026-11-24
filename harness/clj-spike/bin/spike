@@ -12,15 +12,15 @@ task="$1"; shift
 case "$task" in
   formal)
     cd "$SPIKE"
-    # Preserve flags like --theory; default --root when omitted.
+    # Formal verification lives in formal/src (loyly.formal.*).
     has_root=0
     for a in "$@"; do
       if [[ "$a" == "--root" ]]; then has_root=1; break; fi
     done
     if [[ $has_root -eq 0 ]]; then
-      exec bb scripts/formal.clj "$@" --root "$REPO"
+      exec bb -m loyly.formal.main "$@" --root "$REPO"
     else
-      exec bb scripts/formal.clj "$@"
+      exec bb -m loyly.formal.main "$@"
     fi
     ;;
   lint|analyze|analyze:deps|analyze:dead|analyze:dupes|analyze:metrics|lint:kondo|lint:loyly)

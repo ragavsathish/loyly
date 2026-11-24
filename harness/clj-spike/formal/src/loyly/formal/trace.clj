@@ -1,10 +1,10 @@
-(ns loyly.spike.formal.trace
+(ns loyly.formal.trace
   "Traceability proofs between formal models, TS JSON Schema files, and
   concrete artifacts (digests / receipts / panel plans)."
   (:require [babashka.fs :as fs]
             [clojure.string :as str]
+            [loyly.formal.models :as models]
             [loyly.spike.digest :as d]
-            [loyly.spike.formal.models :as models]
             [loyly.spike.hjson :as hjson]
             [loyly.spike.project.loyly :as loyly]))
 

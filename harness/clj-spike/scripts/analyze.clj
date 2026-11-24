@@ -12,6 +12,7 @@
 
 (def root (-> *file* fs/parent fs/parent))
 (def src (fs/path root "src"))
+(def formal-src (fs/path root "formal" "src"))
 
 (def banned-literals
   [{:value "01-011" :hint "BLIND_ITEM_ID"}
@@ -25,7 +26,7 @@
 ;; Match eslint-plugin-loyly allow paths (+ scripts/ for this checker).
 ;; CLJ barrel is project/loyly.clj (TS keeps index.ts under project/loyly/).
 (def allow-product-path
-  #"project/loyly\.clj|project/loyly/|scripts/")
+  #"project/loyly\.clj|project/loyly/|formal/|scripts/")
 
 (def entry-namespaces
   "CLI / task roots that keep a namespace alive (knip entry equivalents)."
@@ -40,14 +41,17 @@
     "loyly.spike.tasks.grade"
     "loyly.spike.tasks.panel"
     "loyly.spike.audit-rows"
-    "loyly.spike.formal.models"
-    "loyly.spike.formal.trace"
-    "loyly.spike.formal.props"
-    "loyly.spike.formal.theory"
-    "loyly.spike.formal.cycle"})
+    "loyly.formal.main"
+    "loyly.formal.models"
+    "loyly.formal.trace"
+    "loyly.formal.props"
+    "loyly.formal.theory"
+    "loyly.formal.cycle"})
 
 (defn- clj-files []
-  (->> (fs/glob src "**.clj")
+  (->> (concat (fs/glob src "**.clj")
+               (when (fs/directory? formal-src)
+                 (fs/glob formal-src "**.clj")))
        (map str)
        sort))
 
@@ -58,7 +62,8 @@
   (second (re-find #"^\(ns\s+([^\s\)]+)" (slurp path))))
 
 (defn- spike-requires [path]
-  (->> (re-seq #"\[(loyly\.spike[a-z0-9.-]*)(?:\s|:|\])" (slurp path))
+  "Requires into spike or formal modules (for the dep graph)."
+  (->> (re-seq #"\[(loyly\.(?:spike|formal)[a-z0-9.-]*)(?:\s|:|\])" (slurp path))
        (map second)
        set))
 
@@ -73,8 +78,10 @@
         (println "clj-kondo not found; install to PATH or ~/.local/bin"))
       (System/exit 2))
     (let [{:keys [exit out err]}
-          @(p/process [kondo "--lint" (str src)
-                       "--config" (str (fs/path root ".clj-kondo/config.edn"))]
+          @(p/process (cond-> [kondo "--lint" (str src)
+                               "--config" (str (fs/path root ".clj-kondo/config.edn"))]
+                        (fs/directory? formal-src)
+                        (into ["--lint" (str formal-src)]))
                       {:out :string :err :string :dir (str root)})]
       (print out)
       (print err)

@@ -1,4 +1,4 @@
-(ns loyly.spike.formal.cycle
+(ns loyly.formal.cycle
   "Mathematical model of the Löyly Pi cycle as a labeled transition system.
 
   Cycle 𝒞 = (Q, q₀, →, L, F)
@@ -11,7 +11,7 @@
 
   Concrete handlers live in tasks.cycle-phases; this ns is the closed math."
   (:require [clojure.test.check.generators :as gen]
-            [loyly.spike.formal.models :as models]
+            [loyly.formal.models :as models]
             [loyly.spike.project.loyly :as loyly]
             [loyly.spike.tasks.cycle-phases :as phases]
             [malli.core :as m]
