@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["*.ts", "*.d.ts", "*.d.mts", "*.mjs.d.ts", "tasks/**/*.ts", "project/**/*.ts"]
+  "include": ["pi-extension.ts"]
 }

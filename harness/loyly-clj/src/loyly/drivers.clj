@@ -1,11 +1,11 @@
 (ns loyly.drivers
   "Unified production cycle CLI for Pi / Codex / Cursor.
 
-  Pure/local actions (Pi --check, Codex/Cursor decide|candidate|evidence|panel)
-  run via shared .cljc modules (loyly.live-contract, loyly.adapters) by default.
-  Node async & backend actions (Pi --run, panel-reassess, Codex/Cursor preflight,
-  Codex reassess, or --ts) delegate through the ClojureScript Node wrapper
-  (loyly.node.cli via nbb)."
+  All pure/local actions (Pi --check, ALL Codex & Cursor actions including
+  preflight and reassess) run via shared .cljc modules (loyly.live-contract,
+  loyly.adapters). Node async & @earendil-works/pi-durable actions (Pi --run,
+  panel-reassess, worker, export-replay, render-allure) delegate through the
+  thin ClojureScript Node wrapper (loyly.node.cli via nbb)."
   (:require [babashka.fs :as fs]
             [babashka.process :as p]
             [clojure.string :as str]
@@ -15,9 +15,6 @@
 
 (def ADAPTER-ACTIONS
   ["preflight" "candidate" "decide" "evidence" "panel"])
-
-(def CLJC-ADAPTER-ACTIONS
-  #{"candidate" "decide" "evidence" "panel"})
 
 (def PI-ACTIONS
   ["--check" "--run"])
@@ -32,10 +29,9 @@
    [{:id "pi"
      :kind "durable-live"
      :backend "loyly-clj"
-     :script "harness/pi-durable/run-live.mjs"
-     :reassess "harness/pi-durable/reassess-panel.mjs"
+     :extension "harness/pi-durable/pi-extension.ts"
      :cljc-actions ["--check"]
-     :cljs-node-actions ["--run" "panel-reassess"]
+     :cljs-node-actions ["--run" "panel-reassess" "worker" "export-replay" "render-allure" "blind-review" "supplemental-grade"]
      :actions PI-ACTIONS
      :usage "loyly-clj cycle pi --check <live-run.json>
   loyly-clj cycle pi --run <live-run.json>
@@ -43,23 +39,17 @@
     {:id "codex"
      :kind "orchestrator-adapter"
      :backend "loyly-clj"
-     :script "harness/codex-cycle/cli.ts"
-     :cljc-actions (vec CLJC-ADAPTER-ACTIONS)
-     :cljs-node-actions ["preflight" "reassess"]
-     :reassess "harness/codex-cycle/reassessment-cli.ts"
-     :actions ADAPTER-ACTIONS
-     :usage "loyly-clj cycle codex decide|candidate|evidence|panel <input.json>
-  loyly-clj cycle codex preflight <contract.json>
-  loyly-clj cycle codex reassess <contract.json>"}
+     :cljc-actions (conj ADAPTER-ACTIONS "reassess")
+     :cljs-node-actions []
+     :actions (conj ADAPTER-ACTIONS "reassess")
+     :usage "loyly-clj cycle codex preflight|decide|candidate|evidence|panel|reassess <input.json>"}
     {:id "cursor"
      :kind "orchestrator-adapter"
      :backend "loyly-clj"
-     :script "harness/cursor-cycle/cli.ts"
-     :cljc-actions (vec CLJC-ADAPTER-ACTIONS)
-     :cljs-node-actions ["preflight"]
+     :cljc-actions ADAPTER-ACTIONS
+     :cljs-node-actions []
      :actions ADAPTER-ACTIONS
-     :usage "loyly-clj cycle cursor decide|candidate|evidence|panel <input.json>
-  loyly-clj cycle cursor preflight <contract.json>"}]})
+     :usage "loyly-clj cycle cursor preflight|decide|candidate|evidence|panel <input.json>"}]})
 
 (defn- die!
   [msg]
@@ -86,14 +76,12 @@
 
 (defn- run-cljs-node!
   "Delegate to ClojureScript Node wrapper (nbb -m loyly.node.cli ...)."
-  [{:keys [repo args node]}]
+  [{:keys [repo args]}]
   (let [nbb (resolve-nbb repo)
         pkg-dir (str (fs/path repo "harness" "loyly-clj"))
         cmd (if nbb
               (into [nbb "-m" "loyly.node.cli"] args)
               (into ["npx" "--yes" "nbb" "-m" "loyly.node.cli"] args))
-        cmd (cond-> cmd
-              (and node (not= node "node")) (into ["--node" node]))
         result @(p/process cmd
                            {:dir pkg-dir
                             :env (into {} (System/getenv))
@@ -120,12 +108,13 @@
       1)))
 
 (defn- invoke-adapter-cljc!
-  [{:keys [driver action input]}]
+  [{:keys [repo driver action input]}]
   (when-not (fs/regular-file? input)
     (die! (str "missing input JSON: " input)))
   (try
     (let [report (adapters/dispatch (keyword driver) action
-                                    (str (fs/absolutize input)))]
+                                    (str (fs/absolutize input))
+                                    repo)]
       (println (hjson/compact-json report))
       0)
     (catch Exception e
@@ -135,65 +124,37 @@
 
 (defn invoke!
   "Dispatch to one driver. Returns process exit code."
-  [{:keys [driver action args root node ts?]
-    :or {node "node"}
-    :as opts}]
+  [{:keys [driver action args root] :as opts}]
   (let [repo (resolve-repo root)
-        opts (assoc opts :repo repo :node node)
-        forward-cljs (fn [cli-args]
-                       (run-cljs-node!
-                        {:repo repo
-                         :node node
-                         :args (cond-> (into ["cycle" (name driver) action] cli-args)
-                                 true (into ["--root" repo])
-                                 ts? (conj "--ts"))}))]
+        opts (assoc opts :repo repo)]
     (case (keyword driver)
       :pi
       (let [[contract] args]
         (when-not contract
-          (die! "usage: loyly-clj cycle pi --check|--run <live-run.json> [--ts]"))
-        (cond
-          (and (= action "--check") (not ts?))
-          (invoke-pi-check-cljc! (assoc opts :contract contract))
-
-          (some #{action} PI-ACTIONS)
-          (forward-cljs [(str (fs/absolutize contract))])
-
-          :else
+          (die! "usage: loyly-clj cycle pi --check|--run <live-run.json>"))
+        (case action
+          "--check" (invoke-pi-check-cljc! (assoc opts :contract contract))
+          "--run" (run-cljs-node!
+                   {:repo repo
+                    :args ["cycle" "pi" "--run" (str (fs/absolutize contract)) "--root" repo]})
           (die! (str "pi actions: " (str/join "|" PI-ACTIONS)))))
 
       :codex
-      (cond
-        (= action "reassess")
-        (let [[contract] args]
-          (when-not contract
-            (die! "usage: loyly-clj cycle codex reassess <contract.json>"))
-          (forward-cljs [(str (fs/absolutize contract))]))
-
-        (and (not ts?) (contains? CLJC-ADAPTER-ACTIONS action))
-        (let [[input] args]
-          (when-not input
-            (die! "usage: loyly-clj cycle codex <action> <input.json>"))
-          (invoke-adapter-cljc! {:driver :codex :action action :input input}))
-
-        (some #{action} ADAPTER-ACTIONS)
-        (let [[input] args]
-          (when-not input
-            (die! "usage: loyly-clj cycle codex <action> <input.json> [--ts]"))
-          (forward-cljs [(str (fs/absolutize input))]))
-
-        :else
-        (die! (str "codex actions: " (str/join "|" (conj ADAPTER-ACTIONS "reassess")))))
+      (let [valid (conj ADAPTER-ACTIONS "reassess")
+            [input] args]
+        (when-not (some #{action} valid)
+          (die! (str "codex actions: " (str/join "|" valid))))
+        (when-not input
+          (die! "usage: loyly-clj cycle codex preflight|candidate|decide|evidence|panel|reassess <input.json>"))
+        (invoke-adapter-cljc! {:repo repo :driver :codex :action action :input input}))
 
       :cursor
       (let [[input] args]
         (when-not (some #{action} ADAPTER-ACTIONS)
           (die! (str "cursor actions: " (str/join "|" ADAPTER-ACTIONS))))
         (when-not input
-          (die! "usage: loyly-clj cycle cursor <action> <input.json> [--ts]"))
-        (if (and (not ts?) (contains? CLJC-ADAPTER-ACTIONS action))
-          (invoke-adapter-cljc! {:driver :cursor :action action :input input})
-          (forward-cljs [(str (fs/absolutize input))])))
+          (die! "usage: loyly-clj cycle cursor preflight|candidate|decide|evidence|panel <input.json>"))
+        (invoke-adapter-cljc! {:repo repo :driver :cursor :action action :input input}))
 
       (die! (str "unknown driver: " driver " (expected pi|codex|cursor)")))))
 
@@ -201,27 +162,20 @@
   (binding [*out* *err*]
     (println "usage:")
     (println "  loyly-clj cycle list")
-    (println "  loyly-clj cycle pi --check <live-run.json>")
-    (println "  loyly-clj cycle pi --run <live-run.json>")
-    (println "  loyly-clj cycle cursor|codex decide|candidate|evidence|panel <input.json>")
-    (println "  loyly-clj cycle cursor|codex preflight <contract.json>")
-    (println "  loyly-clj cycle codex reassess <contract.json>")
+    (println "  loyly-clj cycle pi --check|--run <live-run.json>")
+    (println "  loyly-clj cycle codex preflight|candidate|decide|evidence|panel|reassess <input.json>")
+    (println "  loyly-clj cycle cursor preflight|candidate|decide|evidence|panel <input.json>")
     (println)
-    (println "Core logic runs via shared .cljc modules; Node async/backend steps")
-    (println "(pi --run, preflight, reassess, --ts) delegate to loyly.node.cli (.cljs).")
-    (println "Options: --root <repo>  --node <bin>  --ts")))
+    (println "All core/adapter logic runs in shared .cljc; Pi --run delegates to loyly.node.cli (.cljs).")
+    (println "Options: --root <repo>")))
 
 (defn- parse-opts
   [args]
-  (loop [args (vec args) acc {:args [] :ts? false}]
+  (loop [args (vec args) acc {:args []}]
     (if-let [a (first args)]
       (cond
         (= a "--root")
         (recur (nnext args) (assoc acc :root (second args)))
-        (= a "--node")
-        (recur (nnext args) (assoc acc :node (second args)))
-        (= a "--ts")
-        (recur (next args) (assoc acc :ts? true))
         (#{"-h" "--help" "help"} a)
         (assoc acc :help true)
         :else
@@ -230,7 +184,7 @@
 
 (defn -main
   [& argv]
-  (let [{:keys [args root node help ts?]} (parse-opts argv)]
+  (let [{:keys [args root help]} (parse-opts argv)]
     (when (or help (empty? args))
       (print-help)
       (System/exit (if help 0 2)))
@@ -248,7 +202,5 @@
             code (invoke! {:driver driver
                            :action action
                            :args (vec rest)
-                           :root root
-                           :node (or node "node")
-                           :ts? ts?})]
+                           :root root})]
         (System/exit (or code 1))))))

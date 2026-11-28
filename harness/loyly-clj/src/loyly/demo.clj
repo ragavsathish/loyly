@@ -116,11 +116,9 @@
                 (when-not (= 3 (count (:drivers cat)))
                   (die "drivers catalog drifted (expected pi/codex/cursor)"))
                 (doseq [d (:drivers cat)]
-                  (when-not (fs/regular-file? (fs/path repo (:script d)))
-                    (die (str "driver script missing: " (:script d))))
-                  (when-let [re (:reassess d)]
-                    (when-not (fs/regular-file? (fs/path repo re))
-                      (die (str "reassess script missing: " re))))))
+                  (when-let [ext (:extension d)]
+                    (when-not (fs/regular-file? (fs/path repo ext))
+                      (die (str "driver extension missing: " ext))))))
             _ (when-not (ws/exists? (str scratch))
                 (die "workspace-effects exists? failed"))
             _ (when-not (fn? allure/read-allure-results)

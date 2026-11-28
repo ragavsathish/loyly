@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-exec node "$ROOT/harness/pi-durable/run-live.mjs" "$@"
+exec "$ROOT/bin/loyly-clj" node cycle pi "$@"

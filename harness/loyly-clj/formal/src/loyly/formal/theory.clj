@@ -96,7 +96,7 @@
     :proved-by 'loyly.formal.props/prop-continuation-max}])
 
 (def Morphisms
-  "Traceability arrows from formal sorts to published TS artifacts."
+  "Traceability arrows from formal sorts to published schemas and .cljc sources."
   [{:from :panel-plan
     :to "harness/pi-durable/panel-plan.schema.json"
     :kind :json-schema-pin}
@@ -113,32 +113,32 @@
     :to (str "harness/pi-durable/" loyly/DEFAULT_PANEL_PLAN)
     :kind :fixture-instance}
    {:from :grading-room
-    :to "harness/pi-durable/grading-room.ts"
-    :kind :ts-source}
+    :to "harness/loyly-clj/src/loyly/grading_room.cljc"
+    :kind :cljc-source}
    {:from :panel-vm-run
-    :to "harness/pi-durable/panel-vm-run.ts"
-    :kind :ts-source}
+    :to "harness/loyly-clj/src/loyly/panel_vm.cljc"
+    :kind :cljc-source}
    {:from :panel-report
-    :to "harness/pi-durable/panel-compile.ts"
-    :kind :ts-source}
+    :to "harness/loyly-clj/src/loyly/panel_compile.cljc"
+    :kind :cljc-source}
    {:from :score-input
-    :to "harness/pi-durable/score-receipt.ts"
-    :kind :ts-source}
+    :to "harness/loyly-clj/src/loyly/score_receipt.cljc"
+    :kind :cljc-source}
    {:from :panel-selection
-    :to "harness/pi-durable/panel-adapter.ts"
-    :kind :ts-source}
+    :to "harness/loyly-clj/src/loyly/panel_adapter.cljc"
+    :kind :cljc-source}
    {:from :grader-shards
-    :to "harness/pi-durable/grader-shards.ts"
-    :kind :ts-source}
+    :to "harness/loyly-clj/src/loyly/grader_shards.cljc"
+    :kind :cljc-source}
    {:from :continuation-ids
-    :to "harness/pi-durable/continuation.ts"
-    :kind :ts-source}
+    :to "harness/loyly-clj/src/loyly/continuation.cljc"
+    :kind :cljc-source}
    {:from :audit-rows
-    :to "harness/pi-durable/audit-rows.ts"
-    :kind :ts-source}
+    :to "harness/loyly-clj/src/loyly/audit_rows.cljc"
+    :kind :cljc-source}
    {:from :worker-config
-    :to "harness/pi-durable/worker-config.ts"
-    :kind :ts-source}])
+    :to "harness/loyly-clj/src/loyly/worker_config.cljc"
+    :kind :cljc-source}])
 
 (defn theory
   "Closed description of 𝒜 for export / examination, plus cycle 𝒞."

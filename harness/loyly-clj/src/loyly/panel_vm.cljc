@@ -177,10 +177,14 @@
                  (not= (get receipt "worker_bundle_sha256") (:sha256 bundle)))
             (and (not (:sha256 bundle))
                  (= (:script worker) "panel-runtime.mjs")
-                 (or (not= (get receipt "profile_validator_sha256")
-                           (d/file-sha256 (plat/path here "runtime-profile-evidence.mjs")))
-                     (not= (get receipt "profile_otel_schema_sha256")
-                           (d/file-sha256 (plat/path here "panel-otel-metrics.schema.json")))))
+                 (let [validator-path (let [cljc (plat/path here ".." "loyly-clj" "src" "loyly" "runtime_profile_evidence.cljc")]
+                                        (if (plat/regular-file? cljc)
+                                          cljc
+                                          (plat/path here "runtime-profile-evidence.mjs")))]
+                   (or (not= (get receipt "profile_validator_sha256")
+                             (d/file-sha256 validator-path))
+                       (not= (get receipt "profile_otel_schema_sha256")
+                             (d/file-sha256 (plat/path here "panel-otel-metrics.schema.json"))))))
             (and (get manifest "worker_support_sha256")
                  (not= (get receipt "worker_support_sha256")
                        (get manifest "worker_support_sha256")))
@@ -219,7 +223,9 @@
          pi-durable "harness/pi-durable"}}]
   (let [original (str (plat/absolutize original))
         out (str (plat/absolutize out))
-        here (plat/path original pi-durable)
+        here (if (plat/absolute? pi-durable)
+               pi-durable
+               (plat/path original pi-durable))
         manifest (hjson/read-json (plat/read-text (plat/path out "manifest.json")))
         score-input (run-binding original)
         candidate-sha256 (room/candidate-digest (plat/path original "fenced-room"))
@@ -231,8 +237,8 @@
         plan (hjson/read-json (plat/read-text plan-path))
         bundle (worker-bundle plan (str here))
         workers (specialist-workers plan (str here))
-        schema-file (plat/path here "../evidence-core/allure-lifecycle-result.schema.json")
-        validate ((schema/compile-allure-schema nil))]
+        schema-file (plat/path here "allure-lifecycle-result.schema.json")
+        validate (schema/compile-allure-schema nil)]
     (assert-panel-vm-manifest
      {:manifest manifest :score-input score-input :candidate-sha256 candidate-sha256
       :score-sha256 score-sha256 :plan-sha256 plan-sha256 :bundle bundle :workers workers

@@ -137,7 +137,7 @@
         (require-hash (plat/path settings) (get agent "settings_sha256"))))
     (when (= (get-in config ["builder" "model"]) (get-in config ["grader" "model"]))
       (throw (ex-info "builder and black-box grader must use different models" {})))
-    (require-hash (plat/path here "../evidence-core/allure-lifecycle-result.schema.json")
+    (require-hash (plat/path here "allure-lifecycle-result.schema.json")
                   (get-in config ["grader" "schema_sha256"]))
     (when-let [panel-cfg (get config "panel")]
       (require-hash (plat/path here (or (get panel-cfg "plan_file") loyly/DEFAULT_PANEL_PLAN))

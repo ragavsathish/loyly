@@ -76,6 +76,59 @@
         (write-log scratch name output)
         {:code 1 :output output :sha256 (hash-value output)}))))
 
+(def ^:private BUILDER-CACHE-DIRS
+  ["node_modules" ".tmp" ".npm-cache" ".npm" ".m2" ".cache" ".uv-cache" ".gradle"])
+
+(defn clear-builder-test-artifacts
+  "Remove transient download/build caches under room/impl before sealing the candidate."
+  [room]
+  (doseq [n BUILDER-CACHE-DIRS]
+    (plat/delete-tree (plat/path room "impl" n))))
+
+(defn verify-builder-scope
+  "Verify builder wrote only under impl/ and .builder/ and left required entrypoints."
+  ([room] (verify-builder-scope room true))
+  ([room require-entrypoints?]
+   (when (and require-entrypoints?
+              (or (not (plat/exists? (plat/path room "impl" "start.sh")))
+                  (not (plat/exists? (plat/path room "impl" "test.sh")))))
+     (throw (ex-info "builder did not leave both legacy app entrypoints" {:room room})))
+   (let [{:keys [exit out]}
+         (plat/exec-sync ["git" "status" "--porcelain=v1" "-z" "--untracked-files=all"]
+                         {:dir room})]
+     (when-not (zero? exit)
+       (throw (ex-info "cannot check builder write scope" {:room room})))
+     (doseq [line (remove str/blank? (str/split (or out "") #"\u0000"))]
+       (when-not (= "??" (subs line 0 (min 2 (count line))))
+         (throw (ex-info "builder modified a tracked clean-room file" {:line line})))
+       (let [p (subs line 3)]
+         (when-not (or (str/starts-with? p "impl/")
+                       (str/starts-with? p ".builder/"))
+           (throw (ex-info (str "builder wrote outside declared scope: " p) {:path p}))))))))
+
+(defn gate-room-for
+  "Create or reconcile an immutable per-attempt gate copy of the fenced room."
+  [{:keys [scratch room digest-candidate]} attempt digest]
+  (let [base (plat/path scratch (str "gate-" attempt))
+        gate-room (plat/path base "room")
+        marker (plat/path base "copy.json")]
+    (when (and (plat/exists? gate-room) (not (plat/exists? marker)))
+      (throw (ex-info "gate-room copy was interrupted; inspect its scratch directory" {:base base})))
+    (if-not (plat/exists? gate-room)
+      (do
+        (plat/create-dirs base)
+        (plat/copy-tree room gate-room)
+        (when-not (= (digest-candidate gate-room) digest)
+          (throw (ex-info "gate copy differs from candidate" {:gate-room gate-room})))
+        (hjson/spit-utf8 marker (hjson/compact-json {"candidateSha256" digest})))
+      (let [recorded (hjson/read-json (plat/read-text marker))
+            intent (plat/path scratch (str "gate-" attempt "-evidence") "intent.json")]
+        (when (or (not= (get recorded "candidateSha256") digest)
+                  (and (not (plat/exists? intent))
+                       (not= (digest-candidate gate-room) digest)))
+          (throw (ex-info "gate-room copy receipt differs from candidate" {:gate-room gate-room})))))
+    gate-room))
+
 (defn create-cycle-effects
   "Return a map of effect helpers mirroring createCycleEffects(paths)."
   [{:keys [root scratch room cut source-root approved-source-repo approved-commit
@@ -92,7 +145,16 @@
                                  :cut cut
                                  :source-root source-root
                                  :approved-source-repo approved-source-repo}))
-   :candidate-digest digest-candidate
+   :candidate-digest (fn
+                       ([] (digest-candidate room))
+                       ([candidate-room] (digest-candidate candidate-room)))
+   :clear-builder-test-artifacts (fn [] (clear-builder-test-artifacts room))
+   :verify-builder-scope (fn
+                           ([] (verify-builder-scope room true))
+                           ([req?] (verify-builder-scope room req?)))
+   :gate-room-for (fn [attempt digest]
+                    (gate-room-for {:scratch scratch :room room :digest-candidate digest-candidate}
+                                   attempt digest))
    :measure-log (fn [name run-fn] (measure-log scratch name run-fn))
    :root root
    :scratch scratch})

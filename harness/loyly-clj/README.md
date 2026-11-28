@@ -3,12 +3,20 @@
 Production Clojure/ClojureScript implementation of the Löyly harness and formal
 examiner under `harness/loyly-clj/`, with top-level entrypoint `bin/loyly-clj`.
 
-- **Shared core (`.cljc`)**: `src/loyly/**.cljc` (55 namespaces) runs identically
+- **Primary core (`.cljc`)**: `src/loyly/**.cljc` (60 namespaces) runs identically
   on **Babashka** (`bb`) and **Node ClojureScript** (`nbb`) via `loyly.platform`.
-- **Node async & backend adapters (`.cljs`)**: `src/loyly/node/*.cljs` wraps Node
-  async execution, native `fetch`, Pi durable workers (`worker.mjs`,
-  `reassess-panel.mjs`, sqlite `audit-rows.mjs`), and Codex/Cursor preflight &
-  reassessment CLIs directly on Node 22 via `nbb`.
+  Includes measure, contracts, digests, hjson, grading-room, blind-review,
+  blind-agent, panel selection/policy/compile/vm/reassess, shards, evidence,
+  Codex & Cursor adapters (preflight/candidate/decide/evidence/panel/reassess),
+  replay export, Allure rendering, supplemental grading, tasks, and `project/loyly`.
+- **Thin Node adapters (`.cljs`)**: `src/loyly/node/*.cljs` (5 namespaces) wraps
+  Node async subprocess/HTTP/ESM execution, Pi durable worker phase wiring,
+  panel reassessment, replay export, and Allure rendering directly on Node via `nbb`.
+- **Minimal `@earendil-works/*` TS extensions**:
+  - `harness/pi-durable/pi-extension.ts` — minimal `@earendil-works/pi-durable` /
+    `chord` / `pi-ai` SDK bridge (SQLite audit reader + `Harness`/`defineTask`/`defineExtension`).
+  - `.pi/harness/builder-host/` — minimal `@earendil-works/gondolin` +
+    `@earendil-works/pi-env` + `@earendil-works/pi-coding-agent` builder/grader VM host.
 - **Formal verification (`loyly.formal.*`)**: `formal/src/loyly/formal/*.clj`
   models theory $\mathcal{A}$ (28 Malli sorts, invariants I1–I13) and cycle LTS
   $\mathcal{C}$ (invariants C1–C5), pinned to the published JSON Schemas.
@@ -19,8 +27,9 @@ examiner under `harness/loyly-clj/`, with top-level entrypoint `bin/loyly-clj`.
 
 | Layer | Files | Runtime | Role |
 | --- | --- | --- | --- |
-| Cross-platform core | `src/loyly/**/*.cljc` | `bb` and `nbb` | Measure, contracts, digests, hjson, grading-room, blind-review, panel selection/policy/compile/vm, shards, evidence, adapters, tasks, `project/loyly` |
-| Node async & backend wrappers | `src/loyly/node/*.cljs` | `nbb` (Node 22) | Async subprocess/HTTP/ESM runtime, Pi `--run` / `panel-reassess` / sqlite audit rows, Codex & Cursor adapters + hook factories (`make-http-fetch-fn`, `make-allure-cli-fn`, `make-spawn-hook`) |
+| Primary cross-platform core | `src/loyly/**/*.cljc` | `bb` and `nbb` | Measure, contracts, digests, hjson, grading-room, blind-review/agent, panel selection/policy/compile/vm/reassess, shards, evidence, Codex/Cursor preflight/reassess/decide/candidate/evidence/panel, replay export, Allure rendering, supplemental grade, `project/loyly` |
+| Thin Node adapters | `src/loyly/node/*.cljs` | `nbb` (Node) | Async subprocess/HTTP/ESM runtime, Pi durable worker orchestration (`pi_worker.cljs`), Pi backend CLI (`pi_backend.cljs`), Codex/Cursor CLI (`adapters.cljs`, `cli.cljs`) |
+| Minimal `@earendil-works/*` TS extensions | `harness/pi-durable/pi-extension.ts`, `.pi/harness/builder-host/*.ts` | Node TS | Thin SDK boundary for `@earendil-works/pi-durable`, `@earendil-works/gondolin`, `@earendil-works/pi-env`, `@earendil-works/pi-coding-agent` |
 | Babashka CLI orchestration | `src/loyly/drivers.clj`, `src/loyly/demo.clj` | `bb` | Unified `bin/loyly-clj` front-end + full smoke verification |
 | Formal examiner | `formal/src/loyly/formal/*.clj` | `bb` (Malli + `test.check`) | Many-sorted theory $\mathcal{A}$, cycle LTS $\mathcal{C}$, schema traceability |
 
@@ -32,7 +41,7 @@ examiner under `harness/loyly-clj/`, with top-level entrypoint `bin/loyly-clj`.
 | SHA-256 | `org.clj-commons/digest` / `MessageDigest` | `node:crypto` |
 | Filesystem | `babashka.fs` | `node:fs`, `node:path`, `node:os` |
 | Process / async | `babashka.process` | `node:child_process` + `promesa.core` |
-| HTTP | injectable `:fetch-fn` | Node 22 `js/fetch` (`loyly.node.runtime/fetch-json`) |
+| HTTP | injectable `:fetch-fn` | Node native `js/fetch` (`loyly.node.runtime/fetch-json`) |
 | Formal models | `metosin/malli` + `org.clojure/test.check` | structural predicates + injectable Ajv |
 
 **Kept custom (`.cljc`):** pretty JSON write + order-preserving read in
@@ -56,17 +65,20 @@ bin/loyly-clj score 01 --verdicts verdicts.json
 bin/loyly-clj scoreboard 01
 bin/loyly-clj stamp
 
-# Unified cycle CLI (.cljc core + .cljs Node wrapper for async/backend steps)
+# Unified cycle CLI (.cljc core + .cljs Node adapter for Pi durable backend)
 bin/loyly-clj cycle list
 bin/loyly-clj cycle pi --check <live-run.json>
 bin/loyly-clj cycle pi --run <live-run.json>
-bin/loyly-clj cycle codex decide|candidate|evidence|panel <input.json>
-bin/loyly-clj cycle codex preflight <contract.json>
-bin/loyly-clj cycle codex reassess <contract.json>
-bin/loyly-clj cycle cursor decide|candidate|evidence|panel|preflight <input.json>
+bin/loyly-clj cycle codex preflight|candidate|decide|evidence|panel|reassess <input.json>
+bin/loyly-clj cycle cursor preflight|candidate|decide|evidence|panel <input.json>
 
-# Panel-only reassessment (.cljs Node wrapper)
+# Pi durable backend tools (.cljc core + thin .cljs Node adapter)
 bin/loyly-clj panel-reassess --check|--run <reassess.json>
+bin/loyly-clj worker <scratch> [mode]
+bin/loyly-clj export-replay [scratch...] [--out <html-path>]
+bin/loyly-clj render-allure <scored-cycle-scratch>
+bin/loyly-clj blind-review prepare|probe|file <paths...>
+bin/loyly-clj supplemental-grade <original-scratch> <probe-root>
 
 # Direct Node ClojureScript CLI (nbb -m loyly.node.cli ...)
 bin/loyly-clj node smoke
@@ -79,9 +91,6 @@ bin/loyly-clj formal --theory
 # Babashka end-to-end smoke
 bin/loyly-clj demo
 ```
-
-Pass `--ts` on `cycle` commands to delegate directly to the underlying TypeScript
-CLIs when comparing parity.
 
 ## Two roads (assurance ↔ formal models)
 

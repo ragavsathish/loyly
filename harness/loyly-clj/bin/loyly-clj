@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Wrapper: bin/loyly-clj <task> [args...]
-# Runs Babashka (.clj/.cljc) tasks and nbb ClojureScript (.cljs) Node wrappers.
+# Runs Babashka (.clj/.cljc) tasks and nbb ClojureScript (.cljs) Node adapters.
 # Default --root is the git repository root.
 set -euo pipefail
 PKG="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$PKG/../.." && pwd)"
 
 if [[ $# -lt 1 ]]; then
-  echo "usage: bin/loyly-clj <gen-checklist|score|scoreboard|stamp|demo|cycle|panel-reassess|node|lint|analyze|formal> [args...]" >&2
+  echo "usage: bin/loyly-clj <gen-checklist|score|scoreboard|stamp|demo|cycle|panel-reassess|worker|export-replay|render-allure|blind-review|supplemental-grade|node|lint|analyze|formal> [args...]" >&2
   exit 2
 fi
 
@@ -41,11 +41,11 @@ case "$task" in
       run_nbb "$@" --root "$REPO"
     fi
     ;;
-  panel-reassess)
+  panel-reassess|worker|export-replay|render-allure|blind-review|supplemental-grade)
     if has_root_arg "$@"; then
-      run_nbb panel-reassess "$@"
+      run_nbb "$task" "$@"
     else
-      run_nbb panel-reassess "$@" --root "$REPO"
+      run_nbb "$task" "$@" --root "$REPO"
     fi
     ;;
   cycle)

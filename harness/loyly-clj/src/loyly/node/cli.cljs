@@ -1,10 +1,12 @@
 (ns loyly.node.cli
   "Unified Node ClojureScript CLI (nbb -m loyly.node.cli ...).
 
-  Executes shared .cljc core modules directly inside Node and wraps Node async
-  backends (Pi durable worker, panel reassessment, Codex/Cursor preflight/reassess)."
+  Executes shared .cljc core modules directly inside Node and bridges into the
+  minimal @earendil-works/pi-durable TypeScript extension when running live Pi
+  durable cycles or reading Pi SQLite audit stores."
   (:require [clojure.string :as str]
             [loyly.adapters :as adapters]
+            [loyly.blind-agent :as blind-agent]
             [loyly.blind-review :as blind]
             [loyly.contracts :as contracts]
             [loyly.cycle-core :as life]
@@ -17,25 +19,29 @@
             [loyly.live-contract :as live]
             [loyly.node.adapters :as node-ad]
             [loyly.node.pi-backend :as pi]
+            [loyly.node.pi-worker :as pi-worker]
             [loyly.node.runtime :as rt]
             [loyly.panel-selection :as panel]
             [loyly.panel-vm :as panel-vm]
             [loyly.platform :as plat]
             [loyly.project.loyly :as loyly]
+            [loyly.reassess-panel :as reassess-panel]
+            [loyly.render-allure :as render-allure]
+            [loyly.replay-export :as replay-export]
             [loyly.score :as score]
             [loyly.score-receipt :as receipt]
             [loyly.scoreboard :as board]
+            [loyly.supplemental-grade :as supp]
             [loyly.validate-verdicts :as vv]
             [loyly.worker-config :as worker]
             [promesa.core :as p]))
 
 (defn- parse-opts [args]
-  (loop [args (vec args) acc {:args [] :ts? false}]
+  (loop [args (vec args) acc {:args []}]
     (if-let [a (first args)]
       (cond
         (= a "--root") (recur (nnext args) (assoc acc :root (second args)))
-        (= a "--node") (recur (nnext args) (assoc acc :node (second args)))
-        (= a "--ts") (recur (next args) (assoc acc :ts? true))
+        (= a "--out") (recur (nnext args) (assoc acc :out (second args)))
         (#{"-h" "--help" "help"} a) (assoc acc :help true)
         :else (recur (next args) (update acc :args conj a)))
       acc)))
@@ -44,10 +50,15 @@
   (plat/err
    (str "usage:\n"
         "  loyly-clj node cycle list\n"
-        "  loyly-clj node cycle pi --check|--run <live-run.json> [--ts]\n"
-        "  loyly-clj node cycle cursor|codex decide|candidate|evidence|panel|preflight <input.json> [--ts]\n"
+        "  loyly-clj node cycle pi --check|--run <live-run.json>\n"
+        "  loyly-clj node cycle cursor|codex preflight|candidate|decide|evidence|panel <input.json>\n"
         "  loyly-clj node cycle codex reassess <contract.json>\n"
         "  loyly-clj node panel-reassess --check|--run <reassess.json>\n"
+        "  loyly-clj node worker <scratch> [mode]\n"
+        "  loyly-clj node export-replay [scratch...] [--out <html-path>]\n"
+        "  loyly-clj node render-allure <scored-cycle-scratch>\n"
+        "  loyly-clj node blind-review prepare|probe|file <paths...>\n"
+        "  loyly-clj node supplemental-grade <original-scratch> <probe-root>\n"
         "  loyly-clj node smoke [--root <repo>]\n")))
 
 (defn- run-smoke!
@@ -133,6 +144,14 @@
             _ (room/verify-grading-room
                {:out grade-out :candidate-sha256 cand-sha
                 :checklist-sha256 checklist-sha :schema-sha256 schema-sha})
+            blind-pkt (plat/path scratch "blind-pkt")
+            _ (do (plat/create-dirs blind-pkt)
+                  (hjson/spit-utf8 (plat/path blind-pkt "question.txt") "q\n")
+                  (hjson/spit-utf8 (plat/path blind-pkt "refusal.txt") "r\n"))
+            blind-room-res (blind-agent/prepare-blind-agent-room
+                            {:packet-dir blind-pkt :out (plat/path scratch "blind-room")})
+            _ (when-not (= 64 (count (:room-sha256 blind-room-res)))
+                (rt/die! "blind-agent room preparation failed in Node"))
             _ (score/score-cycle {:root instrument :cycle "02" :verdicts-path verdicts-file})
             _ (receipt/bind-score-input
                {:scratch scratch :source-root repo :instrument instrument
@@ -147,21 +166,33 @@
                                 {"attempt" 1
                                  "build" {"status" "completed"}
                                  "gate" {"status" "completed" "result" {"passed" true}}}))
-            decided (adapters/dispatch :codex "decide" decide-in)
+            decided (adapters/dispatch :codex "decide" decide-in repo)
             _ (when-not (= "grading-room" (get-in decided ["afterGate" "phase"]))
                 (rt/die! (str "cljc adapters/dispatch decide failed in Node: " (pr-str decided))))
-            _ (when-not (and (fn? (node-ad/make-http-fetch-fn))
+            wcfg (worker/parse-worker-config repo scratch "repair" {})
+            ci (pi-worker/build-cycle-input wcfg "smoke-1" "02" {})
+            _ (when-not (= "smoke-1" (:runId ci))
+                (rt/die! "pi-worker build-cycle-input failed in Node"))
+            audit-file (plat/path scratch "audit-rows.json")
+            _ (hjson/spit-utf8 audit-file (hjson/compact-json [{"seq" 1 "stage" "score" "outcome" "filed"}]))
+            exported (replay-export/export-run scratch [{"seq" 1 "stage" "score" "outcome" "filed"}])
+            html (replay-export/render-replay-html [exported])
+            _ (when-not (and (str/includes? html "Pi durable cycle audit")
+                             (fn? (node-ad/make-http-fetch-fn))
                              (fn? (node-ad/make-allure-cli-fn repo))
                              (fn? (node-ad/make-spawn-hook))
                              (fn? pi/read-audit-rows-async)
                              (fn? live/check-live-run)
                              (fn? launch/worker-environment)
-                             (map? (worker/parse-worker-config repo scratch "repair" {}))
+                             (fn? reassess-panel/check-reassessment)
+                             (fn? render-allure/render-scored-allure)
+                             (fn? supp/collect-supplemental-grade)
+                             (fn? adapters/check-codex-contract)
+                             (fn? adapters/check-cursor-contract)
+                             (fn? adapters/check-codex-reassessment)
                              (= 3 (count (:drivers (node-ad/catalog))))
                              (map? (life/create-lifecycle)))
-                (rt/die! "Node hook / API verification failed"))
-            audit-file (plat/path scratch "audit-rows.json")
-            _ (hjson/spit-utf8 audit-file (hjson/compact-json [{"stage" "score" "outcome" "filed"}]))]
+                (rt/die! "Node hook / API verification failed"))]
         (p/let [audit-rows (pi/read-audit-rows-async repo scratch)]
           (when-not (= 1 (count audit-rows))
             (rt/die! "read-audit-rows-async failed"))
@@ -176,21 +207,46 @@
           0)))))
 
 (defn -main [& argv]
-  (let [{:keys [args root node help ts?]} (parse-opts argv)]
+  (let [{:keys [args root out help]} (parse-opts argv)]
     (when (or help (empty? args))
       (print-help)
       (plat/exit! (if help 0 2)))
-    (let [[cmd & more] args]
+    (let [[cmd & more] args
+          repo (when-not (= cmd "blind-review") (rt/resolve-repo root))]
       (-> (case cmd
             "smoke" (run-smoke! root)
+
+            "worker"
+            (let [[scratch mode] more]
+              (pi-worker/run-worker! {:repo repo :scratch scratch :mode mode}))
+
             "panel-reassess"
             (let [[action contract] more]
               (when-not (and action contract)
                 (rt/die! "usage: panel-reassess --check|--run <reassess.json>"))
-              (pi/panel-reassess! {:repo (rt/resolve-repo root)
-                                   :action action
-                                   :contract contract
-                                   :node node}))
+              (pi/panel-reassess! {:repo repo :action action :contract contract}))
+
+            "export-replay"
+            (pi/export-replay! {:repo repo :dirs more :out out})
+
+            "render-allure"
+            (let [[scratch] more]
+              (when-not scratch
+                (rt/die! "usage: render-allure <scored-cycle-scratch>"))
+              (pi/render-allure! {:repo repo :scratch scratch}))
+
+            "blind-review"
+            (let [[action & paths] more]
+              (when-not action
+                (rt/die! "usage: blind-review prepare|probe|file <paths...>"))
+              (pi/blind-review-cli! {:action action :paths paths}))
+
+            "supplemental-grade"
+            (let [[original probes] more]
+              (when-not (and original probes)
+                (rt/die! "usage: supplemental-grade <original-scratch> <probe-root>"))
+              (pi/supplemental-grade! {:repo repo :original original :probes probes}))
+
             "cycle"
             (let [[driver & rest-args] more]
               (cond
@@ -203,9 +259,7 @@
                 (node-ad/invoke-driver! {:driver driver
                                          :action (first rest-args)
                                          :args (vec (rest rest-args))
-                                         :root root
-                                         :node node
-                                         :ts? ts?})
+                                         :root root})
 
                 :else
                 (do (print-help) (p/resolved 2))))

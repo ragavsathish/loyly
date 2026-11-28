@@ -4,8 +4,7 @@ import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium } from 'playwright-core';
-import { treeDigest } from './grading-room.mjs';
-import { launchCandidate, readDerivedViews } from './panel-candidate.mjs';
+import { launchCandidate, readDerivedViews, treeDigest } from './panel-candidate.mjs';
 
 const root = '/out';
 const candidate = '/candidate';

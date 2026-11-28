@@ -1,21 +1,24 @@
-# Pi durable harness
+# Pi durable extension & Gondolin probe assets
 
-This directory contains the active Pi durable cycle driver. Pi owns cycle
-checkpoints and committed audit entries. The original
-`harness/` scripts still perform the self-check, physical fence, checklist,
-gate, score and scoreboard. Gondolin runs the Pi builder, independent grader
-shards, blind reviewer and project-specific specialist probes. The former
-ORC runner remains historical comparison evidence.
+This directory holds the minimal `@earendil-works/pi-durable` TypeScript shim
+(`pi-extension.ts`), the pinned JSON Schemas, panel plans, agent instructions,
+and guest-VM specialist scripts (`panel-*.mjs`, mounted read-only into Gondolin
+QEMU VMs). All cycle logic, contract verification, grading-room management,
+blind review, panel compilation, and scoring live in `harness/loyly-clj`
+(`.cljc` primary core + thin `.cljs` Node adapters). The original `harness/`
+scripts still perform the self-check, physical fence, checklist, gate, score
+and scoreboard.
 
 ## Run a pinned live cycle
 
-Install this directory's npm dependencies and the `.pi/harness/builder-host`
-dependencies. Set `JAVA_HOME` to Java 21. Create an ignored JSON contract
-matching [`live-run.schema.json`](live-run.schema.json), then run:
+Install dependencies in `harness/loyly-clj`, `harness/pi-durable`, and
+`.pi/harness/builder-host`. Set `JAVA_HOME` to Java 21. Create an ignored JSON
+contract matching [`live-run.schema.json`](live-run.schema.json), then run from
+the repository root:
 
 ```sh
-node run-live.mjs --check scratch-production-cycle-XX/live-run.json
-node run-live.mjs --run scratch-production-cycle-XX/live-run.json
+bin/loyly-cycle --check scratch-production-cycle-XX/live-run.json
+bin/loyly-cycle --run scratch-production-cycle-XX/live-run.json
 ```
 
 The contract pins the clean controller and source commits, selected spec and

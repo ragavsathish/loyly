@@ -4,8 +4,7 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
-import { treeDigest } from './grading-room.mjs';
-import { launchCandidate, readDerivedViews } from './panel-candidate.mjs';
+import { launchCandidate, readDerivedViews, treeDigest } from './panel-candidate.mjs';
 
 const out = '/out';
 const config = JSON.parse(await readFile(join(out, 'config.json'), 'utf8'));

@@ -4,7 +4,6 @@
   Provides Promise-based child process execution, native Node fetch with
   timeouts, dynamic ESM module loading, and repo root resolution."
   (:require ["node:child_process" :as cp]
-            ["node:process" :as node-proc]
             ["node:url" :as node-url]
             [loyly.platform :as plat]
             [promesa.core :as p]))
@@ -24,14 +23,6 @@
       (plat/directory? (plat/path base ".." ".." "harness" "pi-durable"))
       (plat/absolutize (plat/path base ".." ".."))
       :else (die! (str "not a Löyly repo root (missing harness/pi-durable): " base)))))
-
-(defn script-path
-  "Resolve and verify a repo-relative Node script."
-  [repo rel]
-  (let [target (plat/path repo rel)]
-    (when-not (plat/regular-file? target)
-      (die! (str "driver script missing: " rel)))
-    target))
 
 (defn- env->js [env-map]
   (let [obj #js {}]
@@ -70,16 +61,6 @@
                    (resolve {:exit exit
                              :out (.join out-chunks "")
                              :err (.join err-chunks "")}))))))))))
-
-(defn spawn-node-inherit
-  "Spawn Node with inherited stdio. Returns a Promise resolving to the exit code."
-  [{:keys [node cwd args env]
-    :or {node (.-execPath node-proc)}}]
-  (p/let [res (spawn-async (into [node] args)
-                           {:cwd cwd
-                            :env (or env (plat/getenv))
-                            :stdio :inherit})]
-    (:exit res)))
 
 (defn fetch-json
   "Async HTTP request using Node 22 native fetch with AbortController timeout."
