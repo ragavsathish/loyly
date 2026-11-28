@@ -9,29 +9,17 @@
   - L  — labeling: phase ↦ required models / digests produced
   - F  — accepting states {done}
 
-  Concrete handlers live in tasks.cycle-phases; this ns is the closed math."
+  Concrete orchestration lives in loyly.node.pi-worker; this ns is the closed math."
   (:require [clojure.test.check.generators :as gen]
+            [loyly.cycle-core :as life]
             [loyly.formal.models :as models]
             [loyly.project.loyly :as loyly]
-            [loyly.tasks.cycle-phases :as phases]
-            [malli.core :as m]
-            [malli.error :as me]
-            [malli.generator :as mg]))
+            [malli.core :as m]))
 
 ;;; --- Sorts -----------------------------------------------------------------
 
 (def PhaseName
-  (into [:enum] phases/ALL-PHASES))
-
-(def CorePhaseName
-  "Coarse spine used by PHASES (demo / scoreboard)."
-  (into [:enum] phases/PHASES))
-
-(def PhaseResult
-  [:map
-   ["phase" PhaseName]
-   ["code" [:int {:min 0}]]
-   ["sha256" models/Sha256]])
+  (into [:enum] life/ALL-PHASES))
 
 (def CycleState
   "Runtime configuration of a cycle run (abstract state vector)."
@@ -48,7 +36,7 @@
 
 (def Q
   "State set = ALL-PHASES."
-  (vec phases/ALL-PHASES))
+  (vec life/ALL-PHASES))
 
 (def q0
   "Initial state."
@@ -76,10 +64,6 @@
   "The unique maximal path from q₀: cut · … · done."
   []
   Q)
-
-(defn reachable?
-  [q]
-  (boolean (some #{q} Q)))
 
 ;;; --- Labeling: phase ↦ models / obligations --------------------------------
 
@@ -113,7 +97,7 @@
 (defn I-path-covers-core
   "Every core PHASES element appears on the ALL-PHASES path."
   []
-  (every? (set Q) phases/PHASES))
+  (every? (set Q) life/PHASES))
 
 (defn I-linear-total
   "succ is defined exactly on Q ∖ F and lands in Q."
@@ -179,7 +163,7 @@
                       (partition 2 1 Q))
    :labeling (into (sorted-map)
                    (map (fn [[k v]] [k (vec (sort v))]) labeling))
-   :core-phases phases/PHASES
+   :core-phases life/PHASES
    :equations
    ["Q = ALL-PHASES"
     "q₀ = cut"
@@ -195,11 +179,4 @@
     {:id :C5 :statement "⋃_q L(q) ⊆ Registry"}]
    :proof (prove-cycle!)})
 
-(defn valid-phase? [p] (m/validate PhaseName p))
 (defn valid-state? [s] (m/validate CycleState s))
-(defn explain-state [s] (some-> (m/explain CycleState s) me/humanize))
-
-(defn generate-state [& {:keys [seed size] :or {size 8}}]
-  (if seed
-    (mg/generate CycleState {:seed seed :size size})
-    (mg/generate CycleState {:size size})))

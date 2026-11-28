@@ -15,8 +15,7 @@
   (:require [loyly.formal.cycle :as cycle]
             [loyly.formal.models :as models]
             [loyly.formal.trace :as trace]
-            [loyly.project.loyly :as loyly]
-            [malli.core :as m]))
+            [loyly.project.loyly :as loyly]))
 
 (def Sorts
   "Named carrier sets. Each name maps to a Malli schema (the set's definition)."
@@ -153,13 +152,3 @@
    :registry-digest (trace/registry-digest)
    :project loyly/PROJECT_ID
    :cycle (cycle/cycle-theory)})
-
-(defn sort-form
-  "Pretty closed form of one sort (for human inspection)."
-  [name]
-  (m/form (models/schema name)))
-
-(defn explain-rejection
-  "Counterexample witness when Validₛ(x) fails."
-  [name value]
-  (models/explain name value))

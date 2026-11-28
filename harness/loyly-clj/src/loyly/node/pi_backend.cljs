@@ -13,7 +13,6 @@
             [loyly.reassess-panel :as reassess]
             [loyly.render-allure :as render-allure]
             [loyly.replay-export :as replay-export]
-            [loyly.supplemental-grade :as supp]
             [promesa.core :as p]))
 
 (def PI-ACTIONS ["--check" "--run"])
@@ -177,12 +176,3 @@
          0))
 
      (rt/die! "blind-review actions: prepare|probe|file"))))
-
-(defn supplemental-grade!
-  "Collect and verify supplemental probes via .cljc loyly.supplemental-grade."
-  [{:keys [repo original probes]}]
-  (let [pi-dir (plat/path repo "harness" "pi-durable")
-        {:keys [out stats]} (supp/collect-supplemental-grade
-                             original probes {:pi-durable pi-dir})]
-    (println (str out ": " (get stats "total") " supplemental Allure results"))
-    (p/resolved 0)))

@@ -28,5 +28,5 @@ bb -m loyly.formal.main --root ../..
 ```
 
 Depends on production product constants and phase lists (`loyly.project.loyly`,
-`loyly.tasks.cycle-phases`, `loyly.digest`, `loyly.hjson`). Assurance modules
+`loyly.cycle-core`, `loyly.digest`, `loyly.hjson`). Assurance modules
 call formal models for validation on `:clj`; they do not own the theory.

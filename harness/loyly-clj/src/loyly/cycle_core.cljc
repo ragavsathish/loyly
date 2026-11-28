@@ -1,5 +1,13 @@
 (ns loyly.cycle-core
-  "PoC port of harness/cycle-core/lifecycle.ts — pure phase decisions.")
+  "Core cycle lifecycle policy and canonical phase list (.cljc).")
+
+(def PHASES
+  ["cut" "preflight" "build" "gate" "grade" "blind-review" "score" "panel" "done"])
+
+(def ALL-PHASES
+  ["cut" "preflight" "fence" "checklist" "render" "build" "after-build"
+   "gate" "after-gate" "grading-room" "grade" "after-grade" "blind-review"
+   "panel" "after-panel" "score" "panel-report" "done"])
 
 (defn create-lifecycle
   "Return {:after-build :after-gate :after-grade :after-assessment …}."

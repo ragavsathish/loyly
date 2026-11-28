@@ -64,14 +64,6 @@
            :file-sha256 (d/file-sha256 path)
            :schema (get plan "schema"))))
 
-(defn prove-blind-packet!
-  [packet]
-  (prove-fixture-obeys :blind-packet packet))
-
-(defn prove-score-input!
-  [input]
-  (prove-fixture-obeys :score-input input))
-
 (defn prove-digest-roundtrip!
   "Property of the digest model: hex length and alphabet."
   [s]

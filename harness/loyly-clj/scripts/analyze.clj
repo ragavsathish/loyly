@@ -29,31 +29,15 @@
   #"project/loyly\.cljc?|project/loyly/|formal/|scripts/")
 
 (def entry-namespaces
-  "CLI / task roots that keep a namespace alive (knip entry equivalents)."
+  "CLI / formal roots that keep a namespace alive (knip entry equivalents)."
   #{"loyly.demo"
-    "loyly.adapters"
-    "loyly.candidate-caches"
-    "loyly.cycle-core"
     "loyly.drivers"
-    "loyly.evidence.assess-room-panel"
-    "loyly.evidence.check-room"
     "loyly.gen-checklist"
     "loyly.score"
     "loyly.scoreboard"
     "loyly.stamp-item-ids"
-    "loyly.tasks.builder"
-    "loyly.tasks.cycle"
-    "loyly.tasks.gate"
-    "loyly.tasks.grade"
-    "loyly.tasks.panel"
-    "loyly.audit-rows"
     "loyly.node.cli"
-    "loyly.formal.main"
-    "loyly.formal.models"
-    "loyly.formal.trace"
-    "loyly.formal.props"
-    "loyly.formal.theory"
-    "loyly.formal.cycle"})
+    "loyly.formal.main"})
 
 (defn- clj-files []
   (->> (concat (fs/glob src "**.{clj,cljc,cljs}")

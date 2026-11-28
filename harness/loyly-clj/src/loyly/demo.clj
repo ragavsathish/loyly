@@ -8,6 +8,7 @@
             [loyly.builder-adapter :as builder]
             [loyly.continuation :as cont]
             [loyly.contracts :as contracts]
+            [loyly.cycle-core :as life]
             [loyly.cycle-effects :as effects]
             [loyly.digest :as d]
             [loyly.drivers :as drivers]
@@ -15,7 +16,6 @@
             [loyly.formal.models :as formal]
             [loyly.formal.trace :as ftrace]
             [loyly.gate-adapter :as gate]
-            [loyly.gate-effects :as gate-fx]
             [loyly.gen-checklist :as checklist]
             [loyly.grader-shards :as shards]
             [loyly.grading-room :as room]
@@ -33,10 +33,8 @@
             [loyly.score :as score]
             [loyly.score-receipt :as receipt]
             [loyly.scoreboard :as board]
-            [loyly.tasks.cycle-phases :as phases]
             [loyly.validate-verdicts :as vv]
-            [loyly.worker-config :as worker]
-            [loyly.workspace-effects :as ws]))
+            [loyly.worker-config :as worker]))
 
 (defn- die [msg]
   (hjson/err (str msg "\n"))
@@ -119,8 +117,6 @@
                   (when-let [ext (:extension d)]
                     (when-not (fs/regular-file? (fs/path repo ext))
                       (die (str "driver extension missing: " ext))))))
-            _ (when-not (ws/exists? (str scratch))
-                (die "workspace-effects exists? failed"))
             _ (when-not (fn? allure/read-allure-results)
                 (die "allure-results read-allure-results missing"))
             ;; Gate / builder receipt helpers against scratch fixtures.
@@ -138,16 +134,7 @@
                   (when-not (= 0 (:exit (gate/read-gate-receipt
                                          (str (fs/absolutize gate-out))
                                          room-path cand-sha)))
-                    (die "gate receipt parse failed"))
-                  (let [verified (gate-fx/verify-candidate
-                                  {:room room-path
-                                   :out (str (fs/absolutize gate-out))
-                                   :candidate-sha256 cand-sha
-                                   :run (fn [req]
-                                          (gate/read-gate-receipt
-                                           (:out req) (:room req) (:candidate-sha256 req)))})]
-                    (when-not (:passed verified)
-                      (die "gate-effects verify-candidate failed"))))
+                    (die "gate receipt parse failed")))
                 (let [ev (fs/file scratch "builder-evidence" "launch-1")
                       instr (fs/file scratch "builder-instr.txt")
                       img (fs/file scratch "builder-image")
@@ -309,12 +296,10 @@
             _ (when-not (nil? (replay/project-grade-row
                                [{"stage" "grade" "outcome" "failed"}]))
                 (die "project-grade-row should skip incomplete grade rows"))
-            _ (when-not (= "score" (nth phases/PHASES 6))
-                (die "cycle-phases PHASES map drifted"))
-            _ (when-not (pos? (count phases/ALL-PHASES))
-                (die "cycle-phases ALL-PHASES missing"))
-            _ (when-not (fn? phases/create-cycle-phases)
-                (die "create-cycle-phases missing"))
+            _ (when-not (= "score" (nth life/PHASES 6))
+                (die "cycle-core PHASES map drifted"))
+            _ (when-not (pos? (count life/ALL-PHASES))
+                (die "cycle-core ALL-PHASES missing"))
             _ (when-not (fn? replay/project-replay-evidence)
                 (die "project-replay-evidence missing"))
             _ (when-not (fn? live/check-live-run)
@@ -345,16 +330,14 @@
                 (die "write-blind-agent-allure missing"))
             _ (when-not (fn? blind/final-verdicts-from-blind-review)
                 (die "final-verdicts-from-blind-review missing"))
-            _ (let [cut (phases/phase-cut
-                         {:fx (effects/create-cycle-effects
-                               {:root (str repo) :scratch (str scratch)
-                                :room (str instrument) :cut (str (fs/path scratch "cut2"))
-                                :source-root (str instrument)
-                                :approved-source-repo (str repo)
-                                :digest-candidate #(room/candidate-digest %)})
-                          :approved-commit nil})]
-                (when-not (zero? (:code cut))
-                  (die "phase-cut with no commit should no-op")))
+            _ (let [fx (effects/create-cycle-effects
+                        {:root (str repo) :scratch (str scratch)
+                         :room (str instrument) :cut (str (fs/path scratch "cut2"))
+                         :source-root (str instrument)
+                         :approved-source-repo (str repo)
+                         :digest-candidate #(room/candidate-digest %)})]
+                (when-not ((:prove-cut fx))
+                  (die "prove-cut with no commit should return true")))
             _ (when-not (fn? panel-pol/evaluate-panel)
                 (die "panel-policy evaluate-panel missing"))
             _ (let [parsed (blind/parse-review-answer

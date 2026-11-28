@@ -1,9 +1,9 @@
 (ns loyly.continuation
-  "PoC port of pure helpers from harness/pi-durable/continuation.ts"
+  "Continuation prompt and UNCARRIED.md selection helpers (.cljc)."
   (:require [clojure.string :as str]
             [loyly.evidence.validate-verdicts :as ev]
-            [loyly.platform :as plat]
-            [loyly.workspace-effects :as ws]))
+            [loyly.hjson :as hjson]
+            [loyly.platform :as plat]))
 
 (def MAX_CONTINUATIONS 3)
 
@@ -17,15 +17,15 @@
     (vec ids)))
 
 (defn selected-uncarried
-  "Synchronous port of selectedUncarried(room, checklistFile)."
+  "Return sorted selected item IDs still listed in room/impl/UNCARRIED.md."
   [room checklist-file]
   (let [file (plat/path room "impl" "UNCARRIED.md")]
     (if-not (plat/regular-file? file)
       []
-      (let [checklist (ws/read-workspace-json checklist-file)]
+      (let [checklist (hjson/read-json (plat/read-text checklist-file))]
         (when-not (ev/selected-checklist? checklist)
           (throw (ex-info "invalid selected checklist" {:path (str checklist-file)})))
-        (extract-uncarried checklist (ws/read-text file))))))
+        (extract-uncarried checklist (plat/read-text file))))))
 
 (defn continuation-prompt [ids]
   (when (or (empty? ids)

@@ -36,13 +36,6 @@
   (when-not (plat/regular-file? (plat/path room "harness" "verify.sh"))
     (throw (ex-info "legacy gate missing" {}))))
 
-(defn reconcile-gate
-  "If a valid receipt already exists, return it with :reconciled true."
-  [{:keys [room out candidate-sha256] :as args}]
-  (assert-gate-args args)
-  (when-let [done (read-gate-receipt out room candidate-sha256)]
-    (assoc done :reconciled true)))
-
 (defn live-pid?
   "True when pid is a live gate-host wrapper (injectable `:ps-fn` for tests)."
   [pid & {:keys [ps-fn host-marker]

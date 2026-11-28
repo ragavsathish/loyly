@@ -31,7 +31,6 @@
             [loyly.score :as score]
             [loyly.score-receipt :as receipt]
             [loyly.scoreboard :as board]
-            [loyly.supplemental-grade :as supp]
             [loyly.validate-verdicts :as vv]
             [loyly.worker-config :as worker]
             [promesa.core :as p]))
@@ -58,7 +57,6 @@
         "  loyly-clj node export-replay [scratch...] [--out <html-path>]\n"
         "  loyly-clj node render-allure <scored-cycle-scratch>\n"
         "  loyly-clj node blind-review prepare|probe|file <paths...>\n"
-        "  loyly-clj node supplemental-grade <original-scratch> <probe-root>\n"
         "  loyly-clj node smoke [--root <repo>]\n")))
 
 (defn- run-smoke!
@@ -186,7 +184,6 @@
                              (fn? launch/worker-environment)
                              (fn? reassess-panel/check-reassessment)
                              (fn? render-allure/render-scored-allure)
-                             (fn? supp/collect-supplemental-grade)
                              (fn? adapters/check-codex-contract)
                              (fn? adapters/check-cursor-contract)
                              (fn? adapters/check-codex-reassessment)
@@ -240,12 +237,6 @@
               (when-not action
                 (rt/die! "usage: blind-review prepare|probe|file <paths...>"))
               (pi/blind-review-cli! {:action action :paths paths}))
-
-            "supplemental-grade"
-            (let [[original probes] more]
-              (when-not (and original probes)
-                (rt/die! "usage: supplemental-grade <original-scratch> <probe-root>"))
-              (pi/supplemental-grade! {:repo repo :original original :probes probes}))
 
             "cycle"
             (let [[driver & rest-args] more]

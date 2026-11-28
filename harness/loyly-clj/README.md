@@ -3,12 +3,12 @@
 Production Clojure/ClojureScript implementation of the Löyly harness and formal
 examiner under `harness/loyly-clj/`, with top-level entrypoint `bin/loyly-clj`.
 
-- **Primary core (`.cljc`)**: `src/loyly/**.cljc` (60 namespaces) runs identically
+- **Primary core (`.cljc`)**: `src/loyly/**.cljc` (51 namespaces) runs identically
   on **Babashka** (`bb`) and **Node ClojureScript** (`nbb`) via `loyly.platform`.
   Includes measure, contracts, digests, hjson, grading-room, blind-review,
   blind-agent, panel selection/policy/compile/vm/reassess, shards, evidence,
   Codex & Cursor adapters (preflight/candidate/decide/evidence/panel/reassess),
-  replay export, Allure rendering, supplemental grading, tasks, and `project/loyly`.
+  replay export, Allure rendering, and `project/loyly`.
 - **Thin Node adapters (`.cljs`)**: `src/loyly/node/*.cljs` (5 namespaces) wraps
   Node async subprocess/HTTP/ESM execution, Pi durable worker phase wiring,
   panel reassessment, replay export, and Allure rendering directly on Node via `nbb`.
@@ -27,7 +27,7 @@ examiner under `harness/loyly-clj/`, with top-level entrypoint `bin/loyly-clj`.
 
 | Layer | Files | Runtime | Role |
 | --- | --- | --- | --- |
-| Primary cross-platform core | `src/loyly/**/*.cljc` | `bb` and `nbb` | Measure, contracts, digests, hjson, grading-room, blind-review/agent, panel selection/policy/compile/vm/reassess, shards, evidence, Codex/Cursor preflight/reassess/decide/candidate/evidence/panel, replay export, Allure rendering, supplemental grade, `project/loyly` |
+| Primary cross-platform core | `src/loyly/**/*.cljc` | `bb` and `nbb` | Measure, contracts, digests, hjson, grading-room, blind-review/agent, panel selection/policy/compile/vm/reassess, shards, evidence, Codex/Cursor preflight/reassess/decide/candidate/evidence/panel, replay export, Allure rendering, `project/loyly` |
 | Thin Node adapters | `src/loyly/node/*.cljs` | `nbb` (Node) | Async subprocess/HTTP/ESM runtime, Pi durable worker orchestration (`pi_worker.cljs`), Pi backend CLI (`pi_backend.cljs`), Codex/Cursor CLI (`adapters.cljs`, `cli.cljs`) |
 | Minimal `@earendil-works/*` TS extensions | `harness/pi-durable/pi-extension.ts`, `.pi/harness/builder-host/*.ts` | Node TS | Thin SDK boundary for `@earendil-works/pi-durable`, `@earendil-works/gondolin`, `@earendil-works/pi-env`, `@earendil-works/pi-coding-agent` |
 | Babashka CLI orchestration | `src/loyly/drivers.clj`, `src/loyly/demo.clj` | `bb` | Unified `bin/loyly-clj` front-end + full smoke verification |
@@ -78,7 +78,6 @@ bin/loyly-clj worker <scratch> [mode]
 bin/loyly-clj export-replay [scratch...] [--out <html-path>]
 bin/loyly-clj render-allure <scored-cycle-scratch>
 bin/loyly-clj blind-review prepare|probe|file <paths...>
-bin/loyly-clj supplemental-grade <original-scratch> <probe-root>
 
 # Direct Node ClojureScript CLI (nbb -m loyly.node.cli ...)
 bin/loyly-clj node smoke
