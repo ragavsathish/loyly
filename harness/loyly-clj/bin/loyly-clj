@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# Wrapper: bin/loyly-clj <task> [args...]
+# Runs Babashka (.clj/.cljc) tasks and nbb ClojureScript (.cljs) Node adapters.
+# Default --root is the git repository root.
+set -euo pipefail
+PKG="$(cd "$(dirname "$0")/.." && pwd)"
+REPO="$(cd "$PKG/../.." && pwd)"
+
+if [[ $# -lt 1 ]]; then
+  echo "usage: bin/loyly-clj <gen-checklist|score|scoreboard|stamp|demo|cycle|panel-reassess|worker|builder-host|export-replay|render-allure|blind-review|node|lint|analyze|formal> [args...]" >&2
+  exit 2
+fi
+
+run_nbb() {
+  local nbb_bin
+  if [[ -x "$PKG/node_modules/.bin/nbb" ]]; then
+    nbb_bin="$PKG/node_modules/.bin/nbb"
+  elif command -v nbb >/dev/null 2>&1; then
+    nbb_bin="$(command -v nbb)"
+  else
+    echo "nbb not found; run 'npm install' in harness/loyly-clj" >&2
+    exit 2
+  fi
+  cd "$PKG"
+  exec "$nbb_bin" -m loyly.node.cli "$@"
+}
+
+has_root_arg() {
+  for a in "$@"; do
+    if [[ "$a" == "--root" ]]; then return 0; fi
+  done
+  return 1
+}
+
+task="$1"; shift
+case "$task" in
+  node)
+    if has_root_arg "$@"; then
+      run_nbb "$@"
+    else
+      run_nbb "$@" --root "$REPO"
+    fi
+    ;;
+  panel-reassess|worker|builder-host|export-replay|render-allure|blind-review)
+    if has_root_arg "$@"; then
+      run_nbb "$task" "$@"
+    else
+      run_nbb "$task" "$@" --root "$REPO"
+    fi
+    ;;
+  cycle)
+    cd "$PKG"
+    if has_root_arg "$@"; then
+      exec bb -m loyly.drivers "$@"
+    else
+      exec bb -m loyly.drivers "$@" --root "$REPO"
+    fi
+    ;;
+  formal)
+    cd "$PKG"
+    # Formal verification lives in formal/src (loyly.formal.*).
+    if has_root_arg "$@"; then
+      exec bb -m loyly.formal.main "$@"
+    else
+      exec bb -m loyly.formal.main "$@" --root "$REPO"
+    fi
+    ;;
+  lint|analyze|analyze:deps|analyze:dead|analyze:dupes|analyze:metrics|lint:kondo|lint:loyly)
+    cd "$PKG"
+    exec bb scripts/analyze.clj "$task" "$@"
+    ;;
+esac
+
+case "$task" in
+  gen-checklist|gen_checklist) ns=loyly.gen-checklist ;;
+  score) ns=loyly.score ;;
+  scoreboard) ns=loyly.scoreboard ;;
+  stamp) ns=loyly.stamp-item-ids ;;
+  demo) ns=loyly.demo ;;
+  *)
+    echo "unknown task: $task" >&2
+    exit 2
+    ;;
+esac
+
+cd "$PKG"
+if has_root_arg "$@"; then
+  exec bb -m "$ns" "$@"
+else
+  exec bb -m "$ns" --root "$REPO" "$@"
+fi

@@ -1,8 +1,10 @@
 # Löyly agent instructions
 
 The active cycle driver is Pi durable. Start at `README.md`, then read
-`harness/pi-durable/README.md` when preparing or operating a
-cycle. `bin/loyly-cycle` checks and runs a pinned live contract. The driver
+`harness/pi-durable/README.md` and `harness/loyly-clj/README.md` when preparing
+or operating a cycle. `bin/loyly-cycle` checks and runs a pinned live contract,
+and `bin/loyly-clj` provides the production Clojure/ClojureScript harness
+(`.cljc` core + `.cljs` Node backend wrappers + formal examiner). The driver
 records checkpoints and audit entries in Pi; its replay projects committed
 entries and bound Allure evidence. The original `harness/` scripts still
 perform the self-check, fence, checklist, gate, score and scoreboard.

@@ -218,4 +218,42 @@ the specialist manifest SHA-256 is
 This is an acceptance candidate for booking core, not an accepted build. The
 operator still needs to decide acceptance after reviewing the bound evidence.
 The full cross-stack runtime profile and live controller restart matrix remain
-open for a production claim; the Pi driver currently covers booking core only.
+open for a production claim. The whole-product attempt below extends the Pi
+driver beyond booking core.
+
+## Whole-product cycle 02, 2026-11-20
+
+The operator approved the 47-item cut across slices 01–05 at source and
+controller commit `7e2fb1c`. The spec clarified that a full-schedule refusal
+must not suggest a free slot. The fresh Sol builder completed attempt 1 and
+the independent legacy gate passed on attempt 1. Six parallel Terra grader
+shards filed 46 passes and left `01-011` pending for a fresh blind Sol reviewer.
+`01-006`, which failed in the prior whole-product attempt, now passes. No item
+newly fails in the raw grade.
+
+The blind reviewer saw only the refusal and question and answered
+`REQUEST: pukuhuone 8 | Tuesday | 17:00`. The original Pi cycle stopped before
+scoring because the controller's HTTP probe assumed a different generated
+JSON API layout. Controller `5abf8a3` corrected the probe; a fresh copy of the
+same candidate confirmed the exact request with HTTP 200. A separate recovery
+script at `56d3ba6` bound the original gate, raw Allure, blind agent receipt,
+corrected HTTP probe and legacy scorer. It filed a **supplemental 47/47** score
+in `scratch-whole-product-cycle-02/recovery-56d3ba6/`. The original Pi task
+and its failed outcome are unchanged. This is not a completed Pi cycle score
+or an acceptance decision.
+
+The graders recorded three surprises: an unclaimed occurrence still has a
+heater signal in two observations (`02-003`, `02-008`), and a FREE release
+record carries a resale price reference (`03-003`). The selected scenarios
+do not settle those observations. Three exploratory specialist Gondolin VMs
+ran against the frozen candidate in parallel. Their Playwright, protocol and
+runtime results failed because the fixed probes assumed the previous app's
+selector, HTTP 201 response and request without an explicit booker role. The
+51-case Allure report contains 47 passes, one planned raw-grader handoff skip
+and three specialist failures. Its HTML and recovery manifest are local under
+`scratch-whole-product-cycle-02/recovery-56d3ba6/`.
+
+The candidate is not ready for acceptance. The next instrument work is to
+make specialist probes follow the generated app's public contract, then
+reassess this frozen candidate. A new scored build requires a fresh pinned
+contract and operator approval under `AGENTS.md`.

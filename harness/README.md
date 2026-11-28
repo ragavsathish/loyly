@@ -55,6 +55,13 @@ cover what nobody wrote down. The scoreboard counts verdicts and cannot tell a w
 verdict from a careful one. What is left over is found by a person driving the real
 interface, which is why the failure modes at the bottom of this file read as they do.
 
+These measure tools are **not** Allure producers. Graders, blind review, and
+specialist panel workers write Allure under the schema in
+[`evidence-core/`](evidence-core/); their tool catalog, panel roles, and
+alignment chain are in [`evidence-core/README.md`](evidence-core/README.md).
+`oracle.sh` guards checklist/score goldens; it does not validate Allure bytes.
+Adapters validate Allure via evidence-core, then hand verdicts to `score.clj`.
+
 ## The three modules, and the check that they have not forked
 
 This harness exists in three repositories: löyly, saunavuoro and kalibra. They are not
@@ -307,6 +314,12 @@ Three events look alike in a diff and must never be confused:
   git diff -- harness/oracle/checklist.golden.json | grep '^-' | grep -v '^---'
   #   must print the old "total" line and nothing else
   ```
+
+On 2026-11-20 the operator approved the first whole-product policy cut.
+Slices 02–05 gained 36 stamped scenarios, raising the product checklist from
+11 to 47 items. `harness/oracle.sh record` updated only this repository's
+checklist golden. The diff removed only `"total": 11`; all eleven earlier item
+records remained byte-for-byte unchanged. No shared legacy harness tool changed.
 
 **2026-09-08: the spec grew, in all three repositories.** Scenarios were added under
 `docs/plan/`, so the derived checklist gained items and the golden moved with it. The

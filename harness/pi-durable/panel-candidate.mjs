@@ -1,8 +1,31 @@
 // The specialist sees the frozen source read-only. It runs a private copy
 // through the same public start.sh seam used by the legacy gate and grader.
 import { spawn } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+
+export function treeDigest(root, prefix) {
+  const digest = createHash('sha256');
+  const walk = (dir, current) => {
+    for (const name of readdirSync(dir).sort()) {
+      const target = join(dir, name);
+      const relative = `${current}/${name}`;
+      const stat = lstatSync(target);
+      if (stat.isDirectory()) walk(target, relative);
+      else if (stat.isFile()) {
+        digest.update(relative);
+        digest.update('\0');
+        digest.update(String(stat.mode & 0o777));
+        digest.update('\0');
+        digest.update(readFileSync(target));
+        digest.update('\0');
+      } else throw new Error(`candidate has a symlink or special file: ${relative}`);
+    }
+  };
+  walk(root, prefix);
+  return digest.digest('hex');
+}
 
 export function launchCandidate({ candidate, out, port, env = {}, nodeOptions }) {
   const runtime = join(out, 'runtime');

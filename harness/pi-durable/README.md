@@ -1,89 +1,70 @@
-# Löyly Pi durable harness
+# Pi & Gondolin extensions and probe assets
 
-This directory contains the active Pi durable cycle driver. Pi owns cycle
-checkpoints and committed audit entries. The original
-`harness/` scripts still perform the self-check, physical fence, checklist,
-gate, score and scoreboard. Gondolin runs the Pi builder, independent grader
-shards, blind reviewer and project-specific specialist probes. The former
-ORC runner remains historical comparison evidence.
+This directory holds the three minimal `@earendil-works/*` TypeScript shims
+(`pi-extension.ts`, `pi-builder-extension.ts`, `gondolin-vm.ts`), the pinned
+JSON Schemas, panel plans, agent instructions, and guest-VM specialist scripts
+(`panel-*.mjs`, mounted read-only into Gondolin QEMU VMs). All cycle logic,
+builder-host policy/prompt/receipt/steering logic, contract verification,
+grading-room management, blind review, panel compilation, and scoring live in
+[`../loyly-clj/`](../loyly-clj/) (`.cljc` primary core + thin `.cljs` Node
+adapters). The original `harness/` scripts still perform the self-check,
+physical fence, checklist, gate, score and scoreboard.
 
 ## Run a pinned live cycle
 
-Install this directory's npm dependencies and the `.pi/harness/builder-host`
-dependencies. Set `JAVA_HOME` to Java 21. Create an ignored JSON contract
-matching [`live-run.schema.json`](live-run.schema.json), then run:
+Install dependencies in `harness/loyly-clj` and `harness/pi-durable`. Set
+`JAVA_HOME` to Java 21 when required by the contract. Create an ignored JSON
+contract matching [`live-run.schema.json`](live-run.schema.json), then run from
+the repository root:
 
 ```sh
-node run-live.mjs --check scratch-production-cycle-XX/live-run.json
-node run-live.mjs --run scratch-production-cycle-XX/live-run.json
+bin/loyly-cycle --check scratch-production-cycle-XX/live-run.json
+bin/loyly-cycle --run scratch-production-cycle-XX/live-run.json
 ```
 
-The contract pins the clean controller and source commits, selected spec and
-checklist, agent wrappers and instructions, model names, Allure schema, panel
-plan and both VM images. The builder and grader use different models. The
-controller clones the source cut into private scratch, sends the builder at
-most three same-session continuations on selected uncarried items, and runs
-the legacy gate independently after each completed build. A red gate or a
-failed builder process with a completed Pi session receipt starts a repair
-attempt: Pi forks the prior conversation at its last committed entry, keeps
-the existing `impl/`, and gives the fork the failure log. The cycle stops
-after three attempts; a changed approved input or invalid receipt stops it
-immediately. It then grades rule scopes in separate VMs, launches a
-fresh blind Pi reviewer for `01-011`, and runs three specialist VMs in
-parallel. The selected panel manifest is bound into the filed score input.
-Five Allure result directories then generate one 15-case report.
+The contract pins the clean controller and source commits, selected specs and
+checklist, agent wrappers and instructions, model names (builder and grader
+must differ), Allure schema, panel plan, and VM images.
 
-## Panel-only reassessment
+## Multistack specialist VM image
 
-If a score has been filed but the panel instrument fails, use
-[`reassess-panel.mjs`](reassess-panel.mjs) with a separately pinned contract.
-It verifies the frozen candidate and the committed Pi score, launches new
-specialist VMs, and compiles Allure from the existing grader and blind result
-directories plus the new VM directories. It writes a separate immutable
-receipt. It never changes the original cycle's audit, score or outcome. See
-[`PRODUCTION-CANDIDATE.md`](PRODUCTION-CANDIDATE.md) for the contract fields.
+Build the combined specialist Gondolin image from `Dockerfile.panel-multistack`:
 
-## Current evidence
+```sh
+cd harness/pi-durable
+docker build --platform linux/arm64 \
+  -f Dockerfile.panel-multistack -t loyly/panel-multistack:oci .
+gondolin build --config panel-vm-multistack-build.json \
+  --output ../../.pi/harness/.state/assets/panel-multistack \
+  --tag loyly-panel:multistack-v1
+```
 
-- The Pi regression suite passed 31/31 in a serialized run, including
-  the live blind handoff and controller restart tests. The Pi host's fork
-  and timeout tests passed separately.
-- A fresh Pi cycle at controller `36bb97f` passed the legacy gate, independent
-  grader shards and blind review, and filed **11/11** with the original scorer.
-  Its original specialist checks failed for a generated UI variant, so the
-  original cycle ended failed at panel report.
-- Pinned panel reassessment at `e47f92a` ran Playwright, 100 protocol races
-  and OpenTelemetry in three overlapping Gondolin VMs. It reused the frozen
-  scored candidate and generated **15 Allure cases, ready-for-review**, with
-  no gaps. Reopening the reassessment reused its verified receipts.
-- A later fresh cycle generated a Babashka/Clojure app and passed the legacy
-  gate. A grader shard stalled while waiting on its own long-lived servers;
-  the cycle recorded a grade failure and filed no score. The bounded grader
-  recovery fix and remaining panel portability work are tracked in
-  [`PRODUCTION-CANDIDATE.md`](PRODUCTION-CANDIDATE.md).
-- Cycle 05 passed the independent gate on attempt 1 and completed all three
-  grader shards. Its blind reviewer rejected `01-011` under an end-time
-  requirement added by the blind instruction, so the filed score is **10/11**.
-  The original specialist panel failed to launch the generated `server.js`
-  candidate because it hardcoded `server.mjs`. The corrected workers later
-  passed all three Gondolin probes in a separate, pinned reassessment. The
-  original score remains **10/11**, and that reassessment is still `not-ready`.
-- Cycle 06 passed the independent gate, all ten direct behavior items, and the
-  fresh blind review. The original scorer filed **11/11**. Its original panel
-  failed on new UI and view shapes; a separately pinned reassessment of the
-  same frozen candidate passed all three Gondolin specialists and produced
-  **15 Allure cases, ready-for-review**, with no gaps. The original cycle
-  audit and score remain unchanged.
+## Panel-only reassessment & audit playback
 
-Pi is the active driver by operator direction. The original cycle failure
-remains visible; the reassessment is separately labelled. The generated app
-and grading panel still need the acceptance checks in
-[`PRODUCTION-CANDIDATE.md`](PRODUCTION-CANDIDATE.md).
+- Panel-only reassessment (leaves the original cycle outcome unchanged):
+  ```sh
+  bin/loyly-panel-reassess --check <reassess.json>
+  bin/loyly-panel-reassess --run <reassess.json>
+  ```
+- Export committed Pi audit entries and bound Allure evidence to replay HTML:
+  ```sh
+  bin/loyly-clj export-replay <cycle-scratch>
+  ```
+- Render scored Allure report:
+  ```sh
+  bin/loyly-clj render-allure <cycle-scratch>
+  ```
 
-## Audit playback
+## Typecheck & static analysis
 
-`node export.mjs <cycle-scratch>` exports committed Pi entries to
-`audit.v1.jsonl`, validates the bound Allure evidence into
-`evidence.v1.json`, and writes `replay.PROTOTYPE.html` in the current working
-directory. The page distinguishes Pi events from Allure evidence projections.
-The reassessment receipt and report remain separate from the original replay.
+```sh
+# Minimal @earendil-works/pi-durable TypeScript extension
+(cd harness/pi-durable && npm run check)
+
+# Full Clojure/ClojureScript harness lint, static analysis & formal verification
+bin/loyly-clj analyze
+bin/loyly-clj formal
+```
+
+Read [`PRODUCTION-CANDIDATE.md`](PRODUCTION-CANDIDATE.md) before claiming a
+generated app or grading panel is accepted.
