@@ -7,7 +7,7 @@ PKG="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$PKG/../.." && pwd)"
 
 if [[ $# -lt 1 ]]; then
-  echo "usage: bin/loyly-clj <gen-checklist|score|scoreboard|stamp|demo|cycle|panel-reassess|worker|export-replay|render-allure|blind-review|node|lint|analyze|formal> [args...]" >&2
+  echo "usage: bin/loyly-clj <gen-checklist|score|scoreboard|stamp|demo|cycle|panel-reassess|worker|builder-host|export-replay|render-allure|blind-review|node|lint|analyze|formal> [args...]" >&2
   exit 2
 fi
 
@@ -41,7 +41,7 @@ case "$task" in
       run_nbb "$@" --root "$REPO"
     fi
     ;;
-  panel-reassess|worker|export-replay|render-allure|blind-review)
+  panel-reassess|worker|builder-host|export-replay|render-allure|blind-review)
     if has_root_arg "$@"; then
       run_nbb "$task" "$@"
     else

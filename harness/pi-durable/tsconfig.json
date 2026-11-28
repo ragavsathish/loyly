@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["pi-extension.ts"]
+  "include": ["pi-extension.ts", "pi-builder-extension.ts", "gondolin-vm.ts"]
 }

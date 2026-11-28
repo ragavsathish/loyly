@@ -8,6 +8,7 @@
             [loyly.adapters :as adapters]
             [loyly.blind-agent :as blind-agent]
             [loyly.blind-review :as blind]
+            [loyly.builder-host :as bh]
             [loyly.contracts :as contracts]
             [loyly.cycle-core :as life]
             [loyly.digest :as d]
@@ -18,6 +19,7 @@
             [loyly.launch-config :as launch]
             [loyly.live-contract :as live]
             [loyly.node.adapters :as node-ad]
+            [loyly.node.builder-host :as node-bh]
             [loyly.node.pi-backend :as pi]
             [loyly.node.pi-worker :as pi-worker]
             [loyly.node.runtime :as rt]
@@ -54,6 +56,7 @@
         "  loyly-clj node cycle codex reassess <contract.json>\n"
         "  loyly-clj node panel-reassess --check|--run <reassess.json>\n"
         "  loyly-clj node worker <scratch> [mode]\n"
+        "  loyly-clj node builder-host <room> <instruction> <store> <request-id> <pi-settings>\n"
         "  loyly-clj node export-replay [scratch...] [--out <html-path>]\n"
         "  loyly-clj node render-allure <scored-cycle-scratch>\n"
         "  loyly-clj node blind-review prepare|probe|file <paths...>\n"
@@ -176,6 +179,13 @@
             exported (replay-export/export-run scratch [{"seq" 1 "stage" "score" "outcome" "filed"}])
             html (replay-export/render-replay-html [exported])
             _ (when-not (and (str/includes? html "Pi durable cycle audit")
+                             (= 300 (bh/clamp-bash-timeout nil 300 300))
+                             (= 300 (bh/clamp-bash-timeout 30 300 300))
+                             (= 300 (bh/clamp-bash-timeout 1800 300 300))
+                             (= 1800 (bh/clamp-bash-timeout 30 1800 nil))
+                             (nil? (bh/clamp-bash-timeout nil 1800 nil))
+                             (str/includes? (bh/environment-text {:tools ["read" "bash"] :timeout-floor 300 :timeout-ceiling 300})
+                                            "5 minutes timeout")
                              (fn? (node-ad/make-http-fetch-fn))
                              (fn? (node-ad/make-allure-cli-fn repo))
                              (fn? (node-ad/make-spawn-hook))
@@ -216,6 +226,9 @@
             "worker"
             (let [[scratch mode] more]
               (pi-worker/run-worker! {:repo repo :scratch scratch :mode mode}))
+
+            "builder-host"
+            (node-bh/run-builder-host! {:repo repo :argv more})
 
             "panel-reassess"
             (let [[action contract] more]

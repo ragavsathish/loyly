@@ -1,21 +1,21 @@
-# Pi durable extension & Gondolin probe assets
+# Pi & Gondolin extensions and probe assets
 
-This directory holds the minimal `@earendil-works/pi-durable` TypeScript shim
-(`pi-extension.ts`), the pinned JSON Schemas, panel plans, agent instructions,
-and guest-VM specialist scripts (`panel-*.mjs`, mounted read-only into Gondolin
-QEMU VMs). All cycle logic, contract verification, grading-room management,
-blind review, panel compilation, and scoring live in
+This directory holds the three minimal `@earendil-works/*` TypeScript shims
+(`pi-extension.ts`, `pi-builder-extension.ts`, `gondolin-vm.ts`), the pinned
+JSON Schemas, panel plans, agent instructions, and guest-VM specialist scripts
+(`panel-*.mjs`, mounted read-only into Gondolin QEMU VMs). All cycle logic,
+builder-host policy/prompt/receipt/steering logic, contract verification,
+grading-room management, blind review, panel compilation, and scoring live in
 [`../loyly-clj/`](../loyly-clj/) (`.cljc` primary core + thin `.cljs` Node
 adapters). The original `harness/` scripts still perform the self-check,
 physical fence, checklist, gate, score and scoreboard.
 
 ## Run a pinned live cycle
 
-Install dependencies in `harness/loyly-clj`, `harness/pi-durable`, and
-`.pi/harness/builder-host`. Set `JAVA_HOME` to Java 21 when required by the
-contract. Create an ignored JSON contract matching
-[`live-run.schema.json`](live-run.schema.json), then run from the repository
-root:
+Install dependencies in `harness/loyly-clj` and `harness/pi-durable`. Set
+`JAVA_HOME` to Java 21 when required by the contract. Create an ignored JSON
+contract matching [`live-run.schema.json`](live-run.schema.json), then run from
+the repository root:
 
 ```sh
 bin/loyly-cycle --check scratch-production-cycle-XX/live-run.json

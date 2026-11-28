@@ -26,7 +26,7 @@
      :backend "loyly-clj"
      :extension "harness/pi-durable/pi-extension.ts"
      :cljc-actions ["--check"]
-     :cljs-node-actions ["--run" "panel-reassess" "worker" "export-replay" "render-allure" "blind-review"]
+     :cljs-node-actions ["--run" "panel-reassess" "worker" "builder-host" "export-replay" "render-allure" "blind-review"]
      :actions pi/PI-ACTIONS
      :usage "loyly-clj cycle pi --check <live-run.json>
   loyly-clj cycle pi --run <live-run.json>
