@@ -7,7 +7,7 @@ PKG="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$PKG/../.." && pwd)"
 
 if [[ $# -lt 1 ]]; then
-  echo "usage: bin/loyly-clj <gen-checklist|score|scoreboard|stamp|demo|cycle|panel-reassess|worker|builder-host|export-replay|render-allure|blind-review|node|lint|analyze|formal> [args...]" >&2
+  echo "usage: bin/loyly-clj <gen-checklist|score|scoreboard|stamp|demo|cycle|panel-reassess|worker|builder-host|export-replay|render-allure|blind-review|node|lint|analyze|formal|spec> [args...]" >&2
   exit 2
 fi
 
@@ -77,6 +77,7 @@ case "$task" in
   scoreboard) ns=loyly.scoreboard ;;
   stamp) ns=loyly.stamp-item-ids ;;
   demo) ns=loyly.demo ;;
+  spec) ns=loyly.spec-check ;;
   *)
     echo "unknown task: $task" >&2
     exit 2

@@ -25,7 +25,7 @@
   (fs/path repo "harness" "pi-durable" rel))
 
 (defn pin-json-schema!
-  "Prove a TS JSON Schema file still exists and return its content digest.
+  "Prove a published JSON Schema file still exists and return its content digest.
   Traceability: formal CLJ models ↔ published schema bytes on disk."
   [repo rel]
   (let [path (schema-path repo rel)]
@@ -37,7 +37,7 @@
      :bytes (fs/size path)}))
 
 (def SchemaPins
-  "TS schema files the formal road must stay bound to."
+  "Published JSON Schema files the formal road must stay bound to."
   ["panel-plan.schema.json"
    "panel-summary.schema.json"
    "live-run.schema.json"

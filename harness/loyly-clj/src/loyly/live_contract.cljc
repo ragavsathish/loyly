@@ -166,7 +166,8 @@
             :or {make-checklist true
                  root "."
                  pi-durable "harness/pi-durable"}}]
-  (let [config ((schema/compile-schema :live-run nil) input "live run")
+  (let [_ ((schema/compile-schema :live-run nil) input "live run")
+        config input
         source (str (plat/absolutize (get-in config ["source" "repo"])))
         scratch (str (plat/absolutize (get config "scratch")))
         repo-root (str (plat/absolutize root))]

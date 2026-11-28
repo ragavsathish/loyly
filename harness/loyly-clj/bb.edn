@@ -45,6 +45,11 @@
    :requires ([loyly.formal.main :as formal])
    :task (apply formal/-main *command-line-args*)}
 
+  spec
+  {:doc "Run executable Gherkin spec checks (harness/specs/cycle.spec.feature + project)"
+   :requires ([loyly.spec-check :as spec])
+   :task (apply spec/-main *command-line-args*)}
+
   lint
   {:doc "clj-kondo (.clj/.cljc/.cljs) + loyly product-literal / deep-import rules"
    :task (shell {:dir "."} "bb" "scripts/analyze.clj" "lint")}

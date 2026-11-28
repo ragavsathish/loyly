@@ -85,9 +85,10 @@ bin/loyly-clj blind-review prepare|probe|file <paths...>
 bin/loyly-clj node smoke
 bin/loyly-clj node cycle list
 
-# Formal verification (theory 𝒜 + cycle 𝒞)
+# Formal verification (theory 𝒜 + cycle 𝒞) and executable Gherkin specs
 bin/loyly-clj formal
 bin/loyly-clj formal --theory
+bin/loyly-clj spec
 
 # Babashka end-to-end smoke
 bin/loyly-clj demo
@@ -95,8 +96,9 @@ bin/loyly-clj demo
 
 ## Two roads (assurance ↔ formal models)
 
-Gherkin behaviour specs live in `harness/cycle.spec.feature` (language- and
-project-agnostic) and `harness/project/loyly/cycle.spec.feature` (Löyly pins).
+Gherkin behaviour specs live in `harness/specs/cycle.spec.feature` (language- and
+project-agnostic) and `harness/project/loyly/cycle.spec.feature` (Löyly pins),
+and are executed with strict 1-to-1 tag coverage via `bin/loyly-clj spec`.
 
 | Symbol | Meaning | Code |
 | --- | --- | --- |

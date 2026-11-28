@@ -37,7 +37,8 @@
     "loyly.scoreboard"
     "loyly.stamp-item-ids"
     "loyly.node.cli"
-    "loyly.formal.main"})
+    "loyly.formal.main"
+    "loyly.spec-check"})
 
 (defn- clj-files []
   (->> (concat (fs/glob src "**.{clj,cljc,cljs}")

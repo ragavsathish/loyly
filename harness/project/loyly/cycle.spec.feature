@@ -1,6 +1,6 @@
 # Löyly project-specific live cycle and formal behaviour.
 #
-# Complements the product-agnostic harness/cycle.spec.feature. Product slice
+# Complements the product-agnostic harness/specs/cycle.spec.feature. Product slice
 # behaviour (booking rooms, slots, …) stays under docs/plan/*/spec.feature.
 # This file only covers how the Löyly project specialises the cycle examiner
 # and formal pins — still outside the product checklist denominator.

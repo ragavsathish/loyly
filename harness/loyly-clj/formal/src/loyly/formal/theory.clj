@@ -73,7 +73,7 @@
     :statement (str loyly/DEFAULT_PANEL_PLAN " ∈ PanelPlan")
     :proved-by 'loyly.formal.trace/prove-booking-panel!}
    {:id :I7
-    :statement "TS JSON Schema files for panel/live/allure are present and digested"
+    :statement "Published JSON Schema files for panel/live/allure are present and digested"
     :proved-by 'loyly.formal.trace/pin-all-json-schemas!}
    {:id :I8
     :statement "∀ r ∈ LiveRun. schema∈{v1,v2} ∧ Valid_live-run(r)"

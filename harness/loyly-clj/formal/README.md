@@ -7,7 +7,7 @@ assurance modules under `../src/loyly/` (`.cljc` core + `.cljs` Node wrappers).
 
 | File | Scope |
 |------|--------|
-| [`../../cycle.spec.feature`](../../cycle.spec.feature) | Language- and project-agnostic (`@cycle-*`, `@formal-*`) |
+| [`../../specs/cycle.spec.feature`](../../specs/cycle.spec.feature) | Language- and project-agnostic (`@cycle-*`, `@formal-*`) |
 | [`../../project/loyly/cycle.spec.feature`](../../project/loyly/cycle.spec.feature) | Löyly pins (`@loyly-cycle-*`, `@loyly-formal-*`) |
 
 | Module | Role |
@@ -15,7 +15,7 @@ assurance modules under `../src/loyly/` (`.cljc` core + `.cljs` Node wrappers).
 | `loyly.formal.models` | Many-sorted carriers 𝒜 (Malli Registry) |
 | `loyly.formal.cycle` | Cycle LTS 𝒞 = (Q,q₀,→,L,F) |
 | `loyly.formal.props` | Property / generative proofs (I*, C*) |
-| `loyly.formal.trace` | Pins to TS JSON Schema + fixtures |
+| `loyly.formal.trace` | Pins to published JSON Schema + fixtures |
 | `loyly.formal.theory` | Closed theory export |
 | `loyly.formal.main` | CLI: prove / `--theory` |
 

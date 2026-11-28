@@ -2,6 +2,9 @@
 #
 # This file describes product-agnostic behaviour of:
 #   - the pinned live cycle (assurance)
+#   - panel-only reassessment
+#   - the builder/grader Gondolin VM host policy
+#   - replay export and bound Allure rendering
 #   - the formal examiner (theory 𝒜 and cycle 𝒞)
 #
 # Language-agnostic and project-agnostic: steps name contracts, digests,
@@ -11,21 +14,21 @@
 #
 # CONVENTIONS:
 #
-# - Lives under harness/, NOT under docs/plan/. It is not a product slice and
-#   must never enter the product checklist denominator.
-# - Not part of the three-repository shared instrument (harness/spec.feature).
-#   modules.sh does not require this file to be byte-identical across siblings.
+# - Lives under harness/specs/, NOT under docs/plan/ (never enters the product
+#   checklist denominator) and NOT directly in top-level harness/ (keeps the
+#   shared three-repository adoption check in harness/modules.sh clean).
 # - Item ids are `@cycle-NNN` (live cycle / assurance) and `@formal-NNN`
 #   (mathematical examiner). They are stamped by hand; stamp_item_ids does not
-#   touch this file.
+#   touch this file. Existing ids are never renumbered.
 # - Formal verification examines published contracts; it does not replace the
 #   live worker. Scored production runs use the ratified cycle driver of record.
 # - "no incident, no guard" still holds for refuse scenarios. Contract scenarios
 #   that only state ordinary behaviour cite nothing.
 #
-# HOW IT IS JUDGED: a live-contract check CLI and a formal prove / theory CLI
-# (paths may vary by implementation). Oracle byte-parity for this file may
-# follow; until then those CLIs are the executable half.
+# HOW IT IS JUDGED: `bin/loyly-clj spec` parses this file and
+# `harness/project/loyly/cycle.spec.feature`, requires 1-to-1 executable
+# coverage of every scenario tag, and runs every scenario against the harness
+# and formal examiner (`bin/loyly-clj formal`).
 
 Feature: Live cycle and formal verification
 
@@ -100,6 +103,84 @@ Feature: Live cycle and formal verification
       When score is invoked for that cycle
       Then scoring refuses
       And no cycle score record is written for that refusal
+
+    @cycle-009
+    Scenario: Checking a live-run contract stays separate from starting the live worker
+      Given a valid pinned live-run contract
+      When the operator checks the contract without running a cycle
+      Then the check validates pins and cleanliness without starting a live worker
+      And no worker state or score record is written by the check alone
+
+  # -------------------------------------------------------------------------------
+  # Panel-only reassessment
+  # -------------------------------------------------------------------------------
+
+  Rule: Panel-only reassessment uses a separate pinned contract and preserves the original cycle
+
+    @cycle-010
+    Scenario: Panel reassessment refuses unpinned contracts or output outside the original scratch
+      Given a panel reassessment contract with missing digests or an output path outside the original scratch
+      When the reassessment check runs
+      Then the check refuses before launching any specialist VM
+
+    @cycle-011
+    Scenario: Panel reassessment records an immutable receipt leaving the original cycle unchanged
+      Given a verified reassessment run over a frozen candidate and filed score
+      When the reassessment receipt is finalized
+      Then the receipt records original_cycle_unchanged as true
+      And a conflicting rewrite of that receipt is refused
+
+  # -------------------------------------------------------------------------------
+  # Builder and grader VM host policy
+  # -------------------------------------------------------------------------------
+
+  Rule: The builder and grader VM host enforces sandbox, timeout and lineage bounds
+
+    @cycle-012
+    Scenario: Bash timeouts are clamped to the configured floor and optional ceiling
+      Given a configured bash timeout floor and an optional ceiling
+      When a tool call requests a timeout below the floor or above the ceiling
+      Then the timeout is raised to the floor or capped at the ceiling
+      And when no ceiling is set an in-range timeout is left unchanged
+
+    @cycle-013
+    Scenario: Image additions and VM resources stay within safe bounds
+      Given an image-additions path outside /workspace or containing parent traversal
+      Or invalid VM memory or CPU resource values
+      When the VM host policy validates those settings
+      Then validation refuses the unsafe path or resource specification
+
+    @cycle-014
+    Scenario: Forked builder sessions reject mismatched stores or missing parent fork points
+      Given a conversation receipt whose store differs or whose parent has no completed fork point
+      Or a fork receipt reopened without its parent receipt
+      When the session lineage is validated
+      Then validation refuses before resuming the builder session
+
+    @cycle-015
+    Scenario: Steer inbox scans only unprocessed markdown messages in sorted order
+      Given a steer directory with pending markdown files, already steered or refused files, and non-markdown entries
+      When pending steer messages are collected
+      Then only unprocessed markdown files with valid names are returned in sorted order
+
+  # -------------------------------------------------------------------------------
+  # Replay export and bound Allure rendering
+  # -------------------------------------------------------------------------------
+
+  Rule: Replay export and Allure rendering stay bound to committed audit digests
+
+    @cycle-016
+    Scenario: Portable replay export sanitizes host paths and classifies provenance
+      Given committed Pi audit rows referencing a host-local scratch path
+      When replay export runs for that scratch directory
+      Then audit.v1.jsonl and evidence.v1.json replace the host scratch path with <scratch>
+      And provenance distinguishes fixture evidence, live path and pre-agent refusal
+
+    @cycle-017
+    Scenario: Allure rendering refuses when candidate or audit bindings drift
+      Given a scored cycle scratch whose candidate tree no longer matches score-input.json
+      When Allure rendering is invoked
+      Then rendering refuses before generating a report manifest
 
   # -------------------------------------------------------------------------------
   # Formal verification road — 𝒜 and 𝒞
@@ -204,6 +285,16 @@ Feature: Live cycle and formal verification
       Then the prove uses those published contract bytes
       And no live worker needs to have run for the prove to succeed
 
+  Rule: Bounded retry, panel attempt and shard invariants hold
+
+    @formal-013
+    Scenario: Panel attempts, grader shards and builder continuations stay bounded
+      Given the formal property suite for invariants I11, I12 and I13
+      When panel selections, grader shards and continuation limits are checked
+      Then panel attempts are in {1, 2}
+      And grader shards have between 1 and 16 unique ids
+      And builder continuations are capped at 3
+
   # -------------------------------------------------------------------------------
   # Dual roads — assurance and formal stay distinct
   # -------------------------------------------------------------------------------
@@ -217,11 +308,3 @@ Feature: Live cycle and formal verification
       When an operator asks what formal verification examined
       Then the answer names the published schema and panel digests
       And the answer does not claim the formal examiner executed the live worker
-
-    @cycle-009
-    Scenario: An alternate live-check implementation may exist without replacing the worker of record
-      Given more than one conforming live-check implementation
-      When the operator checks a live-run contract with either implementation
-      Then both refuse or accept according to the same pin and cleanliness rules
-      And starting the live worker remains a separate action from checking the contract
-      And the ratified cycle driver of record remains authoritative for scored production runs
