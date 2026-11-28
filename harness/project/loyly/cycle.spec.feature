@@ -24,7 +24,7 @@ Feature: Löyly project cycle and formal pins
     Scenario: Blind review is on the Löyly path before score
       Given the project is loyly
       And the booking-core cycle phase list
-      When the path from cut to done is read
+      When the path from prepare to done is read
       Then blind-review appears on the path
       And blind-review appears before score
       And formal cycle invariant C4 holds

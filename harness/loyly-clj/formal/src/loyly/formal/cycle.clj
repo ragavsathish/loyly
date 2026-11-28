@@ -3,9 +3,9 @@
 
   Cycle 𝒞 = (Q, q₀, →, L, F)
 
-  - Q  — phases (states)
-  - q₀ — initial phase (cut)
-  - →  — successor relation (linear spine + after-* sync points)
+  - Q  — canonical phases (prepare -> build -> gate -> grade -> blind-review -> score -> panel -> done)
+  - q₀ — initial phase (prepare)
+  - →  — successor relation (linear cycle spine)
   - L  — labeling: phase ↦ required models / digests produced
   - F  — accepting states {done}
 
@@ -19,7 +19,7 @@
 ;;; --- Sorts -----------------------------------------------------------------
 
 (def PhaseName
-  (into [:enum] life/ALL-PHASES))
+  (into [:enum] life/PHASES))
 
 (def CycleState
   "Runtime configuration of a cycle run (abstract state vector)."
@@ -35,12 +35,12 @@
 ;;; --- Transition system -----------------------------------------------------
 
 (def Q
-  "State set = ALL-PHASES."
-  (vec life/ALL-PHASES))
+  "State set = canonical PHASES."
+  (vec life/PHASES))
 
 (def q0
   "Initial state."
-  "cut")
+  "prepare")
 
 (def F
   "Accepting / terminal states."
@@ -61,7 +61,7 @@
   (= (succ q) q'))
 
 (defn path
-  "The unique maximal path from q₀: cut · … · done."
+  "The unique maximal path from q₀: prepare · … · done."
   []
   Q)
 
@@ -69,24 +69,14 @@
 
 (def labeling
   "L(q) = models that must be Valid at/after phase q (traceability to 𝒜 sorts)."
-  {"cut"           #{:commit}
-   "preflight"     #{:live-run :worker-config}
-   "fence"         #{:commit}
-   "checklist"     #{:checklist :item-id}
-   "render"        #{:continuation-ids}
-   "build"         #{:sha256 :continuation-ids}
-   "after-build"   #{:sha256}
-   "gate"          #{:gate-receipt :sha256}
-   "after-gate"    #{:gate-receipt}
-   "grading-room"  #{:grading-room :sha256}
-   "grade"         #{:allure-lifecycle :verdicts :grader-shards :audit-row}
-   "after-grade"   #{:allure-lifecycle :audit-rows}
-   "blind-review"  #{:blind-packet :blind-response :blind-probe}
-   "panel"         #{:panel-plan :panel-vm-run :panel-selection}
-   "after-panel"   #{:panel-summary :panel-vm-run :panel-selection}
-   "score"         #{:score-input :scores :verdicts}
-   "panel-report"  #{:panel-report :panel-summary :replay-evidence :audit-rows}
-   "done"          #{}})
+  {"prepare"      #{:commit :live-run :worker-config :checklist :item-id :continuation-ids}
+   "build"        #{:sha256 :continuation-ids}
+   "gate"         #{:gate-receipt :sha256}
+   "grade"        #{:grading-room :sha256 :allure-lifecycle :verdicts :grader-shards :audit-row :audit-rows}
+   "blind-review" #{:blind-packet :blind-response :blind-probe}
+   "score"        #{:score-input :scores :verdicts}
+   "panel"        #{:panel-plan :panel-vm-run :panel-selection :panel-summary :panel-report :replay-evidence :audit-rows}
+   "done"         #{}})
 
 (defn labels
   [q]
@@ -95,9 +85,10 @@
 ;;; --- Invariants on the cycle -----------------------------------------------
 
 (defn I-path-covers-core
-  "Every core PHASES element appears on the ALL-PHASES path."
+  "Q consists of distinct canonical phases with no duplicates."
   []
-  (every? (set Q) life/PHASES))
+  (and (= Q (vec life/PHASES))
+       (= (count Q) (count (set Q)))))
 
 (defn I-linear-total
   "succ is defined exactly on Q ∖ F and lands in Q."
@@ -117,12 +108,14 @@
        (= Q (path))))
 
 (defn I-blind-when-loyly
-  "If project is loyly booking-core, blind-review is on the path
-   (handoff phase exists before score)."
+  "Blind review precedes score, and panel follows score so panel never alters filed verdicts."
   []
   (let [i-blind (.indexOf Q "blind-review")
-        i-score (.indexOf Q "score")]
-    (and (>= i-blind 0) (>= i-score 0) (< i-blind i-score))))
+        i-score (.indexOf Q "score")
+        i-panel (.indexOf Q "panel")]
+    (and (>= i-blind 0) (>= i-score 0) (>= i-panel 0)
+         (< i-blind i-score)
+         (< i-score i-panel))))
 
 (defn I-labels-subset-registry
   "Every model mentioned in L(q) is a registered sort."
@@ -165,17 +158,17 @@
                    (map (fn [[k v]] [k (vec (sort v))]) labeling))
    :core-phases life/PHASES
    :equations
-   ["Q = ALL-PHASES"
-    "q₀ = cut"
+   ["Q = PHASES"
+    "q₀ = prepare"
     "q → q'  ⇔  succ(q) = q'"
     "F = {done}"
     "L : Q → 𝒫(SortNames)"
     "run = q₀ →* done"]
    :invariants
-   [{:id :C1 :statement "PHASES ⊆ Q"}
+   [{:id :C1 :statement "Q = distinct PHASES"}
     {:id :C2 :statement "succ total on Q\\F and image ⊆ Q"}
-    {:id :C3 :statement "unique path cut ↦ … ↦ done"}
-    {:id :C4 :statement "blind-review ≺ score on path"}
+    {:id :C3 :statement "unique path prepare ↦ … ↦ done"}
+    {:id :C4 :statement "blind-review ≺ score ≺ panel on path"}
     {:id :C5 :statement "⋃_q L(q) ⊆ Registry"}]
    :proof (prove-cycle!)})
 

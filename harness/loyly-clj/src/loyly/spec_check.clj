@@ -268,8 +268,10 @@
 (defn- check-cycle-006 [_repo]
   (let [p (formal-cycle/path)
         i-blind (.indexOf p "blind-review")
-        i-score (.indexOf p "score")]
+        i-score (.indexOf p "score")
+        i-panel (.indexOf p "panel")]
     (assert! (and (>= i-blind 0) (< i-blind i-score)) "blind-review precedes score")
+    (assert! (and (>= i-panel 0) (< i-score i-panel)) "panel follows score")
     (assert! (= #{"done"} formal-cycle/F) "done is the only terminal phase")))
 
 (defn- check-cycle-007 [_repo]
@@ -547,8 +549,9 @@
 
 (defn- check-formal-004 [_repo]
   (let [res (formal-cycle/prove-cycle!)]
-    (assert! (= "cut" (:q0 res)) "q0 is cut")
+    (assert! (= "prepare" (:q0 res)) "q0 is prepare")
     (assert! (= ["done"] (:F res)) "F is {done}")
+    (assert! (= 8 (count (:path res))) "8 canonical phases")
     (assert! (= (count formal-cycle/Q) (count (:path res))) "path length |Q|")
     (assert! (= [:C1 :C2 :C3 :C4 :C5] (:invariants res)) "C1..C5 proved")))
 
@@ -556,13 +559,13 @@
   (assert! (formal-cycle/I-labels-subset-registry) "C5 holds"))
 
 (defn- check-formal-006 [_repo]
-  (assert! (contains? (formal-cycle/labels "preflight") :live-run) "L(preflight) has :live-run")
+  (assert! (contains? (formal-cycle/labels "prepare") :live-run) "L(prepare) has :live-run")
   (assert! (set/subset? #{:score-input :verdicts} (formal-cycle/labels "score"))
            "L(score) has :score-input and :verdicts")
   (assert! (contains? (formal-cycle/labels "blind-review") :blind-packet)
            "L(blind-review) has :blind-packet")
-  (assert! (contains? (formal-cycle/labels "panel") :panel-plan)
-           "L(panel) has :panel-plan"))
+  (assert! (set/subset? #{:panel-plan :panel-report} (formal-cycle/labels "panel"))
+           "L(panel) has :panel-plan and :panel-report"))
 
 (defn- check-formal-007 [repo]
   (let [pins (trace/pin-all-json-schemas! repo)
@@ -583,7 +586,7 @@
         report (hjson/read-json (first lines))]
     (assert! (= "loyly.formal-run.v1" (get report "schema")) "formal-run schema")
     (assert! (true? (get report "ok")) "formal-run ok")
-    (assert! (= "cut" (first (get-in report ["cycle" "path"]))) "path starts at cut")
+    (assert! (= "prepare" (first (get-in report ["cycle" "path"]))) "path starts at prepare")
     (assert! (= "done" (last (get-in report ["cycle" "path"]))) "path ends at done")
     (assert! (= (mapv #(str "I" %) (range 1 14)) (get report "invariants")) "I1..I13 reported")
     (assert! (= ["C1" "C2" "C3" "C4" "C5"] (get-in report ["cycle" "invariants"])) "C1..C5 reported")))

@@ -1,34 +1,26 @@
 (ns loyly.cycle-core
-  "Core cycle lifecycle policy and canonical phase list (.cljc).")
+  "Core cycle lifecycle policy and canonical phase list (.cljc).
+
+   7 active phases + terminal done:
+     prepare -> build -> gate -> grade -> blind-review -> score -> panel -> done")
 
 (def PHASES
-  ["cut" "preflight" "build" "gate" "grade" "blind-review" "score" "panel" "done"])
-
-(def ALL-PHASES
-  ["cut" "preflight" "fence" "checklist" "render" "build" "after-build"
-   "gate" "after-gate" "grading-room" "grade" "after-grade" "blind-review"
-   "panel" "after-panel" "score" "panel-report" "done"])
+  ["prepare" "build" "gate" "grade" "blind-review" "score" "panel" "done"])
 
 (defn create-lifecycle
-  "Return {:after-build :after-gate :after-grade :after-assessment …}."
-  [& {:keys [max-build-attempts assessments]
-      :or {max-build-attempts 3 assessments []}}]
+  "Return transition functions for the simplified cycle API:
+   {:max-build-attempts :blind-review? :panel?
+    :after-build :after-gate :after-grade :after-blind-review :after-score :after-panel}."
+  [& {:keys [max-build-attempts blind-review? panel?]
+      :or {max-build-attempts 3 blind-review? false panel? false}}]
   (when (or (not (integer? max-build-attempts))
-            (< max-build-attempts 1)
-            (not (vector? assessments))
-            (not= (count assessments) (count (set assessments)))
-            (some #(nil? (re-matches #"^[a-z][a-z0-9-]*$" %)) assessments))
+            (< max-build-attempts 1))
     (throw (ex-info "invalid lifecycle policy" {})))
-  (let [after-grade-phase (or (first assessments) "score")
-        next-assessment
-        (fn [stage]
-          (let [idx (or (first (keep-indexed (fn [i x] (when (= x stage) i)) assessments))
-                        -1)]
-            (when (neg? idx)
-              (throw (ex-info (str "unknown assessment stage: " stage) {:stage stage})))
-            (or (get assessments (inc idx)) "score")))]
+  (let [blind? (boolean blind-review?)
+        panel-enabled? (boolean panel?)]
     {:max-build-attempts max-build-attempts
-     :assessments (vec assessments)
+     :blind-review? blind?
+     :panel? panel-enabled?
      :after-build
      (fn [attempt outcome]
        (when (or (not (integer? attempt)) (< attempt 1)
@@ -67,7 +59,7 @@
          {"terminal" true "reason" "gate-effect-failed" "attempt" attempt}
 
          (get-in outcome ["result" "passed"])
-         (cond-> {"phase" "grading-room" "attempt" attempt}
+         (cond-> {"phase" "grade" "attempt" attempt}
            (contains? (get outcome "result") "candidateSha256")
            (assoc "candidateSha256" (get-in outcome ["result" "candidateSha256"])))
 
@@ -89,15 +81,26 @@
      :after-grade
      (fn [outcome]
        (if (= (get outcome "status") "completed")
-         {"phase" after-grade-phase}
+         {"phase" (if blind? "blind-review" "score")}
          {"terminal" true "reason" "grader-effect-or-verdict"}))
 
-     :after-assessment
-     (fn [stage passed?]
-       (next-assessment stage)
+     :after-blind-review
+     (fn [passed?]
        (if passed?
-         {"phase" (next-assessment stage)}
-         {"terminal" true "reason" (str stage "-effect")}))}))
+         {"phase" "score"}
+         {"terminal" true "reason" "blind-review-effect"}))
+
+     :after-score
+     (fn [passed?]
+       (if passed?
+         {"phase" (if panel-enabled? "panel" "done")}
+         {"terminal" true "reason" "score-effect"}))
+
+     :after-panel
+     (fn [passed?]
+       (if passed?
+         {"phase" "done"}
+         {"terminal" true "reason" "panel-effect"}))}))
 
 (defn decide-attempt
   "Codex/Cursor decide: afterBuild (+ afterGate when build reached gate)."

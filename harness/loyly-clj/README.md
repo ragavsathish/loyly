@@ -106,8 +106,8 @@ and are executed with strict 1-to-1 tag coverage via `bin/loyly-clj spec`.
 | $\mathcal{P}$ | $\mathrm{Valid}_s(x)$ | `loyly.formal.models/valid?` |
 | $\mathcal{F}$ | $H$, $\delta$, $\Delta$, $\iota$ | `loyly.digest` + `loyly.formal.trace` |
 | $\mathcal{I}$ | I1–I13 | `loyly.formal.props` + `loyly.formal.trace` |
-| $Q$ | ALL-PHASES | `loyly.formal.cycle/Q` |
-| $q_0$ | cut | `loyly.formal.cycle/q0` |
+| $Q$ | PHASES (8 canonical) | `loyly.formal.cycle/Q` |
+| $q_0$ | prepare | `loyly.formal.cycle/q0` |
 | $\to$ | linear succ | `loyly.formal.cycle/succ` |
 | $L$ | phase $\mapsto$ model obligations | `loyly.formal.cycle/labeling` |
 | $F$ | $\{\mathrm{done}\}$ | `loyly.formal.cycle/F` |

@@ -441,18 +441,17 @@
   (let [files (read-json input-path)
         report (room/check-room-evidence files (seals-for driver))
         life (life/create-lifecycle
-              :assessments (get report "assessments"))]
+              :blind-review? (boolean (seq (get report "assessments"))))]
     (assoc report "nextPhase" ((:after-grade life) {"status" "completed"}))))
 
 (defn panel
   [input-path]
   (let [files (read-json input-path)
         assessed (panel/assess-room-panel files)
-        life (life/create-lifecycle :assessments ["panel"])]
+        life (life/create-lifecycle :panel? true)]
     (assoc assessed
            "nextPhase"
-           ((:after-assessment life)
-            "panel"
+           ((:after-panel life)
             (= "ready-for-review" (get assessed "panel_outcome"))))))
 
 (defn preflight

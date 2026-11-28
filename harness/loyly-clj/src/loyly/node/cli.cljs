@@ -168,7 +168,7 @@
                                  "build" {"status" "completed"}
                                  "gate" {"status" "completed" "result" {"passed" true}}}))
             decided (adapters/dispatch :codex "decide" decide-in repo)
-            _ (when-not (= "grading-room" (get-in decided ["afterGate" "phase"]))
+            _ (when-not (= "grade" (get-in decided ["afterGate" "phase"]))
                 (rt/die! (str "cljc adapters/dispatch decide failed in Node: " (pr-str decided))))
             wcfg (worker/parse-worker-config repo scratch "repair" {})
             ci (pi-worker/build-cycle-input wcfg "smoke-1" "02" {})
@@ -178,6 +178,7 @@
             _ (hjson/spit-utf8 audit-file (hjson/compact-json [{"seq" 1 "stage" "score" "outcome" "filed"}]))
             exported (replay-export/export-run scratch [{"seq" 1 "stage" "score" "outcome" "filed"}])
             html (replay-export/render-replay-html [exported])
+            life (life/create-lifecycle :blind-review? true :panel? true)
             _ (when-not (and (str/includes? html "Pi durable cycle audit")
                              (= 300 (bh/clamp-bash-timeout nil 300 300))
                              (= 300 (bh/clamp-bash-timeout 30 300 300))
@@ -198,7 +199,10 @@
                              (fn? adapters/check-cursor-contract)
                              (fn? adapters/check-codex-reassessment)
                              (= 3 (count (:drivers (node-ad/catalog))))
-                             (map? (life/create-lifecycle)))
+                             (= "blind-review" (get ((:after-grade life) {"status" "completed"}) "phase"))
+                             (= "score" (get ((:after-blind-review life) true) "phase"))
+                             (= "panel" (get ((:after-score life) true) "phase"))
+                             (= "done" (get ((:after-panel life) true) "phase")))
                 (rt/die! "Node hook / API verification failed"))]
         (p/let [audit-rows (pi/read-audit-rows-async repo scratch)]
           (when-not (= 1 (count audit-rows))

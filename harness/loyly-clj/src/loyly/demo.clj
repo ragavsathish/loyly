@@ -296,10 +296,9 @@
             _ (when-not (nil? (replay/project-grade-row
                                [{"stage" "grade" "outcome" "failed"}]))
                 (die "project-grade-row should skip incomplete grade rows"))
-            _ (when-not (= "score" (nth life/PHASES 6))
-                (die "cycle-core PHASES map drifted"))
-            _ (when-not (pos? (count life/ALL-PHASES))
-                (die "cycle-core ALL-PHASES missing"))
+            _ (when-not (= ["prepare" "build" "gate" "grade" "blind-review" "score" "panel" "done"]
+                           life/PHASES)
+                (die "cycle-core PHASES drifted"))
             _ (when-not (fn? replay/project-replay-evidence)
                 (die "project-replay-evidence missing"))
             _ (when-not (fn? live/check-live-run)

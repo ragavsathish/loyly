@@ -586,329 +586,304 @@
                           :outcome (legacy-failure "panel" {})})
                        ctx)))))}}))
 
+(defn- append-audits! [audit tx task entries]
+  (reduce (fn [acc [stage outcome extra]]
+            (p/then acc (fn [_] (audit tx task stage outcome (clj->js extra)))))
+          (p/resolved nil)
+          entries))
+
+(defn- run-prepare-steps
+  [{:keys [approved-commit approved-source-repo approved-checklist-sha256
+           cut source-root live builder]}
+   {:keys [scratch room-dir pi-dir repo command prove-cut proof-of-fence git-at measure-log]}]
+  (let [cut-r (cond
+                (or (nil? approved-commit) (prove-cut))
+                {:code 0 :sha256 (fx/hash-value "original source: no cut requested")}
+                :else
+                (do
+                  (when (plat/exists? cut)
+                    (throw (ex-info "incomplete or changed original-source cut" {})))
+                  (plat/create-dirs cut)
+                  (let [r1 (command "cut-clone" "git"
+                                    ["clone" "-q" "--no-local" "--no-checkout"
+                                     approved-source-repo source-root]
+                                    :cwd repo)
+                        r2 (if (zero? (:code r1))
+                             (command "cut-checkout" "git"
+                                      ["checkout" "-q" "--detach" approved-commit]
+                                      :cwd source-root)
+                             r1)]
+                    (when (and (zero? (:code r2))
+                               (= (git-at source-root "rev-parse" "HEAD") approved-commit)
+                               (= (git-at source-root "status" "--porcelain") ""))
+                      (hjson/spit-utf8
+                       (plat/path cut "cut.json")
+                       (hjson/compact-json
+                        (array-map "commit" approved-commit
+                                   "project" source-root
+                                   "source_repo" approved-source-repo))))
+                    (if (prove-cut) r2 (assoc r2 :code 1)))))
+        cut-entry ["cut" (if (zero? (:code cut-r)) "pinned" "failed")
+                   {:approved_commit approved-commit
+                    :source_root source-root
+                    :log_sha256 (:sha256 cut-r)}]]
+    (if-not (zero? (:code cut-r))
+      {:failed "cut" :audits [cut-entry]}
+      (let [check-r (command "preflight" "bash" ["harness/check.sh" "--local"])
+            check-entry ["self-check" (if (zero? (:code check-r)) "passed" "failed")
+                         {:log_sha256 (:sha256 check-r)}]]
+        (if-not (zero? (:code check-r))
+          {:failed "self-check" :audits [cut-entry check-entry]}
+          (let [fence-r (if (proof-of-fence)
+                          {:code 0 :output "fence OK: reconciled"
+                           :sha256 (fx/hash-value "fence OK: reconciled")}
+                          (command "fence" "bash" ["harness/fence.sh" room-dir]))
+                fence-entry ["fence" (if (zero? (:code fence-r)) "passed" "failed")
+                             {:room room-dir :log_sha256 (:sha256 fence-r)}]]
+            (if-not (zero? (:code fence-r))
+              {:failed "fence" :audits [cut-entry check-entry fence-entry]}
+              (let [out (plat/path scratch "checklist.json")
+                    cl-r (measure-log "checklist"
+                                      #(do (checklist/generate {:root source-root :out out})
+                                           {:stdout "checklist derived\n" :stderr ""}))
+                    n (if (zero? (:code cl-r))
+                        (count (get (hjson/read-json (plat/read-text out)) "items"))
+                        0)
+                    actual (when (zero? (:code cl-r)) (d/file-sha256 out))
+                    cl-ok? (and (zero? (:code cl-r))
+                                (or (nil? approved-commit) (= actual approved-checklist-sha256)))
+                    cl-entry ["checklist" (if cl-ok? "derived" "refused")
+                              {:item_count n
+                               :checklist_sha256 actual
+                               :approved_sha256 approved-checklist-sha256
+                               :log_sha256 (:sha256 cl-r)}]]
+                (if-not cl-ok?
+                  {:failed "checklist" :audits [cut-entry check-entry fence-entry cl-entry]}
+                  (let [instruction (if live
+                                      (plat/read-text (plat/path pi-dir (:instruction-file builder)))
+                                      (str (plat/read-text (plat/path source-root "harness" "README.md"))
+                                           "\n\n"
+                                           (plat/read-text (plat/path source-root "docs" "plan"
+                                                                      loyly/BOOKING_SLICE "spec.feature"))))
+                        cmd-sha (when (and live (plat/exists? (:command builder)))
+                                  (d/file-sha256 (:command builder)))
+                        manifest (when live (plat/path (:image builder) "manifest.json"))
+                        img-sha (when (and manifest (plat/exists? manifest))
+                                  (d/file-sha256 manifest))
+                        instr-sha (fx/hash-value instruction)
+                        render-ok? (or (not live)
+                                       (and (= instr-sha (:instruction-sha256 builder))
+                                            (= cmd-sha (:command-sha256 builder))
+                                            (= img-sha (:image-sha256 builder))))
+                        _ (when render-ok?
+                            (plat/write-text (plat/path scratch "prompt.txt") instruction))
+                        render-entry ["render" (if render-ok? "completed" "refused")
+                                      {:instruction_sha256 instr-sha
+                                       :approved_instruction_sha256 (:instruction-sha256 builder)
+                                       :builder_command_sha256 cmd-sha
+                                       :approved_command_sha256 (:command-sha256 builder)
+                                       :builder_image_sha256 img-sha
+                                       :approved_image_sha256 (:image-sha256 builder)
+                                       :model (:model builder)}]]
+                    {:failed (when-not render-ok? "render")
+                     :audits [cut-entry check-entry fence-entry cl-entry render-entry]}))))))))))
+
 (defn- build-cycle-task
   [{:keys [cfg lifecycle scratch room-dir grading-room instrument pi-dir repo run-id score-cycle
            schema-file attached-schema-sha256 effects audit allure-cli-fn read-audit-rows-fn]}
    {:keys [Builder Gate Grade Panel]}]
-  (let [{:keys [approved-commit approved-source-repo approved-checklist-sha256
-                cut source-root live builder grader blind-agent blind-required project panel]} cfg
+  (let [{:keys [approved-checklist-sha256 source-root live grader blind-agent
+                blind-required project panel]} cfg
         command (:command effects)
-        prove-cut (:prove-cut effects)
-        proof-of-fence (:proof-of-fence effects)
-        git-at (:git-at effects)
         candidate-digest (:candidate-digest effects)
         measure-log (:measure-log effects)]
     #js {:name "loyly.proto.cycle"
-         :initial (fn [] #js {:phase "cut"})
+         :initial (fn [] #js {:phase "prepare"})
          :phases
-         #js {"cut"
+         #js {"prepare"
               (fn [task runtime ctx]
-                (let [r (cond
-                          (or (nil? approved-commit) (prove-cut))
-                          {:code 0 :sha256 (fx/hash-value "original source: no cut requested")}
-                          :else
-                          (do
-                            (when (plat/exists? cut)
-                              (throw (ex-info "incomplete or changed original-source cut" {})))
-                            (plat/create-dirs cut)
-                            (let [r1 (command "cut-clone" "git"
-                                              ["clone" "-q" "--no-local" "--no-checkout"
-                                               approved-source-repo source-root]
-                                              :cwd repo)
-                                  r2 (if (zero? (:code r1))
-                                       (command "cut-checkout" "git"
-                                                ["checkout" "-q" "--detach" approved-commit]
-                                                :cwd source-root)
-                                       r1)]
-                              (when (and (zero? (:code r2))
-                                         (= (git-at source-root "rev-parse" "HEAD") approved-commit)
-                                         (= (git-at source-root "status" "--porcelain") ""))
-                                (hjson/spit-utf8
-                                 (plat/path cut "cut.json")
-                                 (hjson/compact-json
-                                  (array-map "commit" approved-commit
-                                             "project" source-root
-                                             "source_repo" approved-source-repo))))
-                              (if (prove-cut) r2 (assoc r2 :code 1)))))]
-                  (commit-with-audit!
-                   runtime audit task "cut" (if (zero? (:code r)) "pinned" "failed")
-                   {:approved_commit approved-commit
-                    :source_root source-root
-                    :log_sha256 (:sha256 r)}
-                   (if (zero? (:code r))
-                     {:status "running" :checkpoint {:phase "preflight"}}
-                     (terminal-fail "cut"))
-                   ctx)))
-
-              "preflight"
-              (fn [task runtime ctx]
-                (let [r (command "preflight" "bash" ["harness/check.sh" "--local"])]
-                  (commit-with-audit!
-                   runtime audit task "self-check" (if (zero? (:code r)) "passed" "failed")
-                   {:log_sha256 (:sha256 r)}
-                   (if (zero? (:code r))
-                     {:status "running" :checkpoint {:phase "fence"}}
-                     (terminal-fail "self-check"))
-                   ctx)))
-
-              "fence"
-              (fn [task runtime ctx]
-                (let [r (if (proof-of-fence)
-                          {:code 0 :output "fence OK: reconciled"
-                           :sha256 (fx/hash-value "fence OK: reconciled")}
-                          (command "fence" "bash" ["harness/fence.sh" room-dir]))]
-                  (commit-with-audit!
-                   runtime audit task "fence" (if (zero? (:code r)) "passed" "failed")
-                   {:room room-dir :log_sha256 (:sha256 r)}
-                   (if (zero? (:code r))
-                     {:status "running" :checkpoint {:phase "checklist"}}
-                     (terminal-fail "fence"))
-                   ctx)))
-
-              "checklist"
-              (fn [task runtime ctx]
-                (let [out (plat/path scratch "checklist.json")
-                      r (measure-log "checklist"
-                                     #(do (checklist/generate {:root source-root :out out})
-                                          {:stdout "checklist derived\n" :stderr ""}))
-                      n (if (zero? (:code r))
-                          (count (get (hjson/read-json (plat/read-text out)) "items"))
-                          0)
-                      actual (when (zero? (:code r)) (d/file-sha256 out))
-                      approved? (or (nil? approved-commit) (= actual approved-checklist-sha256))]
-                  (commit-with-audit!
-                   runtime audit task "checklist"
-                   (if (and (zero? (:code r)) approved?) "derived" "refused")
-                   {:item_count n
-                    :checklist_sha256 actual
-                    :approved_sha256 approved-checklist-sha256
-                    :log_sha256 (:sha256 r)}
-                   (if (and (zero? (:code r)) approved?)
-                     {:status "running" :checkpoint {:phase "render"}}
-                     (terminal-fail "checklist"))
-                   ctx)))
-
-              "render"
-              (fn [task runtime ctx]
-                (let [instruction (if live
-                                    (plat/read-text (plat/path pi-dir (:instruction-file builder)))
-                                    (str (plat/read-text (plat/path source-root "harness" "README.md"))
-                                         "\n\n"
-                                         (plat/read-text (plat/path source-root "docs" "plan"
-                                                                    loyly/BOOKING_SLICE "spec.feature"))))
-                      cmd-sha (when (and live (plat/exists? (:command builder)))
-                                (d/file-sha256 (:command builder)))
-                      manifest (when live (plat/path (:image builder) "manifest.json"))
-                      img-sha (when (and manifest (plat/exists? manifest))
-                                (d/file-sha256 manifest))
-                      instr-sha (fx/hash-value instruction)
-                      approved? (or (not live)
-                                    (and (= instr-sha (:instruction-sha256 builder))
-                                         (= cmd-sha (:command-sha256 builder))
-                                         (= img-sha (:image-sha256 builder))))]
-                  (when approved?
-                    (plat/write-text (plat/path scratch "prompt.txt") instruction))
-                  (commit-with-audit!
-                   runtime audit task "render" (if approved? "completed" "refused")
-                   {:instruction_sha256 instr-sha
-                    :approved_instruction_sha256 (:instruction-sha256 builder)
-                    :builder_command_sha256 cmd-sha
-                    :approved_command_sha256 (:command-sha256 builder)
-                    :builder_image_sha256 img-sha
-                    :approved_image_sha256 (:image-sha256 builder)
-                    :model (:model builder)}
-                   (if approved?
-                     {:status "running"
-                      :checkpoint {:phase "build" :attempt 1 :previousGateLog nil}}
-                     (terminal-fail "render"))
-                   ctx)))
+                (let [{:keys [failed audits]}
+                      (run-prepare-steps cfg (assoc effects :scratch scratch :room-dir room-dir
+                                                    :pi-dir pi-dir :repo repo))]
+                  (.commit runtime
+                           (fn [tx]
+                             (p/let [_ (append-audits! audit tx task audits)]
+                               (clj->js
+                                (if failed
+                                  (terminal-fail failed)
+                                  {:status "running"
+                                   :checkpoint {:phase "build" :attempt 1}}))))
+                           ctx)))
 
               "build"
               (fn [task runtime ctx]
-                (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)]
-                  (.commit runtime
-                           (fn [tx]
-                             (p/let [id (.createTask tx Builder
-                                                     (clj->js {:attempt (:attempt cp)
-                                                               :previousFailureLog (:previousFailureLog cp)
-                                                               :previousFailureSha256 (:previousFailureSha256 cp)
-                                                               :previousFailureKind (:previousFailureKind cp)})
-                                                     #js {:ownership #js {:kind "task" :taskId (.-id task)}})]
-                               #js {:status "waiting"
-                                    :checkpoint #js {:phase "after-build"
-                                                     :attempt (:attempt cp)
-                                                     :builder id}
-                                    :on #js [id]
-                                    :policy "failFast"}))
-                           ctx)))
-
-              "after-build"
-              (fn [task runtime ctx]
                 (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)
                       attempt (:attempt cp)]
-                  (p/let [outcomes (.outcomes runtime #js [(:builder cp)] ctx)]
-                    (let [outcome (js->clj (aget outcomes 0))
-                          decision ((:after-build lifecycle) attempt outcome)]
-                      (cond
-                        (= "builder" (get decision "retry"))
-                        (commit-with-audit!
-                         runtime audit task "retry" "scheduled"
-                         {:attempt (get decision "attempt")
-                          :previous_builder_log (get decision "failureLog")
-                          :previous_builder_log_sha256 (get decision "failureSha256")
-                          :fork_from (builder-receipt-path scratch attempt)}
-                         {:status "running"
-                          :checkpoint {:phase "build"
-                                       :attempt (get decision "attempt")
-                                       :previousFailureLog (get decision "failureLog")
-                                       :previousFailureSha256 (get decision "failureSha256")
-                                       :previousFailureKind "builder"}}
-                         ctx)
+                  (if-let [child-id (:waiting cp)]
+                    (p/let [outcomes (.outcomes runtime #js [child-id] ctx)]
+                      (let [outcome (js->clj (aget outcomes 0))
+                            decision ((:after-build lifecycle) attempt outcome)]
+                        (cond
+                          (= "builder" (get decision "retry"))
+                          (commit-with-audit!
+                           runtime audit task "retry" "scheduled"
+                           {:attempt (get decision "attempt")
+                            :previous_builder_log (get decision "failureLog")
+                            :previous_builder_log_sha256 (get decision "failureSha256")
+                            :fork_from (builder-receipt-path scratch attempt)}
+                           {:status "running"
+                            :checkpoint {:phase "build"
+                                         :attempt (get decision "attempt")
+                                         :previousFailureLog (get decision "failureLog")
+                                         :previousFailureSha256 (get decision "failureSha256")
+                                         :previousFailureKind "builder"}}
+                           ctx)
 
-                        (get decision "terminal")
-                        (commit-with-audit!
-                         runtime audit task "cycle" "failed"
-                         {:reason (get decision "reason") :attempt attempt}
-                         (if (get decision "exhausted")
-                           {:status "terminal"
-                            :outcome {:status "completed" :result {:passed false :attempts attempt}}}
-                           (terminal-fail "build"))
-                         ctx)
+                          (get decision "terminal")
+                          (commit-with-audit!
+                           runtime audit task "cycle" "failed"
+                           {:reason (get decision "reason") :attempt attempt}
+                           (if (get decision "exhausted")
+                             {:status "terminal"
+                              :outcome {:status "completed" :result {:passed false :attempts attempt}}}
+                             (terminal-fail "build"))
+                           ctx)
 
-                        :else
-                        (.commit runtime
-                                 (fn [_tx]
-                                   #js {:status "running"
-                                        :checkpoint #js {:phase (get decision "phase") :attempt attempt}})
-                                 ctx))))))
+                          :else
+                          (.commit runtime
+                                   (fn [_tx]
+                                     #js {:status "running"
+                                          :checkpoint #js {:phase (get decision "phase") :attempt attempt}})
+                                   ctx))))
+                    (.commit runtime
+                             (fn [tx]
+                               (p/let [id (.createTask tx Builder
+                                                       (clj->js {:attempt attempt
+                                                                 :previousFailureLog (:previousFailureLog cp)
+                                                                 :previousFailureSha256 (:previousFailureSha256 cp)
+                                                                 :previousFailureKind (:previousFailureKind cp)})
+                                                       #js {:ownership #js {:kind "task" :taskId (.-id task)}})]
+                                 #js {:status "waiting"
+                                      :checkpoint #js {:phase "build"
+                                                       :attempt attempt
+                                                       :waiting id}
+                                      :on #js [id]
+                                      :policy "failFast"}))
+                             ctx))))
 
               "gate"
               (fn [task runtime ctx]
-                (let [attempt (.. task -state -checkpoint -attempt)]
-                  (.commit runtime
-                           (fn [tx]
-                             (p/let [id (.createTask tx Gate #js {:attempt attempt}
-                                                     #js {:ownership #js {:kind "task" :taskId (.-id task)}})]
-                               #js {:status "waiting"
-                                    :checkpoint #js {:phase "after-gate" :attempt attempt :gate id}
-                                    :on #js [id]
-                                    :policy "failFast"}))
-                           ctx)))
-
-              "after-gate"
-              (fn [task runtime ctx]
                 (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)
                       attempt (:attempt cp)]
-                  (p/let [outcomes (.outcomes runtime #js [(:gate cp)] ctx)]
-                    (let [outcome (js->clj (aget outcomes 0))
-                          decision ((:after-gate lifecycle) attempt outcome)]
-                      (cond
-                        (= "gate-effect-failed" (get decision "reason"))
-                        (commit-with-audit!
-                         runtime audit task "cycle" "failed"
-                         {:reason (get decision "reason") :attempt attempt}
-                         (terminal-fail "gate")
-                         ctx)
+                  (if-let [child-id (:waiting cp)]
+                    (p/let [outcomes (.outcomes runtime #js [child-id] ctx)]
+                      (let [outcome (js->clj (aget outcomes 0))
+                            decision ((:after-gate lifecycle) attempt outcome)]
+                        (cond
+                          (= "gate-effect-failed" (get decision "reason"))
+                          (commit-with-audit!
+                           runtime audit task "cycle" "failed"
+                           {:reason (get decision "reason") :attempt attempt}
+                           (terminal-fail "gate")
+                           ctx)
 
-                        (= "gate" (get decision "retry"))
-                        (commit-with-audit!
-                         runtime audit task "retry" "scheduled"
-                         {:attempt (get decision "attempt")
-                          :previous_gate_log (get decision "failureLog")
-                          :previous_gate_log_sha256 (get decision "failureSha256")
-                          :fork_from (when live (builder-receipt-path scratch attempt))}
-                         {:status "running"
-                          :checkpoint {:phase "build"
-                                       :attempt (get decision "attempt")
-                                       :previousFailureLog (get decision "failureLog")
-                                       :previousFailureSha256 (get decision "failureSha256")
-                                       :previousFailureKind "gate"}}
-                         ctx)
+                          (= "gate" (get decision "retry"))
+                          (commit-with-audit!
+                           runtime audit task "retry" "scheduled"
+                           {:attempt (get decision "attempt")
+                            :previous_gate_log (get decision "failureLog")
+                            :previous_gate_log_sha256 (get decision "failureSha256")
+                            :fork_from (when live (builder-receipt-path scratch attempt))}
+                           {:status "running"
+                            :checkpoint {:phase "build"
+                                         :attempt (get decision "attempt")
+                                         :previousFailureLog (get decision "failureLog")
+                                         :previousFailureSha256 (get decision "failureSha256")
+                                         :previousFailureKind "gate"}}
+                           ctx)
 
-                        (get decision "terminal")
-                        (commit-with-audit!
-                         runtime audit task "cycle" "failed"
-                         {:reason (get decision "reason") :attempts attempt}
-                         {:status "terminal"
-                          :outcome {:status "completed" :result {:passed false :attempts attempt}}}
-                         ctx)
+                          (get decision "terminal")
+                          (commit-with-audit!
+                           runtime audit task "cycle" "failed"
+                           {:reason (get decision "reason") :attempts attempt}
+                           {:status "terminal"
+                            :outcome {:status "completed" :result {:passed false :attempts attempt}}}
+                           ctx)
 
-                        :else
-                        (.commit runtime
-                                 (fn [_tx]
-                                   #js {:status "running"
-                                        :checkpoint #js {:phase (get decision "phase")
-                                                         :attempt attempt
-                                                         :candidateSha256 (get decision "candidateSha256")}})
-                                 ctx))))))
-
-              "grading-room"
-              (fn [task runtime ctx]
-                (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)
-                      cand-sha (or (:candidateSha256 cp) (candidate-digest))]
-                  (if live
-                    (room/prepare-grading-room
-                     {:source-room source-root
-                      :candidate-room room-dir
-                      :checklist-file (plat/path scratch "checklist.json")
-                      :schema-file schema-file
-                      :out grading-room
-                      :candidate-sha256 cand-sha
-                      :checklist-sha256 approved-checklist-sha256
-                      :schema-sha256 (:schema-sha256 grader)
-                      :project project
-                      :blind-review blind-required})
-                    (do
-                      (plat/create-dirs grading-room)
-                      (let [ids (map #(get % "id")
-                                     (get (hjson/read-json (plat/read-text (plat/path scratch "checklist.json"))) "items"))]
-                        (plat/write-text (plat/path grading-room "checklist.txt")
-                                         (str (str/join "\n" ids) "\n")))))
-                  (commit-with-audit!
-                   runtime audit task "grading-room" "prepared"
-                   {:room grading-room
-                    :candidate_sha256 cand-sha
-                    :checklist_sha256 approved-checklist-sha256
-                    :schema_sha256 (when live attached-schema-sha256)}
-                   {:status "running"
-                    :checkpoint {:phase "grade" :attempt (:attempt cp) :candidateSha256 cand-sha}}
-                   ctx)))
+                          :else
+                          (.commit runtime
+                                   (fn [_tx]
+                                     #js {:status "running"
+                                          :checkpoint #js {:phase (get decision "phase")
+                                                           :attempt attempt
+                                                           :candidateSha256 (get decision "candidateSha256")}})
+                                   ctx))))
+                    (.commit runtime
+                             (fn [tx]
+                               (p/let [id (.createTask tx Gate #js {:attempt attempt}
+                                                       #js {:ownership #js {:kind "task" :taskId (.-id task)}})]
+                                 #js {:status "waiting"
+                                      :checkpoint #js {:phase "gate" :attempt attempt :waiting id}
+                                      :on #js [id]
+                                      :policy "failFast"}))
+                             ctx))))
 
               "grade"
               (fn [task runtime ctx]
                 (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)]
-                  (.commit runtime
-                           (fn [tx]
-                             (p/let [id (.createTask tx Grade #js {:candidateSha256 (:candidateSha256 cp)}
-                                                     #js {:ownership #js {:kind "task" :taskId (.-id task)}})]
-                               #js {:status "waiting"
-                                    :checkpoint #js {:phase "after-grade"
-                                                     :attempt (:attempt cp)
-                                                     :candidateSha256 (:candidateSha256 cp)
-                                                     :grade id}
-                                    :on #js [id]
-                                    :policy "failFast"}))
-                           ctx)))
-
-              "after-grade"
-              (fn [task runtime ctx]
-                (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)]
-                  (p/let [outcomes (.outcomes runtime #js [(:grade cp)] ctx)]
-                    (let [outcome (js->clj (aget outcomes 0))
-                          decision ((:after-grade lifecycle) outcome)]
-                      (if (get decision "terminal")
-                        (commit-with-audit!
-                         runtime audit task "cycle" "failed"
-                         {:reason (get decision "reason") :attempt (:attempt cp)}
-                         (terminal-fail "grade")
-                         ctx)
-                        (.commit runtime
-                                 (fn [_tx]
-                                   #js {:status "running"
-                                        :checkpoint #js {:phase (get decision "phase")
+                  (if-let [child-id (:waiting cp)]
+                    (p/let [outcomes (.outcomes runtime #js [child-id] ctx)]
+                      (let [outcome (js->clj (aget outcomes 0))
+                            decision ((:after-grade lifecycle) outcome)]
+                        (if (get decision "terminal")
+                          (commit-with-audit!
+                           runtime audit task "cycle" "failed"
+                           {:reason (get decision "reason") :attempt (:attempt cp)}
+                           (terminal-fail "grade")
+                           ctx)
+                          (.commit runtime
+                                   (fn [_tx]
+                                     #js {:status "running"
+                                          :checkpoint #js {:phase (get decision "phase")
+                                                           :attempt (:attempt cp)
+                                                           :candidateSha256 (:candidateSha256 cp)}})
+                                   ctx))))
+                    (let [cand-sha (or (:candidateSha256 cp) (candidate-digest))]
+                      (if live
+                        (room/prepare-grading-room
+                         {:source-room source-root
+                          :candidate-room room-dir
+                          :checklist-file (plat/path scratch "checklist.json")
+                          :schema-file schema-file
+                          :out grading-room
+                          :candidate-sha256 cand-sha
+                          :checklist-sha256 approved-checklist-sha256
+                          :schema-sha256 (:schema-sha256 grader)
+                          :project project
+                          :blind-review blind-required})
+                        (do
+                          (plat/create-dirs grading-room)
+                          (let [ids (map #(get % "id")
+                                         (get (hjson/read-json (plat/read-text (plat/path scratch "checklist.json"))) "items"))]
+                            (plat/write-text (plat/path grading-room "checklist.txt")
+                                             (str (str/join "\n" ids) "\n")))))
+                      (.commit runtime
+                               (fn [tx]
+                                 (p/let [_ (audit tx task "grading-room" "prepared"
+                                                  (clj->js {:room grading-room
+                                                            :candidate_sha256 cand-sha
+                                                            :checklist_sha256 approved-checklist-sha256
+                                                            :schema_sha256 (when live attached-schema-sha256)}))
+                                         id (.createTask tx Grade #js {:candidateSha256 cand-sha}
+                                                         #js {:ownership #js {:kind "task" :taskId (.-id task)}})]
+                                   #js {:status "waiting"
+                                        :checkpoint #js {:phase "grade"
                                                          :attempt (:attempt cp)
-                                                         :candidateSha256 (:candidateSha256 cp)}})
-                                 ctx))))))
+                                                         :candidateSha256 cand-sha
+                                                         :waiting id}
+                                        :on #js [id]
+                                        :policy "failFast"}))
+                               ctx)))))
 
               "blind-review"
               (fn [task runtime ctx]
@@ -974,7 +949,7 @@
                                            {:reason reason}))))]
                     (let [{:keys [res projected reason]} outcome
                           ok? (some? projected)
-                          decision ((:after-assessment lifecycle) "blind-review" ok?)]
+                          decision ((:after-blind-review lifecycle) ok?)]
                       (commit-with-audit!
                        runtime audit task "blind-review" (if ok? "completed" "failed")
                        {:item loyly/BLIND_ITEM_ID
@@ -992,44 +967,6 @@
                                        :attempt (:attempt cp)
                                        :candidateSha256 (:candidateSha256 cp)}})
                        ctx)))))
-
-              "panel"
-              (fn [task runtime ctx]
-                (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)]
-                  (.commit runtime
-                           (fn [tx]
-                             (p/let [id (.createTask tx Panel #js {:candidateSha256 (:candidateSha256 cp)}
-                                                     #js {:ownership #js {:kind "task" :taskId (.-id task)}})]
-                               #js {:status "waiting"
-                                    :checkpoint #js {:phase "after-panel"
-                                                     :attempt (:attempt cp)
-                                                     :candidateSha256 (:candidateSha256 cp)
-                                                     :panel id}
-                                    :on #js [id]
-                                    :policy "failFast"}))
-                           ctx)))
-
-              "after-panel"
-              (fn [task runtime ctx]
-                (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)]
-                  (p/let [outcomes (.outcomes runtime #js [(:panel cp)] ctx)]
-                    (let [outcome (js->clj (aget outcomes 0))
-                          ok? (= "completed" (get outcome "status"))
-                          decision ((:after-assessment lifecycle) "panel" ok?)]
-                      (if (get decision "terminal")
-                        (commit-with-audit!
-                         runtime audit task "cycle" "failed"
-                         {:reason (get decision "reason") :attempt (:attempt cp)}
-                         (terminal-fail "panel")
-                         ctx)
-                        (.commit runtime
-                                 (fn [_tx]
-                                   #js {:status "running"
-                                        :checkpoint #js {:phase (get decision "phase")
-                                                         :attempt (:attempt cp)
-                                                         :candidateSha256 (:candidateSha256 cp)
-                                                         :panelAttempt (get-in outcome ["result" "attempt"])}})
-                                 ctx))))))
 
               "score"
               (fn [task runtime ctx]
@@ -1070,7 +1007,8 @@
                                   (measure-log "scoreboard"
                                                #(let [res (board/report {:root instrument :cycle score-cycle})]
                                                   {:stdout (:text res) :stderr ""})))
-                      ok? (and verified board-res (zero? (:code board-res)))]
+                      ok? (and verified board-res (zero? (:code board-res)))
+                      decision ((:after-score lifecycle) ok?)]
                   (.commit runtime
                            (fn [tx]
                              (p/let [_ (audit tx task "score" (if ok? "filed" "failed")
@@ -1081,60 +1019,83 @@
                                      _ (when ok?
                                          (audit tx task "scoreboard" "written"
                                                 (clj->js {:log_sha256 (:sha256 board-res)})))]
-                               (if-not ok?
+                               (cond
+                                 (get decision "terminal")
                                  (terminal-fail "score")
-                                 (if (and live panel)
-                                   #js {:status "running"
-                                        :checkpoint (clj->js (assoc cp :phase "panel-report"
-                                                                    :score (:score verified)))}
-                                   (p/let [_ (audit tx task "cycle" "measured"
-                                                    (clj->js {:attempt (:attempt cp) :score (:score verified)}))]
-                                     #js {:status "terminal"
-                                          :outcome #js {:status "completed"
-                                                        :result #js {:passed true
-                                                                     :attempt (:attempt cp)
-                                                                     :score (:score verified)}}})))))
+
+                                 (= "panel" (get decision "phase"))
+                                 #js {:status "running"
+                                      :checkpoint (clj->js {:phase "panel"
+                                                            :attempt (:attempt cp)
+                                                            :candidateSha256 cand-sha
+                                                            :score (:score verified)})}
+
+                                 :else
+                                 (p/let [_ (audit tx task "cycle" "measured"
+                                                  (clj->js {:attempt (:attempt cp) :score (:score verified)}))]
+                                   #js {:status "terminal"
+                                        :outcome #js {:status "completed"
+                                                      :result #js {:passed true
+                                                                   :attempt (:attempt cp)
+                                                                   :score (:score verified)}}}))))
                            ctx)))
 
-              "panel-report"
+              "panel"
               (fn [task runtime ctx]
-                (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)
-                      panel-attempt (:panelAttempt cp)
-                      spec-dir (plat/path scratch "panel-vm" (str "attempt-" (plat/pad-left-zero panel-attempt 2)))]
-                  (p/let [rows (read-audit-rows-fn scratch)]
-                    (let [rep (panel-ad/run-durable-panel-report
-                               {:scratch scratch
-                                :specialists spec-dir
-                                :plan-file (plat/path pi-dir (:plan-file panel))
-                                :pi-durable pi-dir
-                                :allure-cli-fn allure-cli-fn
-                                :audit-rows-fn (constantly rows)})
-                          ok? (= "ready-for-review" (get-in rep [:summary "panel_outcome"]))]
-                      (.commit runtime
-                               (fn [tx]
-                                 (p/let [_ (audit tx task "panel-report" (if ok? "ready" "failed")
-                                                  (clj->js {:panel_outcome (get-in rep [:summary "panel_outcome"])
-                                                            :panel_manifest_sha256 (d/file-sha256 (plat/path (:out rep) "panel-manifest.json"))
-                                                            :attempt (:attempt rep)}))]
-                                   (if ok?
-                                     (p/let [_ (audit tx task "cycle" "measured"
-                                                      (clj->js {:attempt (:attempt cp) :score (:score cp)}))]
-                                       #js {:status "terminal"
-                                            :outcome #js {:status "completed"
-                                                          :result #js {:passed true
-                                                                       :attempt (:attempt cp)
-                                                                       :score (:score cp)
-                                                                       :panelOutcome (get-in rep [:summary "panel_outcome"])}}})
-                                     (terminal-fail "panel-report"))))
-                               ctx)))))
-
-              "done"
-              (fn [_task runtime ctx]
-                (.commit runtime
-                         (fn [_tx]
-                           #js {:status "terminal"
-                                :outcome #js {:status "completed" :result #js {:passed true}}})
-                         ctx))}}))
+                (let [cp (js->clj (.. task -state -checkpoint) :keywordize-keys true)]
+                  (if-let [child-id (:waiting cp)]
+                    (p/let [outcomes (.outcomes runtime #js [child-id] ctx)]
+                      (let [outcome (js->clj (aget outcomes 0))
+                            vm-ok? (= "completed" (get outcome "status"))]
+                        (if-not vm-ok?
+                          (commit-with-audit!
+                           runtime audit task "cycle" "failed"
+                           {:reason "panel-effect" :attempt (:attempt cp)}
+                           (terminal-fail "panel")
+                           ctx)
+                          (let [panel-attempt (get-in outcome ["result" "attempt"])
+                                spec-dir (plat/path scratch "panel-vm"
+                                                    (str "attempt-" (plat/pad-left-zero panel-attempt 2)))]
+                            (p/let [rows (read-audit-rows-fn scratch)]
+                              (let [rep (panel-ad/run-durable-panel-report
+                                         {:scratch scratch
+                                          :specialists spec-dir
+                                          :plan-file (plat/path pi-dir (:plan-file panel))
+                                          :pi-durable pi-dir
+                                          :allure-cli-fn allure-cli-fn
+                                          :audit-rows-fn (constantly rows)})
+                                    ok? (= "ready-for-review" (get-in rep [:summary "panel_outcome"]))
+                                    decision ((:after-panel lifecycle) ok?)]
+                                (.commit runtime
+                                         (fn [tx]
+                                           (p/let [_ (audit tx task "panel-report" (if ok? "ready" "failed")
+                                                            (clj->js {:panel_outcome (get-in rep [:summary "panel_outcome"])
+                                                                      :panel_manifest_sha256 (d/file-sha256 (plat/path (:out rep) "panel-manifest.json"))
+                                                                      :attempt (:attempt rep)}))]
+                                             (if (get decision "terminal")
+                                               (terminal-fail "panel")
+                                               (p/let [_ (audit tx task "cycle" "measured"
+                                                                (clj->js {:attempt (:attempt cp) :score (:score cp)}))]
+                                                 #js {:status "terminal"
+                                                      :outcome #js {:status "completed"
+                                                                    :result #js {:passed true
+                                                                                 :attempt (:attempt cp)
+                                                                                 :score (:score cp)
+                                                                                 :panelOutcome (get-in rep [:summary "panel_outcome"])}}}))))
+                                         ctx)))))))
+                    (.commit runtime
+                             (fn [tx]
+                               (p/let [id (.createTask tx Panel #js {:candidateSha256 (:candidateSha256 cp)}
+                                                       #js {:ownership #js {:kind "task" :taskId (.-id task)}})]
+                                 #js {:status "waiting"
+                                      :checkpoint #js {:phase "panel"
+                                                       :attempt (:attempt cp)
+                                                       :candidateSha256 (:candidateSha256 cp)
+                                                       :score (:score cp)
+                                                       :waiting id}
+                                      :on #js [id]
+                                      :policy "failFast"}))
+                             ctx))))}}))
 
 (defn build-cycle-input [cfg run-id score-cycle env-map]
   (let [{:keys [approved-commit approved-checklist-sha256 mode builder grader
@@ -1169,11 +1130,8 @@
             (rt/die! "LOYLY_SCORE_CYCLE must be two digits"))
         cfg (wcfg/parse-worker-config repo scratch mode env-map)
         lifecycle (life/create-lifecycle
-                   :assessments (if (:live cfg)
-                                  (cond-> []
-                                    (:blind-required cfg) (conj "blind-review")
-                                    (:panel cfg) (conj "panel"))
-                                  []))
+                   :blind-review? (boolean (and (:live cfg) (:blind-required cfg)))
+                   :panel? (boolean (and (:live cfg) (:panel cfg))))
         store-path (plat/path scratch "cycle.PROTOTYPE.sqlite")
         room-dir (plat/path scratch "fenced-room")
         grading-room (plat/path scratch "grading-room")

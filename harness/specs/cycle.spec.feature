@@ -82,9 +82,10 @@ Feature: Live cycle and formal verification
 
     @cycle-006
     Scenario: When blind-review is on the path it precedes score
-      Given a cycle path that includes blind-review and score
-      When the path from cut to done is read
+      Given a cycle path that includes blind-review, score and panel
+      When the path from prepare to done is read
       Then blind-review appears before score
+      And panel appears after score
       And done is the only terminal phase
 
   Rule: Certification artifacts cannot rewrite filed agent verdicts
@@ -216,12 +217,12 @@ Feature: Live cycle and formal verification
   Rule: Formal cycle C is the labeled transition system of the live path
 
     @formal-004
-    Scenario: The cycle spine is unique from cut to done
+    Scenario: The cycle spine is unique from prepare to done
       Given cycle C = (Q, q0, transition, L, F)
       When the cycle invariants are proved
-      Then q0 is cut
+      Then q0 is prepare
       And F is exactly the set containing done
-      And there is exactly one path of length |Q| from cut to done
+      And there is exactly one path of length |Q| from prepare to done
       And the successor map is total on Q except F
       And invariants C1 through C5 hold
 
@@ -233,12 +234,12 @@ Feature: Live cycle and formal verification
       And invariant C5 holds
 
     @formal-006
-    Scenario: Preflight obliges a live-run; score obliges score-input
+    Scenario: Prepare obliges a live-run; score obliges score-input
       Given the labeling L
-      Then L(preflight) includes live-run
+      Then L(prepare) includes live-run
       And L(score) includes score-input and verdicts
       And L(blind-review) includes blind-packet
-      And L(panel) includes panel-plan
+      And L(panel) includes panel-plan and panel-report
 
   Rule: Formal verification pins the published harness contracts
 
@@ -264,7 +265,7 @@ Feature: Live cycle and formal verification
       Given a repository root that holds the published live cycle contracts
       When the operator runs formal prove for that repository
       Then the command emits a formal-run report with success
-      And the report lists the cycle path from cut to done
+      And the report lists the cycle path from prepare to done
       And the report lists invariants I1 through I13
       And the report lists cycle invariants C1 through C5
       And the command exits successfully
