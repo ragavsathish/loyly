@@ -1,0 +1,71 @@
+{:paths ["src" "formal/src"]
+ :deps {org.clj-commons/digest {:mvn/version "1.4.100"}
+        metosin/malli {:mvn/version "0.16.4"}
+        org.clojure/test.check {:mvn/version "1.1.1"}}
+ ;; cheshire + babashka.fs + babashka.process ship with Babashka.
+ ;; Node async & adapter wrappers (.cljs) run via nbb (nbb.edn + package.json).
+ :tasks
+ {;; Prefer: bin/loyly-clj <task> [args...]
+  gen-checklist
+  {:doc "Derive checklist (loyly.gen-checklist .cljc)"
+   :requires ([loyly.gen-checklist :as g])
+   :task (apply g/-main *command-line-args*)}
+
+  score
+  {:doc "File verdicts (loyly.score .cljc)"
+   :requires ([loyly.score :as s])
+   :task (apply s/-main *command-line-args*)}
+
+  scoreboard
+  {:doc "Pass-rate report (loyly.scoreboard .cljc)"
+   :requires ([loyly.scoreboard :as b])
+   :task (apply b/-main *command-line-args*)}
+
+  stamp
+  {:doc "Stamp @item tags (loyly.stamp-item-ids .cljc)"
+   :requires ([loyly.stamp-item-ids :as t])
+   :task (apply t/-main *command-line-args*)}
+
+  demo
+  {:doc "End-to-end Babashka (.cljc + formal) smoke"
+   :requires ([loyly.demo :as d])
+   :task (apply d/-main *command-line-args*)}
+
+  cycle
+  {:doc "Production cycle CLI: Pi / Codex / Cursor (.cljc core + .cljs Node wrapper)"
+   :requires ([loyly.drivers :as drivers])
+   :task (apply drivers/-main *command-line-args*)}
+
+  node
+  {:doc "ClojureScript Node CLI (nbb -m loyly.node.cli ...)"
+   :task (apply shell {:dir "."} "./node_modules/.bin/nbb" "-m" "loyly.node.cli" *command-line-args*)}
+
+  formal
+  {:doc "Formal verification module (loyly.formal.*)"
+   :requires ([loyly.formal.main :as formal])
+   :task (apply formal/-main *command-line-args*)}
+
+  lint
+  {:doc "clj-kondo (.clj/.cljc/.cljs) + loyly product-literal / deep-import rules"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "lint")}
+
+  analyze
+  {:doc "Full static analysis: lint + deps + dead + dupes + metrics + formal"
+   :task (do (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze")
+             (apply shell {:dir "."} "bb" "-m" "loyly.formal.main" *command-line-args*))}
+
+  analyze:deps
+  {:doc "Require-graph cycles (TS madge)"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze:deps")}
+
+  analyze:dead
+  {:doc "Unreachable namespaces / unused defs (TS knip)"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze:dead")}
+
+  analyze:dupes
+  {:doc "Near-identical defn bodies (TS jscpd)"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze:dupes")}
+
+  analyze:metrics
+  {:doc "LOC / form / branch metrics (TS metrics.mjs)"
+   :task (shell {:dir "."} "bb" "scripts/analyze.clj" "analyze:metrics")}}}

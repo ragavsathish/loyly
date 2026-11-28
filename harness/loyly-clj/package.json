@@ -1,0 +1,14 @@
+{
+  "name": "@loyly/loyly-clj",
+  "private": true,
+  "type": "module",
+  "description": "Production Clojure/ClojureScript harness and formal examiner for Löyly (.cljc core + .cljs Node async/adapter wrappers)",
+  "scripts": {
+    "cljs:smoke": "nbb -m loyly.node.cli smoke --root ../..",
+    "cljs:cycle": "nbb -m loyly.node.cli cycle",
+    "cljs:reassess": "nbb -m loyly.node.cli panel-reassess"
+  },
+  "dependencies": {
+    "nbb": "^1.6.215"
+  }
+}

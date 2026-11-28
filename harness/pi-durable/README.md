@@ -110,9 +110,9 @@ node harness/pi-durable/measure/cli.mjs score --root . 02 --verdicts verdicts.js
 node harness/pi-durable/measure/cli.mjs scoreboard --root . 02
 ```
 
-A separate Babashka spike that ports this TS measure surface toward Clojure
-lives in [`../clj-spike/`](../clj-spike/) (`harness/clj-spike/bin/spike …`).
-TypeScript remains the Pi driver path; the spike is exploratory only.
+The production Clojure/ClojureScript harness (`.cljc` shared core + `.cljs`
+Node async/adapter wrappers + formal examiner) lives in
+[`../loyly-clj/`](../loyly-clj/) (`bin/loyly-clj …`).
 
 Selected Gherkin files follow `docs/plan/NN-name/spec.feature`; checklist
 items carry stamped `NN-NNN` IDs and source line references. The adapter also

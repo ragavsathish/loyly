@@ -1,0 +1,24 @@
+{:lint-as {loyly.hjson/refuse clojure.core/str
+           promesa.core/let clojure.core/let
+           promesa.core/do clojure.core/do}
+ :linters
+ {:unused-namespace {:level :warning}
+  :unused-referred-var {:level :warning}
+  :unused-binding {:level :warning}
+  :redundant-let {:level :warning}
+  :redundant-str-call {:level :off}
+  :misplaced-docstring {:level :warning}
+  :single-key-in {:level :warning}
+  :unsorted-required-namespaces {:level :warning}
+  :consistent-alias
+  {:level :warning
+   :aliases {loyly.project.loyly loyly
+             loyly.hjson hjson
+             loyly.digest d
+             loyly.platform plat
+             babashka.fs fs
+             babashka.process p
+             cheshire.core json
+             clj-commons.digest digest
+             clojure.string str}}}
+ :output {:exclude-files ["scripts/"]}}

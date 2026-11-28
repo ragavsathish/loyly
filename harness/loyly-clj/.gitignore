@@ -1,0 +1,7 @@
+.clj-kondo/.cache/
+.cpcache/
+.nbb/
+node_modules/
+scratch-*/
+*.class
+.nrepl-port
